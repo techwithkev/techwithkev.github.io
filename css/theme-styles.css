@@ -98,7 +98,7 @@ h5 {
 .row-corporate {
   height: 600px;
   background-size: cover !important;
-  overflow: hidden;
+/*overflow: hidden;*/
   height: 600px;
 }
 .flush-with-header {
