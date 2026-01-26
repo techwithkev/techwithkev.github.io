@@ -1,0 +1,361 @@
+---
+# Only the main Sass file needs front matter (the dashes are enough)
+---
+
+// Variables
+$bg-color: #ffffff;
+$text-color: #1a1a1a;
+$text-secondary: #666666;
+$accent-color: #0070f3;
+$border-color: #eaeaea;
+$footer-bg: #f9f9f9;
+$font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+
+// Base Styles
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: $font-family;
+  font-size: 16px;
+  line-height: 1.6;
+  color: $text-color;
+  background-color: $bg-color;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.25;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+a {
+  color: $accent-color;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Header
+.site-header {
+  border-bottom: 1px solid $border-color;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+}
+
+.site-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: $text-color;
+  float: left;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.site-nav {
+  float: right;
+  line-height: 64px;
+
+  .nav-trigger {
+    display: none;
+  }
+
+  .menu-icon {
+    display: none;
+  }
+
+  .page-link {
+    color: $text-color;
+    font-weight: 500;
+    margin-left: 24px;
+
+    &:hover {
+      color: $accent-color;
+      text-decoration: none;
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    position: absolute;
+    top: 12px;
+    right: 20px;
+    background-color: $bg-color;
+    border: 1px solid $border-color;
+    border-radius: 5px;
+    text-align: right;
+    line-height: 1;
+
+    .nav-trigger {
+      display: block;
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .menu-icon {
+      display: block;
+      float: right;
+      width: 36px;
+      height: 36px;
+      line-height: 36px;
+      text-align: center;
+      padding: 0 8px;
+
+      svg {
+        fill: $text-color;
+      }
+    }
+
+    .trigger {
+      clear: both;
+      display: none;
+      padding-bottom: 10px;
+    }
+
+    .nav-trigger:checked ~ .trigger {
+      display: block;
+    }
+
+    .page-link {
+      display: block;
+      padding: 10px 20px;
+      margin-left: 0;
+    }
+  }
+}
+
+// Footer
+.site-footer {
+  padding: 60px 0;
+  border-top: 1px solid $border-color;
+  color: $text-secondary;
+  font-size: 0.875rem;
+}
+
+.footer-col-wrapper {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.social-media-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 20px;
+}
+
+// Hero Section
+.hero {
+  padding: 80px 0;
+  text-align: center;
+
+  h1 {
+    font-size: 3rem;
+    margin-top: 0;
+    letter-spacing: -1px;
+  }
+
+  p {
+    font-size: 1.25rem;
+    color: $text-secondary;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  @media screen and (max-width: 600px) {
+    padding: 40px 0;
+    h1 { font-size: 2rem; }
+  }
+}
+
+// Grid
+.app-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 32px;
+  padding: 40px 0;
+}
+
+.app-card {
+  border: 1px solid $border-color;
+  border-radius: 12px;
+  padding: 24px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: white;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    text-decoration: none;
+  }
+
+  .app-card-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 14px;
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    margin: 0 0 8px 0;
+    color: $text-color;
+  }
+
+  p {
+    margin: 0;
+    color: $text-secondary;
+    font-size: 0.9rem;
+  }
+}
+
+// Buttons
+.button {
+  display: inline-block;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border: none;
+  font-family: inherit;
+  font-size: 1rem;
+
+  &.primary {
+    background-color: $accent-color;
+    color: white;
+
+    &:hover {
+      background-color: darken($accent-color, 10%);
+      text-decoration: none;
+    }
+  }
+
+  &.outline {
+    background-color: transparent;
+    border: 1px solid $border-color;
+    color: $text-color;
+
+    &:hover {
+      background-color: $border-color;
+      text-decoration: none;
+    }
+  }
+}
+
+// Forms
+.form-group {
+  margin-bottom: 20px;
+
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  input, textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+
+    &:focus {
+      outline: none;
+      border-color: $accent-color;
+    }
+  }
+
+  textarea {
+    height: 150px;
+    resize: vertical;
+  }
+}
+
+// App Page Styles
+.app-header {
+  padding: 60px 0;
+  border-bottom: 1px solid $border-color;
+
+  .app-header-content {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .app-icon.Large {
+    width: 160px;
+    height: 160px;
+    border-radius: 32px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+
+  .app-title {
+    margin: 0 0 10px 0;
+    font-size: 2.5rem;
+  }
+
+  .app-tagline {
+    font-size: 1.25rem;
+    color: $text-secondary;
+    margin-bottom: 24px;
+  }
+
+  @media screen and (max-width: 600px) {
+    .app-header-content {
+      flex-direction: column;
+      text-align: center;
+      gap: 20px;
+    }
+  }
+}
+
+.app-content {
+  padding: 40px 0;
+}
+
+.app-privacy-policy {
+  background-color: $footer-bg;
+  padding: 60px 0;
+  border-top: 1px solid $border-color;
+  margin-top: 60px;
+
+  h2 {
+    margin-top: 0;
+  }
+
+  .privacy-content {
+    color: $text-secondary;
+    font-size: 0.9rem;
+    max-width: 700px;
+  }
+}
+
+// Utility
+.center { text-align: center; }
+.mt-40 { margin-top: 40px; }
