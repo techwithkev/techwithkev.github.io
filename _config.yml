@@ -1,0 +1,31 @@
+title: Tech With Kev
+email: kev@techwithkev.com
+description: >- # this means to ignore newlines until "baseurl:"
+  Educator and App Builder. Showcasing mobile apps, online courses, and providing support.
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "https://techwithkev.github.io" # the base hostname & protocol for your site
+
+# Collections
+collections:
+  apps:
+    output: true
+    permalink: /apps/:path/
+
+# Build settings
+markdown: kramdown
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+# Exclude from processing.
+exclude:
+  - .sass-cache/
+  - .jekyll-cache/
+  - gemfiles/
+  - Gemfile
+  - Gemfile.lock
+  - node_modules/
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/

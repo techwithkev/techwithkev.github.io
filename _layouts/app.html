@@ -1,0 +1,30 @@
+---
+layout: default
+---
+<article class="app-page">
+    <header class="app-header">
+        <div class="app-header-content">
+            <img src="{{ page.icon_url }}" alt="{{ page.title }} Icon" class="app-icon Large">
+            <div class="app-info">
+                <h1 class="app-title">{{ page.title }}</h1>
+                <p class="app-tagline">{{ page.tagline }}</p>
+                <a href="{{ page.app_store_link }}" class="button primary cta">Download on App Store</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="app-content">
+        {{ content }}
+    </div>
+
+    {% if page.privacy_policy_text %}
+    <section class="app-privacy-policy">
+        <div class="wrapper">
+            <h2>Privacy Policy</h2>
+            <div class="privacy-content">
+                {{ page.privacy_policy_text | markdownify }}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+</article>
