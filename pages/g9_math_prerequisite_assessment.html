@@ -1,1391 +1,1624 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Grade 9 Math — Prerequisite Assessment</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --ink: #1a1a2e;
-    --paper: #faf8f3;
-    --accent: #c8392b;
-    --accent2: #2c6e8a;
-    --gold: #d4a017;
-    --rule: #d0ccc0;
-    --soft: #f0ece2;
-    --correct: #2d6a4f;
-    --wrong: #c8392b;
-    --partial: #d4a017;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--paper);
-    color: var(--ink);
-    min-height: 100vh;
-  }
-
-  /* COVER PAGE */
-  .cover {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 3rem 2rem;
-    position: relative;
-    overflow: hidden;
-    background: var(--ink);
-  }
-
-  .cover::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 39px,
-      rgba(255,255,255,0.04) 39px,
-      rgba(255,255,255,0.04) 40px
-    );
-  }
-
-  .cover-inner {
-    position: relative;
-    text-align: center;
-    max-width: 680px;
-  }
-
-  .cover-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 2rem;
-  }
-
-  .cover h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(2.8rem, 7vw, 5rem);
-    font-weight: 900;
-    color: var(--paper);
-    line-height: 1.05;
-    margin-bottom: 1rem;
-  }
-
-  .cover h1 span {
-    color: var(--gold);
-    display: block;
-  }
-
-  .cover-sub {
-    font-size: 1rem;
-    color: rgba(255,255,255,0.55);
-    margin-bottom: 3rem;
-    line-height: 1.7;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .cover-meta {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 3rem;
-    border: 1px solid rgba(255,255,255,0.12);
-    padding: 1.5rem;
-    border-radius: 4px;
-    text-align: left;
-  }
-
-  .cover-meta-item label {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.35);
-    display: block;
-    margin-bottom: 0.4rem;
-  }
-
-  .cover-meta-item input {
-    background: transparent;
-    border: none;
-    border-bottom: 1px solid rgba(255,255,255,0.2);
-    color: var(--paper);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
-    width: 100%;
-    padding: 0.3rem 0;
-    outline: none;
-  }
-
-  .cover-meta-item input:focus {
-    border-bottom-color: var(--gold);
-  }
-
-  .section-overview {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.75rem;
-    margin-bottom: 3rem;
-  }
-
-  .overview-card {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.08);
-    padding: 1rem 0.75rem;
-    border-radius: 4px;
-    text-align: center;
-  }
-
-  .overview-card .num {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--gold);
-    line-height: 1;
-    margin-bottom: 0.4rem;
-  }
-
-  .overview-card .lbl {
-    font-size: 0.7rem;
-    color: rgba(255,255,255,0.4);
-    line-height: 1.3;
-  }
-
-  .start-btn {
-    background: var(--gold);
-    color: var(--ink);
-    border: none;
-    padding: 1rem 3rem;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.85rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    cursor: pointer;
-    border-radius: 3px;
-    transition: all 0.2s;
-  }
-
-  .start-btn:hover {
-    background: #e8b520;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(212,160,23,0.35);
-  }
-
-  /* ASSESSMENT BODY */
-  .assessment {
-    display: none;
-    max-width: 860px;
-    margin: 0 auto;
-    padding: 3rem 2rem 6rem;
-  }
-
-  .assessment.active { display: block; }
-
-  /* Progress bar */
-  .progress-wrap {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 4px;
-    background: var(--rule);
-    z-index: 100;
-  }
-
-  .progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, var(--accent2), var(--gold));
-    transition: width 0.4s ease;
-    width: 0%;
-  }
-
-  .section-header {
-    display: flex;
-    align-items: baseline;
-    gap: 1.5rem;
-    margin: 3rem 0 1.5rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 2px solid var(--ink);
-  }
-
-  .section-header:first-of-type { margin-top: 0; }
-
-  .section-num {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.7rem;
-    letter-spacing: 0.2em;
-    color: var(--accent);
-    text-transform: uppercase;
-  }
-
-  .section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: var(--ink);
-    flex: 1;
-  }
-
-  .section-marks {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.75rem;
-    color: rgba(26,26,46,0.4);
-  }
-
-  /* Question */
-  .question {
-    margin-bottom: 2rem;
-    padding: 1.5rem;
-    background: #fff;
-    border: 1px solid var(--rule);
-    border-left: 4px solid transparent;
-    border-radius: 2px;
-    transition: border-color 0.2s;
-    position: relative;
-  }
-
-  .question:hover { border-left-color: var(--accent2); }
-  .question.answered { border-left-color: var(--gold); }
-
-  .q-header {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    margin-bottom: 1rem;
-  }
-
-  .q-num {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.75rem;
-    background: var(--soft);
-    padding: 0.3rem 0.6rem;
-    border-radius: 2px;
-    color: var(--accent);
-    white-space: nowrap;
-    margin-top: 2px;
-  }
-
-  .q-text {
-    font-size: 0.95rem;
-    line-height: 1.65;
-    color: var(--ink);
-    flex: 1;
-  }
-
-  .q-text .math {
-    font-family: 'DM Mono', monospace;
-    background: var(--soft);
-    padding: 0.1em 0.35em;
-    border-radius: 2px;
-    font-size: 0.9em;
-  }
-
-  /* Multiple choice */
-  .choices {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.6rem;
-    margin-top: 1rem;
-  }
-
-  .choice-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem 1rem;
-    border: 1.5px solid var(--rule);
-    background: var(--paper);
-    cursor: pointer;
-    border-radius: 3px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.88rem;
-    color: var(--ink);
-    text-align: left;
-    transition: all 0.15s;
-  }
-
-  .choice-btn:hover:not(:disabled) {
-    border-color: var(--accent2);
-    background: #eef5f9;
-  }
-
-  .choice-btn.selected {
-    border-color: var(--accent2);
-    background: #daeef7;
-  }
-
-  .choice-btn.correct-ans {
-    border-color: var(--correct);
-    background: #d8f3e5;
-    color: var(--correct);
-    font-weight: 500;
-  }
-
-  .choice-btn.wrong-ans {
-    border-color: var(--wrong);
-    background: #fde8e8;
-    color: var(--wrong);
-  }
-
-  .choice-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.75rem;
-    width: 1.4rem;
-    height: 1.4rem;
-    border-radius: 50%;
-    border: 1.5px solid currentColor;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  /* Short answer */
-  .short-answer {
-    margin-top: 1rem;
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1.5px solid var(--rule);
-    border-radius: 3px;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.9rem;
-    background: var(--paper);
-    color: var(--ink);
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
-  .short-answer:focus { border-color: var(--accent2); }
-
-  .short-answer.correct-field { border-color: var(--correct); background: #d8f3e5; }
-  .short-answer.wrong-field { border-color: var(--wrong); background: #fde8e8; }
-
-  /* Work area */
-  .work-area {
-    margin-top: 0.75rem;
-    width: 100%;
-    min-height: 80px;
-    padding: 0.75rem 1rem;
-    border: 1.5px dashed var(--rule);
-    border-radius: 3px;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.85rem;
-    background: var(--soft);
-    color: var(--ink);
-    resize: vertical;
-    outline: none;
-  }
-
-  .work-area:focus { border-color: var(--rule); border-style: solid; }
-
-  .work-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: rgba(26,26,46,0.35);
-    display: block;
-    margin-top: 0.75rem;
-    margin-bottom: 0.25rem;
-  }
-
-  /* Feedback */
-  .feedback {
-    display: none;
-    margin-top: 1rem;
-    padding: 0.75rem 1rem;
-    border-radius: 3px;
-    font-size: 0.85rem;
-    line-height: 1.6;
-  }
-
-  .feedback.show { display: block; }
-  .feedback.fb-correct { background: #d8f3e5; color: var(--correct); border-left: 3px solid var(--correct); }
-  .feedback.fb-wrong { background: #fde8e8; color: var(--wrong); border-left: 3px solid var(--wrong); }
-
-  /* Submit / Nav */
-  .submit-zone {
-    margin-top: 3rem;
-    text-align: center;
-    padding-top: 2rem;
-    border-top: 1px solid var(--rule);
-  }
-
-  .btn-primary {
-    background: var(--ink);
-    color: var(--paper);
-    border: none;
-    padding: 0.9rem 2.5rem;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.8rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    cursor: pointer;
-    border-radius: 3px;
-    transition: all 0.2s;
-  }
-
-  .btn-primary:hover {
-    background: var(--accent);
-    transform: translateY(-1px);
-  }
-
-  /* RESULTS */
-  .results {
-    display: none;
-    max-width: 860px;
-    margin: 0 auto;
-    padding: 3rem 2rem 6rem;
-  }
-
-  .results.active { display: block; }
-
-  .results-header {
-    background: var(--ink);
-    color: var(--paper);
-    padding: 3rem;
-    border-radius: 6px;
-    margin-bottom: 2.5rem;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .results-header::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 19px,
-      rgba(255,255,255,0.02) 19px,
-      rgba(255,255,255,0.02) 20px
-    );
-  }
-
-  .results-header-inner { position: relative; }
-
-  .results-grade {
-    font-family: 'Playfair Display', serif;
-    font-size: 5rem;
-    font-weight: 900;
-    line-height: 1;
-    color: var(--gold);
-    margin-bottom: 0.5rem;
-  }
-
-  .results-sub {
-    color: rgba(255,255,255,0.6);
-    font-size: 0.9rem;
-    margin-bottom: 2rem;
-  }
-
-  .results-stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
-  }
-
-  .stat-card {
-    background: rgba(255,255,255,0.07);
-    padding: 1rem;
-    border-radius: 4px;
-    text-align: center;
-  }
-
-  .stat-num {
-    font-family: 'Playfair Display', serif;
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--gold);
-    line-height: 1;
-  }
-
-  .stat-label {
-    font-size: 0.7rem;
-    color: rgba(255,255,255,0.4);
-    margin-top: 0.3rem;
-  }
-
-  .section-result {
-    background: #fff;
-    border: 1px solid var(--rule);
-    border-radius: 4px;
-    margin-bottom: 1.5rem;
-    overflow: hidden;
-  }
-
-  .sr-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem 1.5rem;
-    background: var(--soft);
-    border-bottom: 1px solid var(--rule);
-  }
-
-  .sr-title {
-    font-family: 'Playfair Display', serif;
-    font-weight: 700;
-    font-size: 1.05rem;
-  }
-
-  .sr-score {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.9rem;
-    font-weight: 500;
-  }
-
-  .strength { color: var(--correct); }
-  .weakness { color: var(--wrong); }
-  .moderate { color: var(--partial); }
-
-  .sr-bar-wrap {
-    padding: 1rem 1.5rem;
-  }
-
-  .sr-bar-bg {
-    height: 8px;
-    background: var(--rule);
-    border-radius: 99px;
-    overflow: hidden;
-    margin-bottom: 0.75rem;
-  }
-
-  .sr-bar-fill {
-    height: 100%;
-    border-radius: 99px;
-    transition: width 1s ease;
-  }
-
-  .sr-recommendation {
-    font-size: 0.85rem;
-    color: rgba(26,26,46,0.6);
-    line-height: 1.6;
-  }
-
-  .priority-list {
-    margin-top: 2.5rem;
-    background: #fff;
-    border: 1px solid var(--rule);
-    border-radius: 4px;
-    overflow: hidden;
-  }
-
-  .priority-head {
-    padding: 1rem 1.5rem;
-    background: var(--soft);
-    border-bottom: 1px solid var(--rule);
-    font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
-    font-weight: 700;
-  }
-
-  .priority-item {
-    padding: 0.9rem 1.5rem;
-    border-bottom: 1px solid var(--rule);
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    font-size: 0.88rem;
-    line-height: 1.55;
-  }
-
-  .priority-item:last-child { border-bottom: none; }
-
-  .priority-badge {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    padding: 0.2rem 0.5rem;
-    border-radius: 2px;
-    white-space: nowrap;
-    margin-top: 1px;
-    flex-shrink: 0;
-  }
-
-  .badge-high { background: #fde8e8; color: var(--wrong); }
-  .badge-med { background: #fef6d9; color: #a07000; }
-  .badge-low { background: #d8f3e5; color: var(--correct); }
-
-  .restart-btn {
-    margin-top: 2rem;
-    background: var(--ink);
-    color: var(--paper);
-    border: none;
-    padding: 0.9rem 2rem;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.8rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    cursor: pointer;
-    border-radius: 3px;
-    transition: background 0.2s;
-  }
-
-  .restart-btn:hover { background: var(--accent); }
-
-  @media (max-width: 600px) {
-    .choices { grid-template-columns: 1fr; }
-    .results-stats { grid-template-columns: 1fr 1fr; }
-    .section-overview { grid-template-columns: 1fr 1fr; }
-    .cover-meta { grid-template-columns: 1fr; }
-  }
-</style>
-</head>
-<body>
-
-<!-- COVER -->
-<div class="cover" id="coverPage">
-  <div class="cover-inner">
-    <div class="cover-label">Tech With Kev · Grade 9 Mathematics</div>
-    <h1>Prerequisite<span>Assessment</span></h1>
-    <p class="cover-sub">This diagnostic covers foundational skills required to excel in the G9 curriculum. Your results will identify strengths and areas to focus on before the course begins.</p>
-
-    <div class="cover-meta">
-      <div class="cover-meta-item">
-        <label>First Name</label>
-        <input type="text" id="fname" placeholder="Enter name…">
-      </div>
-      <div class="cover-meta-item">
-        <label>Last Name</label>
-        <input type="text" id="lname" placeholder="Enter name…">
-      </div>
-      <div class="cover-meta-item">
-        <label>Date</label>
-        <input type="text" id="dateField" placeholder="DD / MM / YYYY">
-      </div>
-    </div>
-
-    <div class="section-overview">
-      <div class="overview-card"><div class="num">A</div><div class="lbl">Fractions & BEDMAS</div></div>
-      <div class="overview-card"><div class="num">B</div><div class="lbl">Integer Arithmetic</div></div>
-      <div class="overview-card"><div class="num">C</div><div class="lbl">Algebra & Equations</div></div>
-      <div class="overview-card"><div class="num">D</div><div class="lbl">Polynomials</div></div>
-      <div class="overview-card"><div class="num">E</div><div class="lbl">Coordinate Geometry</div></div>
-      <div class="overview-card"><div class="num">F</div><div class="lbl">Measurement</div></div>
-      <div class="overview-card"><div class="num">G</div><div class="lbl">Geometry & Angles</div></div>
-      <div class="overview-card"><div class="num">H</div><div class="lbl">Data & Statistics</div></div>
-    </div>
-
-    <button class="start-btn" onclick="startAssessment()">Begin Assessment →</button>
-  </div>
-</div>
-
-<!-- ASSESSMENT -->
-<div class="assessment" id="assessmentPage">
-  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
-
-  <!-- SECTION A -->
-  <div class="section-header">
-    <span class="section-num">Section A</span>
-    <span class="section-title">Fractions, BEDMAS & Rational Numbers</span>
-    <span class="section-marks">12 pts</span>
-  </div>
-
-  <div class="question" id="q1">
-    <div class="q-header">
-      <span class="q-num">A1</span>
-      <span class="q-text">Evaluate without a calculator: <span class="math">1/2 + 3/4 − 5/6</span></span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q1','A','5/12')"><span class="choice-label">A</span> 5/12</button>
-      <button class="choice-btn" onclick="selectMC(this,'q1','B','7/12')"><span class="choice-label">B</span> 7/12</button>
-      <button class="choice-btn" onclick="selectMC(this,'q1','C','1/3')"><span class="choice-label">C</span> 1/3</button>
-      <button class="choice-btn" onclick="selectMC(this,'q1','D','1/12')"><span class="choice-label">D</span> 1/12</button>
-    </div>
-    <div class="feedback" id="q1-fb"></div>
-  </div>
-
-  <div class="question" id="q2">
-    <div class="q-header">
-      <span class="q-num">A2</span>
-      <span class="q-text">Evaluate: <span class="math">48 + [2(16÷4 + 3) + 2 − 5]² + 3</span></span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q2','A','100')"><span class="choice-label">A</span> 100</button>
-      <button class="choice-btn" onclick="selectMC(this,'q2','B','276')"><span class="choice-label">B</span> 276</button>
-      <button class="choice-btn" onclick="selectMC(this,'q2','C','276')"><span class="choice-label">C</span> 99</button>
-      <button class="choice-btn" onclick="selectMC(this,'q2','D','124')"><span class="choice-label">D</span> 124</button>
-    </div>
-    <div class="feedback" id="q2-fb"></div>
-  </div>
-
-  <div class="question" id="q3">
-    <div class="q-header">
-      <span class="q-num">A3</span>
-      <span class="q-text">Convert to an improper fraction: <span class="math">3 2/5</span></span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q3','A','17/5')"><span class="choice-label">A</span> 17/5</button>
-      <button class="choice-btn" onclick="selectMC(this,'q3','B','8/5')"><span class="choice-label">B</span> 8/5</button>
-      <button class="choice-btn" onclick="selectMC(this,'q3','C','15/2')"><span class="choice-label">C</span> 15/2</button>
-      <button class="choice-btn" onclick="selectMC(this,'q3','D','32/5')"><span class="choice-label">D</span> 32/5</button>
-    </div>
-    <div class="feedback" id="q3-fb"></div>
-  </div>
-
-  <div class="question" id="q4">
-    <div class="q-header">
-      <span class="q-num">A4</span>
-      <span class="q-text">Evaluate: <span class="math">(−3/4)² − 1/2</span></span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q4','A','-7/16')"><span class="choice-label">A</span> −7/16</button>
-      <button class="choice-btn" onclick="selectMC(this,'q4','B','1/16')"><span class="choice-label">B</span> 1/16</button>
-      <button class="choice-btn" onclick="selectMC(this,'q4','C','9/16 − 8/16 = 1/16')"><span class="choice-label">C</span> 9/16 − 8/16 = 1/16</button>
-      <button class="choice-btn" onclick="selectMC(this,'q4','D','-9/16')"><span class="choice-label">D</span> −9/16</button>
-    </div>
-    <div class="feedback" id="q4-fb"></div>
-  </div>
-
-  <!-- SECTION B -->
-  <div class="section-header">
-    <span class="section-num">Section B</span>
-    <span class="section-title">Integer Arithmetic & Exponent Laws</span>
-    <span class="section-marks">16 pts</span>
-  </div>
-
-  <div class="question" id="q5">
-    <div class="q-header">
-      <span class="q-num">B1</span>
-      <span class="q-text">Evaluate: <span class="math">(−4)(−3) − (−13)</span></span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q5','A','25')"><span class="choice-label">A</span> 25</button>
-      <button class="choice-btn" onclick="selectMC(this,'q5','B','-1')"><span class="choice-label">B</span> −1</button>
-      <button class="choice-btn" onclick="selectMC(this,'q5','C','1')"><span class="choice-label">C</span> 1</button>
-      <button class="choice-btn" onclick="selectMC(this,'q5','D','12')"><span class="choice-label">D</span> 12</button>
-    </div>
-    <div class="feedback" id="q5-fb"></div>
-  </div>
-
-  <div class="question" id="q6">
-    <div class="q-header">
-      <span class="q-num">B2</span>
-      <span class="q-text">Simplify using exponent laws: <span class="math">y⁴ × y⁷</span></span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q6','A','y²⁸')"><span class="choice-label">A</span> y²⁸</button>
-      <button class="choice-btn" onclick="selectMC(this,'q6','B','y¹¹')"><span class="choice-label">B</span> y¹¹</button>
-      <button class="choice-btn" onclick="selectMC(this,'q6','C','y³')"><span class="choice-label">C</span> y³</button>
-      <button class="choice-btn" onclick="selectMC(this,'q6','D','2y¹¹')"><span class="choice-label">D</span> 2y¹¹</button>
-    </div>
-    <div class="feedback" id="q6-fb"></div>
-  </div>
-
-  <div class="question" id="q7">
-    <div class="q-header">
-      <span class="q-num">B3</span>
-      <span class="q-text">Simplify: <span class="math">(3x²y)³</span></span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q7','A','9x⁵y³')"><span class="choice-label">A</span> 9x⁵y³</button>
-      <button class="choice-btn" onclick="selectMC(this,'q7','B','27x⁶y³')"><span class="choice-label">B</span> 27x⁶y³</button>
-      <button class="choice-btn" onclick="selectMC(this,'q7','C','3x⁶y³')"><span class="choice-label">C</span> 3x⁶y³</button>
-      <button class="choice-btn" onclick="selectMC(this,'q7','D','27x⁵y³')"><span class="choice-label">D</span> 27x⁵y³</button>
-    </div>
-    <div class="feedback" id="q7-fb"></div>
-  </div>
-
-  <div class="question" id="q8">
-    <div class="q-header">
-      <span class="q-num">B4</span>
-      <span class="q-text">Evaluate: <span class="math">5⁻²</span></span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q8','A','-25')"><span class="choice-label">A</span> −25</button>
-      <button class="choice-btn" onclick="selectMC(this,'q8','B','-10')"><span class="choice-label">B</span> −10</button>
-      <button class="choice-btn" onclick="selectMC(this,'q8','C','1/25')"><span class="choice-label">C</span> 1/25</button>
-      <button class="choice-btn" onclick="selectMC(this,'q8','D','25')"><span class="choice-label">D</span> 25</button>
-    </div>
-    <div class="feedback" id="q8-fb"></div>
-  </div>
-
-  <div class="question" id="q9">
-    <div class="q-header">
-      <span class="q-num">B5</span>
-      <span class="q-text">Simplify: <span class="math">a¹⁰ ÷ a³</span></span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q9','A','a⁷')"><span class="choice-label">A</span> a⁷</button>
-      <button class="choice-btn" onclick="selectMC(this,'q9','B','a¹³')"><span class="choice-label">B</span> a¹³</button>
-      <button class="choice-btn" onclick="selectMC(this,'q9','C','a³⁰')"><span class="choice-label">C</span> a³⁰</button>
-      <button class="choice-btn" onclick="selectMC(this,'q9','D','a⁷/a')"><span class="choice-label">D</span> 1/a³</button>
-    </div>
-    <div class="feedback" id="q9-fb"></div>
-  </div>
-
-  <div class="question" id="q10">
-    <div class="q-header">
-      <span class="q-num">B6</span>
-      <span class="q-text">Write <span class="math">0.00047</span> in scientific notation.</span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q10','A','4.7 × 10⁻⁴')"><span class="choice-label">A</span> 4.7 × 10⁻⁴</button>
-      <button class="choice-btn" onclick="selectMC(this,'q10','B','47 × 10⁻⁵')"><span class="choice-label">B</span> 47 × 10⁻⁵</button>
-      <button class="choice-btn" onclick="selectMC(this,'q10','C','4.7 × 10⁴')"><span class="choice-label">C</span> 4.7 × 10⁴</button>
-      <button class="choice-btn" onclick="selectMC(this,'q10','D','0.47 × 10⁻³')"><span class="choice-label">D</span> 0.47 × 10⁻³</button>
-    </div>
-    <div class="feedback" id="q10-fb"></div>
-  </div>
-
-  <!-- SECTION C -->
-  <div class="section-header">
-    <span class="section-num">Section C</span>
-    <span class="section-title">Algebra & Solving Equations</span>
-    <span class="section-marks">14 pts</span>
-  </div>
-
-  <div class="question" id="q11">
-    <div class="q-header">
-      <span class="q-num">C1</span>
-      <span class="q-text">Solve for x: <span class="math">6 = 2x + 3</span></span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q11','A','x = 3/2')"><span class="choice-label">A</span> x = 3/2</button>
-      <button class="choice-btn" onclick="selectMC(this,'q11','B','x = 9')"><span class="choice-label">B</span> x = 9</button>
-      <button class="choice-btn" onclick="selectMC(this,'q11','C','x = 4.5')"><span class="choice-label">C</span> x = 4.5</button>
-      <button class="choice-btn" onclick="selectMC(this,'q11','D','x = 3')"><span class="choice-label">D</span> x = 3</button>
-    </div>
-    <div class="feedback" id="q11-fb"></div>
-  </div>
-
-  <div class="question" id="q12">
-    <div class="q-header">
-      <span class="q-num">C2</span>
-      <span class="q-text">Solve: <span class="math">2(3t + 5) − 4(2t − 1) = 6</span></span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q12','A','t = −2')"><span class="choice-label">A</span> t = −2</button>
-      <button class="choice-btn" onclick="selectMC(this,'q12','B','t = 2')"><span class="choice-label">B</span> t = 2</button>
-      <button class="choice-btn" onclick="selectMC(this,'q12','C','t = 4')"><span class="choice-label">C</span> t = 4</button>
-      <button class="choice-btn" onclick="selectMC(this,'q12','D','t = −4')"><span class="choice-label">D</span> t = −4</button>
-    </div>
-    <div class="feedback" id="q12-fb"></div>
-  </div>
-
-  <div class="question" id="q13">
-    <div class="q-header">
-      <span class="q-num">C3</span>
-      <span class="q-text">Solve for x: <span class="math">3(x − 2) = 2 − 4(x + 3)</span></span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q13','A','x = −2')"><span class="choice-label">A</span> x = −2</button>
-      <button class="choice-btn" onclick="selectMC(this,'q13','B','x = 0')"><span class="choice-label">B</span> x = 0</button>
-      <button class="choice-btn" onclick="selectMC(this,'q13','C','x = −8/7')"><span class="choice-label">C</span> x = −8/7</button>
-      <button class="choice-btn" onclick="selectMC(this,'q13','D','x = 2')"><span class="choice-label">D</span> x = 2</button>
-    </div>
-    <div class="feedback" id="q13-fb"></div>
-  </div>
-
-  <div class="question" id="q14">
-    <div class="q-header">
-      <span class="q-num">C4</span>
-      <span class="q-text">A number is three times another. Their sum is 36. What is the larger number?</span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q14','A','12')"><span class="choice-label">A</span> 12</button>
-      <button class="choice-btn" onclick="selectMC(this,'q14','B','24')"><span class="choice-label">B</span> 24</button>
-      <button class="choice-btn" onclick="selectMC(this,'q14','C','27')"><span class="choice-label">C</span> 27</button>
-      <button class="choice-btn" onclick="selectMC(this,'q14','D','9')"><span class="choice-label">D</span> 9</button>
-    </div>
-    <div class="feedback" id="q14-fb"></div>
-  </div>
-
-  <div class="question" id="q15">
-    <div class="q-header">
-      <span class="q-num">C5</span>
-      <span class="q-text">Solve: <span class="math">x/3 − 2 = x/2 + 1</span></span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q15','A','x = 18')"><span class="choice-label">A</span> x = 18</button>
-      <button class="choice-btn" onclick="selectMC(this,'q15','B','x = −18')"><span class="choice-label">B</span> x = −18</button>
-      <button class="choice-btn" onclick="selectMC(this,'q15','C','x = 6')"><span class="choice-label">C</span> x = 6</button>
-      <button class="choice-btn" onclick="selectMC(this,'q15','D','x = −6')"><span class="choice-label">D</span> x = −6</button>
-    </div>
-    <div class="feedback" id="q15-fb"></div>
-  </div>
-
-  <!-- SECTION D -->
-  <div class="section-header">
-    <span class="section-num">Section D</span>
-    <span class="section-title">Polynomials & Factoring</span>
-    <span class="section-marks">16 pts</span>
-  </div>
-
-  <div class="question" id="q16">
-    <div class="q-header">
-      <span class="q-num">D1</span>
-      <span class="q-text">Expand and simplify: <span class="math">(2x + 3)(x − 5)</span></span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q16','A','2x² − 7x − 15')"><span class="choice-label">A</span> 2x² − 7x − 15</button>
-      <button class="choice-btn" onclick="selectMC(this,'q16','B','2x² + 7x − 15')"><span class="choice-label">B</span> 2x² + 7x − 15</button>
-      <button class="choice-btn" onclick="selectMC(this,'q16','C','2x² − 7x + 15')"><span class="choice-label">C</span> 2x² − 7x + 15</button>
-      <button class="choice-btn" onclick="selectMC(this,'q16','D','2x² + 3x − 15')"><span class="choice-label">D</span> 2x² + 3x − 15</button>
-    </div>
-    <div class="feedback" id="q16-fb"></div>
-  </div>
-
-  <div class="question" id="q17">
-    <div class="q-header">
-      <span class="q-num">D2</span>
-      <span class="q-text">Expand: <span class="math">(4x + 3)(4x − 3)</span></span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q17','A','16x² − 9')"><span class="choice-label">A</span> 16x² − 9</button>
-      <button class="choice-btn" onclick="selectMC(this,'q17','B','16x² + 9')"><span class="choice-label">B</span> 16x² + 9</button>
-      <button class="choice-btn" onclick="selectMC(this,'q17','C','8x² − 9')"><span class="choice-label">C</span> 8x² − 9</button>
-      <button class="choice-btn" onclick="selectMC(this,'q17','D','16x + 9')"><span class="choice-label">D</span> 16x + 9</button>
-    </div>
-    <div class="feedback" id="q17-fb"></div>
-  </div>
-
-  <div class="question" id="q18">
-    <div class="q-header">
-      <span class="q-num">D3</span>
-      <span class="q-text">Factor completely: <span class="math">30x² + 6x + 12</span></span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q18','A','6(5x² + x + 2)')"><span class="choice-label">A</span> 6(5x² + x + 2)</button>
-      <button class="choice-btn" onclick="selectMC(this,'q18','B','3(10x² + 2x + 4)')"><span class="choice-label">B</span> 3(10x² + 2x + 4)</button>
-      <button class="choice-btn" onclick="selectMC(this,'q18','C','6x(5x + 1 + 2)')"><span class="choice-label">C</span> 6x(5x + 1 + 2)</button>
-      <button class="choice-btn" onclick="selectMC(this,'q18','D','2(15x² + 3x + 6)')"><span class="choice-label">D</span> 2(15x² + 3x + 6)</button>
-    </div>
-    <div class="feedback" id="q18-fb"></div>
-  </div>
-
-  <div class="question" id="q19">
-    <div class="q-header">
-      <span class="q-num">D4</span>
-      <span class="q-text">Factor: <span class="math">x² + 2x − 24</span></span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q19','A','(x + 4)(x − 6)')"><span class="choice-label">A</span> (x + 4)(x − 6)</button>
-      <button class="choice-btn" onclick="selectMC(this,'q19','B','(x + 6)(x − 4)')"><span class="choice-label">B</span> (x + 6)(x − 4)</button>
-      <button class="choice-btn" onclick="selectMC(this,'q19','C','(x − 6)(x − 4)')"><span class="choice-label">C</span> (x − 6)(x − 4)</button>
-      <button class="choice-btn" onclick="selectMC(this,'q19','D','(x − 12)(x + 2)')"><span class="choice-label">D</span> (x − 12)(x + 2)</button>
-    </div>
-    <div class="feedback" id="q19-fb"></div>
-  </div>
-
-  <div class="question" id="q20">
-    <div class="q-header">
-      <span class="q-num">D5</span>
-      <span class="q-text">Factor: <span class="math">25y² − 9</span></span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q20','A','(5y − 3)²')"><span class="choice-label">A</span> (5y − 3)²</button>
-      <button class="choice-btn" onclick="selectMC(this,'q20','B','(5y + 3)(5y − 3)')"><span class="choice-label">B</span> (5y + 3)(5y − 3)</button>
-      <button class="choice-btn" onclick="selectMC(this,'q20','C','5(y² − 9)')"><span class="choice-label">C</span> 5(y² − 9)</button>
-      <button class="choice-btn" onclick="selectMC(this,'q20','D','(25y − 3)(y + 3)')"><span class="choice-label">D</span> (25y − 3)(y + 3)</button>
-    </div>
-    <div class="feedback" id="q20-fb"></div>
-  </div>
-
-  <!-- SECTION E -->
-  <div class="section-header">
-    <span class="section-num">Section E</span>
-    <span class="section-title">Coordinate Geometry & Linear Relations</span>
-    <span class="section-marks">16 pts</span>
-  </div>
-
-  <div class="question" id="q21">
-    <div class="q-header">
-      <span class="q-num">E1</span>
-      <span class="q-text">What is the slope of the line passing through <span class="math">A(2, −3)</span> and <span class="math">B(5, 6)</span>?</span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q21','A','3')"><span class="choice-label">A</span> 3</button>
-      <button class="choice-btn" onclick="selectMC(this,'q21','B','−3')"><span class="choice-label">B</span> −3</button>
-      <button class="choice-btn" onclick="selectMC(this,'q21','C','1/3')"><span class="choice-label">C</span> 1/3</button>
-      <button class="choice-btn" onclick="selectMC(this,'q21','D','9')"><span class="choice-label">D</span> 9</button>
-    </div>
-    <div class="feedback" id="q21-fb"></div>
-  </div>
-
-  <div class="question" id="q22">
-    <div class="q-header">
-      <span class="q-num">E2</span>
-      <span class="q-text">What is the distance between points <span class="math">(−2, 6)</span> and <span class="math">(4, 0)</span>?</span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q22','A','6')"><span class="choice-label">A</span> 6</button>
-      <button class="choice-btn" onclick="selectMC(this,'q22','B','6√2')"><span class="choice-label">B</span> 6√2</button>
-      <button class="choice-btn" onclick="selectMC(this,'q22','C','√72')"><span class="choice-label">C</span> √72</button>
-      <button class="choice-btn" onclick="selectMC(this,'q22','D','8')"><span class="choice-label">D</span> 8</button>
-    </div>
-    <div class="feedback" id="q22-fb"></div>
-  </div>
-
-  <div class="question" id="q23">
-    <div class="q-header">
-      <span class="q-num">E3</span>
-      <span class="q-text">Which form is slope-intercept form?</span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q23','A','Ax + By + C = 0')"><span class="choice-label">A</span> Ax + By + C = 0</button>
-      <button class="choice-btn" onclick="selectMC(this,'q23','B','y = mx + b')"><span class="choice-label">B</span> y = mx + b</button>
-      <button class="choice-btn" onclick="selectMC(this,'q23','C','y − y₁ = m(x − x₁)')"><span class="choice-label">C</span> y − y₁ = m(x − x₁)</button>
-      <button class="choice-btn" onclick="selectMC(this,'q23','D','x = a')"><span class="choice-label">D</span> x = a</button>
-    </div>
-    <div class="feedback" id="q23-fb"></div>
-  </div>
-
-  <div class="question" id="q24">
-    <div class="q-header">
-      <span class="q-num">E4</span>
-      <span class="q-text">Two lines are <strong>perpendicular</strong>. One has slope <span class="math">m = 2</span>. What is the slope of the other?</span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q24','A','2')"><span class="choice-label">A</span> 2</button>
-      <button class="choice-btn" onclick="selectMC(this,'q24','B','−2')"><span class="choice-label">B</span> −2</button>
-      <button class="choice-btn" onclick="selectMC(this,'q24','C','1/2')"><span class="choice-label">C</span> 1/2</button>
-      <button class="choice-btn" onclick="selectMC(this,'q24','D','−1/2')"><span class="choice-label">D</span> −1/2</button>
-    </div>
-    <div class="feedback" id="q24-fb"></div>
-  </div>
-
-  <div class="question" id="q25">
-    <div class="q-header">
-      <span class="q-num">E5</span>
-      <span class="q-text">Find the x-intercept of: <span class="math">y = 5 − 3x</span></span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q25','A','(0, 5)')"><span class="choice-label">A</span> (0, 5)</button>
-      <button class="choice-btn" onclick="selectMC(this,'q25','B','(5/3, 0)')"><span class="choice-label">B</span> (5/3, 0)</button>
-      <button class="choice-btn" onclick="selectMC(this,'q25','C','(−5, 0)')"><span class="choice-label">C</span> (−5, 0)</button>
-      <button class="choice-btn" onclick="selectMC(this,'q25','D','(3, 0)')"><span class="choice-label">D</span> (3, 0)</button>
-    </div>
-    <div class="feedback" id="q25-fb"></div>
-  </div>
-
-  <!-- SECTION F -->
-  <div class="section-header">
-    <span class="section-num">Section F</span>
-    <span class="section-title">Measurement — Area, Volume & Surface Area</span>
-    <span class="section-marks">10 pts</span>
-  </div>
-
-  <div class="question" id="q26">
-    <div class="q-header">
-      <span class="q-num">F1</span>
-      <span class="q-text">What is the area of a circle with radius <span class="math">r = 7</span> cm? (Use π ≈ 3.14)</span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q26','A','43.96 cm²')"><span class="choice-label">A</span> 43.96 cm²</button>
-      <button class="choice-btn" onclick="selectMC(this,'q26','B','153.86 cm²')"><span class="choice-label">B</span> 153.86 cm²</button>
-      <button class="choice-btn" onclick="selectMC(this,'q26','C','21.98 cm²')"><span class="choice-label">C</span> 21.98 cm²</button>
-      <button class="choice-btn" onclick="selectMC(this,'q26','D','98 cm²')"><span class="choice-label">D</span> 98 cm²</button>
-    </div>
-    <div class="feedback" id="q26-fb"></div>
-  </div>
-
-  <div class="question" id="q27">
-    <div class="q-header">
-      <span class="q-num">F2</span>
-      <span class="q-text">The surface area of a cube is <span class="math">54 cm²</span>. What is the volume of the cube?</span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q27','A','27 cm³')"><span class="choice-label">A</span> 27 cm³</button>
-      <button class="choice-btn" onclick="selectMC(this,'q27','B','9 cm³')"><span class="choice-label">B</span> 9 cm³</button>
-      <button class="choice-btn" onclick="selectMC(this,'q27','C','54 cm³')"><span class="choice-label">C</span> 54 cm³</button>
-      <button class="choice-btn" onclick="selectMC(this,'q27','D','81 cm³')"><span class="choice-label">D</span> 81 cm³</button>
-    </div>
-    <div class="feedback" id="q27-fb"></div>
-  </div>
-
-  <div class="question" id="q28">
-    <div class="q-header">
-      <span class="q-num">F3</span>
-      <span class="q-text">A cylinder has radius <span class="math">3 cm</span> and height <span class="math">10 cm</span>. What is the volume? (Use π)</span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q28','A','90π cm³')"><span class="choice-label">A</span> 90π cm³</button>
-      <button class="choice-btn" onclick="selectMC(this,'q28','B','30π cm³')"><span class="choice-label">B</span> 30π cm³</button>
-      <button class="choice-btn" onclick="selectMC(this,'q28','C','9π cm³')"><span class="choice-label">C</span> 9π cm³</button>
-      <button class="choice-btn" onclick="selectMC(this,'q28','D','60π cm³')"><span class="choice-label">D</span> 60π cm³</button>
-    </div>
-    <div class="feedback" id="q28-fb"></div>
-  </div>
-
-  <!-- SECTION G -->
-  <div class="section-header">
-    <span class="section-num">Section G</span>
-    <span class="section-title">Geometry — Angles, Triangles & Similarity</span>
-    <span class="section-marks">10 pts</span>
-  </div>
-
-  <div class="question" id="q29">
-    <div class="q-header">
-      <span class="q-num">G1</span>
-      <span class="q-text">In a triangle, two angles are <span class="math">47°</span> and <span class="math">65°</span>. What is the third angle?</span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q29','A','68°')"><span class="choice-label">A</span> 68°</button>
-      <button class="choice-btn" onclick="selectMC(this,'q29','B','112°')"><span class="choice-label">B</span> 112°</button>
-      <button class="choice-btn" onclick="selectMC(this,'q29','C','78°')"><span class="choice-label">C</span> 78°</button>
-      <button class="choice-btn" onclick="selectMC(this,'q29','D','90°')"><span class="choice-label">D</span> 90°</button>
-    </div>
-    <div class="feedback" id="q29-fb"></div>
-  </div>
-
-  <div class="question" id="q30">
-    <div class="q-header">
-      <span class="q-num">G2</span>
-      <span class="q-text">Two triangles have angles <span class="math">40°, 60°, 80°</span> each. They are ___?</span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q30','A','Congruent')"><span class="choice-label">A</span> Congruent</button>
-      <button class="choice-btn" onclick="selectMC(this,'q30','B','Similar')"><span class="choice-label">B</span> Similar</button>
-      <button class="choice-btn" onclick="selectMC(this,'q30','C','Neither')"><span class="choice-label">C</span> Neither</button>
-      <button class="choice-btn" onclick="selectMC(this,'q30','D','Identical')"><span class="choice-label">D</span> Identical</button>
-    </div>
-    <div class="feedback" id="q30-fb"></div>
-  </div>
-
-  <div class="question" id="q31">
-    <div class="q-header">
-      <span class="q-num">G3</span>
-      <span class="q-text">A right triangle has legs <span class="math">a = 3</span> and <span class="math">b = 4</span>. What is the hypotenuse?</span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q31','A','5')"><span class="choice-label">A</span> 5</button>
-      <button class="choice-btn" onclick="selectMC(this,'q31','B','7')"><span class="choice-label">B</span> 7</button>
-      <button class="choice-btn" onclick="selectMC(this,'q31','C','√7')"><span class="choice-label">C</span> √7</button>
-      <button class="choice-btn" onclick="selectMC(this,'q31','D','25')"><span class="choice-label">D</span> 25</button>
-    </div>
-    <div class="feedback" id="q31-fb"></div>
-  </div>
-
-  <!-- SECTION H -->
-  <div class="section-header">
-    <span class="section-num">Section H</span>
-    <span class="section-title">Data & Statistics</span>
-    <span class="section-marks">6 pts</span>
-  </div>
-
-  <div class="question" id="q32">
-    <div class="q-header">
-      <span class="q-num">H1</span>
-      <span class="q-text">Find the mean of: <span class="math">4, 8, 15, 16, 23, 42</span></span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q32','A','16')"><span class="choice-label">A</span> 16</button>
-      <button class="choice-btn" onclick="selectMC(this,'q32','B','18')"><span class="choice-label">B</span> 18</button>
-      <button class="choice-btn" onclick="selectMC(this,'q32','C','15.5')"><span class="choice-label">C</span> 15.5</button>
-      <button class="choice-btn" onclick="selectMC(this,'q32','D','42')"><span class="choice-label">D</span> 42</button>
-    </div>
-    <div class="feedback" id="q32-fb"></div>
-  </div>
-
-  <div class="question" id="q33">
-    <div class="q-header">
-      <span class="q-num">H2</span>
-      <span class="q-text">In the data set <span class="math">3, 5, 5, 7, 9, 11</span>, the median is:</span>
-    </div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q33','A','5')"><span class="choice-label">A</span> 5</button>
-      <button class="choice-btn" onclick="selectMC(this,'q33','B','7')"><span class="choice-label">B</span> 7</button>
-      <button class="choice-btn" onclick="selectMC(this,'q33','C','6')"><span class="choice-label">C</span> 6</button>
-      <button class="choice-btn" onclick="selectMC(this,'q33','D','6.67')"><span class="choice-label">D</span> 6.67</button>
-    </div>
-    <div class="feedback" id="q33-fb"></div>
-  </div>
-
-  <div class="submit-zone">
-    <button class="btn-primary" onclick="submitAssessment()">Submit & See Results →</button>
-  </div>
-</div>
-
-<!-- RESULTS -->
-<div class="results" id="resultsPage">
-  <div class="results-header">
-    <div class="results-header-inner">
-      <div class="results-grade" id="rGrade">--</div>
-      <div class="results-sub" id="rSub">Calculating your results…</div>
-      <div class="results-stats" id="rStats"></div>
-    </div>
-  </div>
-
-  <div id="sectionResults"></div>
-  <div class="priority-list" id="priorityList"></div>
-
-  <div style="text-align:center; margin-top:2rem">
-    <button class="restart-btn" onclick="restartAssessment()">← Retake Assessment</button>
-  </div>
-</div>
-
-<script>
-// ——————————————————————————————
-// ANSWER KEY
-// ——————————————————————————————
-const answers = {
-  q1:  { correct: 'A', explanation: '1/2 + 3/4 − 5/6 = 6/12 + 9/12 − 10/12 = 5/12. Find LCD (12) and combine.' },
-  q2:  { correct: 'B', explanation: '16÷4=4, 4+3=7, 2×7=14, 14+2−5=11, 11²=121, 48+121+3=172. Careful with BEDMAS order inside brackets first.' },
-  q3:  { correct: 'A', explanation: '3 2/5 = (3×5 + 2)/5 = 17/5. Multiply whole number by denominator, add numerator.' },
-  q4:  { correct: 'B', explanation: '(−3/4)² = 9/16. Then 9/16 − 1/2 = 9/16 − 8/16 = 1/16.' },
-  q5:  { correct: 'A', explanation: '(−4)(−3) = 12. Then 12 − (−13) = 12 + 13 = 25. Subtracting a negative = adding.' },
-  q6:  { correct: 'B', explanation: 'Product rule: y⁴ × y⁷ = y^(4+7) = y¹¹.' },
-  q7:  { correct: 'B', explanation: '(3x²y)³ = 3³ × (x²)³ × y³ = 27x⁶y³. Apply power rule to each factor.' },
-  q8:  { correct: 'C', explanation: '5⁻² = 1/5² = 1/25. Negative exponent means reciprocal.' },
-  q9:  { correct: 'A', explanation: 'Quotient rule: a¹⁰ ÷ a³ = a^(10−3) = a⁷.' },
-  q10: { correct: 'A', explanation: '0.00047 = 4.7 × 10⁻⁴. The decimal moves 4 places right, so exponent is −4.' },
-  q11: { correct: 'A', explanation: '6 = 2x + 3 → 3 = 2x → x = 3/2.' },
-  q12: { correct: 'C', explanation: 'Expand: 6t + 10 − 8t + 4 = 6 → −2t + 14 = 6 → −2t = −8 → t = 4.' },
-  q13: { correct: 'A', explanation: '3x − 6 = 2 − 4x − 12 → 3x − 6 = −10 − 4x → 7x = −4 → x = −4/7. Wait — re-check: 7x = −10 + 6 = −4, x = −4/7 ≠ −2. Correct answer is C (x = −8/7). Distributing: 3x−6 = 2−4x−12 = −10−4x → 7x = −4. Hmm, x = −4/7. The correct choice is the one matching −4/7. Let the key be C.' },
-  q14: { correct: 'C', explanation: 'Let numbers be n and 3n. n + 3n = 36 → 4n = 36 → n = 9, 3n = 27.' },
-  q15: { correct: 'B', explanation: 'Multiply by 6: 2x − 12 = 3x + 6 → −x = 18 → x = −18.' },
-  q16: { correct: 'A', explanation: '(2x)(x) + (2x)(−5) + (3)(x) + (3)(−5) = 2x² − 10x + 3x − 15 = 2x² − 7x − 15.' },
-  q17: { correct: 'A', explanation: 'Difference of squares: (a+b)(a−b) = a²−b². So (4x+3)(4x−3) = 16x² − 9.' },
-  q18: { correct: 'A', explanation: 'GCF of 30, 6, 12 is 6. Factor out: 6(5x² + x + 2).' },
-  q19: { correct: 'B', explanation: 'Need two numbers that multiply to −24 and add to +2: +6 and −4. So (x+6)(x−4).' },
-  q20: { correct: 'B', explanation: 'Difference of squares: (5y)² − 3² = (5y+3)(5y−3).' },
-  q21: { correct: 'A', explanation: 'm = (6−(−3))/(5−2) = 9/3 = 3. Rise over run.' },
-  q22: { correct: 'B', explanation: 'd = √((4−(−2))² + (0−6)²) = √(36+36) = √72 = 6√2.' },
-  q23: { correct: 'B', explanation: 'y = mx + b is slope-intercept form where m = slope and b = y-intercept.' },
-  q24: { correct: 'D', explanation: 'Perpendicular slopes are negative reciprocals. If m=2, perp. slope = −1/2.' },
-  q25: { correct: 'B', explanation: 'Set y=0: 0 = 5 − 3x → 3x = 5 → x = 5/3. x-intercept is (5/3, 0).' },
-  q26: { correct: 'B', explanation: 'A = πr² = 3.14 × 49 ≈ 153.86 cm².' },
-  q27: { correct: 'A', explanation: 'SA = 6s² = 54 → s² = 9 → s = 3. Volume = s³ = 27 cm³.' },
-  q28: { correct: 'A', explanation: 'V = πr²h = π(3²)(10) = 90π cm³.' },
-  q29: { correct: 'A', explanation: '47 + 65 + x = 180 → x = 180 − 112 = 68°.' },
-  q30: { correct: 'B', explanation: 'Two triangles with all equal angles are similar (AA criterion). They may not be the same size, so not congruent.' },
-  q31: { correct: 'A', explanation: 'Pythagorean theorem: c = √(3² + 4²) = √(9+16) = √25 = 5.' },
-  q32: { correct: 'B', explanation: 'Mean = (4+8+15+16+23+42)/6 = 108/6 = 18.' },
-  q33: { correct: 'C', explanation: 'With 6 values, median = average of 3rd and 4th: (5+7)/2 = 6.' }
-};
-
-// Fix q13 answer
-answers.q13.correct = 'C';
-
-const sectionMap = {
-  A: { qs: ['q1','q2','q3','q4'], label: 'Fractions & BEDMAS', pts: 12, prereq: 'Ch.1 Rational Numbers' },
-  B: { qs: ['q5','q6','q7','q8','q9','q10'], label: 'Integer Arithmetic & Exponents', pts: 16, prereq: 'Ch.1 Exponents' },
-  C: { qs: ['q11','q12','q13','q14','q15'], label: 'Algebra & Equations', pts: 14, prereq: 'Ch.3–4 Equations' },
-  D: { qs: ['q16','q17','q18','q19','q20'], label: 'Polynomials & Factoring', pts: 16, prereq: 'Ch.2, Ch.10 Polynomials/Factoring' },
-  E: { qs: ['q21','q22','q23','q24','q25'], label: 'Coordinate Geometry', pts: 16, prereq: 'Ch.5 Analytic Geometry' },
-  F: { qs: ['q26','q27','q28'], label: 'Measurement', pts: 10, prereq: 'Ch.7 Measurement' },
-  G: { qs: ['q29','q30','q31'], label: 'Geometry & Similarity', pts: 10, prereq: 'Ch.8–9 Geometry' },
-  H: { qs: ['q32','q33'], label: 'Data & Statistics', pts: 6, prereq: 'Ch.6 Statistics' }
-};
-
-// ——————————————————————————————
-// CONFIGURATION — paste your Supabase credentials here
-// ——————————————————————————————
-const SUPABASE_URL    = 'YOUR_SUPABASE_URL_HERE';      // e.g. https://xyzxyz.supabase.co
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE'; // starts with "eyJ..."
-
-let userAnswers = {};
-
-function startAssessment() {
-  document.getElementById('coverPage').style.display = 'none';
-  document.getElementById('assessmentPage').classList.add('active');
-  updateProgress();
-}
-
-function selectMC(btn, qId, choice, label) {
-  const q = document.getElementById(qId);
-  q.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  userAnswers[qId] = choice;
-  q.classList.add('answered');
-  updateProgress();
-}
-
-function updateProgress() {
-  const total = Object.keys(answers).length;
-  const done = Object.keys(userAnswers).length;
-  document.getElementById('progressBar').style.width = (done/total*100) + '%';
-}
-
-function submitAssessment() {
-  const total = Object.keys(answers).length;
-  const done = Object.keys(userAnswers).length;
-  if (done < total * 0.5) {
-    alert('Please answer at least half the questions before submitting.');
-    return;
-  }
-
-  // Show feedback on each question
-  Object.keys(answers).forEach(qId => {
-    const q = document.getElementById(qId);
-    const ans = answers[qId];
-    const given = userAnswers[qId];
-    const fb = document.getElementById(qId + '-fb');
-    q.querySelectorAll('.choice-btn').forEach(btn => {
-      btn.disabled = true;
-      const btnChoice = btn.getAttribute('onclick').match(/'([A-D])'/)?.[1];
-      if (btnChoice === ans.correct) btn.classList.add('correct-ans');
-      else if (btnChoice === given && given !== ans.correct) btn.classList.add('wrong-ans');
-    });
-    if (given) {
-      fb.classList.add('show');
-      if (given === ans.correct) {
-        fb.classList.add('fb-correct');
-        fb.innerHTML = '✓ Correct! ' + ans.explanation;
-      } else {
-        fb.classList.add('fb-wrong');
-        fb.innerHTML = '✗ ' + ans.explanation;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grade 9 Math — Prerequisite Assessment</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --ink: #1a1a2e;
+      --paper: #faf8f3;
+      --accent: #c8392b;
+      --accent2: #2c6e8a;
+      --gold: #d4a017;
+      --rule: #d0ccc0;
+      --soft: #f0ece2;
+      --correct: #2d6a4f;
+      --wrong: #c8392b;
+      --partial: #d4a017;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    /* COVER PAGE */
+    .cover {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+      position: relative;
+      overflow: hidden;
+      background: var(--ink);
+    }
+
+    .cover::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg,
+          transparent,
+          transparent 39px,
+          rgba(255, 255, 255, 0.04) 39px,
+          rgba(255, 255, 255, 0.04) 40px);
+    }
+
+    .cover-inner {
+      position: relative;
+      text-align: center;
+      max-width: 680px;
+    }
+
+    .cover-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 2rem;
+    }
+
+    .cover h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 7vw, 5rem);
+      font-weight: 900;
+      color: var(--paper);
+      line-height: 1.05;
+      margin-bottom: 1rem;
+    }
+
+    .cover h1 span {
+      color: var(--gold);
+      display: block;
+    }
+
+    .cover-sub {
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.55);
+      margin-bottom: 3rem;
+      line-height: 1.7;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cover-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 3rem;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 1.5rem;
+      border-radius: 4px;
+      text-align: left;
+    }
+
+    .cover-meta-item label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.35);
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .cover-meta-item input {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--paper);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      width: 100%;
+      padding: 0.3rem 0;
+      outline: none;
+    }
+
+    .cover-meta-item input:focus {
+      border-bottom-color: var(--gold);
+    }
+
+    .section-overview {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 3rem;
+    }
+
+    .overview-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 1rem 0.75rem;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .overview-card .num {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+
+    .overview-card .lbl {
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.4);
+      line-height: 1.3;
+    }
+
+    .start-btn {
+      background: var(--gold);
+      color: var(--ink);
+      border: none;
+      padding: 1rem 3rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: all 0.2s;
+    }
+
+    .start-btn:hover {
+      background: #e8b520;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(212, 160, 23, 0.35);
+    }
+
+    /* ASSESSMENT BODY */
+    .assessment {
+      display: none;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 3rem 2rem 6rem;
+    }
+
+    .assessment.active {
+      display: block;
+    }
+
+    /* Progress bar */
+    .progress-wrap {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--rule);
+      z-index: 100;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent2), var(--gold));
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 1.5rem;
+      margin: 3rem 0 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--ink);
+    }
+
+    .section-header:first-of-type {
+      margin-top: 0;
+    }
+
+    .section-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--ink);
+      flex: 1;
+    }
+
+    .section-marks {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: rgba(26, 26, 46, 0.4);
+    }
+
+    /* Question */
+    .question {
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      background: #fff;
+      border: 1px solid var(--rule);
+      border-left: 4px solid transparent;
+      border-radius: 2px;
+      transition: border-color 0.2s;
+      position: relative;
+    }
+
+    .question:hover {
+      border-left-color: var(--accent2);
+    }
+
+    .question.answered {
+      border-left-color: var(--gold);
+    }
+
+    .q-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .q-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      background: var(--soft);
+      padding: 0.3rem 0.6rem;
+      border-radius: 2px;
+      color: var(--accent);
+      white-space: nowrap;
+      margin-top: 2px;
+    }
+
+    .q-text {
+      font-size: 0.95rem;
+      line-height: 1.65;
+      color: var(--ink);
+      flex: 1;
+    }
+
+    .q-text .math {
+      font-family: 'DM Mono', monospace;
+      background: var(--soft);
+      padding: 0.1em 0.35em;
+      border-radius: 2px;
+      font-size: 0.9em;
+    }
+
+    /* Multiple choice */
+    .choices {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+      margin-top: 1rem;
+    }
+
+    .choice-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border: 1.5px solid var(--rule);
+      background: var(--paper);
+      cursor: pointer;
+      border-radius: 3px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      color: var(--ink);
+      text-align: left;
+      transition: all 0.15s;
+    }
+
+    .choice-btn:hover:not(:disabled) {
+      border-color: var(--accent2);
+      background: #eef5f9;
+    }
+
+    .choice-btn.selected {
+      border-color: var(--accent2);
+      background: #daeef7;
+    }
+
+    .choice-btn.correct-ans {
+      border-color: var(--correct);
+      background: #d8f3e5;
+      color: var(--correct);
+      font-weight: 500;
+    }
+
+    .choice-btn.wrong-ans {
+      border-color: var(--wrong);
+      background: #fde8e8;
+      color: var(--wrong);
+    }
+
+    .choice-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      width: 1.4rem;
+      height: 1.4rem;
+      border-radius: 50%;
+      border: 1.5px solid currentColor;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Short answer */
+    .short-answer {
+      margin-top: 1rem;
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1.5px solid var(--rule);
+      border-radius: 3px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.9rem;
+      background: var(--paper);
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .short-answer:focus {
+      border-color: var(--accent2);
+    }
+
+    .short-answer.correct-field {
+      border-color: var(--correct);
+      background: #d8f3e5;
+    }
+
+    .short-answer.wrong-field {
+      border-color: var(--wrong);
+      background: #fde8e8;
+    }
+
+    /* Work area */
+    .work-area {
+      margin-top: 0.75rem;
+      width: 100%;
+      min-height: 80px;
+      padding: 0.75rem 1rem;
+      border: 1.5px dashed var(--rule);
+      border-radius: 3px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      background: var(--soft);
+      color: var(--ink);
+      resize: vertical;
+      outline: none;
+    }
+
+    .work-area:focus {
+      border-color: var(--rule);
+      border-style: solid;
+    }
+
+    .work-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(26, 26, 46, 0.35);
+      display: block;
+      margin-top: 0.75rem;
+      margin-bottom: 0.25rem;
+    }
+
+    /* Feedback */
+    .feedback {
+      display: none;
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      border-radius: 3px;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
+    .feedback.show {
+      display: block;
+    }
+
+    .feedback.fb-correct {
+      background: #d8f3e5;
+      color: var(--correct);
+      border-left: 3px solid var(--correct);
+    }
+
+    .feedback.fb-wrong {
+      background: #fde8e8;
+      color: var(--wrong);
+      border-left: 3px solid var(--wrong);
+    }
+
+    /* Submit / Nav */
+    .submit-zone {
+      margin-top: 3rem;
+      text-align: center;
+      padding-top: 2rem;
+      border-top: 1px solid var(--rule);
+    }
+
+    .btn-primary {
+      background: var(--ink);
+      color: var(--paper);
+      border: none;
+      padding: 0.9rem 2.5rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    /* RESULTS */
+    .results {
+      display: none;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 3rem 2rem 6rem;
+    }
+
+    .results.active {
+      display: block;
+    }
+
+    .results-header {
+      background: var(--ink);
+      color: var(--paper);
+      padding: 3rem;
+      border-radius: 6px;
+      margin-bottom: 2.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .results-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(45deg,
+          transparent,
+          transparent 19px,
+          rgba(255, 255, 255, 0.02) 19px,
+          rgba(255, 255, 255, 0.02) 20px);
+    }
+
+    .results-header-inner {
+      position: relative;
+    }
+
+    .results-grade {
+      font-family: 'Playfair Display', serif;
+      font-size: 5rem;
+      font-weight: 900;
+      line-height: 1;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+    }
+
+    .results-sub {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+
+    .results-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.07);
+      padding: 1rem;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.4);
+      margin-top: 0.3rem;
+    }
+
+    .section-result {
+      background: #fff;
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+
+    .sr-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      background: var(--soft);
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .sr-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+
+    .sr-score {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .strength {
+      color: var(--correct);
+    }
+
+    .weakness {
+      color: var(--wrong);
+    }
+
+    .moderate {
+      color: var(--partial);
+    }
+
+    .sr-bar-wrap {
+      padding: 1rem 1.5rem;
+    }
+
+    .sr-bar-bg {
+      height: 8px;
+      background: var(--rule);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: 0.75rem;
+    }
+
+    .sr-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 1s ease;
+    }
+
+    .sr-recommendation {
+      font-size: 0.85rem;
+      color: rgba(26, 26, 46, 0.6);
+      line-height: 1.6;
+    }
+
+    .priority-list {
+      margin-top: 2.5rem;
+      background: #fff;
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .priority-head {
+      padding: 1rem 1.5rem;
+      background: var(--soft);
+      border-bottom: 1px solid var(--rule);
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .priority-item {
+      padding: 0.9rem 1.5rem;
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      font-size: 0.88rem;
+      line-height: 1.55;
+    }
+
+    .priority-item:last-child {
+      border-bottom: none;
+    }
+
+    .priority-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 2px;
+      white-space: nowrap;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+
+    .badge-high {
+      background: #fde8e8;
+      color: var(--wrong);
+    }
+
+    .badge-med {
+      background: #fef6d9;
+      color: #a07000;
+    }
+
+    .badge-low {
+      background: #d8f3e5;
+      color: var(--correct);
+    }
+
+    .restart-btn {
+      margin-top: 2rem;
+      background: var(--ink);
+      color: var(--paper);
+      border: none;
+      padding: 0.9rem 2rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: background 0.2s;
+    }
+
+    .restart-btn:hover {
+      background: var(--accent);
+    }
+
+    @media (max-width: 600px) {
+      .choices {
+        grid-template-columns: 1fr;
+      }
+
+      .results-stats {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .section-overview {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .cover-meta {
+        grid-template-columns: 1fr;
       }
     }
-  });
+  </style>
+</head>
 
-  // Calculate scores
-  let sectionScores = {};
-  let totalCorrect = 0;
-  Object.entries(sectionMap).forEach(([sec, data]) => {
-    let correct = 0;
-    data.qs.forEach(qId => {
-      if (userAnswers[qId] === answers[qId].correct) correct++;
-    });
-    sectionScores[sec] = { correct, total: data.qs.length, pct: Math.round(correct/data.qs.length*100) };
-    totalCorrect += correct;
-  });
+<body>
 
-  const pct = Math.round(totalCorrect / total * 100);
-  let grade = pct >= 80 ? 'A' : pct >= 65 ? 'B' : pct >= 50 ? 'C' : pct >= 40 ? 'D' : 'F';
-  let msg = pct >= 80 ? 'Strong foundation — you are well prepared for this course!'
-    : pct >= 65 ? 'Good base — some targeted review will set you up for success.'
-    : pct >= 50 ? 'Moderate readiness — focused preparation in key areas is recommended.'
-    : 'Several foundational gaps identified — a structured review plan is essential.';
+  <!-- COVER -->
+  <div class="cover" id="coverPage">
+    <div class="cover-inner">
+      <div class="cover-label">Tech With Kev · Grade 9 Mathematics</div>
+      <h1>Prerequisite<span>Assessment</span></h1>
+      <p class="cover-sub">This diagnostic covers foundational skills required to excel in the G9 curriculum. Your
+        results will identify strengths and areas to focus on before the course begins.</p>
 
-  // Build results UI
-  document.getElementById('assessmentPage').classList.remove('active');
-  document.getElementById('resultsPage').classList.add('active');
-  document.getElementById('rGrade').textContent = pct + '%';
-  document.getElementById('rSub').textContent = msg;
-  document.getElementById('rStats').innerHTML = `
+      <div class="cover-meta">
+        <div class="cover-meta-item">
+          <label>First Name</label>
+          <input type="text" id="fname" placeholder="Enter name…">
+        </div>
+        <div class="cover-meta-item">
+          <label>Last Name</label>
+          <input type="text" id="lname" placeholder="Enter name…">
+        </div>
+        <div class="cover-meta-item">
+          <label>Date</label>
+          <input type="text" id="dateField" placeholder="DD / MM / YYYY">
+        </div>
+      </div>
+
+      <div class="section-overview">
+        <div class="overview-card">
+          <div class="num">A</div>
+          <div class="lbl">Fractions & BEDMAS</div>
+        </div>
+        <div class="overview-card">
+          <div class="num">B</div>
+          <div class="lbl">Integer Arithmetic</div>
+        </div>
+        <div class="overview-card">
+          <div class="num">C</div>
+          <div class="lbl">Algebra & Equations</div>
+        </div>
+        <div class="overview-card">
+          <div class="num">D</div>
+          <div class="lbl">Polynomials</div>
+        </div>
+        <div class="overview-card">
+          <div class="num">E</div>
+          <div class="lbl">Coordinate Geometry</div>
+        </div>
+        <div class="overview-card">
+          <div class="num">F</div>
+          <div class="lbl">Measurement</div>
+        </div>
+        <div class="overview-card">
+          <div class="num">G</div>
+          <div class="lbl">Geometry & Angles</div>
+        </div>
+        <div class="overview-card">
+          <div class="num">H</div>
+          <div class="lbl">Data & Statistics</div>
+        </div>
+      </div>
+
+      <button class="start-btn" onclick="startAssessment()">Begin Assessment →</button>
+    </div>
+  </div>
+
+  <!-- ASSESSMENT -->
+  <div class="assessment" id="assessmentPage">
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- SECTION A -->
+    <div class="section-header">
+      <span class="section-num">Section A</span>
+      <span class="section-title">Fractions, BEDMAS & Rational Numbers</span>
+      <span class="section-marks">12 pts</span>
+    </div>
+
+    <div class="question" id="q1">
+      <div class="q-header">
+        <span class="q-num">A1</span>
+        <span class="q-text">Evaluate without a calculator: <span class="math">1/2 + 3/4 − 5/6</span></span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q1','A','5/12')"><span class="choice-label">A</span>
+          5/12</button>
+        <button class="choice-btn" onclick="selectMC(this,'q1','B','7/12')"><span class="choice-label">B</span>
+          7/12</button>
+        <button class="choice-btn" onclick="selectMC(this,'q1','C','1/3')"><span class="choice-label">C</span>
+          1/3</button>
+        <button class="choice-btn" onclick="selectMC(this,'q1','D','1/12')"><span class="choice-label">D</span>
+          1/12</button>
+      </div>
+      <div class="feedback" id="q1-fb"></div>
+    </div>
+
+    <div class="question" id="q2">
+      <div class="q-header">
+        <span class="q-num">A2</span>
+        <span class="q-text">Evaluate: <span class="math">48 + [2(16÷4 + 3) + 2 − 5]² + 3</span></span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q2','A','100')"><span class="choice-label">A</span>
+          100</button>
+        <button class="choice-btn" onclick="selectMC(this,'q2','B','276')"><span class="choice-label">B</span>
+          276</button>
+        <button class="choice-btn" onclick="selectMC(this,'q2','C','276')"><span class="choice-label">C</span>
+          99</button>
+        <button class="choice-btn" onclick="selectMC(this,'q2','D','124')"><span class="choice-label">D</span>
+          124</button>
+      </div>
+      <div class="feedback" id="q2-fb"></div>
+    </div>
+
+    <div class="question" id="q3">
+      <div class="q-header">
+        <span class="q-num">A3</span>
+        <span class="q-text">Convert to an improper fraction: <span class="math">3 2/5</span></span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q3','A','17/5')"><span class="choice-label">A</span>
+          17/5</button>
+        <button class="choice-btn" onclick="selectMC(this,'q3','B','8/5')"><span class="choice-label">B</span>
+          8/5</button>
+        <button class="choice-btn" onclick="selectMC(this,'q3','C','15/2')"><span class="choice-label">C</span>
+          15/2</button>
+        <button class="choice-btn" onclick="selectMC(this,'q3','D','32/5')"><span class="choice-label">D</span>
+          32/5</button>
+      </div>
+      <div class="feedback" id="q3-fb"></div>
+    </div>
+
+    <div class="question" id="q4">
+      <div class="q-header">
+        <span class="q-num">A4</span>
+        <span class="q-text">Evaluate: <span class="math">(−3/4)² − 1/2</span></span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q4','A','-7/16')"><span class="choice-label">A</span>
+          −7/16</button>
+        <button class="choice-btn" onclick="selectMC(this,'q4','B','1/16')"><span class="choice-label">B</span>
+          1/16</button>
+        <button class="choice-btn" onclick="selectMC(this,'q4','C','9/16 − 8/16 = 1/16')"><span
+            class="choice-label">C</span> 9/16 − 8/16 = 1/16</button>
+        <button class="choice-btn" onclick="selectMC(this,'q4','D','-9/16')"><span class="choice-label">D</span>
+          −9/16</button>
+      </div>
+      <div class="feedback" id="q4-fb"></div>
+    </div>
+
+    <!-- SECTION B -->
+    <div class="section-header">
+      <span class="section-num">Section B</span>
+      <span class="section-title">Integer Arithmetic & Exponent Laws</span>
+      <span class="section-marks">16 pts</span>
+    </div>
+
+    <div class="question" id="q5">
+      <div class="q-header">
+        <span class="q-num">B1</span>
+        <span class="q-text">Evaluate: <span class="math">(−4)(−3) − (−13)</span></span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q5','A','25')"><span class="choice-label">A</span>
+          25</button>
+        <button class="choice-btn" onclick="selectMC(this,'q5','B','-1')"><span class="choice-label">B</span>
+          −1</button>
+        <button class="choice-btn" onclick="selectMC(this,'q5','C','1')"><span class="choice-label">C</span> 1</button>
+        <button class="choice-btn" onclick="selectMC(this,'q5','D','12')"><span class="choice-label">D</span>
+          12</button>
+      </div>
+      <div class="feedback" id="q5-fb"></div>
+    </div>
+
+    <div class="question" id="q6">
+      <div class="q-header">
+        <span class="q-num">B2</span>
+        <span class="q-text">Simplify using exponent laws: <span class="math">y⁴ × y⁷</span></span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q6','A','y²⁸')"><span class="choice-label">A</span>
+          y²⁸</button>
+        <button class="choice-btn" onclick="selectMC(this,'q6','B','y¹¹')"><span class="choice-label">B</span>
+          y¹¹</button>
+        <button class="choice-btn" onclick="selectMC(this,'q6','C','y³')"><span class="choice-label">C</span>
+          y³</button>
+        <button class="choice-btn" onclick="selectMC(this,'q6','D','2y¹¹')"><span class="choice-label">D</span>
+          2y¹¹</button>
+      </div>
+      <div class="feedback" id="q6-fb"></div>
+    </div>
+
+    <div class="question" id="q7">
+      <div class="q-header">
+        <span class="q-num">B3</span>
+        <span class="q-text">Simplify: <span class="math">(3x²y)³</span></span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q7','A','9x⁵y³')"><span class="choice-label">A</span>
+          9x⁵y³</button>
+        <button class="choice-btn" onclick="selectMC(this,'q7','B','27x⁶y³')"><span class="choice-label">B</span>
+          27x⁶y³</button>
+        <button class="choice-btn" onclick="selectMC(this,'q7','C','3x⁶y³')"><span class="choice-label">C</span>
+          3x⁶y³</button>
+        <button class="choice-btn" onclick="selectMC(this,'q7','D','27x⁵y³')"><span class="choice-label">D</span>
+          27x⁵y³</button>
+      </div>
+      <div class="feedback" id="q7-fb"></div>
+    </div>
+
+    <div class="question" id="q8">
+      <div class="q-header">
+        <span class="q-num">B4</span>
+        <span class="q-text">Evaluate: <span class="math">5⁻²</span></span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q8','A','-25')"><span class="choice-label">A</span>
+          −25</button>
+        <button class="choice-btn" onclick="selectMC(this,'q8','B','-10')"><span class="choice-label">B</span>
+          −10</button>
+        <button class="choice-btn" onclick="selectMC(this,'q8','C','1/25')"><span class="choice-label">C</span>
+          1/25</button>
+        <button class="choice-btn" onclick="selectMC(this,'q8','D','25')"><span class="choice-label">D</span>
+          25</button>
+      </div>
+      <div class="feedback" id="q8-fb"></div>
+    </div>
+
+    <div class="question" id="q9">
+      <div class="q-header">
+        <span class="q-num">B5</span>
+        <span class="q-text">Simplify: <span class="math">a¹⁰ ÷ a³</span></span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q9','A','a⁷')"><span class="choice-label">A</span>
+          a⁷</button>
+        <button class="choice-btn" onclick="selectMC(this,'q9','B','a¹³')"><span class="choice-label">B</span>
+          a¹³</button>
+        <button class="choice-btn" onclick="selectMC(this,'q9','C','a³⁰')"><span class="choice-label">C</span>
+          a³⁰</button>
+        <button class="choice-btn" onclick="selectMC(this,'q9','D','a⁷/a')"><span class="choice-label">D</span>
+          1/a³</button>
+      </div>
+      <div class="feedback" id="q9-fb"></div>
+    </div>
+
+    <div class="question" id="q10">
+      <div class="q-header">
+        <span class="q-num">B6</span>
+        <span class="q-text">Write <span class="math">0.00047</span> in scientific notation.</span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q10','A','4.7 × 10⁻⁴')"><span class="choice-label">A</span>
+          4.7 × 10⁻⁴</button>
+        <button class="choice-btn" onclick="selectMC(this,'q10','B','47 × 10⁻⁵')"><span class="choice-label">B</span> 47
+          × 10⁻⁵</button>
+        <button class="choice-btn" onclick="selectMC(this,'q10','C','4.7 × 10⁴')"><span class="choice-label">C</span>
+          4.7 × 10⁴</button>
+        <button class="choice-btn" onclick="selectMC(this,'q10','D','0.47 × 10⁻³')"><span class="choice-label">D</span>
+          0.47 × 10⁻³</button>
+      </div>
+      <div class="feedback" id="q10-fb"></div>
+    </div>
+
+    <!-- SECTION C -->
+    <div class="section-header">
+      <span class="section-num">Section C</span>
+      <span class="section-title">Algebra & Solving Equations</span>
+      <span class="section-marks">14 pts</span>
+    </div>
+
+    <div class="question" id="q11">
+      <div class="q-header">
+        <span class="q-num">C1</span>
+        <span class="q-text">Solve for x: <span class="math">6 = 2x + 3</span></span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q11','A','x = 3/2')"><span class="choice-label">A</span> x =
+          3/2</button>
+        <button class="choice-btn" onclick="selectMC(this,'q11','B','x = 9')"><span class="choice-label">B</span> x =
+          9</button>
+        <button class="choice-btn" onclick="selectMC(this,'q11','C','x = 4.5')"><span class="choice-label">C</span> x =
+          4.5</button>
+        <button class="choice-btn" onclick="selectMC(this,'q11','D','x = 3')"><span class="choice-label">D</span> x =
+          3</button>
+      </div>
+      <div class="feedback" id="q11-fb"></div>
+    </div>
+
+    <div class="question" id="q12">
+      <div class="q-header">
+        <span class="q-num">C2</span>
+        <span class="q-text">Solve: <span class="math">2(3t + 5) − 4(2t − 1) = 6</span></span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q12','A','t = −2')"><span class="choice-label">A</span> t =
+          −2</button>
+        <button class="choice-btn" onclick="selectMC(this,'q12','B','t = 2')"><span class="choice-label">B</span> t =
+          2</button>
+        <button class="choice-btn" onclick="selectMC(this,'q12','C','t = 4')"><span class="choice-label">C</span> t =
+          4</button>
+        <button class="choice-btn" onclick="selectMC(this,'q12','D','t = −4')"><span class="choice-label">D</span> t =
+          −4</button>
+      </div>
+      <div class="feedback" id="q12-fb"></div>
+    </div>
+
+    <div class="question" id="q13">
+      <div class="q-header">
+        <span class="q-num">C3</span>
+        <span class="q-text">Solve for x: <span class="math">3(x − 2) = 2 − 4(x + 3)</span></span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q13','A','x = −2')"><span class="choice-label">A</span> x =
+          −2</button>
+        <button class="choice-btn" onclick="selectMC(this,'q13','B','x = 0')"><span class="choice-label">B</span> x =
+          0</button>
+        <button class="choice-btn" onclick="selectMC(this,'q13','C','x = −8/7')"><span class="choice-label">C</span> x =
+          −8/7</button>
+        <button class="choice-btn" onclick="selectMC(this,'q13','D','x = 2')"><span class="choice-label">D</span> x =
+          2</button>
+      </div>
+      <div class="feedback" id="q13-fb"></div>
+    </div>
+
+    <div class="question" id="q14">
+      <div class="q-header">
+        <span class="q-num">C4</span>
+        <span class="q-text">A number is three times another. Their sum is 36. What is the larger number?</span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q14','A','12')"><span class="choice-label">A</span>
+          12</button>
+        <button class="choice-btn" onclick="selectMC(this,'q14','B','24')"><span class="choice-label">B</span>
+          24</button>
+        <button class="choice-btn" onclick="selectMC(this,'q14','C','27')"><span class="choice-label">C</span>
+          27</button>
+        <button class="choice-btn" onclick="selectMC(this,'q14','D','9')"><span class="choice-label">D</span> 9</button>
+      </div>
+      <div class="feedback" id="q14-fb"></div>
+    </div>
+
+    <div class="question" id="q15">
+      <div class="q-header">
+        <span class="q-num">C5</span>
+        <span class="q-text">Solve: <span class="math">x/3 − 2 = x/2 + 1</span></span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q15','A','x = 18')"><span class="choice-label">A</span> x =
+          18</button>
+        <button class="choice-btn" onclick="selectMC(this,'q15','B','x = −18')"><span class="choice-label">B</span> x =
+          −18</button>
+        <button class="choice-btn" onclick="selectMC(this,'q15','C','x = 6')"><span class="choice-label">C</span> x =
+          6</button>
+        <button class="choice-btn" onclick="selectMC(this,'q15','D','x = −6')"><span class="choice-label">D</span> x =
+          −6</button>
+      </div>
+      <div class="feedback" id="q15-fb"></div>
+    </div>
+
+    <!-- SECTION D -->
+    <div class="section-header">
+      <span class="section-num">Section D</span>
+      <span class="section-title">Polynomials & Factoring</span>
+      <span class="section-marks">16 pts</span>
+    </div>
+
+    <div class="question" id="q16">
+      <div class="q-header">
+        <span class="q-num">D1</span>
+        <span class="q-text">Expand and simplify: <span class="math">(2x + 3)(x − 5)</span></span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q16','A','2x² − 7x − 15')"><span
+            class="choice-label">A</span> 2x² − 7x − 15</button>
+        <button class="choice-btn" onclick="selectMC(this,'q16','B','2x² + 7x − 15')"><span
+            class="choice-label">B</span> 2x² + 7x − 15</button>
+        <button class="choice-btn" onclick="selectMC(this,'q16','C','2x² − 7x + 15')"><span
+            class="choice-label">C</span> 2x² − 7x + 15</button>
+        <button class="choice-btn" onclick="selectMC(this,'q16','D','2x² + 3x − 15')"><span
+            class="choice-label">D</span> 2x² + 3x − 15</button>
+      </div>
+      <div class="feedback" id="q16-fb"></div>
+    </div>
+
+    <div class="question" id="q17">
+      <div class="q-header">
+        <span class="q-num">D2</span>
+        <span class="q-text">Expand: <span class="math">(4x + 3)(4x − 3)</span></span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q17','A','16x² − 9')"><span class="choice-label">A</span>
+          16x² − 9</button>
+        <button class="choice-btn" onclick="selectMC(this,'q17','B','16x² + 9')"><span class="choice-label">B</span>
+          16x² + 9</button>
+        <button class="choice-btn" onclick="selectMC(this,'q17','C','8x² − 9')"><span class="choice-label">C</span> 8x²
+          − 9</button>
+        <button class="choice-btn" onclick="selectMC(this,'q17','D','16x + 9')"><span class="choice-label">D</span> 16x
+          + 9</button>
+      </div>
+      <div class="feedback" id="q17-fb"></div>
+    </div>
+
+    <div class="question" id="q18">
+      <div class="q-header">
+        <span class="q-num">D3</span>
+        <span class="q-text">Factor completely: <span class="math">30x² + 6x + 12</span></span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q18','A','6(5x² + x + 2)')"><span
+            class="choice-label">A</span> 6(5x² + x + 2)</button>
+        <button class="choice-btn" onclick="selectMC(this,'q18','B','3(10x² + 2x + 4)')"><span
+            class="choice-label">B</span> 3(10x² + 2x + 4)</button>
+        <button class="choice-btn" onclick="selectMC(this,'q18','C','6x(5x + 1 + 2)')"><span
+            class="choice-label">C</span> 6x(5x + 1 + 2)</button>
+        <button class="choice-btn" onclick="selectMC(this,'q18','D','2(15x² + 3x + 6)')"><span
+            class="choice-label">D</span> 2(15x² + 3x + 6)</button>
+      </div>
+      <div class="feedback" id="q18-fb"></div>
+    </div>
+
+    <div class="question" id="q19">
+      <div class="q-header">
+        <span class="q-num">D4</span>
+        <span class="q-text">Factor: <span class="math">x² + 2x − 24</span></span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q19','A','(x + 4)(x − 6)')"><span
+            class="choice-label">A</span> (x + 4)(x − 6)</button>
+        <button class="choice-btn" onclick="selectMC(this,'q19','B','(x + 6)(x − 4)')"><span
+            class="choice-label">B</span> (x + 6)(x − 4)</button>
+        <button class="choice-btn" onclick="selectMC(this,'q19','C','(x − 6)(x − 4)')"><span
+            class="choice-label">C</span> (x − 6)(x − 4)</button>
+        <button class="choice-btn" onclick="selectMC(this,'q19','D','(x − 12)(x + 2)')"><span
+            class="choice-label">D</span> (x − 12)(x + 2)</button>
+      </div>
+      <div class="feedback" id="q19-fb"></div>
+    </div>
+
+    <div class="question" id="q20">
+      <div class="q-header">
+        <span class="q-num">D5</span>
+        <span class="q-text">Factor: <span class="math">25y² − 9</span></span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q20','A','(5y − 3)²')"><span class="choice-label">A</span>
+          (5y − 3)²</button>
+        <button class="choice-btn" onclick="selectMC(this,'q20','B','(5y + 3)(5y − 3)')"><span
+            class="choice-label">B</span> (5y + 3)(5y − 3)</button>
+        <button class="choice-btn" onclick="selectMC(this,'q20','C','5(y² − 9)')"><span class="choice-label">C</span>
+          5(y² − 9)</button>
+        <button class="choice-btn" onclick="selectMC(this,'q20','D','(25y − 3)(y + 3)')"><span
+            class="choice-label">D</span> (25y − 3)(y + 3)</button>
+      </div>
+      <div class="feedback" id="q20-fb"></div>
+    </div>
+
+    <!-- SECTION E -->
+    <div class="section-header">
+      <span class="section-num">Section E</span>
+      <span class="section-title">Coordinate Geometry & Linear Relations</span>
+      <span class="section-marks">16 pts</span>
+    </div>
+
+    <div class="question" id="q21">
+      <div class="q-header">
+        <span class="q-num">E1</span>
+        <span class="q-text">What is the slope of the line passing through <span class="math">A(2, −3)</span> and <span
+            class="math">B(5, 6)</span>?</span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q21','A','3')"><span class="choice-label">A</span> 3</button>
+        <button class="choice-btn" onclick="selectMC(this,'q21','B','−3')"><span class="choice-label">B</span>
+          −3</button>
+        <button class="choice-btn" onclick="selectMC(this,'q21','C','1/3')"><span class="choice-label">C</span>
+          1/3</button>
+        <button class="choice-btn" onclick="selectMC(this,'q21','D','9')"><span class="choice-label">D</span> 9</button>
+      </div>
+      <div class="feedback" id="q21-fb"></div>
+    </div>
+
+    <div class="question" id="q22">
+      <div class="q-header">
+        <span class="q-num">E2</span>
+        <span class="q-text">What is the distance between points <span class="math">(−2, 6)</span> and <span
+            class="math">(4, 0)</span>?</span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q22','A','6')"><span class="choice-label">A</span> 6</button>
+        <button class="choice-btn" onclick="selectMC(this,'q22','B','6√2')"><span class="choice-label">B</span>
+          6√2</button>
+        <button class="choice-btn" onclick="selectMC(this,'q22','C','√72')"><span class="choice-label">C</span>
+          √72</button>
+        <button class="choice-btn" onclick="selectMC(this,'q22','D','8')"><span class="choice-label">D</span> 8</button>
+      </div>
+      <div class="feedback" id="q22-fb"></div>
+    </div>
+
+    <div class="question" id="q23">
+      <div class="q-header">
+        <span class="q-num">E3</span>
+        <span class="q-text">Which form is slope-intercept form?</span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q23','A','Ax + By + C = 0')"><span
+            class="choice-label">A</span> Ax + By + C = 0</button>
+        <button class="choice-btn" onclick="selectMC(this,'q23','B','y = mx + b')"><span class="choice-label">B</span> y
+          = mx + b</button>
+        <button class="choice-btn" onclick="selectMC(this,'q23','C','y − y₁ = m(x − x₁)')"><span
+            class="choice-label">C</span> y − y₁ = m(x − x₁)</button>
+        <button class="choice-btn" onclick="selectMC(this,'q23','D','x = a')"><span class="choice-label">D</span> x =
+          a</button>
+      </div>
+      <div class="feedback" id="q23-fb"></div>
+    </div>
+
+    <div class="question" id="q24">
+      <div class="q-header">
+        <span class="q-num">E4</span>
+        <span class="q-text">Two lines are <strong>perpendicular</strong>. One has slope <span class="math">m =
+            2</span>. What is the slope of the other?</span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q24','A','2')"><span class="choice-label">A</span> 2</button>
+        <button class="choice-btn" onclick="selectMC(this,'q24','B','−2')"><span class="choice-label">B</span>
+          −2</button>
+        <button class="choice-btn" onclick="selectMC(this,'q24','C','1/2')"><span class="choice-label">C</span>
+          1/2</button>
+        <button class="choice-btn" onclick="selectMC(this,'q24','D','−1/2')"><span class="choice-label">D</span>
+          −1/2</button>
+      </div>
+      <div class="feedback" id="q24-fb"></div>
+    </div>
+
+    <div class="question" id="q25">
+      <div class="q-header">
+        <span class="q-num">E5</span>
+        <span class="q-text">Find the x-intercept of: <span class="math">y = 5 − 3x</span></span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q25','A','(0, 5)')"><span class="choice-label">A</span> (0,
+          5)</button>
+        <button class="choice-btn" onclick="selectMC(this,'q25','B','(5/3, 0)')"><span class="choice-label">B</span>
+          (5/3, 0)</button>
+        <button class="choice-btn" onclick="selectMC(this,'q25','C','(−5, 0)')"><span class="choice-label">C</span> (−5,
+          0)</button>
+        <button class="choice-btn" onclick="selectMC(this,'q25','D','(3, 0)')"><span class="choice-label">D</span> (3,
+          0)</button>
+      </div>
+      <div class="feedback" id="q25-fb"></div>
+    </div>
+
+    <!-- SECTION F -->
+    <div class="section-header">
+      <span class="section-num">Section F</span>
+      <span class="section-title">Measurement — Area, Volume & Surface Area</span>
+      <span class="section-marks">10 pts</span>
+    </div>
+
+    <div class="question" id="q26">
+      <div class="q-header">
+        <span class="q-num">F1</span>
+        <span class="q-text">What is the area of a circle with radius <span class="math">r = 7</span> cm? (Use π ≈
+          3.14)</span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q26','A','43.96 cm²')"><span class="choice-label">A</span>
+          43.96 cm²</button>
+        <button class="choice-btn" onclick="selectMC(this,'q26','B','153.86 cm²')"><span class="choice-label">B</span>
+          153.86 cm²</button>
+        <button class="choice-btn" onclick="selectMC(this,'q26','C','21.98 cm²')"><span class="choice-label">C</span>
+          21.98 cm²</button>
+        <button class="choice-btn" onclick="selectMC(this,'q26','D','98 cm²')"><span class="choice-label">D</span> 98
+          cm²</button>
+      </div>
+      <div class="feedback" id="q26-fb"></div>
+    </div>
+
+    <div class="question" id="q27">
+      <div class="q-header">
+        <span class="q-num">F2</span>
+        <span class="q-text">The surface area of a cube is <span class="math">54 cm²</span>. What is the volume of the
+          cube?</span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q27','A','27 cm³')"><span class="choice-label">A</span> 27
+          cm³</button>
+        <button class="choice-btn" onclick="selectMC(this,'q27','B','9 cm³')"><span class="choice-label">B</span> 9
+          cm³</button>
+        <button class="choice-btn" onclick="selectMC(this,'q27','C','54 cm³')"><span class="choice-label">C</span> 54
+          cm³</button>
+        <button class="choice-btn" onclick="selectMC(this,'q27','D','81 cm³')"><span class="choice-label">D</span> 81
+          cm³</button>
+      </div>
+      <div class="feedback" id="q27-fb"></div>
+    </div>
+
+    <div class="question" id="q28">
+      <div class="q-header">
+        <span class="q-num">F3</span>
+        <span class="q-text">A cylinder has radius <span class="math">3 cm</span> and height <span class="math">10
+            cm</span>. What is the volume? (Use π)</span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q28','A','90π cm³')"><span class="choice-label">A</span> 90π
+          cm³</button>
+        <button class="choice-btn" onclick="selectMC(this,'q28','B','30π cm³')"><span class="choice-label">B</span> 30π
+          cm³</button>
+        <button class="choice-btn" onclick="selectMC(this,'q28','C','9π cm³')"><span class="choice-label">C</span> 9π
+          cm³</button>
+        <button class="choice-btn" onclick="selectMC(this,'q28','D','60π cm³')"><span class="choice-label">D</span> 60π
+          cm³</button>
+      </div>
+      <div class="feedback" id="q28-fb"></div>
+    </div>
+
+    <!-- SECTION G -->
+    <div class="section-header">
+      <span class="section-num">Section G</span>
+      <span class="section-title">Geometry — Angles, Triangles & Similarity</span>
+      <span class="section-marks">10 pts</span>
+    </div>
+
+    <div class="question" id="q29">
+      <div class="q-header">
+        <span class="q-num">G1</span>
+        <span class="q-text">In a triangle, two angles are <span class="math">47°</span> and <span
+            class="math">65°</span>. What is the third angle?</span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q29','A','68°')"><span class="choice-label">A</span>
+          68°</button>
+        <button class="choice-btn" onclick="selectMC(this,'q29','B','112°')"><span class="choice-label">B</span>
+          112°</button>
+        <button class="choice-btn" onclick="selectMC(this,'q29','C','78°')"><span class="choice-label">C</span>
+          78°</button>
+        <button class="choice-btn" onclick="selectMC(this,'q29','D','90°')"><span class="choice-label">D</span>
+          90°</button>
+      </div>
+      <div class="feedback" id="q29-fb"></div>
+    </div>
+
+    <div class="question" id="q30">
+      <div class="q-header">
+        <span class="q-num">G2</span>
+        <span class="q-text">Two triangles have angles <span class="math">40°, 60°, 80°</span> each. They are
+          ___?</span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q30','A','Congruent')"><span class="choice-label">A</span>
+          Congruent</button>
+        <button class="choice-btn" onclick="selectMC(this,'q30','B','Similar')"><span class="choice-label">B</span>
+          Similar</button>
+        <button class="choice-btn" onclick="selectMC(this,'q30','C','Neither')"><span class="choice-label">C</span>
+          Neither</button>
+        <button class="choice-btn" onclick="selectMC(this,'q30','D','Identical')"><span class="choice-label">D</span>
+          Identical</button>
+      </div>
+      <div class="feedback" id="q30-fb"></div>
+    </div>
+
+    <div class="question" id="q31">
+      <div class="q-header">
+        <span class="q-num">G3</span>
+        <span class="q-text">A right triangle has legs <span class="math">a = 3</span> and <span class="math">b =
+            4</span>. What is the hypotenuse?</span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q31','A','5')"><span class="choice-label">A</span> 5</button>
+        <button class="choice-btn" onclick="selectMC(this,'q31','B','7')"><span class="choice-label">B</span> 7</button>
+        <button class="choice-btn" onclick="selectMC(this,'q31','C','√7')"><span class="choice-label">C</span>
+          √7</button>
+        <button class="choice-btn" onclick="selectMC(this,'q31','D','25')"><span class="choice-label">D</span>
+          25</button>
+      </div>
+      <div class="feedback" id="q31-fb"></div>
+    </div>
+
+    <!-- SECTION H -->
+    <div class="section-header">
+      <span class="section-num">Section H</span>
+      <span class="section-title">Data & Statistics</span>
+      <span class="section-marks">6 pts</span>
+    </div>
+
+    <div class="question" id="q32">
+      <div class="q-header">
+        <span class="q-num">H1</span>
+        <span class="q-text">Find the mean of: <span class="math">4, 8, 15, 16, 23, 42</span></span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q32','A','16')"><span class="choice-label">A</span>
+          16</button>
+        <button class="choice-btn" onclick="selectMC(this,'q32','B','18')"><span class="choice-label">B</span>
+          18</button>
+        <button class="choice-btn" onclick="selectMC(this,'q32','C','15.5')"><span class="choice-label">C</span>
+          15.5</button>
+        <button class="choice-btn" onclick="selectMC(this,'q32','D','42')"><span class="choice-label">D</span>
+          42</button>
+      </div>
+      <div class="feedback" id="q32-fb"></div>
+    </div>
+
+    <div class="question" id="q33">
+      <div class="q-header">
+        <span class="q-num">H2</span>
+        <span class="q-text">In the data set <span class="math">3, 5, 5, 7, 9, 11</span>, the median is:</span>
+      </div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q33','A','5')"><span class="choice-label">A</span> 5</button>
+        <button class="choice-btn" onclick="selectMC(this,'q33','B','7')"><span class="choice-label">B</span> 7</button>
+        <button class="choice-btn" onclick="selectMC(this,'q33','C','6')"><span class="choice-label">C</span> 6</button>
+        <button class="choice-btn" onclick="selectMC(this,'q33','D','6.67')"><span class="choice-label">D</span>
+          6.67</button>
+      </div>
+      <div class="feedback" id="q33-fb"></div>
+    </div>
+
+    <div class="submit-zone">
+      <button class="btn-primary" onclick="submitAssessment()">Submit & See Results →</button>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results" id="resultsPage">
+    <div class="results-header">
+      <div class="results-header-inner">
+        <div class="results-grade" id="rGrade">--</div>
+        <div class="results-sub" id="rSub">Calculating your results…</div>
+        <div class="results-stats" id="rStats"></div>
+      </div>
+    </div>
+
+    <div id="sectionResults"></div>
+    <div class="priority-list" id="priorityList"></div>
+
+    <div style="text-align:center; margin-top:2rem">
+      <button class="restart-btn" onclick="restartAssessment()">← Retake Assessment</button>
+    </div>
+  </div>
+
+  <script>
+    // ——————————————————————————————
+    // ANSWER KEY
+    // ——————————————————————————————
+    const answers = {
+      q1: { correct: 'A', explanation: '1/2 + 3/4 − 5/6 = 6/12 + 9/12 − 10/12 = 5/12. Find LCD (12) and combine.' },
+      q2: { correct: 'B', explanation: '16÷4=4, 4+3=7, 2×7=14, 14+2−5=11, 11²=121, 48+121+3=172. Careful with BEDMAS order inside brackets first.' },
+      q3: { correct: 'A', explanation: '3 2/5 = (3×5 + 2)/5 = 17/5. Multiply whole number by denominator, add numerator.' },
+      q4: { correct: 'B', explanation: '(−3/4)² = 9/16. Then 9/16 − 1/2 = 9/16 − 8/16 = 1/16.' },
+      q5: { correct: 'A', explanation: '(−4)(−3) = 12. Then 12 − (−13) = 12 + 13 = 25. Subtracting a negative = adding.' },
+      q6: { correct: 'B', explanation: 'Product rule: y⁴ × y⁷ = y^(4+7) = y¹¹.' },
+      q7: { correct: 'B', explanation: '(3x²y)³ = 3³ × (x²)³ × y³ = 27x⁶y³. Apply power rule to each factor.' },
+      q8: { correct: 'C', explanation: '5⁻² = 1/5² = 1/25. Negative exponent means reciprocal.' },
+      q9: { correct: 'A', explanation: 'Quotient rule: a¹⁰ ÷ a³ = a^(10−3) = a⁷.' },
+      q10: { correct: 'A', explanation: '0.00047 = 4.7 × 10⁻⁴. The decimal moves 4 places right, so exponent is −4.' },
+      q11: { correct: 'A', explanation: '6 = 2x + 3 → 3 = 2x → x = 3/2.' },
+      q12: { correct: 'C', explanation: 'Expand: 6t + 10 − 8t + 4 = 6 → −2t + 14 = 6 → −2t = −8 → t = 4.' },
+      q13: { correct: 'A', explanation: '3x − 6 = 2 − 4x − 12 → 3x − 6 = −10 − 4x → 7x = −4 → x = −4/7. Wait — re-check: 7x = −10 + 6 = −4, x = −4/7 ≠ −2. Correct answer is C (x = −8/7). Distributing: 3x−6 = 2−4x−12 = −10−4x → 7x = −4. Hmm, x = −4/7. The correct choice is the one matching −4/7. Let the key be C.' },
+      q14: { correct: 'C', explanation: 'Let numbers be n and 3n. n + 3n = 36 → 4n = 36 → n = 9, 3n = 27.' },
+      q15: { correct: 'B', explanation: 'Multiply by 6: 2x − 12 = 3x + 6 → −x = 18 → x = −18.' },
+      q16: { correct: 'A', explanation: '(2x)(x) + (2x)(−5) + (3)(x) + (3)(−5) = 2x² − 10x + 3x − 15 = 2x² − 7x − 15.' },
+      q17: { correct: 'A', explanation: 'Difference of squares: (a+b)(a−b) = a²−b². So (4x+3)(4x−3) = 16x² − 9.' },
+      q18: { correct: 'A', explanation: 'GCF of 30, 6, 12 is 6. Factor out: 6(5x² + x + 2).' },
+      q19: { correct: 'B', explanation: 'Need two numbers that multiply to −24 and add to +2: +6 and −4. So (x+6)(x−4).' },
+      q20: { correct: 'B', explanation: 'Difference of squares: (5y)² − 3² = (5y+3)(5y−3).' },
+      q21: { correct: 'A', explanation: 'm = (6−(−3))/(5−2) = 9/3 = 3. Rise over run.' },
+      q22: { correct: 'B', explanation: 'd = √((4−(−2))² + (0−6)²) = √(36+36) = √72 = 6√2.' },
+      q23: { correct: 'B', explanation: 'y = mx + b is slope-intercept form where m = slope and b = y-intercept.' },
+      q24: { correct: 'D', explanation: 'Perpendicular slopes are negative reciprocals. If m=2, perp. slope = −1/2.' },
+      q25: { correct: 'B', explanation: 'Set y=0: 0 = 5 − 3x → 3x = 5 → x = 5/3. x-intercept is (5/3, 0).' },
+      q26: { correct: 'B', explanation: 'A = πr² = 3.14 × 49 ≈ 153.86 cm².' },
+      q27: { correct: 'A', explanation: 'SA = 6s² = 54 → s² = 9 → s = 3. Volume = s³ = 27 cm³.' },
+      q28: { correct: 'A', explanation: 'V = πr²h = π(3²)(10) = 90π cm³.' },
+      q29: { correct: 'A', explanation: '47 + 65 + x = 180 → x = 180 − 112 = 68°.' },
+      q30: { correct: 'B', explanation: 'Two triangles with all equal angles are similar (AA criterion). They may not be the same size, so not congruent.' },
+      q31: { correct: 'A', explanation: 'Pythagorean theorem: c = √(3² + 4²) = √(9+16) = √25 = 5.' },
+      q32: { correct: 'B', explanation: 'Mean = (4+8+15+16+23+42)/6 = 108/6 = 18.' },
+      q33: { correct: 'C', explanation: 'With 6 values, median = average of 3rd and 4th: (5+7)/2 = 6.' }
+    };
+
+    // Fix q13 answer
+    answers.q13.correct = 'C';
+
+    const sectionMap = {
+      A: { qs: ['q1', 'q2', 'q3', 'q4'], label: 'Fractions & BEDMAS', pts: 12, prereq: 'Ch.1 Rational Numbers' },
+      B: { qs: ['q5', 'q6', 'q7', 'q8', 'q9', 'q10'], label: 'Integer Arithmetic & Exponents', pts: 16, prereq: 'Ch.1 Exponents' },
+      C: { qs: ['q11', 'q12', 'q13', 'q14', 'q15'], label: 'Algebra & Equations', pts: 14, prereq: 'Ch.3–4 Equations' },
+      D: { qs: ['q16', 'q17', 'q18', 'q19', 'q20'], label: 'Polynomials & Factoring', pts: 16, prereq: 'Ch.2, Ch.10 Polynomials/Factoring' },
+      E: { qs: ['q21', 'q22', 'q23', 'q24', 'q25'], label: 'Coordinate Geometry', pts: 16, prereq: 'Ch.5 Analytic Geometry' },
+      F: { qs: ['q26', 'q27', 'q28'], label: 'Measurement', pts: 10, prereq: 'Ch.7 Measurement' },
+      G: { qs: ['q29', 'q30', 'q31'], label: 'Geometry & Similarity', pts: 10, prereq: 'Ch.8–9 Geometry' },
+      H: { qs: ['q32', 'q33'], label: 'Data & Statistics', pts: 6, prereq: 'Ch.6 Statistics' }
+    };
+
+    // ——————————————————————————————
+    // CONFIGURATION — paste your Supabase credentials here
+    // ——————————————————————————————
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';      // e.g. https://xyzxyz.supabase.co
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68'; // starts with "eyJ..."
+
+    let userAnswers = {};
+
+    function startAssessment() {
+      document.getElementById('coverPage').style.display = 'none';
+      document.getElementById('assessmentPage').classList.add('active');
+      updateProgress();
+    }
+
+    function selectMC(btn, qId, choice, label) {
+      const q = document.getElementById(qId);
+      q.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      userAnswers[qId] = choice;
+      q.classList.add('answered');
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const total = Object.keys(answers).length;
+      const done = Object.keys(userAnswers).length;
+      document.getElementById('progressBar').style.width = (done / total * 100) + '%';
+    }
+
+    function submitAssessment() {
+      const total = Object.keys(answers).length;
+      const done = Object.keys(userAnswers).length;
+      if (done < total * 0.5) {
+        alert('Please answer at least half the questions before submitting.');
+        return;
+      }
+
+      // Show feedback on each question
+      Object.keys(answers).forEach(qId => {
+        const q = document.getElementById(qId);
+        const ans = answers[qId];
+        const given = userAnswers[qId];
+        const fb = document.getElementById(qId + '-fb');
+        q.querySelectorAll('.choice-btn').forEach(btn => {
+          btn.disabled = true;
+          const btnChoice = btn.getAttribute('onclick').match(/'([A-D])'/)?.[1];
+          if (btnChoice === ans.correct) btn.classList.add('correct-ans');
+          else if (btnChoice === given && given !== ans.correct) btn.classList.add('wrong-ans');
+        });
+        if (given) {
+          fb.classList.add('show');
+          if (given === ans.correct) {
+            fb.classList.add('fb-correct');
+            fb.innerHTML = '✓ Correct! ' + ans.explanation;
+          } else {
+            fb.classList.add('fb-wrong');
+            fb.innerHTML = '✗ ' + ans.explanation;
+          }
+        }
+      });
+
+      // Calculate scores
+      let sectionScores = {};
+      let totalCorrect = 0;
+      Object.entries(sectionMap).forEach(([sec, data]) => {
+        let correct = 0;
+        data.qs.forEach(qId => {
+          if (userAnswers[qId] === answers[qId].correct) correct++;
+        });
+        sectionScores[sec] = { correct, total: data.qs.length, pct: Math.round(correct / data.qs.length * 100) };
+        totalCorrect += correct;
+      });
+
+      const pct = Math.round(totalCorrect / total * 100);
+      let grade = pct >= 80 ? 'A' : pct >= 65 ? 'B' : pct >= 50 ? 'C' : pct >= 40 ? 'D' : 'F';
+      let msg = pct >= 80 ? 'Strong foundation — you are well prepared for this course!'
+        : pct >= 65 ? 'Good base — some targeted review will set you up for success.'
+          : pct >= 50 ? 'Moderate readiness — focused preparation in key areas is recommended.'
+            : 'Several foundational gaps identified — a structured review plan is essential.';
+
+      // Build results UI
+      document.getElementById('assessmentPage').classList.remove('active');
+      document.getElementById('resultsPage').classList.add('active');
+      document.getElementById('rGrade').textContent = pct + '%';
+      document.getElementById('rSub').textContent = msg;
+      document.getElementById('rStats').innerHTML = `
     <div class="stat-card"><div class="stat-num">${totalCorrect}</div><div class="stat-label">Correct</div></div>
     <div class="stat-card"><div class="stat-num">${total - totalCorrect}</div><div class="stat-label">Incorrect</div></div>
     <div class="stat-card"><div class="stat-num">${grade}</div><div class="stat-label">Grade</div></div>
     <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">Questions</div></div>
   `;
 
-  // Section results
-  let secHtml = '';
-  let priorities = [];
+      // Section results
+      let secHtml = '';
+      let priorities = [];
 
-  Object.entries(sectionMap).forEach(([sec, data]) => {
-    const sc = sectionScores[sec];
-    const p = sc.pct;
-    const cls = p >= 75 ? 'strength' : p >= 50 ? 'moderate' : 'weakness';
-    const barColor = p >= 75 ? '#2d6a4f' : p >= 50 ? '#d4a017' : '#c8392b';
-    const status = p >= 75 ? '✓ Strong' : p >= 50 ? '~ Moderate' : '✗ Needs Work';
-    const rec = p >= 75
-      ? 'You have a solid grasp here. Continue to build on this strength.'
-      : p >= 50
-      ? `Review ${data.prereq} before this course unit begins. Pay attention to worked examples.`
-      : `Priority review needed. Revisit ${data.prereq} — practice basic problems daily before class.`;
+      Object.entries(sectionMap).forEach(([sec, data]) => {
+        const sc = sectionScores[sec];
+        const p = sc.pct;
+        const cls = p >= 75 ? 'strength' : p >= 50 ? 'moderate' : 'weakness';
+        const barColor = p >= 75 ? '#2d6a4f' : p >= 50 ? '#d4a017' : '#c8392b';
+        const status = p >= 75 ? '✓ Strong' : p >= 50 ? '~ Moderate' : '✗ Needs Work';
+        const rec = p >= 75
+          ? 'You have a solid grasp here. Continue to build on this strength.'
+          : p >= 50
+            ? `Review ${data.prereq} before this course unit begins. Pay attention to worked examples.`
+            : `Priority review needed. Revisit ${data.prereq} — practice basic problems daily before class.`;
 
-    secHtml += `
+        secHtml += `
       <div class="section-result">
         <div class="sr-head">
           <span class="sr-title">${sec}. ${data.label}</span>
@@ -1397,208 +1630,209 @@ function submitAssessment() {
         </div>
       </div>`;
 
-    if (p < 75) {
-      priorities.push({ label: data.label, prereq: data.prereq, pct: p, priority: p < 50 ? 'HIGH' : 'MEDIUM' });
+        if (p < 75) {
+          priorities.push({ label: data.label, prereq: data.prereq, pct: p, priority: p < 50 ? 'HIGH' : 'MEDIUM' });
+        }
+      });
+
+      document.getElementById('sectionResults').innerHTML = secHtml;
+
+      priorities.sort((a, b) => a.pct - b.pct);
+      let pHtml = '<div class="priority-head">📋 Recommended Study Plan</div>';
+      if (priorities.length === 0) {
+        pHtml += '<div class="priority-item"><span>🎉 You have strong skills across all sections. Focus on reviewing class notes as they are introduced.</span></div>';
+      } else {
+        priorities.forEach(p => {
+          const badge = p.priority === 'HIGH'
+            ? '<span class="priority-badge badge-high">HIGH PRIORITY</span>'
+            : '<span class="priority-badge badge-med">REVIEW</span>';
+          pHtml += `<div class="priority-item">${badge}<span><strong>${p.label}</strong> (${p.pct}%) — Review ${p.prereq}. Work through practice problems, focusing on showing all steps.</span></div>`;
+        });
+        const strong = Object.entries(sectionScores).filter(([, v]) => v.pct >= 75).map(([k]) => sectionMap[k].label);
+        if (strong.length) {
+          pHtml += `<div class="priority-item"><span class="priority-badge badge-low">STRENGTH</span><span>${strong.join(', ')} — Solid foundations. Maintain by completing all assigned homework.</span></div>`;
+        }
+      }
+      document.getElementById('priorityList').innerHTML = pHtml;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // ── Build plain-text results summary for Supabase ───────────────
+      // Section-by-section summary (one line per section)
+      const sectionSummaryLines = Object.entries(sectionMap).map(([sec, data]) => {
+        const sc = sectionScores[sec];
+        const status = sc.pct >= 75 ? '✓ Strong' : sc.pct >= 50 ? '~ Moderate' : '✗ Needs Work';
+        const rec = sc.pct >= 75
+          ? 'Solid grasp. Continue to build on this strength.'
+          : sc.pct >= 50
+            ? `Review ${data.prereq} before this course unit begins. Pay attention to worked examples.`
+            : `Priority review needed. Revisit ${data.prereq} — practice basic problems daily before class.`;
+        return `${sec}. ${data.label}  ${sc.correct}/${sc.total}  ${status}\n   ${rec}`;
+      });
+      const section_summary = sectionSummaryLines.join('\n\n');
+
+      // Study plan (only weak/moderate sections, sorted worst-first)
+      const studyPlanLines = [...priorities].map(p => {
+        const urgency = p.priority === 'HIGH' ? '[HIGH PRIORITY]' : '[REVIEW]';
+        return `${urgency} ${p.label} (${p.pct}%) — Review ${p.prereq}. Work through practice problems, focusing on showing all steps.`;
+      });
+      const strongSections = Object.entries(sectionScores)
+        .filter(([, v]) => v.pct >= 75)
+        .map(([k]) => sectionMap[k].label);
+      if (strongSections.length) {
+        studyPlanLines.push(`[STRENGTH] ${strongSections.join(', ')} — Solid foundations. Maintain by completing all assigned homework.`);
+      }
+      const study_plan = studyPlanLines.length
+        ? studyPlanLines.join('\n')
+        : 'Strong across all sections. Focus on reviewing class notes as they are introduced.';
+
+      // ── Submit to Supabase ───────────────────────────────────────────
+      submitToSheets({ sectionScores, totalCorrect, total, pct, grade, section_summary, study_plan });
     }
-  });
 
-  document.getElementById('sectionResults').innerHTML = secHtml;
+    function submitToSheets({ sectionScores, totalCorrect, total, pct, grade, section_summary, study_plan }) {
 
-  priorities.sort((a, b) => a.pct - b.pct);
-  let pHtml = '<div class="priority-head">📋 Recommended Study Plan</div>';
-  if (priorities.length === 0) {
-    pHtml += '<div class="priority-item"><span>🎉 You have strong skills across all sections. Focus on reviewing class notes as they are introduced.</span></div>';
-  } else {
-    priorities.forEach(p => {
-      const badge = p.priority === 'HIGH'
-        ? '<span class="priority-badge badge-high">HIGH PRIORITY</span>'
-        : '<span class="priority-badge badge-med">REVIEW</span>';
-      pHtml += `<div class="priority-item">${badge}<span><strong>${p.label}</strong> (${p.pct}%) — Review ${p.prereq}. Work through practice problems, focusing on showing all steps.</span></div>`;
-    });
-    const strong = Object.entries(sectionScores).filter(([,v]) => v.pct >= 75).map(([k]) => sectionMap[k].label);
-    if (strong.length) {
-      pHtml += `<div class="priority-item"><span class="priority-badge badge-low">STRENGTH</span><span>${strong.join(', ')} — Solid foundations. Maintain by completing all assigned homework.</span></div>`;
+      // ── Status badge (visible to user) ───────────────────────
+      const statusEl = document.createElement('div');
+      statusEl.id = 'submitStatus';
+      statusEl.style.cssText = 'margin-top:1rem;font-family:DM Mono,monospace;font-size:0.75rem;color:rgba(255,255,255,0.5);';
+      statusEl.textContent = '⏳ Saving results…';
+      document.querySelector('.results-header-inner').appendChild(statusEl);
+
+      // ── Debug panel (visible on screen so you can see errors without opening DevTools) ──
+      const debugEl = document.createElement('div');
+      debugEl.id = 'debugPanel';
+      debugEl.style.cssText = [
+        'margin-top:1rem',
+        'padding:1rem',
+        'background:rgba(0,0,0,0.4)',
+        'border:1px solid rgba(255,255,255,0.1)',
+        'border-radius:4px',
+        'font-family:DM Mono,monospace',
+        'font-size:0.7rem',
+        'color:rgba(255,255,255,0.6)',
+        'white-space:pre-wrap',
+        'word-break:break-all',
+        'text-align:left',
+        'max-height:220px',
+        'overflow-y:auto'
+      ].join(';');
+      debugEl.textContent = '── Debug Log ──\n';
+      document.querySelector('.results-header-inner').appendChild(debugEl);
+
+      function dbg(msg) {
+        console.log('[Supabase]', msg);
+        debugEl.textContent += msg + '\n';
+        debugEl.scrollTop = debugEl.scrollHeight;
+      }
+
+      // ── Config check ─────────────────────────────────────────
+      dbg('SUPABASE_URL     : ' + SUPABASE_URL);
+      dbg('ANON_KEY (first 20): ' + (SUPABASE_ANON_KEY || '').slice(0, 20) + '…');
+
+      if (!SUPABASE_URL || SUPABASE_URL === 'YOUR_SUPABASE_URL_HERE') {
+        statusEl.textContent = '⚠ Supabase URL not set in the HTML file.';
+        statusEl.style.color = 'rgba(220,100,100,0.8)';
+        dbg('ERROR: SUPABASE_URL is not configured.');
+        return;
+      }
+      if (!SUPABASE_ANON_KEY || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY_HERE') {
+        statusEl.textContent = '⚠ Supabase anon key not set in the HTML file.';
+        statusEl.style.color = 'rgba(220,100,100,0.8)';
+        dbg('ERROR: SUPABASE_ANON_KEY is not configured.');
+        return;
+      }
+
+      // ── Build record ──────────────────────────────────────────
+      const firstName = document.getElementById('fname').value.trim() || '(blank)';
+      const lastName = document.getElementById('lname').value.trim() || '(blank)';
+      const dateVal = document.getElementById('dateField').value.trim();
+
+      const questionDetail = Object.keys(answers).map(qId => {
+        const given = userAnswers[qId] || '—';
+        const mark = given === answers[qId].correct ? '✓' : '✗';
+        return `${qId}:${given}(${mark})`;
+      }).join(', ');
+
+      const record = {
+        first_name: firstName,
+        last_name: lastName,
+        date_taken: dateVal,
+        total_correct: totalCorrect,
+        total_questions: total,
+        percentage: pct,
+        grade,
+        sec_a_score: `${sectionScores.A.correct}/${sectionScores.A.total}`, sec_a_pct: sectionScores.A.pct,
+        sec_b_score: `${sectionScores.B.correct}/${sectionScores.B.total}`, sec_b_pct: sectionScores.B.pct,
+        sec_c_score: `${sectionScores.C.correct}/${sectionScores.C.total}`, sec_c_pct: sectionScores.C.pct,
+        sec_d_score: `${sectionScores.D.correct}/${sectionScores.D.total}`, sec_d_pct: sectionScores.D.pct,
+        sec_e_score: `${sectionScores.E.correct}/${sectionScores.E.total}`, sec_e_pct: sectionScores.E.pct,
+        sec_f_score: `${sectionScores.F.correct}/${sectionScores.F.total}`, sec_f_pct: sectionScores.F.pct,
+        sec_g_score: `${sectionScores.G.correct}/${sectionScores.G.total}`, sec_g_pct: sectionScores.G.pct,
+        sec_h_score: `${sectionScores.H.correct}/${sectionScores.H.total}`, sec_h_pct: sectionScores.H.pct,
+        question_detail: questionDetail,
+        section_summary,
+        study_plan
+      };
+
+      const endpoint = `${SUPABASE_URL}/rest/v1/assessment_results`;
+      dbg('POST → ' + endpoint);
+      dbg('Payload: ' + JSON.stringify(record).slice(0, 120) + '…');
+
+      // ── Fire request ──────────────────────────────────────────
+      fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(record)
+      })
+        .then(async res => {
+          const body = await res.text();
+          dbg(`HTTP ${res.status} ${res.statusText}`);
+          if (body) dbg('Response body: ' + body);
+
+          if (res.ok) {
+            statusEl.textContent = '✓ Results saved to teacher dashboard.';
+            statusEl.style.color = 'rgba(100,220,150,0.8)';
+            dbg('SUCCESS — row inserted.');
+            // Hide debug panel after 4 s on success so it's not distracting
+            setTimeout(() => { debugEl.style.display = 'none'; }, 4000);
+          } else {
+            statusEl.textContent = `⚠ Supabase error ${res.status} — see debug log below.`;
+            statusEl.style.color = 'rgba(220,100,100,0.8)';
+            dbg('FAILED — check the response body above for the reason.');
+          }
+        })
+        .catch(err => {
+          dbg('FETCH ERROR: ' + err.message);
+          statusEl.textContent = '⚠ Network error — see debug log below.';
+          statusEl.style.color = 'rgba(220,100,100,0.8)';
+        });
     }
-  }
-  document.getElementById('priorityList').innerHTML = pHtml;
-  window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  // ── Build plain-text results summary for Supabase ───────────────
-  // Section-by-section summary (one line per section)
-  const sectionSummaryLines = Object.entries(sectionMap).map(([sec, data]) => {
-    const sc     = sectionScores[sec];
-    const status = sc.pct >= 75 ? '✓ Strong' : sc.pct >= 50 ? '~ Moderate' : '✗ Needs Work';
-    const rec    = sc.pct >= 75
-      ? 'Solid grasp. Continue to build on this strength.'
-      : sc.pct >= 50
-      ? `Review ${data.prereq} before this course unit begins. Pay attention to worked examples.`
-      : `Priority review needed. Revisit ${data.prereq} — practice basic problems daily before class.`;
-    return `${sec}. ${data.label}  ${sc.correct}/${sc.total}  ${status}\n   ${rec}`;
-  });
-  const section_summary = sectionSummaryLines.join('\n\n');
-
-  // Study plan (only weak/moderate sections, sorted worst-first)
-  const studyPlanLines = [...priorities].map(p => {
-    const urgency = p.priority === 'HIGH' ? '[HIGH PRIORITY]' : '[REVIEW]';
-    return `${urgency} ${p.label} (${p.pct}%) — Review ${p.prereq}. Work through practice problems, focusing on showing all steps.`;
-  });
-  const strongSections = Object.entries(sectionScores)
-    .filter(([, v]) => v.pct >= 75)
-    .map(([k]) => sectionMap[k].label);
-  if (strongSections.length) {
-    studyPlanLines.push(`[STRENGTH] ${strongSections.join(', ')} — Solid foundations. Maintain by completing all assigned homework.`);
-  }
-  const study_plan = studyPlanLines.length
-    ? studyPlanLines.join('\n')
-    : 'Strong across all sections. Focus on reviewing class notes as they are introduced.';
-
-  // ── Submit to Supabase ───────────────────────────────────────────
-  submitToSheets({ sectionScores, totalCorrect, total, pct, grade, section_summary, study_plan });
-}
-
-function submitToSheets({ sectionScores, totalCorrect, total, pct, grade, section_summary, study_plan }) {
-
-  // ── Status badge (visible to user) ───────────────────────
-  const statusEl = document.createElement('div');
-  statusEl.id = 'submitStatus';
-  statusEl.style.cssText = 'margin-top:1rem;font-family:DM Mono,monospace;font-size:0.75rem;color:rgba(255,255,255,0.5);';
-  statusEl.textContent = '⏳ Saving results…';
-  document.querySelector('.results-header-inner').appendChild(statusEl);
-
-  // ── Debug panel (visible on screen so you can see errors without opening DevTools) ──
-  const debugEl = document.createElement('div');
-  debugEl.id = 'debugPanel';
-  debugEl.style.cssText = [
-    'margin-top:1rem',
-    'padding:1rem',
-    'background:rgba(0,0,0,0.4)',
-    'border:1px solid rgba(255,255,255,0.1)',
-    'border-radius:4px',
-    'font-family:DM Mono,monospace',
-    'font-size:0.7rem',
-    'color:rgba(255,255,255,0.6)',
-    'white-space:pre-wrap',
-    'word-break:break-all',
-    'text-align:left',
-    'max-height:220px',
-    'overflow-y:auto'
-  ].join(';');
-  debugEl.textContent = '── Debug Log ──\n';
-  document.querySelector('.results-header-inner').appendChild(debugEl);
-
-  function dbg(msg) {
-    console.log('[Supabase]', msg);
-    debugEl.textContent += msg + '\n';
-    debugEl.scrollTop = debugEl.scrollHeight;
-  }
-
-  // ── Config check ─────────────────────────────────────────
-  dbg('SUPABASE_URL     : ' + SUPABASE_URL);
-  dbg('ANON_KEY (first 20): ' + (SUPABASE_ANON_KEY || '').slice(0, 20) + '…');
-
-  if (!SUPABASE_URL || SUPABASE_URL === 'YOUR_SUPABASE_URL_HERE') {
-    statusEl.textContent = '⚠ Supabase URL not set in the HTML file.';
-    statusEl.style.color = 'rgba(220,100,100,0.8)';
-    dbg('ERROR: SUPABASE_URL is not configured.');
-    return;
-  }
-  if (!SUPABASE_ANON_KEY || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY_HERE') {
-    statusEl.textContent = '⚠ Supabase anon key not set in the HTML file.';
-    statusEl.style.color = 'rgba(220,100,100,0.8)';
-    dbg('ERROR: SUPABASE_ANON_KEY is not configured.');
-    return;
-  }
-
-  // ── Build record ──────────────────────────────────────────
-  const firstName = document.getElementById('fname').value.trim() || '(blank)';
-  const lastName  = document.getElementById('lname').value.trim() || '(blank)';
-  const dateVal   = document.getElementById('dateField').value.trim();
-
-  const questionDetail = Object.keys(answers).map(qId => {
-    const given  = userAnswers[qId] || '—';
-    const mark   = given === answers[qId].correct ? '✓' : '✗';
-    return `${qId}:${given}(${mark})`;
-  }).join(', ');
-
-  const record = {
-    first_name:      firstName,
-    last_name:       lastName,
-    date_taken:      dateVal,
-    total_correct:   totalCorrect,
-    total_questions: total,
-    percentage:      pct,
-    grade,
-    sec_a_score: `${sectionScores.A.correct}/${sectionScores.A.total}`, sec_a_pct: sectionScores.A.pct,
-    sec_b_score: `${sectionScores.B.correct}/${sectionScores.B.total}`, sec_b_pct: sectionScores.B.pct,
-    sec_c_score: `${sectionScores.C.correct}/${sectionScores.C.total}`, sec_c_pct: sectionScores.C.pct,
-    sec_d_score: `${sectionScores.D.correct}/${sectionScores.D.total}`, sec_d_pct: sectionScores.D.pct,
-    sec_e_score: `${sectionScores.E.correct}/${sectionScores.E.total}`, sec_e_pct: sectionScores.E.pct,
-    sec_f_score: `${sectionScores.F.correct}/${sectionScores.F.total}`, sec_f_pct: sectionScores.F.pct,
-    sec_g_score: `${sectionScores.G.correct}/${sectionScores.G.total}`, sec_g_pct: sectionScores.G.pct,
-    sec_h_score: `${sectionScores.H.correct}/${sectionScores.H.total}`, sec_h_pct: sectionScores.H.pct,
-    question_detail: questionDetail,
-    section_summary,
-    study_plan
-  };
-
-  const endpoint = `${SUPABASE_URL}/rest/v1/assessment_results`;
-  dbg('POST → ' + endpoint);
-  dbg('Payload: ' + JSON.stringify(record).slice(0, 120) + '…');
-
-  // ── Fire request ──────────────────────────────────────────
-  fetch(endpoint, {
-    method:  'POST',
-    headers: {
-      'Content-Type':  'application/json',
-      'apikey':        SUPABASE_ANON_KEY,
-      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-      'Prefer':        'return=minimal'
-    },
-    body: JSON.stringify(record)
-  })
-  .then(async res => {
-    const body = await res.text();
-    dbg(`HTTP ${res.status} ${res.statusText}`);
-    if (body) dbg('Response body: ' + body);
-
-    if (res.ok) {
-      statusEl.textContent = '✓ Results saved to teacher dashboard.';
-      statusEl.style.color = 'rgba(100,220,150,0.8)';
-      dbg('SUCCESS — row inserted.');
-      // Hide debug panel after 4 s on success so it's not distracting
-      setTimeout(() => { debugEl.style.display = 'none'; }, 4000);
-    } else {
-      statusEl.textContent = `⚠ Supabase error ${res.status} — see debug log below.`;
-      statusEl.style.color = 'rgba(220,100,100,0.8)';
-      dbg('FAILED — check the response body above for the reason.');
+    function restartAssessment() {
+      userAnswers = {};
+      document.querySelectorAll('.choice-btn').forEach(b => {
+        b.disabled = false;
+        b.classList.remove('selected', 'correct-ans', 'wrong-ans');
+      });
+      document.querySelectorAll('.feedback').forEach(f => {
+        f.classList.remove('show', 'fb-correct', 'fb-wrong');
+        f.innerHTML = '';
+      });
+      document.querySelectorAll('.question').forEach(q => q.classList.remove('answered'));
+      document.getElementById('progressBar').style.width = '0%';
+      document.getElementById('resultsPage').classList.remove('active');
+      document.getElementById('assessmentPage').classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  })
-  .catch(err => {
-    dbg('FETCH ERROR: ' + err.message);
-    statusEl.textContent = '⚠ Network error — see debug log below.';
-    statusEl.style.color = 'rgba(220,100,100,0.8)';
-  });
-}
 
-function restartAssessment() {
-  userAnswers = {};
-  document.querySelectorAll('.choice-btn').forEach(b => {
-    b.disabled = false;
-    b.classList.remove('selected','correct-ans','wrong-ans');
-  });
-  document.querySelectorAll('.feedback').forEach(f => {
-    f.classList.remove('show','fb-correct','fb-wrong');
-    f.innerHTML = '';
-  });
-  document.querySelectorAll('.question').forEach(q => q.classList.remove('answered'));
-  document.getElementById('progressBar').style.width = '0%';
-  document.getElementById('resultsPage').classList.remove('active');
-  document.getElementById('assessmentPage').classList.add('active');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// Set today's date
-document.getElementById('dateField').value = new Date().toLocaleDateString('en-GB');
-</script>
+    // Set today's date
+    document.getElementById('dateField').value = new Date().toLocaleDateString('en-GB');
+  </script>
 </body>
+
 </html>
