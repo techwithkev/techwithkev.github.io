@@ -721,7 +721,7 @@
   <!-- COVER -->
   <div class="cover" id="coverPage">
     <div class="cover-inner">
-      <div class="cover-label">TechWithKev · Grade 9 Mathematics</div>
+      <div class="cover-label">Meritus Academy · Grade 9 Mathematics</div>
       <h1>Prerequisite<span>Assessment</span></h1>
       <p class="cover-sub">This diagnostic covers foundational skills required to excel in the G9 curriculum. Your
         results will identify strengths and areas to focus on before the course begins.</p>
@@ -1511,9 +1511,10 @@
     };
 
     // ——————————————————————————————
-    // CONFIGURATION — paste your Apps Script URL here after deploying
+    // CONFIGURATION — paste your Supabase credentials here
     // ——————————————————————————————
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby5ClBVHOw4_LREcYEmrNgQSIfUCwR2xTrZHuTNiO_eaLSP4y61ET49nF01-YMJWXAxQQ/exec';
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';      // e.g. https://xyzxyz.supabase.co
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68'; // starts with "eyJ..."
 
     let userAnswers = {};
 
@@ -1677,54 +1678,57 @@
         return `${qId}:${given}(${mark})`;
       }).join(', ');
 
-      const payload = {
-        timestamp: new Date().toISOString(),
-        firstName,
-        lastName,
-        date: dateVal,
-        totalCorrect,
-        totalQuestions: total,
+      const record = {
+        first_name: firstName,
+        last_name: lastName,
+        date_taken: dateVal,
+        total_correct: totalCorrect,
+        total_questions: total,
         percentage: pct,
         grade,
-        // One column per section: score and percent
-        secA_score: `${sectionScores.A.correct}/${sectionScores.A.total}`,
-        secA_pct: sectionScores.A.pct,
-        secB_score: `${sectionScores.B.correct}/${sectionScores.B.total}`,
-        secB_pct: sectionScores.B.pct,
-        secC_score: `${sectionScores.C.correct}/${sectionScores.C.total}`,
-        secC_pct: sectionScores.C.pct,
-        secD_score: `${sectionScores.D.correct}/${sectionScores.D.total}`,
-        secD_pct: sectionScores.D.pct,
-        secE_score: `${sectionScores.E.correct}/${sectionScores.E.total}`,
-        secE_pct: sectionScores.E.pct,
-        secF_score: `${sectionScores.F.correct}/${sectionScores.F.total}`,
-        secF_pct: sectionScores.F.pct,
-        secG_score: `${sectionScores.G.correct}/${sectionScores.G.total}`,
-        secG_pct: sectionScores.G.pct,
-        secH_score: `${sectionScores.H.correct}/${sectionScores.H.total}`,
-        secH_pct: sectionScores.H.pct,
-        questionDetail
+        sec_a_score: `${sectionScores.A.correct}/${sectionScores.A.total}`, sec_a_pct: sectionScores.A.pct,
+        sec_b_score: `${sectionScores.B.correct}/${sectionScores.B.total}`, sec_b_pct: sectionScores.B.pct,
+        sec_c_score: `${sectionScores.C.correct}/${sectionScores.C.total}`, sec_c_pct: sectionScores.C.pct,
+        sec_d_score: `${sectionScores.D.correct}/${sectionScores.D.total}`, sec_d_pct: sectionScores.D.pct,
+        sec_e_score: `${sectionScores.E.correct}/${sectionScores.E.total}`, sec_e_pct: sectionScores.E.pct,
+        sec_f_score: `${sectionScores.F.correct}/${sectionScores.F.total}`, sec_f_pct: sectionScores.F.pct,
+        sec_g_score: `${sectionScores.G.correct}/${sectionScores.G.total}`, sec_g_pct: sectionScores.G.pct,
+        sec_h_score: `${sectionScores.H.correct}/${sectionScores.H.total}`, sec_h_pct: sectionScores.H.pct,
+        question_detail: questionDetail
       };
 
-      // Show a small submission status badge in results header
+      // Status badge in results header
       const statusEl = document.createElement('div');
       statusEl.id = 'submitStatus';
       statusEl.style.cssText = 'margin-top:1rem;font-family:DM Mono,monospace;font-size:0.75rem;color:rgba(255,255,255,0.5);';
       statusEl.textContent = '⏳ Saving results…';
       document.querySelector('.results-header-inner').appendChild(statusEl);
 
-      fetch(APPS_SCRIPT_URL, {
+      if (!SUPABASE_URL || SUPABASE_URL === 'YOUR_SUPABASE_URL_HERE') {
+        statusEl.textContent = '⚠ Supabase not configured — results not saved.';
+        return;
+      }
+
+      fetch(`${SUPABASE_URL}/rest/v1/assessment_results`, {
         method: 'POST',
-        mode: 'no-cors',   // Apps Script requires no-cors
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(record)
       })
-        .then(() => {
-          statusEl.textContent = '✓ Results saved to teacher dashboard.';
-          statusEl.style.color = 'rgba(100,220,150,0.8)';
+        .then(res => {
+          if (res.ok) {
+            statusEl.textContent = '✓ Results saved to teacher dashboard.';
+            statusEl.style.color = 'rgba(100,220,150,0.8)';
+          } else {
+            return res.text().then(txt => { throw new Error(txt); });
+          }
         })
         .catch(err => {
-          console.error('Sheets submission failed:', err);
+          console.error('Supabase submission failed:', err);
           statusEl.textContent = '⚠ Could not save results — check your connection.';
           statusEl.style.color = 'rgba(220,100,100,0.8)';
         });
