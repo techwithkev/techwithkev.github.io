@@ -1513,8 +1513,8 @@
     // ——————————————————————————————
     // CONFIGURATION — paste your Supabase credentials here
     // ——————————————————————————————
-    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';      // e.g. https://xyzxyz.supabase.co
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68'; // starts with "eyJ..."
+    const SUPABASE_URL = 'YOUR_SUPABASE_URL_HERE';      // e.g. https://xyzxyz.supabase.co
+    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE'; // starts with "eyJ..."
 
     let userAnswers = {};
 
@@ -1661,20 +1661,66 @@
     }
 
     function submitToSheets({ sectionScores, totalCorrect, total, pct, grade }) {
-      if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
-        console.warn('Google Sheets submission skipped — no APPS_SCRIPT_URL configured.');
+
+      // ── Status badge (visible to user) ───────────────────────
+      const statusEl = document.createElement('div');
+      statusEl.id = 'submitStatus';
+      statusEl.style.cssText = 'margin-top:1rem;font-family:DM Mono,monospace;font-size:0.75rem;color:rgba(255,255,255,0.5);';
+      statusEl.textContent = '⏳ Saving results…';
+      document.querySelector('.results-header-inner').appendChild(statusEl);
+
+      // ── Debug panel (visible on screen so you can see errors without opening DevTools) ──
+      const debugEl = document.createElement('div');
+      debugEl.id = 'debugPanel';
+      debugEl.style.cssText = [
+        'margin-top:1rem',
+        'padding:1rem',
+        'background:rgba(0,0,0,0.4)',
+        'border:1px solid rgba(255,255,255,0.1)',
+        'border-radius:4px',
+        'font-family:DM Mono,monospace',
+        'font-size:0.7rem',
+        'color:rgba(255,255,255,0.6)',
+        'white-space:pre-wrap',
+        'word-break:break-all',
+        'text-align:left',
+        'max-height:220px',
+        'overflow-y:auto'
+      ].join(';');
+      debugEl.textContent = '── Debug Log ──\n';
+      document.querySelector('.results-header-inner').appendChild(debugEl);
+
+      function dbg(msg) {
+        console.log('[Supabase]', msg);
+        debugEl.textContent += msg + '\n';
+        debugEl.scrollTop = debugEl.scrollHeight;
+      }
+
+      // ── Config check ─────────────────────────────────────────
+      dbg('SUPABASE_URL     : ' + SUPABASE_URL);
+      dbg('ANON_KEY (first 20): ' + (SUPABASE_ANON_KEY || '').slice(0, 20) + '…');
+
+      if (!SUPABASE_URL || SUPABASE_URL === 'YOUR_SUPABASE_URL_HERE') {
+        statusEl.textContent = '⚠ Supabase URL not set in the HTML file.';
+        statusEl.style.color = 'rgba(220,100,100,0.8)';
+        dbg('ERROR: SUPABASE_URL is not configured.');
+        return;
+      }
+      if (!SUPABASE_ANON_KEY || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY_HERE') {
+        statusEl.textContent = '⚠ Supabase anon key not set in the HTML file.';
+        statusEl.style.color = 'rgba(220,100,100,0.8)';
+        dbg('ERROR: SUPABASE_ANON_KEY is not configured.');
         return;
       }
 
+      // ── Build record ──────────────────────────────────────────
       const firstName = document.getElementById('fname').value.trim() || '(blank)';
       const lastName = document.getElementById('lname').value.trim() || '(blank)';
       const dateVal = document.getElementById('dateField').value.trim();
 
-      // Build per-question detail: "q1:A(✓), q2:B(✗), ..."
       const questionDetail = Object.keys(answers).map(qId => {
         const given = userAnswers[qId] || '—';
-        const correct = answers[qId].correct;
-        const mark = given === correct ? '✓' : '✗';
+        const mark = given === answers[qId].correct ? '✓' : '✗';
         return `${qId}:${given}(${mark})`;
       }).join(', ');
 
@@ -1697,19 +1743,12 @@
         question_detail: questionDetail
       };
 
-      // Status badge in results header
-      const statusEl = document.createElement('div');
-      statusEl.id = 'submitStatus';
-      statusEl.style.cssText = 'margin-top:1rem;font-family:DM Mono,monospace;font-size:0.75rem;color:rgba(255,255,255,0.5);';
-      statusEl.textContent = '⏳ Saving results…';
-      document.querySelector('.results-header-inner').appendChild(statusEl);
+      const endpoint = `${SUPABASE_URL}/rest/v1/assessment_results`;
+      dbg('POST → ' + endpoint);
+      dbg('Payload: ' + JSON.stringify(record).slice(0, 120) + '…');
 
-      if (!SUPABASE_URL || SUPABASE_URL === 'YOUR_SUPABASE_URL_HERE') {
-        statusEl.textContent = '⚠ Supabase not configured — results not saved.';
-        return;
-      }
-
-      fetch(`${SUPABASE_URL}/rest/v1/assessment_results`, {
+      // ── Fire request ──────────────────────────────────────────
+      fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1719,17 +1758,26 @@
         },
         body: JSON.stringify(record)
       })
-        .then(res => {
+        .then(async res => {
+          const body = await res.text();
+          dbg(`HTTP ${res.status} ${res.statusText}`);
+          if (body) dbg('Response body: ' + body);
+
           if (res.ok) {
             statusEl.textContent = '✓ Results saved to teacher dashboard.';
             statusEl.style.color = 'rgba(100,220,150,0.8)';
+            dbg('SUCCESS — row inserted.');
+            // Hide debug panel after 4 s on success so it's not distracting
+            setTimeout(() => { debugEl.style.display = 'none'; }, 4000);
           } else {
-            return res.text().then(txt => { throw new Error(txt); });
+            statusEl.textContent = `⚠ Supabase error ${res.status} — see debug log below.`;
+            statusEl.style.color = 'rgba(220,100,100,0.8)';
+            dbg('FAILED — check the response body above for the reason.');
           }
         })
         .catch(err => {
-          console.error('Supabase submission failed:', err);
-          statusEl.textContent = '⚠ Could not save results — check your connection.';
+          dbg('FETCH ERROR: ' + err.message);
+          statusEl.textContent = '⚠ Network error — see debug log below.';
           statusEl.style.color = 'rgba(220,100,100,0.8)';
         });
     }
