@@ -1517,10 +1517,18 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68'; // starts with "eyJ..."
 
     let userAnswers = {};
+    let assessmentStartTime = null;
+
+    function formatDuration(totalSeconds) {
+      const m = Math.floor(totalSeconds / 60);
+      const s = totalSeconds % 60;
+      return m + 'm ' + String(s).padStart(2, '0') + 's';
+    }
 
     function startAssessment() {
       document.getElementById('coverPage').style.display = 'none';
       document.getElementById('assessmentPage').classList.add('active');
+      assessmentStartTime = Date.now();
       updateProgress();
     }
 
@@ -1546,6 +1554,12 @@
         alert('Please answer at least half the questions before submitting.');
         return;
       }
+
+      // Capture elapsed time the moment student submits
+      const elapsedSeconds = assessmentStartTime
+        ? Math.round((Date.now() - assessmentStartTime) / 1000)
+        : null;
+      const elapsedFormatted = elapsedSeconds !== null ? formatDuration(elapsedSeconds) : 'N/A';
 
       // Show feedback on each question
       Object.keys(answers).forEach(qId => {
@@ -1600,6 +1614,7 @@
     <div class="stat-card"><div class="stat-num">${total - totalCorrect}</div><div class="stat-label">Incorrect</div></div>
     <div class="stat-card"><div class="stat-num">${grade}</div><div class="stat-label">Grade</div></div>
     <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">Questions</div></div>
+    <div class="stat-card"><div class="stat-num" style="font-size:1.4rem">${elapsedFormatted}</div><div class="stat-label">Time Taken</div></div>
   `;
 
       // Section results
@@ -1686,10 +1701,10 @@
         : 'Strong across all sections. Focus on reviewing class notes as they are introduced.';
 
       // ── Submit to Supabase ───────────────────────────────────────────
-      submitToSheets({ sectionScores, totalCorrect, total, pct, grade, section_summary, study_plan });
+      submitToSheets({ sectionScores, totalCorrect, total, pct, grade, section_summary, study_plan, elapsedSeconds, elapsedFormatted });
     }
 
-    function submitToSheets({ sectionScores, totalCorrect, total, pct, grade, section_summary, study_plan }) {
+    function submitToSheets({ sectionScores, totalCorrect, total, pct, grade, section_summary, study_plan, elapsedSeconds, elapsedFormatted }) {
 
       // ── Status badge (visible to user) ───────────────────────
       const statusEl = document.createElement('div');
@@ -1771,7 +1786,9 @@
         sec_h_score: `${sectionScores.H.correct}/${sectionScores.H.total}`, sec_h_pct: sectionScores.H.pct,
         question_detail: questionDetail,
         section_summary,
-        study_plan
+        study_plan,
+        time_taken_seconds: elapsedSeconds,
+        time_taken_formatted: elapsedFormatted
       };
 
       const endpoint = `${SUPABASE_URL}/rest/v1/assessment_results`;
@@ -1815,6 +1832,7 @@
 
     function restartAssessment() {
       userAnswers = {};
+      assessmentStartTime = null;
       document.querySelectorAll('.choice-btn').forEach(b => {
         b.disabled = false;
         b.classList.remove('selected', 'correct-ans', 'wrong-ans');
