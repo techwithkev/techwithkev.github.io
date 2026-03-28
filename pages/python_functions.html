@@ -1,474 +1,1265 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Python Functions — Tech With Kev</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:wght@300;400;500&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --ink:     #0d1117;
-    --paper:   #f6f8fa;
-    --accent:  #2ea043;
-    --accent2: #1f6feb;
-    --gold:    #e3b341;
-    --rule:    #d0d7de;
-    --soft:    #f0f6ff;
-    --mid:     #57606a;
-    --correct: #2ea043;
-    --wrong:   #cf222e;
-    --partial: #e3b341;
-    --code-bg: #f3f4f6;
-    --code-fg: #24292f;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Functions — Tech With Kev</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:wght@300;400;500&family=Playfair+Display:wght@700;900&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --ink: #0d1117;
+      --paper: #f6f8fa;
+      --accent: #2ea043;
+      --accent2: #1f6feb;
+      --gold: #e3b341;
+      --rule: #d0d7de;
+      --soft: #f0f6ff;
+      --mid: #57606a;
+      --correct: #2ea043;
+      --wrong: #cf222e;
+      --partial: #e3b341;
+      --code-bg: #f3f4f6;
+      --code-fg: #24292f;
+    }
 
-  /* COVER */
-  .cover { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:3rem 2rem; background:var(--ink); position:relative; overflow:hidden; }
-  .cover::before { content:''; position:absolute; inset:0; background:repeating-linear-gradient(0deg,transparent,transparent 15px,rgba(46,160,67,0.04) 15px,rgba(46,160,67,0.04) 16px); pointer-events:none; }
-  .cover-inner { position:relative; text-align:center; max-width:700px; }
-  .cover-tag { font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:var(--accent); margin-bottom:1rem; letter-spacing:0.05em; }
-  .cover-def { font-family:'JetBrains Mono',monospace; font-size:0.9rem; color:#484f58; margin-bottom:0.5rem; }
-  .cover-def .kw { color:#2ea043; }
-  .cover-def .fn { color:#1f6feb; }
-  .cover h1 { font-family:'Playfair Display',serif; font-size:clamp(2.2rem,6vw,3.8rem); font-weight:900; color:#f0f6ff; line-height:1.1; margin-bottom:0.5rem; }
-  .cover h1 span { color:var(--gold); display:block; }
-  .cover-sub { font-size:0.9rem; color:#484f58; margin-bottom:2.5rem; line-height:1.7; }
-  .cover-meta { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; margin-bottom:2.5rem; border:1px solid rgba(255,255,255,0.08); padding:1.5rem; border-radius:6px; text-align:left; background:rgba(255,255,255,0.02); }
-  .cover-meta label { font-family:'JetBrains Mono',monospace; font-size:0.6rem; letter-spacing:0.2em; text-transform:uppercase; color:#484f58; display:block; margin-bottom:0.4rem; }
-  .cover-meta input { background:transparent; border:none; border-bottom:1px solid rgba(255,255,255,0.15); color:#f0f6ff; font-family:'DM Sans',sans-serif; font-size:0.9rem; width:100%; padding:0.3rem 0; outline:none; }
-  .cover-meta input:focus { border-bottom-color:var(--accent); }
-  .sec-overview { display:grid; grid-template-columns:repeat(8,1fr); gap:0.5rem; margin-bottom:2.5rem; }
-  .ov-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); padding:0.8rem 0.4rem; border-radius:4px; text-align:center; }
-  .ov-card .num { font-family:'JetBrains Mono',monospace; font-size:1.4rem; font-weight:700; color:var(--accent); line-height:1; margin-bottom:0.3rem; }
-  .ov-card .lbl { font-size:0.6rem; color:#484f58; line-height:1.3; }
-  .start-btn { background:var(--accent); color:white; border:none; padding:1rem 3rem; font-family:'JetBrains Mono',monospace; font-size:0.85rem; letter-spacing:0.1em; cursor:pointer; border-radius:4px; transition:all 0.2s; }
-  .start-btn:hover { background:#3fb950; transform:translateY(-2px); box-shadow:0 8px 24px rgba(46,160,67,0.35); }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  /* PROGRESS */
-  .progress-wrap { position:fixed; top:0; left:0; right:0; height:3px; background:rgba(0,0,0,0.1); z-index:100; }
-  .progress-bar { height:100%; background:linear-gradient(90deg,var(--accent),var(--gold)); transition:width 0.3s ease; width:0%; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      min-height: 100vh;
+    }
 
-  /* ASSESSMENT */
-  .assessment { display:none; max-width:860px; margin:0 auto; padding:3rem 2rem 6rem; }
-  .assessment.active { display:block; }
+    /* COVER */
+    .cover {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+      background: var(--ink);
+      position: relative;
+      overflow: hidden;
+    }
 
-  .section-header { display:flex; align-items:baseline; gap:1.5rem; margin:3rem 0 1.5rem; padding-bottom:0.75rem; border-bottom:2px solid var(--ink); }
-  .section-header:first-of-type { margin-top:0; }
-  .sec-letter { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--accent); letter-spacing:0.15em; }
-  .sec-title { font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:700; flex:1; }
-  .sec-marks { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--mid); }
+    .cover::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 15px, rgba(46, 160, 67, 0.04) 15px, rgba(46, 160, 67, 0.04) 16px);
+      pointer-events: none;
+    }
 
-  /* QUESTION */
-  .question { margin-bottom:1.75rem; padding:1.5rem; background:#fff; border:1px solid var(--rule); border-left:4px solid transparent; border-radius:2px; transition:border-color 0.2s; }
-  .question:hover { border-left-color:var(--accent2); }
-  .question.answered { border-left-color:var(--accent); }
-  .q-header { display:flex; align-items:flex-start; gap:1rem; margin-bottom:1rem; }
-  .q-num { font-family:'JetBrains Mono',monospace; font-size:0.72rem; background:var(--soft); padding:0.3rem 0.6rem; border-radius:2px; color:var(--accent2); white-space:nowrap; margin-top:2px; }
-  .q-text { font-size:0.95rem; line-height:1.65; flex:1; }
-  code { font-family:'JetBrains Mono',monospace; background:rgba(13,17,23,0.06); padding:0.1em 0.4em; border-radius:3px; font-size:0.88em; color:var(--ink); }
+    .cover-inner {
+      position: relative;
+      text-align: center;
+      max-width: 700px;
+    }
 
-  /* Code block */
-  .code-block { background:var(--code-bg); color:var(--code-fg); font-family:'JetBrains Mono',monospace; font-size:0.85rem; line-height:1.7; padding:1rem 1.25rem; border-radius:6px; margin:0.75rem 0; overflow-x:auto; white-space:pre; border:1px solid #d0d7de; }
-  .code-block .kw { color:#cf222e; }
-  .code-block .fn { color:#8250df; }
-  .code-block .st { color:#0a3069; }
-  .code-block .cm { color:#6e7781; }
-  .code-block .nm { color:#0550ae; }
-  .code-block .op { color:#116329; }
+    .cover-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      letter-spacing: 0.05em;
+    }
 
-  /* Choices */
-  .choices { display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin-top:1rem; }
-  .choice-btn { display:flex; align-items:center; gap:0.75rem; padding:0.75rem 1rem; border:1.5px solid var(--rule); background:var(--paper); cursor:pointer; border-radius:3px; font-family:'DM Sans',sans-serif; font-size:0.88rem; color:var(--ink); text-align:left; transition:all 0.15s; }
-  .choice-btn code { background:rgba(31,111,235,0.07); }
-  .choice-btn:hover:not(:disabled) { border-color:var(--accent2); background:var(--soft); }
-  .choice-btn.selected { border-color:var(--accent2); background:#daeef7; }
-  .choice-btn.correct-ans { border-color:var(--correct); background:#d8f3e5; color:var(--correct); font-weight:500; }
-  .choice-btn.wrong-ans   { border-color:var(--wrong);   background:#fde8e8; color:var(--wrong); }
-  .choice-label { font-family:'JetBrains Mono',monospace; font-size:0.72rem; width:1.4rem; height:1.4rem; border-radius:50%; border:1.5px solid currentColor; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .cover-def {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      color: #484f58;
+      margin-bottom: 0.5rem;
+    }
 
-  /* Feedback */
-  .feedback { display:none; margin-top:1rem; padding:0.75rem 1rem; border-radius:3px; font-size:0.85rem; line-height:1.6; font-family:'JetBrains Mono',monospace; }
-  .feedback.show { display:block; }
-  .feedback.fb-correct { background:#d8f3e5; color:var(--correct); border-left:3px solid var(--correct); }
-  .feedback.fb-wrong   { background:#fde8e8; color:var(--wrong);   border-left:3px solid var(--wrong); }
+    .cover-def .kw {
+      color: #2ea043;
+    }
 
-  /* Submit */
-  .submit-zone { margin-top:3rem; text-align:center; padding-top:2rem; border-top:1px solid var(--rule); }
-  .btn-primary { background:var(--ink); color:white; border:none; padding:0.9rem 2.5rem; font-family:'JetBrains Mono',monospace; font-size:0.8rem; letter-spacing:0.1em; cursor:pointer; border-radius:3px; transition:all 0.2s; }
-  .btn-primary:hover { background:var(--accent2); transform:translateY(-1px); }
+    .cover-def .fn {
+      color: #1f6feb;
+    }
 
-  /* RESULTS */
-  .results { display:none; max-width:860px; margin:0 auto; padding:3rem 2rem 6rem; }
-  .results.active { display:block; }
-  .results-header { background:var(--ink); color:white; padding:2.5rem; border-radius:6px; margin-bottom:2.5rem; position:relative; overflow:hidden; }
-  .results-header::before { content:''; position:absolute; inset:0; background:repeating-linear-gradient(45deg,transparent,transparent 19px,rgba(46,160,67,0.04) 19px,rgba(46,160,67,0.04) 20px); }
-  .rh-inner { position:relative; }
-  .r-grade { font-family:'JetBrains Mono',monospace; font-size:4.5rem; font-weight:700; color:var(--gold); line-height:1; margin-bottom:0.5rem; }
-  .r-sub { color:rgba(255,255,255,0.55); font-size:0.9rem; margin-bottom:2rem; }
-  .r-stats { display:grid; grid-template-columns:repeat(5,1fr); gap:0.75rem; }
-  .stat-card { background:rgba(255,255,255,0.06); padding:1rem 0.75rem; border-radius:4px; text-align:center; }
-  .stat-num { font-family:'JetBrains Mono',monospace; font-size:1.7rem; font-weight:700; color:var(--gold); line-height:1; }
-  .stat-label { font-size:0.65rem; color:rgba(255,255,255,0.4); margin-top:0.3rem; }
-  .section-result { background:#fff; border:1px solid var(--rule); border-radius:4px; margin-bottom:1.25rem; overflow:hidden; }
-  .sr-head { display:flex; align-items:center; justify-content:space-between; padding:0.85rem 1.25rem; background:var(--soft); border-bottom:1px solid var(--rule); }
-  .sr-title { font-family:'Playfair Display',serif; font-weight:700; font-size:1rem; }
-  .sr-score { font-family:'JetBrains Mono',monospace; font-size:0.85rem; }
-  .strength { color:var(--correct); } .weakness { color:var(--wrong); } .moderate { color:var(--partial); }
-  .sr-bar-wrap { padding:0.85rem 1.25rem; }
-  .sr-bar-bg { height:7px; background:var(--rule); border-radius:99px; overflow:hidden; margin-bottom:0.6rem; }
-  .sr-bar-fill { height:100%; border-radius:99px; transition:width 1s ease; }
-  .sr-rec { font-size:0.84rem; color:var(--mid); line-height:1.6; }
-  .priority-list { background:#fff; border:1px solid var(--rule); border-radius:4px; overflow:hidden; margin-top:2rem; }
-  .priority-head { padding:0.85rem 1.25rem; background:var(--soft); border-bottom:1px solid var(--rule); font-family:'Playfair Display',serif; font-size:1.05rem; font-weight:700; }
-  .priority-item { padding:0.85rem 1.25rem; border-bottom:1px solid var(--rule); display:flex; align-items:flex-start; gap:1rem; font-size:0.86rem; line-height:1.55; }
-  .priority-item:last-child { border-bottom:none; }
-  .priority-badge { font-family:'JetBrains Mono',monospace; font-size:0.62rem; padding:0.2rem 0.5rem; border-radius:2px; white-space:nowrap; flex-shrink:0; margin-top:1px; }
-  .badge-high { background:#fde8e8; color:var(--wrong); }
-  .badge-med  { background:#fef6d9; color:#a07000; }
-  .badge-low  { background:#d8f3e5; color:var(--correct); }
-  .restart-btn { margin-top:2rem; background:var(--ink); color:white; border:none; padding:0.9rem 2rem; font-family:'JetBrains Mono',monospace; font-size:0.8rem; cursor:pointer; border-radius:3px; transition:background 0.2s; }
-  .restart-btn:hover { background:var(--accent); }
+    .cover h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.2rem, 6vw, 3.8rem);
+      font-weight: 900;
+      color: #f0f6ff;
+      line-height: 1.1;
+      margin-bottom: 0.5rem;
+    }
 
-  /* FILL-IN-THE-BLANK */
-  .fitb-wrap { margin-top:0.75rem; }
-  .code-line { display:flex; align-items:center; font-family:'JetBrains Mono',monospace; font-size:0.88rem; line-height:2; flex-wrap:wrap; gap:0 4px; padding:2px 0; }
-  .code-line.indent-1 { padding-left:1.5rem; }
-  .code-line.indent-2 { padding-left:3rem; }
-  .code-block-fitb { background:var(--code-bg); border:1px solid #d0d7de; border-radius:6px; padding:1rem 1.25rem; margin:0.75rem 0; }
-  .blank { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:0.85rem; background:#e8f0fe; border:none; border-bottom:2px solid var(--accent2); color:var(--ink); padding:0 6px 2px; outline:none; min-width:80px; text-align:center; border-radius:2px 2px 0 0; transition:border-color 0.2s; }
-  .blank:focus { border-bottom-color:var(--gold); background:#fff8e0; }
-  .blank.correct-blank { border-bottom-color:var(--correct); background:#d8f3e5; color:#116329; }
-  .blank.wrong-blank   { border-bottom-color:var(--wrong);   background:#fde8e8; color:#cf222e; }
-  .blank.partial-blank { border-bottom-color:var(--gold);    background:#2d2200; color:var(--gold); }
-  .fitb-hint { font-size:0.75rem; color:var(--mid); margin-top:0.4rem; font-style:italic; }
-  .fitb-feedback { display:none; margin-top:0.75rem; padding:0.75rem 1rem; border-radius:3px; font-size:0.83rem; line-height:1.6; font-family:'JetBrains Mono',monospace; }
-  .fitb-feedback.show { display:block; }
-  .fitb-feedback.fb-skipped  { background:#f3f4f6; color:var(--mid);     border-left:3px solid var(--rule); }
-  .feedback.fb-skipped       { background:#f3f4f6; color:var(--mid);     border-left:3px solid var(--rule); }
-  .blank.skipped-blank       { border-bottom-color:var(--rule); background:#f3f4f6; color:var(--mid); }
-  .fitb-feedback.fb-correct { background:#d8f3e5; color:var(--correct); border-left:3px solid var(--correct); }
-  .fitb-feedback.fb-partial  { background:#fef6d9; color:#7a5c00; border-left:3px solid var(--gold); }
-  .fitb-feedback.fb-wrong    { background:#fde8e8; color:var(--wrong); border-left:3px solid var(--wrong); }
+    .cover h1 span {
+      color: var(--gold);
+      display: block;
+    }
 
-  @media(max-width:600px) {
-    .choices { grid-template-columns:1fr; }
-    .r-stats { grid-template-columns:1fr 1fr; }
-    .sec-overview { grid-template-columns:repeat(4,1fr); }
-    .cover-meta { grid-template-columns:1fr; }
-  }
-</style>
+    .cover-sub {
+      font-size: 0.9rem;
+      color: #484f58;
+      margin-bottom: 2.5rem;
+      line-height: 1.7;
+    }
+
+    .cover-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 1.5rem;
+      border-radius: 6px;
+      text-align: left;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .cover-meta label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #484f58;
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .cover-meta input {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      color: #f0f6ff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      width: 100%;
+      padding: 0.3rem 0;
+      outline: none;
+    }
+
+    .cover-meta input:focus {
+      border-bottom-color: var(--accent);
+    }
+
+    .sec-overview {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 0.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .ov-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 0.8rem 0.4rem;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .ov-card .num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+
+    .ov-card .lbl {
+      font-size: 0.6rem;
+      color: #484f58;
+      line-height: 1.3;
+    }
+
+    .start-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 1rem 3rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .start-btn:hover {
+      background: #3fb950;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(46, 160, 67, 0.35);
+    }
+
+    /* PROGRESS */
+    .progress-wrap {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: rgba(0, 0, 0, 0.1);
+      z-index: 100;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--gold));
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+
+    /* ASSESSMENT */
+    .assessment {
+      display: none;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 3rem 2rem 6rem;
+    }
+
+    .assessment.active {
+      display: block;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 1.5rem;
+      margin: 3rem 0 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--ink);
+    }
+
+    .section-header:first-of-type {
+      margin-top: 0;
+    }
+
+    .sec-letter {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+    }
+
+    .sec-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      flex: 1;
+    }
+
+    .sec-marks {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--mid);
+    }
+
+    /* QUESTION */
+    .question {
+      margin-bottom: 1.75rem;
+      padding: 1.5rem;
+      background: #fff;
+      border: 1px solid var(--rule);
+      border-left: 4px solid transparent;
+      border-radius: 2px;
+      transition: border-color 0.2s;
+    }
+
+    .question:hover {
+      border-left-color: var(--accent2);
+    }
+
+    .question.answered {
+      border-left-color: var(--accent);
+    }
+
+    .q-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .q-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      background: var(--soft);
+      padding: 0.3rem 0.6rem;
+      border-radius: 2px;
+      color: var(--accent2);
+      white-space: nowrap;
+      margin-top: 2px;
+    }
+
+    .q-text {
+      font-size: 0.95rem;
+      line-height: 1.65;
+      flex: 1;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(13, 17, 23, 0.06);
+      padding: 0.1em 0.4em;
+      border-radius: 3px;
+      font-size: 0.88em;
+      color: var(--ink);
+    }
+
+    /* Code block */
+    .code-block {
+      background: var(--code-bg);
+      color: var(--code-fg);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      line-height: 1.7;
+      padding: 1rem 1.25rem;
+      border-radius: 6px;
+      margin: 0.75rem 0;
+      overflow-x: auto;
+      white-space: pre;
+      border: 1px solid #d0d7de;
+    }
+
+    .code-block .kw {
+      color: #cf222e;
+    }
+
+    .code-block .fn {
+      color: #8250df;
+    }
+
+    .code-block .st {
+      color: #0a3069;
+    }
+
+    .code-block .cm {
+      color: #6e7781;
+    }
+
+    .code-block .nm {
+      color: #0550ae;
+    }
+
+    .code-block .op {
+      color: #116329;
+    }
+
+    /* Choices */
+    .choices {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+      margin-top: 1rem;
+    }
+
+    .choice-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border: 1.5px solid var(--rule);
+      background: var(--paper);
+      cursor: pointer;
+      border-radius: 3px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      color: var(--ink);
+      text-align: left;
+      transition: all 0.15s;
+    }
+
+    .choice-btn code {
+      background: rgba(31, 111, 235, 0.07);
+    }
+
+    .choice-btn:hover:not(:disabled) {
+      border-color: var(--accent2);
+      background: var(--soft);
+    }
+
+    .choice-btn.selected {
+      border-color: var(--accent2);
+      background: #daeef7;
+    }
+
+    .choice-btn.correct-ans {
+      border-color: var(--correct);
+      background: #d8f3e5;
+      color: var(--correct);
+      font-weight: 500;
+    }
+
+    .choice-btn.wrong-ans {
+      border-color: var(--wrong);
+      background: #fde8e8;
+      color: var(--wrong);
+    }
+
+    .choice-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      width: 1.4rem;
+      height: 1.4rem;
+      border-radius: 50%;
+      border: 1.5px solid currentColor;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Feedback */
+    .feedback {
+      display: none;
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      border-radius: 3px;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .feedback.show {
+      display: block;
+    }
+
+    .feedback.fb-correct {
+      background: #d8f3e5;
+      color: var(--correct);
+      border-left: 3px solid var(--correct);
+    }
+
+    .feedback.fb-wrong {
+      background: #fde8e8;
+      color: var(--wrong);
+      border-left: 3px solid var(--wrong);
+    }
+
+    /* Submit */
+    .submit-zone {
+      margin-top: 3rem;
+      text-align: center;
+      padding-top: 2rem;
+      border-top: 1px solid var(--rule);
+    }
+
+    .btn-primary {
+      background: var(--ink);
+      color: white;
+      border: none;
+      padding: 0.9rem 2.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent2);
+      transform: translateY(-1px);
+    }
+
+    /* RESULTS */
+    .results {
+      display: none;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 3rem 2rem 6rem;
+    }
+
+    .results.active {
+      display: block;
+    }
+
+    .results-header {
+      background: var(--ink);
+      color: white;
+      padding: 2.5rem;
+      border-radius: 6px;
+      margin-bottom: 2.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .results-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(45deg, transparent, transparent 19px, rgba(46, 160, 67, 0.04) 19px, rgba(46, 160, 67, 0.04) 20px);
+    }
+
+    .rh-inner {
+      position: relative;
+    }
+
+    .r-grade {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 4.5rem;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+
+    .r-sub {
+      color: rgba(255, 255, 255, 0.55);
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+
+    .r-stats {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.75rem;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.06);
+      padding: 1rem 0.75rem;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.65rem;
+      color: rgba(255, 255, 255, 0.4);
+      margin-top: 0.3rem;
+    }
+
+    .section-result {
+      background: #fff;
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      margin-bottom: 1.25rem;
+      overflow: hidden;
+    }
+
+    .sr-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 1.25rem;
+      background: var(--soft);
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .sr-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .sr-score {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+    }
+
+    .strength {
+      color: var(--correct);
+    }
+
+    .weakness {
+      color: var(--wrong);
+    }
+
+    .moderate {
+      color: var(--partial);
+    }
+
+    .sr-bar-wrap {
+      padding: 0.85rem 1.25rem;
+    }
+
+    .sr-bar-bg {
+      height: 7px;
+      background: var(--rule);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: 0.6rem;
+    }
+
+    .sr-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 1s ease;
+    }
+
+    .sr-rec {
+      font-size: 0.84rem;
+      color: var(--mid);
+      line-height: 1.6;
+    }
+
+    .priority-list {
+      background: #fff;
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 2rem;
+    }
+
+    .priority-head {
+      padding: 0.85rem 1.25rem;
+      background: var(--soft);
+      border-bottom: 1px solid var(--rule);
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .priority-item {
+      padding: 0.85rem 1.25rem;
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      font-size: 0.86rem;
+      line-height: 1.55;
+    }
+
+    .priority-item:last-child {
+      border-bottom: none;
+    }
+
+    .priority-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 2px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .badge-high {
+      background: #fde8e8;
+      color: var(--wrong);
+    }
+
+    .badge-med {
+      background: #fef6d9;
+      color: #a07000;
+    }
+
+    .badge-low {
+      background: #d8f3e5;
+      color: var(--correct);
+    }
+
+    .restart-btn {
+      margin-top: 2rem;
+      background: var(--ink);
+      color: white;
+      border: none;
+      padding: 0.9rem 2rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: background 0.2s;
+    }
+
+    .restart-btn:hover {
+      background: var(--accent);
+    }
+
+    /* FILL-IN-THE-BLANK */
+    .fitb-wrap {
+      margin-top: 0.75rem;
+    }
+
+    .code-line {
+      display: flex;
+      align-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      line-height: 2;
+      flex-wrap: wrap;
+      gap: 0 4px;
+      padding: 2px 0;
+    }
+
+    .code-line.indent-1 {
+      padding-left: 1.5rem;
+    }
+
+    .code-line.indent-2 {
+      padding-left: 3rem;
+    }
+
+    .code-block-fitb {
+      background: var(--code-bg);
+      border: 1px solid #d0d7de;
+      border-radius: 6px;
+      padding: 1rem 1.25rem;
+      margin: 0.75rem 0;
+    }
+
+    .blank {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      background: #e8f0fe;
+      border: none;
+      border-bottom: 2px solid var(--accent2);
+      color: var(--ink);
+      padding: 0 6px 2px;
+      outline: none;
+      min-width: 80px;
+      text-align: center;
+      border-radius: 2px 2px 0 0;
+      transition: border-color 0.2s;
+    }
+
+    .blank:focus {
+      border-bottom-color: var(--gold);
+      background: #fff8e0;
+    }
+
+    .blank.correct-blank {
+      border-bottom-color: var(--correct);
+      background: #d8f3e5;
+      color: #116329;
+    }
+
+    .blank.wrong-blank {
+      border-bottom-color: var(--wrong);
+      background: #fde8e8;
+      color: #cf222e;
+    }
+
+    .blank.partial-blank {
+      border-bottom-color: var(--gold);
+      background: #2d2200;
+      color: var(--gold);
+    }
+
+    .fitb-hint {
+      font-size: 0.75rem;
+      color: var(--mid);
+      margin-top: 0.4rem;
+      font-style: italic;
+    }
+
+    .fitb-feedback {
+      display: none;
+      margin-top: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: 3px;
+      font-size: 0.83rem;
+      line-height: 1.6;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .fitb-feedback.show {
+      display: block;
+    }
+
+    .fitb-feedback.fb-skipped {
+      background: #f3f4f6;
+      color: var(--mid);
+      border-left: 3px solid var(--rule);
+    }
+
+    .feedback.fb-skipped {
+      background: #f3f4f6;
+      color: var(--mid);
+      border-left: 3px solid var(--rule);
+    }
+
+    .blank.skipped-blank {
+      border-bottom-color: var(--rule);
+      background: #f3f4f6;
+      color: var(--mid);
+    }
+
+    .fitb-feedback.fb-correct {
+      background: #d8f3e5;
+      color: var(--correct);
+      border-left: 3px solid var(--correct);
+    }
+
+    .fitb-feedback.fb-partial {
+      background: #fef6d9;
+      color: #7a5c00;
+      border-left: 3px solid var(--gold);
+    }
+
+    .fitb-feedback.fb-wrong {
+      background: #fde8e8;
+      color: var(--wrong);
+      border-left: 3px solid var(--wrong);
+    }
+
+    @media(max-width:600px) {
+      .choices {
+        grid-template-columns: 1fr;
+      }
+
+      .r-stats {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .sec-overview {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .cover-meta {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- COVER -->
-<div class="cover" id="coverPage">
-  <div class="cover-inner">
-    <div class="cover-tag">TECH WITH KEV · Introduction to Python Functions</div>
-    <h1>Python Functions</h1>
-    <p class="cover-sub">Variables · Data Types · Operators · Strings · Conditionals · Loops · Lists</p>
+  <!-- COVER -->
+  <div class="cover" id="coverPage">
+    <div class="cover-inner">
+      <div class="cover-tag">TECH WITH KEV · Introduction to Python Functions</div>
+      <h1>Python Functions</h1>
+      <p class="cover-sub">Variables · Data Types · Operators · Strings · Conditionals · Loops · Lists</p>
 
-    <div class="cover-meta">
-      <div><label>First Name</label><input type="text" id="fname" placeholder="Enter name…"></div>
-      <div><label>Last Name</label><input type="text" id="lname" placeholder="Enter name…"></div>
-      <div><label>Date</label><input type="text" id="dateField"></div>
+      <div class="cover-meta">
+        <div><label>First Name</label><input type="text" id="fname" placeholder="Enter name…"></div>
+        <div><label>Last Name</label><input type="text" id="lname" placeholder="Enter name…"></div>
+        <div><label>Date</label><input type="text" id="dateField"></div>
+      </div>
+
+      <div class="sec-overview">
+        <div class="ov-card">
+          <div class="num">A</div>
+          <div class="lbl">Variables &amp; Types</div>
+        </div>
+        <div class="ov-card">
+          <div class="num">B</div>
+          <div class="lbl">Operators</div>
+        </div>
+        <div class="ov-card">
+          <div class="num">C</div>
+          <div class="lbl">Strings</div>
+        </div>
+        <div class="ov-card">
+          <div class="num">D</div>
+          <div class="lbl">Conditionals</div>
+        </div>
+        <div class="ov-card">
+          <div class="num">E</div>
+          <div class="lbl">Loops</div>
+        </div>
+        <div class="ov-card">
+          <div class="num">F</div>
+          <div class="lbl">Lists</div>
+        </div>
+        <div class="ov-card">
+          <div class="num">G</div>
+          <div class="lbl">Tracing</div>
+        </div>
+        <div class="ov-card">
+          <div class="num">H</div>
+          <div class="lbl">Fill in Blank</div>
+        </div>
+      </div>
+
+      <button class="start-btn" onclick="startAssessment()">Begin Assessment →</button>
+    </div>
+  </div>
+
+  <!-- ASSESSMENT -->
+  <div class="assessment" id="assessmentPage">
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progressBar"></div>
     </div>
 
-    <div class="sec-overview">
-      <div class="ov-card"><div class="num">A</div><div class="lbl">Variables &amp; Types</div></div>
-      <div class="ov-card"><div class="num">B</div><div class="lbl">Operators</div></div>
-      <div class="ov-card"><div class="num">C</div><div class="lbl">Strings</div></div>
-      <div class="ov-card"><div class="num">D</div><div class="lbl">Conditionals</div></div>
-      <div class="ov-card"><div class="num">E</div><div class="lbl">Loops</div></div>
-      <div class="ov-card"><div class="num">F</div><div class="lbl">Lists</div></div>
-      <div class="ov-card"><div class="num">G</div><div class="lbl">Tracing</div></div>
-      <div class="ov-card"><div class="num">H</div><div class="lbl">Fill in Blank</div></div>
+    <!-- SECTION A -->
+    <div class="section-header">
+      <span class="sec-letter">Section A</span>
+      <span class="sec-title">Variables &amp; Data Types</span>
+      <span class="sec-marks">8 pts</span>
     </div>
 
-    <button class="start-btn" onclick="startAssessment()">Begin Assessment →</button>
-  </div>
-</div>
+    <div class="question" id="q1">
+      <div class="q-header"><span class="q-num">A1</span><span class="q-text">What is the data type of
+          <code>3.14</code>?</span></div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q1','A')"><span
+            class="choice-label">A</span><code>int</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q1','B')"><span
+            class="choice-label">B</span><code>float</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q1','C')"><span
+            class="choice-label">C</span><code>str</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q1','D')"><span
+            class="choice-label">D</span><code>bool</code></button>
+      </div>
+      <div class="feedback" id="q1-fb"></div>
+    </div>
 
-<!-- ASSESSMENT -->
-<div class="assessment" id="assessmentPage">
-  <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="question" id="q2">
+      <div class="q-header"><span class="q-num">A2</span><span class="q-text">What is the value of
+          <code>int(3.9)</code>?</span></div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q2','A')"><span
+            class="choice-label">A</span><code>4</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q2','B')"><span
+            class="choice-label">B</span><code>3.9</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q2','C')"><span
+            class="choice-label">C</span><code>3</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q2','D')"><span class="choice-label">D</span>Error</button>
+      </div>
+      <div class="feedback" id="q2-fb"></div>
+    </div>
 
-  <!-- SECTION A -->
-  <div class="section-header">
-    <span class="sec-letter">Section A</span>
-    <span class="sec-title">Variables &amp; Data Types</span>
-    <span class="sec-marks">8 pts</span>
-  </div>
+    <div class="question" id="q3">
+      <div class="q-header"><span class="q-num">A3</span><span class="q-text">After this code runs, what is the value of
+          <code>x</code>?<div class="code-block">x = 10
+            y = x + 3
+            x = y * 2</div></span></div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q3','A')"><span
+            class="choice-label">A</span><code>20</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q3','B')"><span
+            class="choice-label">B</span><code>26</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q3','C')"><span
+            class="choice-label">C</span><code>13</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q3','D')"><span
+            class="choice-label">D</span><code>23</code></button>
+      </div>
+      <div class="feedback" id="q3-fb"></div>
+    </div>
 
-  <div class="question" id="q1">
-    <div class="q-header"><span class="q-num">A1</span><span class="q-text">What is the data type of <code>3.14</code>?</span></div>
+    <div class="question" id="q4">
+      <div class="q-header"><span class="q-num">A4</span><span class="q-text">What does <code>type("42")</code>
+          return?</span></div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q4','A')"><span
+            class="choice-label">A</span><code>&lt;class 'int'&gt;</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q4','B')"><span
+            class="choice-label">B</span><code>&lt;class 'float'&gt;</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q4','C')"><span
+            class="choice-label">C</span><code>&lt;class 'str'&gt;</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q4','D')"><span
+            class="choice-label">D</span><code>&lt;class 'bool'&gt;</code></button>
+      </div>
+      <div class="feedback" id="q4-fb"></div>
+    </div>
+
+    <!-- SECTION B -->
+    <div class="section-header">
+      <span class="sec-letter">Section B</span>
+      <span class="sec-title">Operators</span>
+      <span class="sec-marks">8 pts</span>
+    </div>
+
+    <div class="question" id="q5">
+      <div class="q-header"><span class="q-num">B1</span><span class="q-text">What is the result of
+          <code>17 % 5</code>?</span></div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q5','A')"><span
+            class="choice-label">A</span><code>3</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q5','B')"><span
+            class="choice-label">B</span><code>2</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q5','C')"><span
+            class="choice-label">C</span><code>3.4</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q5','D')"><span
+            class="choice-label">D</span><code>5</code></button>
+      </div>
+      <div class="feedback" id="q5-fb"></div>
+    </div>
+
+    <div class="question" id="q6">
+      <div class="q-header"><span class="q-num">B2</span><span class="q-text">What is the result of
+          <code>3 + 4 * 2 - 1</code>?</span></div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q6','A')"><span
+            class="choice-label">A</span><code>13</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q6','B')"><span
+            class="choice-label">B</span><code>10</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q6','C')"><span
+            class="choice-label">C</span><code>14</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q6','D')"><span
+            class="choice-label">D</span><code>9</code></button>
+      </div>
+      <div class="feedback" id="q6-fb"></div>
+    </div>
+
+    <div class="question" id="q7">
+      <div class="q-header"><span class="q-num">B3</span><span class="q-text">What does this evaluate to?<div
+            class="code-block">10 > 3 <span class="kw">and</span> 5 < 2</div></span></div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q7','A')"><span
+            class="choice-label">A</span><code>True</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q7','B')"><span
+            class="choice-label">B</span><code>False</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q7','C')"><span
+            class="choice-label">C</span><code>None</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q7','D')"><span class="choice-label">D</span>Error</button>
+      </div>
+      <div class="feedback" id="q7-fb"></div>
+    </div>
+
+    <div class="question" id="q8">
+      <div class="q-header"><span class="q-num">B4</span><span class="q-text">What is the result of
+          <code>2 ** 4</code>?</span></div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q8','A')"><span
+            class="choice-label">A</span><code>8</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q8','B')"><span
+            class="choice-label">B</span><code>16</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q8','C')"><span
+            class="choice-label">C</span><code>6</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q8','D')"><span
+            class="choice-label">D</span><code>24</code></button>
+      </div>
+      <div class="feedback" id="q8-fb"></div>
+    </div>
+
+    <!-- SECTION C -->
+    <div class="section-header">
+      <span class="sec-letter">Section C</span>
+      <span class="sec-title">Strings</span>
+      <span class="sec-marks">8 pts</span>
+    </div>
+
+    <div class="question" id="q9">
+      <div class="q-header"><span class="q-num">C1</span><span class="q-text">Given <code>word = "Python"</code>, what
+          is <code>word[0]</code>?</span></div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q9','A')"><span
+            class="choice-label">A</span><code>"P"</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q9','B')"><span
+            class="choice-label">B</span><code>"y"</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q9','C')"><span
+            class="choice-label">C</span><code>"n"</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q9','D')"><span
+            class="choice-label">D</span><code>1</code></button>
+      </div>
+      <div class="feedback" id="q9-fb"></div>
+    </div>
+
+    <div class="question" id="q10">
+      <div class="q-header"><span class="q-num">C2</span><span class="q-text">Given <code>word = "Python"</code>, what
+          is <code>word[1:4]</code>?</span></div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q10','A')"><span
+            class="choice-label">A</span><code>"Pyt"</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q10','B')"><span
+            class="choice-label">B</span><code>"yth"</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q10','C')"><span
+            class="choice-label">C</span><code>"ytho"</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q10','D')"><span
+            class="choice-label">D</span><code>"ython"</code></button>
+      </div>
+      <div class="feedback" id="q10-fb"></div>
+    </div>
+
+    <div class="question" id="q11">
+      <div class="q-header"><span class="q-num">C3</span><span class="q-text">What does this print?<div
+            class="code-block"><span class="nm">name</span> = <span class="st">"alice"</span>
+            <span class="fn">print</span>(name.upper())
+          </div></span></div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q11','A')"><span
+            class="choice-label">A</span><code>alice</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q11','B')"><span
+            class="choice-label">B</span><code>Alice</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q11','C')"><span
+            class="choice-label">C</span><code>ALICE</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q11','D')"><span
+            class="choice-label">D</span><code>"ALICE"</code></button>
+      </div>
+      <div class="feedback" id="q11-fb"></div>
+    </div>
+
+    <div class="question" id="q12">
+      <div class="q-header"><span class="q-num">C4</span><span class="q-text">What does this print?<div
+            class="code-block"><span class="nm">name</span> = <span class="st">"Alice"</span>
+            <span class="nm">age</span> = <span class="nm">14</span>
+            <span class="fn">print</span>(<span class="st">f"My name is {name} and I am {age} years old."</span>)
+          </div></span></div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q12','A')"><span
+            class="choice-label">A</span><code>My name is {name} and I am {age} years old.</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q12','B')"><span
+            class="choice-label">B</span><code>My name is Alice and I am 14 years old.</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q12','C')"><span
+            class="choice-label">C</span><code>My name is "Alice" and I am "14" years old.</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q12','D')"><span class="choice-label">D</span>Error</button>
+      </div>
+      <div class="feedback" id="q12-fb"></div>
+    </div>
+
+    <!-- SECTION D -->
+    <div class="section-header">
+      <span class="sec-letter">Section D</span>
+      <span class="sec-title">Conditionals</span>
+      <span class="sec-marks">10 pts</span>
+    </div>
+
+    <div class="question" id="q13">
+      <div class="q-header"><span class="q-num">D1</span><span class="q-text">What does this print?<div
+            class="code-block"><span class="nm">x</span> = <span class="nm">15</span>
+            <span class="kw">if</span> x > <span class="nm">20</span>:
+            <span class="fn">print</span>(<span class="st">"big"</span>)
+            <span class="kw">elif</span> x > <span class="nm">10</span>:
+            <span class="fn">print</span>(<span class="st">"medium"</span>)
+            <span class="kw">else</span>:
+            <span class="fn">print</span>(<span class="st">"small"</span>)
+          </div></span></div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q13','A')"><span
+            class="choice-label">A</span><code>big</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q13','B')"><span
+            class="choice-label">B</span><code>medium</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q13','C')"><span
+            class="choice-label">C</span><code>small</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q13','D')"><span
+            class="choice-label">D</span><code>medium<br>small</code></button>
+      </div>
+      <div class="feedback" id="q13-fb"></div>
+    </div>
+
+    <div class="question" id="q14">
+      <div class="q-header"><span class="q-num">D2</span><span class="q-text">What does this print?<div
+            class="code-block"><span class="nm">score</span> = <span class="nm">72</span>
+            <span class="kw">if</span> score >= <span class="nm">90</span>:
+            <span class="fn">print</span>(<span class="st">"A"</span>)
+            <span class="kw">elif</span> score >= <span class="nm">80</span>:
+            <span class="fn">print</span>(<span class="st">"B"</span>)
+            <span class="kw">elif</span> score >= <span class="nm">70</span>:
+            <span class="fn">print</span>(<span class="st">"C"</span>)
+            <span class="kw">else</span>:
+            <span class="fn">print</span>(<span class="st">"F"</span>)
+            <span class="fn">print</span>(<span class="st">"Done"</span>)
+          </div></span></div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q14','A')"><span class="choice-label">A</span><code>C</code>
+          only</button>
+        <button class="choice-btn" onclick="selectMC(this,'q14','B')"><span class="choice-label">B</span><code>C</code>
+          then <code>Done</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q14','C')"><span class="choice-label">C</span><code>F</code>
+          then <code>Done</code></button>
+        <button class="choice-btn" onclick="selectMC(this,'q14','D')"><span
+            class="choice-label">D</span><code>Done</code> only</button>
+      </div>
+      <div class="feedback" id="q14-fb"></div>
+    </div>
+
+    <div class="question" id="q15">
+      <div class="q-header"><span class="q-num">D3</span><span class="q-text">Which line contains a syntax error?<div
+            class="code-block"><span class="nm">temperature</span> = <span class="nm">35</span> <span class="cm"># line
+              1</span>
+            <span class="kw">if</span> temperature > <span class="nm">30</span> <span class="cm"># line 2</span>
+            <span class="fn">print</span>(<span class="st">"Hot day!"</span>) <span class="cm"># line 3</span>
+            <span class="kw">else</span>: <span class="cm"># line 4</span>
+            <span class="fn">print</span>(<span class="st">"Nice day!"</span>) <span class="cm"># line 5</span>
+          </div></span></div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q15','A')"><span class="choice-label">A</span>Line 1</button>
+        <button class="choice-btn" onclick="selectMC(this,'q15','B')"><span class="choice-label">B</span>Line 2</button>
+        <button class="choice-btn" onclick="selectMC(this,'q15','C')"><span class="choice-label">C</span>Line 3</button>
+        <button class="choice-btn" onclick="selectMC(this,'q15','D')"><span class="choice-label">D</span>Line 4</button>
+      </div>
+      <div class="feedback" id="q15-fb"></div>
+    </div>
+
+    <!-- SECTION E -->
+    <div class="section-header">
+      <span class="sec-letter">Section E</span>
+      <span class="sec-title">Loops</span>
+      <span class="sec-marks">10 pts</span>
+    </div>
+
+    <div class="question" id="q16">
+      <div class="q-header"><span class="q-num">E1</span><span class="q-text">How many times does this loop print?<div
+            class="code-block"><span class="kw">for</span> i <span class="kw">in</span> <span
+              class="fn">range</span>(<span class="nm">1</span>, <span class="nm">6</span>):
+            <span class="fn">print</span>(i * <span class="nm">2</span>)
+          </div></span></div>
+      <div class="choices">
+        <button class="choice-btn" onclick="selectMC(this,'q16','A')"><span class="choice-label">A</span>4</button>
+        <button class="choice-btn" onclick="selectMC(this,'q16','B')"><span class="choice-label">B</span>5</button>
+        <button class="choice-btn" onclick="selectMC(this,'q16','C')"><span class="choice-label">C</span>6</button>
+        <button class="choice-btn" onclick="selectMC(this,'q16','D')"><span class="choice-label">D</span>7</button>
+      </div>
+      <div class="feedback" id="q16-fb"></div>
+    </div>
+
+    <div class="question" id="q17">
+      <div class="q-header"><span class="q-num">E2</span><span class="q-text">What is printed last by this loop?<div
+            class="code-block"><span class="nm">n</span> = <span class="nm">1</span>
+            <span class="kw">while</span> n < <span class="nm">20</span>:
+        <span class="fn">print</span>(n)
+        n = n * <span class="nm">3</span>
+      </div></span>
+    </div>
     <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q1','A')"><span class="choice-label">A</span><code>int</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q1','B')"><span class="choice-label">B</span><code>float</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q1','C')"><span class="choice-label">C</span><code>str</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q1','D')"><span class="choice-label">D</span><code>bool</code></button>
-    </div>
-    <div class="feedback" id="q1-fb"></div>
-  </div>
-
-  <div class="question" id="q2">
-    <div class="q-header"><span class="q-num">A2</span><span class="q-text">What is the value of <code>int(3.9)</code>?</span></div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q2','A')"><span class="choice-label">A</span><code>4</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q2','B')"><span class="choice-label">B</span><code>3.9</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q2','C')"><span class="choice-label">C</span><code>3</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q2','D')"><span class="choice-label">D</span>Error</button>
-    </div>
-    <div class="feedback" id="q2-fb"></div>
-  </div>
-
-  <div class="question" id="q3">
-    <div class="q-header"><span class="q-num">A3</span><span class="q-text">After this code runs, what is the value of <code>x</code>?<div class="code-block">x = 10
-y = x + 3
-x = y * 2</div></span></div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q3','A')"><span class="choice-label">A</span><code>20</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q3','B')"><span class="choice-label">B</span><code>26</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q3','C')"><span class="choice-label">C</span><code>13</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q3','D')"><span class="choice-label">D</span><code>23</code></button>
-    </div>
-    <div class="feedback" id="q3-fb"></div>
-  </div>
-
-  <div class="question" id="q4">
-    <div class="q-header"><span class="q-num">A4</span><span class="q-text">What does <code>type("42")</code> return?</span></div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q4','A')"><span class="choice-label">A</span><code>&lt;class 'int'&gt;</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q4','B')"><span class="choice-label">B</span><code>&lt;class 'float'&gt;</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q4','C')"><span class="choice-label">C</span><code>&lt;class 'str'&gt;</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q4','D')"><span class="choice-label">D</span><code>&lt;class 'bool'&gt;</code></button>
-    </div>
-    <div class="feedback" id="q4-fb"></div>
-  </div>
-
-  <!-- SECTION B -->
-  <div class="section-header">
-    <span class="sec-letter">Section B</span>
-    <span class="sec-title">Operators</span>
-    <span class="sec-marks">8 pts</span>
-  </div>
-
-  <div class="question" id="q5">
-    <div class="q-header"><span class="q-num">B1</span><span class="q-text">What is the result of <code>17 % 5</code>?</span></div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q5','A')"><span class="choice-label">A</span><code>3</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q5','B')"><span class="choice-label">B</span><code>2</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q5','C')"><span class="choice-label">C</span><code>3.4</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q5','D')"><span class="choice-label">D</span><code>5</code></button>
-    </div>
-    <div class="feedback" id="q5-fb"></div>
-  </div>
-
-  <div class="question" id="q6">
-    <div class="q-header"><span class="q-num">B2</span><span class="q-text">What is the result of <code>3 + 4 * 2 - 1</code>?</span></div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q6','A')"><span class="choice-label">A</span><code>13</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q6','B')"><span class="choice-label">B</span><code>10</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q6','C')"><span class="choice-label">C</span><code>14</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q6','D')"><span class="choice-label">D</span><code>9</code></button>
-    </div>
-    <div class="feedback" id="q6-fb"></div>
-  </div>
-
-  <div class="question" id="q7">
-    <div class="q-header"><span class="q-num">B3</span><span class="q-text">What does this evaluate to?<div class="code-block">10 > 3 <span class="kw">and</span> 5 < 2</div></span></div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q7','A')"><span class="choice-label">A</span><code>True</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q7','B')"><span class="choice-label">B</span><code>False</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q7','C')"><span class="choice-label">C</span><code>None</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q7','D')"><span class="choice-label">D</span>Error</button>
-    </div>
-    <div class="feedback" id="q7-fb"></div>
-  </div>
-
-  <div class="question" id="q8">
-    <div class="q-header"><span class="q-num">B4</span><span class="q-text">What is the result of <code>2 ** 4</code>?</span></div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q8','A')"><span class="choice-label">A</span><code>8</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q8','B')"><span class="choice-label">B</span><code>16</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q8','C')"><span class="choice-label">C</span><code>6</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q8','D')"><span class="choice-label">D</span><code>24</code></button>
-    </div>
-    <div class="feedback" id="q8-fb"></div>
-  </div>
-
-  <!-- SECTION C -->
-  <div class="section-header">
-    <span class="sec-letter">Section C</span>
-    <span class="sec-title">Strings</span>
-    <span class="sec-marks">8 pts</span>
-  </div>
-
-  <div class="question" id="q9">
-    <div class="q-header"><span class="q-num">C1</span><span class="q-text">Given <code>word = "Python"</code>, what is <code>word[0]</code>?</span></div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q9','A')"><span class="choice-label">A</span><code>"P"</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q9','B')"><span class="choice-label">B</span><code>"y"</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q9','C')"><span class="choice-label">C</span><code>"n"</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q9','D')"><span class="choice-label">D</span><code>1</code></button>
-    </div>
-    <div class="feedback" id="q9-fb"></div>
-  </div>
-
-  <div class="question" id="q10">
-    <div class="q-header"><span class="q-num">C2</span><span class="q-text">Given <code>word = "Python"</code>, what is <code>word[1:4]</code>?</span></div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q10','A')"><span class="choice-label">A</span><code>"Pyt"</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q10','B')"><span class="choice-label">B</span><code>"yth"</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q10','C')"><span class="choice-label">C</span><code>"ytho"</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q10','D')"><span class="choice-label">D</span><code>"ython"</code></button>
-    </div>
-    <div class="feedback" id="q10-fb"></div>
-  </div>
-
-  <div class="question" id="q11">
-    <div class="q-header"><span class="q-num">C3</span><span class="q-text">What does this print?<div class="code-block"><span class="nm">name</span> = <span class="st">"alice"</span>
-<span class="fn">print</span>(name.upper())</div></span></div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q11','A')"><span class="choice-label">A</span><code>alice</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q11','B')"><span class="choice-label">B</span><code>Alice</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q11','C')"><span class="choice-label">C</span><code>ALICE</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q11','D')"><span class="choice-label">D</span><code>"ALICE"</code></button>
-    </div>
-    <div class="feedback" id="q11-fb"></div>
-  </div>
-
-  <div class="question" id="q12">
-    <div class="q-header"><span class="q-num">C4</span><span class="q-text">What does this print?<div class="code-block"><span class="nm">name</span> = <span class="st">"Alice"</span>
-<span class="nm">age</span> = <span class="nm">14</span>
-<span class="fn">print</span>(<span class="st">f"My name is {name} and I am {age} years old."</span>)</div></span></div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q12','A')"><span class="choice-label">A</span><code>My name is {name} and I am {age} years old.</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q12','B')"><span class="choice-label">B</span><code>My name is Alice and I am 14 years old.</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q12','C')"><span class="choice-label">C</span><code>My name is "Alice" and I am "14" years old.</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q12','D')"><span class="choice-label">D</span>Error</button>
-    </div>
-    <div class="feedback" id="q12-fb"></div>
-  </div>
-
-  <!-- SECTION D -->
-  <div class="section-header">
-    <span class="sec-letter">Section D</span>
-    <span class="sec-title">Conditionals</span>
-    <span class="sec-marks">10 pts</span>
-  </div>
-
-  <div class="question" id="q13">
-    <div class="q-header"><span class="q-num">D1</span><span class="q-text">What does this print?<div class="code-block"><span class="nm">x</span> = <span class="nm">15</span>
-<span class="kw">if</span> x > <span class="nm">20</span>:
-    <span class="fn">print</span>(<span class="st">"big"</span>)
-<span class="kw">elif</span> x > <span class="nm">10</span>:
-    <span class="fn">print</span>(<span class="st">"medium"</span>)
-<span class="kw">else</span>:
-    <span class="fn">print</span>(<span class="st">"small"</span>)</div></span></div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q13','A')"><span class="choice-label">A</span><code>big</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q13','B')"><span class="choice-label">B</span><code>medium</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q13','C')"><span class="choice-label">C</span><code>small</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q13','D')"><span class="choice-label">D</span><code>medium<br>small</code></button>
-    </div>
-    <div class="feedback" id="q13-fb"></div>
-  </div>
-
-  <div class="question" id="q14">
-    <div class="q-header"><span class="q-num">D2</span><span class="q-text">What does this print?<div class="code-block"><span class="nm">score</span> = <span class="nm">72</span>
-<span class="kw">if</span> score >= <span class="nm">90</span>:
-    <span class="fn">print</span>(<span class="st">"A"</span>)
-<span class="kw">elif</span> score >= <span class="nm">80</span>:
-    <span class="fn">print</span>(<span class="st">"B"</span>)
-<span class="kw">elif</span> score >= <span class="nm">70</span>:
-    <span class="fn">print</span>(<span class="st">"C"</span>)
-<span class="kw">else</span>:
-    <span class="fn">print</span>(<span class="st">"F"</span>)
-<span class="fn">print</span>(<span class="st">"Done"</span>)</div></span></div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q14','A')"><span class="choice-label">A</span><code>C</code> only</button>
-      <button class="choice-btn" onclick="selectMC(this,'q14','B')"><span class="choice-label">B</span><code>C</code> then <code>Done</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q14','C')"><span class="choice-label">C</span><code>F</code> then <code>Done</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q14','D')"><span class="choice-label">D</span><code>Done</code> only</button>
-    </div>
-    <div class="feedback" id="q14-fb"></div>
-  </div>
-
-  <div class="question" id="q15">
-    <div class="q-header"><span class="q-num">D3</span><span class="q-text">Which line contains a syntax error?<div class="code-block"><span class="nm">temperature</span> = <span class="nm">35</span>          <span class="cm"># line 1</span>
-<span class="kw">if</span> temperature > <span class="nm">30</span>           <span class="cm"># line 2</span>
-    <span class="fn">print</span>(<span class="st">"Hot day!"</span>)         <span class="cm"># line 3</span>
-<span class="kw">else</span>:                          <span class="cm"># line 4</span>
-    <span class="fn">print</span>(<span class="st">"Nice day!"</span>)         <span class="cm"># line 5</span></div></span></div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q15','A')"><span class="choice-label">A</span>Line 1</button>
-      <button class="choice-btn" onclick="selectMC(this,'q15','B')"><span class="choice-label">B</span>Line 2</button>
-      <button class="choice-btn" onclick="selectMC(this,'q15','C')"><span class="choice-label">C</span>Line 3</button>
-      <button class="choice-btn" onclick="selectMC(this,'q15','D')"><span class="choice-label">D</span>Line 4</button>
-    </div>
-    <div class="feedback" id="q15-fb"></div>
-  </div>
-
-  <!-- SECTION E -->
-  <div class="section-header">
-    <span class="sec-letter">Section E</span>
-    <span class="sec-title">Loops</span>
-    <span class="sec-marks">10 pts</span>
-  </div>
-
-  <div class="question" id="q16">
-    <div class="q-header"><span class="q-num">E1</span><span class="q-text">How many times does this loop print?<div class="code-block"><span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, <span class="nm">6</span>):
-    <span class="fn">print</span>(i * <span class="nm">2</span>)</div></span></div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q16','A')"><span class="choice-label">A</span>4</button>
-      <button class="choice-btn" onclick="selectMC(this,'q16','B')"><span class="choice-label">B</span>5</button>
-      <button class="choice-btn" onclick="selectMC(this,'q16','C')"><span class="choice-label">C</span>6</button>
-      <button class="choice-btn" onclick="selectMC(this,'q16','D')"><span class="choice-label">D</span>7</button>
-    </div>
-    <div class="feedback" id="q16-fb"></div>
-  </div>
-
-  <div class="question" id="q17">
-    <div class="q-header"><span class="q-num">E2</span><span class="q-text">What is printed last by this loop?<div class="code-block"><span class="nm">n</span> = <span class="nm">1</span>
-<span class="kw">while</span> n < <span class="nm">20</span>:
-    <span class="fn">print</span>(n)
-    n = n * <span class="nm">3</span></div></span></div>
-    <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q17','A')"><span class="choice-label">A</span><code>9</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q17','B')"><span class="choice-label">B</span><code>18</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q17','C')"><span class="choice-label">C</span><code>27</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q17','D')"><span class="choice-label">D</span><code>20</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q17','A')"><span
+          class="choice-label">A</span><code>9</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q17','B')"><span
+          class="choice-label">B</span><code>18</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q17','C')"><span
+          class="choice-label">C</span><code>27</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q17','D')"><span
+          class="choice-label">D</span><code>20</code></button>
     </div>
     <div class="feedback" id="q17-fb"></div>
   </div>
 
   <div class="question" id="q18">
-    <div class="q-header"><span class="q-num">E3</span><span class="q-text">What does this print?<div class="code-block"><span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">5</span>):
-    <span class="kw">if</span> i == <span class="nm">2</span>:
-        <span class="kw">continue</span>
-    <span class="kw">if</span> i == <span class="nm">4</span>:
-        <span class="kw">break</span>
-    <span class="fn">print</span>(i)</div></span></div>
+    <div class="q-header"><span class="q-num">E3</span><span class="q-text">What does this print?<div
+          class="code-block"><span class="kw">for</span> i <span class="kw">in</span> <span
+            class="fn">range</span>(<span class="nm">5</span>):
+          <span class="kw">if</span> i == <span class="nm">2</span>:
+          <span class="kw">continue</span>
+          <span class="kw">if</span> i == <span class="nm">4</span>:
+          <span class="kw">break</span>
+          <span class="fn">print</span>(i)
+        </div></span></div>
     <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q18','A')"><span class="choice-label">A</span><code>0 1 2 3</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q18','B')"><span class="choice-label">B</span><code>0 1 3</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q18','C')"><span class="choice-label">C</span><code>0 1 2 3 4</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q18','D')"><span class="choice-label">D</span><code>0 1</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q18','A')"><span
+          class="choice-label">A</span><code>0 1 2 3</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q18','B')"><span
+          class="choice-label">B</span><code>0 1 3</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q18','C')"><span
+          class="choice-label">C</span><code>0 1 2 3 4</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q18','D')"><span
+          class="choice-label">D</span><code>0 1</code></button>
     </div>
     <div class="feedback" id="q18-fb"></div>
   </div>
 
   <div class="question" id="q19">
-    <div class="q-header"><span class="q-num">E4</span><span class="q-text">What is the value of <code>total</code> after this runs?<div class="code-block"><span class="nm">total</span> = <span class="nm">0</span>
-<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, <span class="nm">6</span>):
-    total = total + i</div></span></div>
+    <div class="q-header"><span class="q-num">E4</span><span class="q-text">What is the value of <code>total</code>
+        after this runs?<div class="code-block"><span class="nm">total</span> = <span class="nm">0</span>
+          <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span
+            class="nm">1</span>, <span class="nm">6</span>):
+          total = total + i
+        </div></span></div>
     <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q19','A')"><span class="choice-label">A</span><code>10</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q19','B')"><span class="choice-label">B</span><code>15</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q19','C')"><span class="choice-label">C</span><code>14</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q19','D')"><span class="choice-label">D</span><code>20</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q19','A')"><span
+          class="choice-label">A</span><code>10</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q19','B')"><span
+          class="choice-label">B</span><code>15</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q19','C')"><span
+          class="choice-label">C</span><code>14</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q19','D')"><span
+          class="choice-label">D</span><code>20</code></button>
     </div>
     <div class="feedback" id="q19-fb"></div>
   </div>
@@ -481,51 +1272,74 @@ x = y * 2</div></span></div>
   </div>
 
   <div class="question" id="q20">
-    <div class="q-header"><span class="q-num">F1</span><span class="q-text">Given <code>nums = [4, 7, 2, 9, 1, 5]</code>, what is <code>nums[-1]</code>?</span></div>
+    <div class="q-header"><span class="q-num">F1</span><span class="q-text">Given
+        <code>nums = [4, 7, 2, 9, 1, 5]</code>, what is <code>nums[-1]</code>?</span></div>
     <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q20','A')"><span class="choice-label">A</span><code>4</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q20','B')"><span class="choice-label">B</span><code>1</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q20','C')"><span class="choice-label">C</span><code>5</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q20','D')"><span class="choice-label">D</span><code>9</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q20','A')"><span
+          class="choice-label">A</span><code>4</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q20','B')"><span
+          class="choice-label">B</span><code>1</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q20','C')"><span
+          class="choice-label">C</span><code>5</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q20','D')"><span
+          class="choice-label">D</span><code>9</code></button>
     </div>
     <div class="feedback" id="q20-fb"></div>
   </div>
 
   <div class="question" id="q21">
-    <div class="q-header"><span class="q-num">F2</span><span class="q-text">Given <code>nums = [4, 7, 2, 9, 1, 5]</code>, what is <code>nums[1:4]</code>?</span></div>
+    <div class="q-header"><span class="q-num">F2</span><span class="q-text">Given
+        <code>nums = [4, 7, 2, 9, 1, 5]</code>, what is <code>nums[1:4]</code>?</span></div>
     <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q21','A')"><span class="choice-label">A</span><code>[4, 7, 2]</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q21','B')"><span class="choice-label">B</span><code>[7, 2, 9]</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q21','C')"><span class="choice-label">C</span><code>[7, 2, 9, 1]</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q21','D')"><span class="choice-label">D</span><code>[2, 9, 1]</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q21','A')"><span
+          class="choice-label">A</span><code>[4, 7, 2]</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q21','B')"><span
+          class="choice-label">B</span><code>[7, 2, 9]</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q21','C')"><span
+          class="choice-label">C</span><code>[7, 2, 9, 1]</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q21','D')"><span
+          class="choice-label">D</span><code>[2, 9, 1]</code></button>
     </div>
     <div class="feedback" id="q21-fb"></div>
   </div>
 
   <div class="question" id="q22">
-    <div class="q-header"><span class="q-num">F3</span><span class="q-text">What is the state of <code>nums</code> after these run in order?<div class="code-block">nums = [<span class="nm">4</span>, <span class="nm">7</span>, <span class="nm">2</span>, <span class="nm">9</span>, <span class="nm">1</span>, <span class="nm">5</span>]
-nums.append(<span class="nm">8</span>)
-nums.remove(<span class="nm">2</span>)
-nums.sort()</div></span></div>
+    <div class="q-header"><span class="q-num">F3</span><span class="q-text">What is the state of <code>nums</code> after
+        these run in order?<div class="code-block">nums = [<span class="nm">4</span>, <span class="nm">7</span>, <span
+            class="nm">2</span>, <span class="nm">9</span>, <span class="nm">1</span>, <span class="nm">5</span>]
+          nums.append(<span class="nm">8</span>)
+          nums.remove(<span class="nm">2</span>)
+          nums.sort()</div></span></div>
     <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q22','A')"><span class="choice-label">A</span><code>[1, 4, 5, 7, 8, 9]</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q22','B')"><span class="choice-label">B</span><code>[1, 4, 5, 7, 8, 9, 2]</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q22','C')"><span class="choice-label">C</span><code>[4, 7, 9, 1, 5, 8]</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q22','D')"><span class="choice-label">D</span><code>[1, 2, 4, 5, 7, 8, 9]</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q22','A')"><span
+          class="choice-label">A</span><code>[1, 4, 5, 7, 8, 9]</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q22','B')"><span
+          class="choice-label">B</span><code>[1, 4, 5, 7, 8, 9, 2]</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q22','C')"><span
+          class="choice-label">C</span><code>[4, 7, 9, 1, 5, 8]</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q22','D')"><span
+          class="choice-label">D</span><code>[1, 2, 4, 5, 7, 8, 9]</code></button>
     </div>
     <div class="feedback" id="q22-fb"></div>
   </div>
 
   <div class="question" id="q23">
-    <div class="q-header"><span class="q-num">F4</span><span class="q-text">What does this print?<div class="code-block">marks = [<span class="nm">55</span>, <span class="nm">72</span>, <span class="nm">88</span>, <span class="nm">61</span>, <span class="nm">90</span>]
-<span class="kw">for</span> m <span class="kw">in</span> marks:
-    <span class="kw">if</span> m >= <span class="nm">70</span>:
-        <span class="fn">print</span>(m)</div></span></div>
+    <div class="q-header"><span class="q-num">F4</span><span class="q-text">What does this print?<div
+          class="code-block">marks = [<span class="nm">55</span>, <span class="nm">72</span>, <span
+            class="nm">88</span>, <span class="nm">61</span>, <span class="nm">90</span>]
+          <span class="kw">for</span> m <span class="kw">in</span> marks:
+          <span class="kw">if</span> m >= <span class="nm">70</span>:
+          <span class="fn">print</span>(m)
+        </div></span></div>
     <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q23','A')"><span class="choice-label">A</span><code>72, 88, 90</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q23','B')"><span class="choice-label">B</span><code>55, 61</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q23','C')"><span class="choice-label">C</span><code>72 88 90</code> (each on new line)</button>
-      <button class="choice-btn" onclick="selectMC(this,'q23','D')"><span class="choice-label">D</span><code>[72, 88, 90]</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q23','A')"><span
+          class="choice-label">A</span><code>72, 88, 90</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q23','B')"><span
+          class="choice-label">B</span><code>55, 61</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q23','C')"><span
+          class="choice-label">C</span><code>72 88 90</code> (each on new line)</button>
+      <button class="choice-btn" onclick="selectMC(this,'q23','D')"><span
+          class="choice-label">D</span><code>[72, 88, 90]</code></button>
     </div>
     <div class="feedback" id="q23-fb"></div>
   </div>
@@ -538,53 +1352,73 @@ nums.sort()</div></span></div>
   </div>
 
   <div class="question" id="q24">
-    <div class="q-header"><span class="q-num">G1</span><span class="q-text">What is the exact output?<div class="code-block">total = <span class="nm">0</span>
-<span class="kw">for</span> num <span class="kw">in</span> [<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>]:
-    total = total + num
-    <span class="kw">if</span> total > <span class="nm">6</span>:
-        <span class="fn">print</span>(<span class="st">"Over 6:"</span>, total)
-        <span class="kw">break</span>
-<span class="fn">print</span>(<span class="st">"Final total:"</span>, total)</div></span></div>
+    <div class="q-header"><span class="q-num">G1</span><span class="q-text">What is the exact output?<div
+          class="code-block">total = <span class="nm">0</span>
+          <span class="kw">for</span> num <span class="kw">in</span> [<span class="nm">1</span>, <span
+            class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>]:
+          total = total + num
+          <span class="kw">if</span> total > <span class="nm">6</span>:
+          <span class="fn">print</span>(<span class="st">"Over 6:"</span>, total)
+          <span class="kw">break</span>
+          <span class="fn">print</span>(<span class="st">"Final total:"</span>, total)
+        </div></span></div>
     <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q24','A')"><span class="choice-label">A</span><code>Over 6: 10<br>Final total: 10</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q24','B')"><span class="choice-label">B</span><code>Over 6: 7<br>Final total: 7</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q24','C')"><span class="choice-label">C</span><code>Final total: 15</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q24','D')"><span class="choice-label">D</span><code>Over 6: 6<br>Final total: 6</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q24','A')"><span
+          class="choice-label">A</span><code>Over 6: 10<br>Final total: 10</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q24','B')"><span
+          class="choice-label">B</span><code>Over 6: 7<br>Final total: 7</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q24','C')"><span
+          class="choice-label">C</span><code>Final total: 15</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q24','D')"><span
+          class="choice-label">D</span><code>Over 6: 6<br>Final total: 6</code></button>
     </div>
     <div class="feedback" id="q24-fb"></div>
   </div>
 
   <div class="question" id="q25">
-    <div class="q-header"><span class="q-num">G2</span><span class="q-text">What does <code>result</code> contain after this runs?<div class="code-block">words = [<span class="st">"cat"</span>, <span class="st">"elephant"</span>, <span class="st">"dog"</span>, <span class="st">"ant"</span>]
-result = []
-<span class="kw">for</span> w <span class="kw">in</span> words:
-    <span class="kw">if</span> <span class="fn">len</span>(w) > <span class="nm">3</span>:
-        result.append(w.upper())
-<span class="fn">print</span>(result)</div></span></div>
+    <div class="q-header"><span class="q-num">G2</span><span class="q-text">What does <code>result</code> contain after
+        this runs?<div class="code-block">words = [<span class="st">"cat"</span>, <span class="st">"elephant"</span>,
+          <span class="st">"dog"</span>, <span class="st">"ant"</span>]
+          result = []
+          <span class="kw">for</span> w <span class="kw">in</span> words:
+          <span class="kw">if</span> <span class="fn">len</span>(w) > <span class="nm">3</span>:
+          result.append(w.upper())
+          <span class="fn">print</span>(result)
+        </div></span></div>
     <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q25','A')"><span class="choice-label">A</span><code>["ELEPHANT", "DOG"]</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q25','B')"><span class="choice-label">B</span><code>["elephant", "dog"]</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q25','C')"><span class="choice-label">C</span><code>["ELEPHANT"]</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q25','D')"><span class="choice-label">D</span><code>["CAT", "ELEPHANT", "DOG", "ANT"]</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q25','A')"><span
+          class="choice-label">A</span><code>["ELEPHANT", "DOG"]</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q25','B')"><span
+          class="choice-label">B</span><code>["elephant", "dog"]</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q25','C')"><span
+          class="choice-label">C</span><code>["ELEPHANT"]</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q25','D')"><span
+          class="choice-label">D</span><code>["CAT", "ELEPHANT", "DOG", "ANT"]</code></button>
     </div>
     <div class="feedback" id="q25-fb"></div>
   </div>
 
   <div class="question" id="q26">
-    <div class="q-header"><span class="q-num">G3</span><span class="q-text">What is the exact output?<div class="code-block">x = <span class="nm">5</span>
-y = <span class="nm">3</span>
-<span class="kw">if</span> x > y:
-    x = x - y
-    <span class="fn">print</span>(<span class="st">f"x is now {x}"</span>)
-<span class="kw">else</span>:
-    y = y - x
-    <span class="fn">print</span>(<span class="st">f"y is now {y}"</span>)
-<span class="fn">print</span>(<span class="st">f"x={x}, y={y}"</span>)</div></span></div>
+    <div class="q-header"><span class="q-num">G3</span><span class="q-text">What is the exact output?<div
+          class="code-block">x = <span class="nm">5</span>
+          y = <span class="nm">3</span>
+          <span class="kw">if</span> x > y:
+          x = x - y
+          <span class="fn">print</span>(<span class="st">f"x is now {x}"</span>)
+          <span class="kw">else</span>:
+          y = y - x
+          <span class="fn">print</span>(<span class="st">f"y is now {y}"</span>)
+          <span class="fn">print</span>(<span class="st">f"x={x}, y={y}"</span>)
+        </div></span></div>
     <div class="choices">
-      <button class="choice-btn" onclick="selectMC(this,'q26','A')"><span class="choice-label">A</span><code>x is now 2<br>x=2, y=3</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q26','B')"><span class="choice-label">B</span><code>y is now 2<br>x=5, y=2</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q26','C')"><span class="choice-label">C</span><code>x is now 5<br>x=5, y=3</code></button>
-      <button class="choice-btn" onclick="selectMC(this,'q26','D')"><span class="choice-label">D</span><code>x=2, y=3</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q26','A')"><span
+          class="choice-label">A</span><code>x is now 2<br>x=2, y=3</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q26','B')"><span
+          class="choice-label">B</span><code>y is now 2<br>x=5, y=2</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q26','C')"><span
+          class="choice-label">C</span><code>x is now 5<br>x=5, y=3</code></button>
+      <button class="choice-btn" onclick="selectMC(this,'q26','D')"><span
+          class="choice-label">D</span><code>x=2, y=3</code></button>
     </div>
     <div class="feedback" id="q26-fb"></div>
   </div>
@@ -611,9 +1445,12 @@ y = <span class="nm">3</span>
     <div class="fitb-wrap">
       <div class="code-block-fitb">
         <div class="code-line"><span class="st">age_str = "14"</span></div>
-        <div class="code-line">age = <input class="blank" id="h1a" placeholder="???" size="8" oninput="markFitbAnswered('q27')"> <span style="color:#6e7781">(age_str)</span></div>
-        <div class="code-line">age_next_year = age + <input class="blank" id="h1b" placeholder="?" size="4" oninput="markFitbAnswered('q27')"></div>
-        <div class="code-line"><span class="fn" style="color:#8250df">print</span>(age_next_year)&nbsp;&nbsp;<span style="color:#6e7781"># should print 15</span></div>
+        <div class="code-line">age = <input class="blank" id="h1a" placeholder="???" size="8"
+            oninput="markFitbAnswered('q27')"> <span style="color:#6e7781">(age_str)</span></div>
+        <div class="code-line">age_next_year = age + <input class="blank" id="h1b" placeholder="?" size="4"
+            oninput="markFitbAnswered('q27')"></div>
+        <div class="code-line"><span class="fn" style="color:#8250df">print</span>(age_next_year)&nbsp;&nbsp;<span
+            style="color:#6e7781"># should print 15</span></div>
       </div>
       <div class="fitb-hint">Hint: you need a type conversion function and a number.</div>
     </div>
@@ -624,11 +1461,16 @@ y = <span class="nm">3</span>
   <div class="question" id="q28">
     <div class="q-header">
       <span class="q-num">H2</span>
-      <span class="q-text">Complete the loop so it prints the <strong>even numbers from 2 to 10</strong> inclusive: 2, 4, 6, 8, 10.</span>
+      <span class="q-text">Complete the loop so it prints the <strong>even numbers from 2 to 10</strong> inclusive: 2,
+        4, 6, 8, 10.</span>
     </div>
     <div class="fitb-wrap">
       <div class="code-block-fitb">
-        <div class="code-line"><span class="kw" style="color:#cf222e">for</span> n <span class="kw" style="color:#cf222e">in</span> <span class="fn" style="color:#8250df">range</span>(<input class="blank" id="h2a" placeholder="?" size="3" oninput="markFitbAnswered('q28')"> , <input class="blank" id="h2b" placeholder="?" size="3" oninput="markFitbAnswered('q28')"> , <input class="blank" id="h2c" placeholder="?" size="3" oninput="markFitbAnswered('q28')">):</div>
+        <div class="code-line"><span class="kw" style="color:#cf222e">for</span> n <span class="kw"
+            style="color:#cf222e">in</span> <span class="fn" style="color:#8250df">range</span>(<input class="blank"
+            id="h2a" placeholder="?" size="3" oninput="markFitbAnswered('q28')"> , <input class="blank" id="h2b"
+            placeholder="?" size="3" oninput="markFitbAnswered('q28')"> , <input class="blank" id="h2c" placeholder="?"
+            size="3" oninput="markFitbAnswered('q28')">):</div>
         <div class="code-line indent-1"><span class="fn" style="color:#8250df">print</span>(n)</div>
       </div>
       <div class="fitb-hint">Hint: range(start, stop, step) — remember stop is exclusive.</div>
@@ -640,19 +1482,28 @@ y = <span class="nm">3</span>
   <div class="question" id="q29">
     <div class="q-header">
       <span class="q-num">H3</span>
-      <span class="q-text">Complete the grade classifier. Fill in the four missing keywords/values so it prints <code>B</code> when score is 85.</span>
+      <span class="q-text">Complete the grade classifier. Fill in the four missing keywords/values so it prints
+        <code>B</code> when score is 85.</span>
     </div>
     <div class="fitb-wrap">
       <div class="code-block-fitb">
         <div class="code-line">score = 85</div>
         <div class="code-line"><span class="kw" style="color:#cf222e">if</span> score >= 90:</div>
-        <div class="code-line indent-1"><span class="fn" style="color:#8250df">print</span>(<span class="st" style="color:#0a3069">"A"</span>)</div>
-        <div class="code-line"><input class="blank" id="h3a" placeholder="????" size="6" oninput="markFitbAnswered('q29')"> score >= <input class="blank" id="h3b" placeholder="??" size="4" oninput="markFitbAnswered('q29')">:</div>
-        <div class="code-line indent-1"><span class="fn" style="color:#8250df">print</span>(<span class="st" style="color:#0a3069">"B"</span>)</div>
-        <div class="code-line"><input class="blank" id="h3c" placeholder="????" size="6" oninput="markFitbAnswered('q29')"> score >= 70:</div>
-        <div class="code-line indent-1"><span class="fn" style="color:#8250df">print</span>(<span class="st" style="color:#0a3069">"C"</span>)</div>
-        <div class="code-line"><input class="blank" id="h3d" placeholder="????" size="6" oninput="markFitbAnswered('q29')">:</div>
-        <div class="code-line indent-1"><span class="fn" style="color:#8250df">print</span>(<span class="st" style="color:#0a3069">"F"</span>)</div>
+        <div class="code-line indent-1"><span class="fn" style="color:#8250df">print</span>(<span class="st"
+            style="color:#0a3069">"A"</span>)</div>
+        <div class="code-line"><input class="blank" id="h3a" placeholder="????" size="6"
+            oninput="markFitbAnswered('q29')"> score >= <input class="blank" id="h3b" placeholder="??" size="4"
+            oninput="markFitbAnswered('q29')">:</div>
+        <div class="code-line indent-1"><span class="fn" style="color:#8250df">print</span>(<span class="st"
+            style="color:#0a3069">"B"</span>)</div>
+        <div class="code-line"><input class="blank" id="h3c" placeholder="????" size="6"
+            oninput="markFitbAnswered('q29')"> score >= 70:</div>
+        <div class="code-line indent-1"><span class="fn" style="color:#8250df">print</span>(<span class="st"
+            style="color:#0a3069">"C"</span>)</div>
+        <div class="code-line"><input class="blank" id="h3d" placeholder="????" size="6"
+            oninput="markFitbAnswered('q29')">:</div>
+        <div class="code-line indent-1"><span class="fn" style="color:#8250df">print</span>(<span class="st"
+            style="color:#0a3069">"F"</span>)</div>
       </div>
     </div>
     <div class="fitb-feedback" id="q29-fb"></div>
@@ -666,9 +1517,12 @@ y = <span class="nm">3</span>
     </div>
     <div class="fitb-wrap">
       <div class="code-block-fitb">
-        <div class="code-line">text = <span class="st" style="color:#0a3069">"  HELLO WORLD  "</span></div>
-        <div class="code-line">result = text.<input class="blank" id="h4a" placeholder="??????" size="8" oninput="markFitbAnswered('q30')">().<input class="blank" id="h4b" placeholder="??????" size="8" oninput="markFitbAnswered('q30')">()<br></div>
-        <div class="code-line"><span class="fn" style="color:#8250df">print</span>(result)&nbsp;&nbsp;<span style="color:#6e7781"># prints: hello world</span></div>
+        <div class="code-line">text = <span class="st" style="color:#0a3069">" HELLO WORLD "</span></div>
+        <div class="code-line">result = text.<input class="blank" id="h4a" placeholder="??????" size="8"
+            oninput="markFitbAnswered('q30')">().<input class="blank" id="h4b" placeholder="??????" size="8"
+            oninput="markFitbAnswered('q30')">()<br></div>
+        <div class="code-line"><span class="fn" style="color:#8250df">print</span>(result)&nbsp;&nbsp;<span
+            style="color:#6e7781"># prints: hello world</span></div>
       </div>
       <div class="fitb-hint">Hint: two string methods chained together — one removes whitespace, one changes case.</div>
     </div>
@@ -684,8 +1538,12 @@ y = <span class="nm">3</span>
     <div class="fitb-wrap">
       <div class="code-block-fitb">
         <div class="code-line">numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]</div>
-        <div class="code-line"><span class="kw" style="color:#cf222e">for</span> num <span class="kw" style="color:#cf222e">in</span> numbers:</div>
-        <div class="code-line indent-1"><span class="kw" style="color:#cf222e">if</span> num <input class="blank" id="h5a" placeholder="??" size="2" oninput="markFitbAnswered('q31')"> <input class="blank" id="h5b" placeholder="?" size="2" oninput="markFitbAnswered('q31')"> == <input class="blank" id="h5c" placeholder="?" size="2" oninput="markFitbAnswered('q31')">:</div>
+        <div class="code-line"><span class="kw" style="color:#cf222e">for</span> num <span class="kw"
+            style="color:#cf222e">in</span> numbers:</div>
+        <div class="code-line indent-1"><span class="kw" style="color:#cf222e">if</span> num <input class="blank"
+            id="h5a" placeholder="??" size="2" oninput="markFitbAnswered('q31')"> <input class="blank" id="h5b"
+            placeholder="?" size="2" oninput="markFitbAnswered('q31')"> == <input class="blank" id="h5c" placeholder="?"
+            size="2" oninput="markFitbAnswered('q31')">:</div>
         <div class="code-line indent-2"><span class="fn" style="color:#8250df">print</span>(num)</div>
       </div>
       <div class="fitb-hint">Hint: a number is odd when divided by 2 it has a remainder of 1.</div>
@@ -696,424 +1554,429 @@ y = <span class="nm">3</span>
   <div class="submit-zone">
     <button class="btn-primary" onclick="submitAssessment()">Submit &amp; See Results →</button>
   </div>
-</div>
+  </div>
 
-<!-- RESULTS -->
-<div class="results" id="resultsPage">
-  <div class="results-header">
-    <div class="rh-inner">
-      <div class="r-grade" id="rGrade">--</div>
-      <div class="r-sub" id="rSub"></div>
-      <div class="r-stats" id="rStats"></div>
+  <!-- RESULTS -->
+  <div class="results" id="resultsPage">
+    <div class="results-header">
+      <div class="rh-inner">
+        <div class="r-grade" id="rGrade">--</div>
+        <div class="r-sub" id="rSub"></div>
+        <div class="r-stats" id="rStats"></div>
+      </div>
+    </div>
+    <div id="sectionResults"></div>
+    <div class="priority-list" id="priorityList"></div>
+    <div style="text-align:center;margin-top:2rem">
+      <button class="restart-btn" onclick="restartAssessment()">← Retake Assessment</button>
     </div>
   </div>
-  <div id="sectionResults"></div>
-  <div class="priority-list" id="priorityList"></div>
-  <div style="text-align:center;margin-top:2rem">
-    <button class="restart-btn" onclick="restartAssessment()">← Retake Assessment</button>
-  </div>
-</div>
 
-<script>
-// ── CONFIG ───────────────────────────────────────────────────
-const SUPABASE_URL     = 'YOUR_SUPABASE_URL_HERE';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE';
-const TABLE_NAME = 'python_assessment_results';
+  <script>
+    // ── CONFIG ───────────────────────────────────────────────────
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';      // e.g. https://xyzxyz.supabase.co
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68'; // starts with "eyJ..."
+    const TABLE_NAME = 'python_assessment_results';
 
-// ── ANSWER KEY ───────────────────────────────────────────────
-const answers = {
-  q1:  { correct:'B', explanation:'3.14 is a float — any number with a decimal point is float.' },
-  q2:  { correct:'C', explanation:'int() truncates (drops the decimal), it does NOT round. int(3.9) = 3.' },
-  q3:  { correct:'B', explanation:'y = 10+3 = 13, then x = 13*2 = 26.' },
-  q4:  { correct:'C', explanation:'"42" has quotes, so it is a string. type() returns <class \'str\'>.' },
-  q5:  { correct:'B', explanation:'17 % 5: 17 = 3×5 + 2, so the remainder is 2.' },
-  q6:  { correct:'B', explanation:'Operator precedence: 4*2=8 first, then 3+8-1 = 10.' },
-  q7:  { correct:'B', explanation:'10>3 is True, but 5<2 is False. True AND False = False.' },
-  q8:  { correct:'B', explanation:'** is exponentiation. 2**4 = 2×2×2×2 = 16.' },
-  q9:  { correct:'A', explanation:'Indexing starts at 0. word[0] is the first character: "P".' },
-  q10: { correct:'B', explanation:'word[1:4] gives indices 1,2,3 (not 4): "y","t","h" → "yth".' },
-  q11: { correct:'C', explanation:'.upper() converts all characters to uppercase: "ALICE".' },
-  q12: { correct:'B', explanation:'f-strings substitute variable values directly into the string.' },
-  q13: { correct:'B', explanation:'x=15. 15>20 is False, skip. 15>10 is True → print "medium".' },
-  q14: { correct:'B', explanation:'score=72. 72>=70 is True → print "C". Then print "Done" runs regardless.' },
-  q15: { correct:'B', explanation:'Line 2 is missing the colon (:) at the end of the if statement.' },
-  q16: { correct:'B', explanation:'range(1,6) produces 1,2,3,4,5 — that is 5 values, so 5 prints.' },
-  q17: { correct:'A', explanation:'n goes: 1→3→9→27. 27 is not <20, loop stops. Last value printed was 9.' },
-  q18: { correct:'B', explanation:'i=0: print 0. i=1: print 1. i=2: continue (skip). i=3: print 3. i=4: break. Output: 0 1 3.' },
-  q19: { correct:'B', explanation:'Sum of 1+2+3+4+5 = 15.' },
-  q20: { correct:'C', explanation:'Negative indices count from the end. nums[-1] is the last element: 5.' },
-  q21: { correct:'B', explanation:'nums[1:4] gives indices 1,2,3: 7,2,9 → [7,2,9].' },
-  q22: { correct:'A', explanation:'append(8)→[4,7,2,9,1,5,8]. remove(2)→[4,7,9,1,5,8]. sort()→[1,4,5,7,8,9].' },
-  q23: { correct:'C', explanation:'print(m) prints each value on its own line. 72, 88, 90 each on a new line.' },
-  q24: { correct:'B', explanation:'totals: 1,3,6,10. After adding 4, total=10>6 → print "Over 6: 10", break. Then "Final total: 10".' },
-  q25: { correct:'C', explanation:'"cat"=3 (not >3, skip), "elephant"=8 (>3, append "ELEPHANT"), "dog"=3 (skip), "ant"=3 (skip). Result: ["ELEPHANT"].' },
-  q26: { correct:'A', explanation:'x=5>y=3, so x=5-3=2, print "x is now 2". Then print "x=2, y=3".' },
-};
+    // ── ANSWER KEY ───────────────────────────────────────────────
+    const answers = {
+      q1: { correct: 'B', explanation: '3.14 is a float — any number with a decimal point is float.' },
+      q2: { correct: 'C', explanation: 'int() truncates (drops the decimal), it does NOT round. int(3.9) = 3.' },
+      q3: { correct: 'B', explanation: 'y = 10+3 = 13, then x = 13*2 = 26.' },
+      q4: { correct: 'C', explanation: '"42" has quotes, so it is a string. type() returns <class \'str\'>.' },
+      q5: { correct: 'B', explanation: '17 % 5: 17 = 3×5 + 2, so the remainder is 2.' },
+      q6: { correct: 'B', explanation: 'Operator precedence: 4*2=8 first, then 3+8-1 = 10.' },
+      q7: { correct: 'B', explanation: '10>3 is True, but 5<2 is False. True AND False = False.' },
+      q8: { correct: 'B', explanation: '** is exponentiation. 2**4 = 2×2×2×2 = 16.' },
+      q9: { correct: 'A', explanation: 'Indexing starts at 0. word[0] is the first character: "P".' },
+      q10: { correct: 'B', explanation: 'word[1:4] gives indices 1,2,3 (not 4): "y","t","h" → "yth".' },
+      q11: { correct: 'C', explanation: '.upper() converts all characters to uppercase: "ALICE".' },
+      q12: { correct: 'B', explanation: 'f-strings substitute variable values directly into the string.' },
+      q13: { correct: 'B', explanation: 'x=15. 15>20 is False, skip. 15>10 is True → print "medium".' },
+      q14: { correct: 'B', explanation: 'score=72. 72>=70 is True → print "C". Then print "Done" runs regardless.' },
+      q15: { correct: 'B', explanation: 'Line 2 is missing the colon (:) at the end of the if statement.' },
+      q16: { correct: 'B', explanation: 'range(1,6) produces 1,2,3,4,5 — that is 5 values, so 5 prints.' },
+      q17: { correct: 'A', explanation: 'n goes: 1→3→9→27. 27 is not <20, loop stops. Last value printed was 9.' },
+      q18: { correct: 'B', explanation: 'i=0: print 0. i=1: print 1. i=2: continue (skip). i=3: print 3. i=4: break. Output: 0 1 3.' },
+      q19: { correct: 'B', explanation: 'Sum of 1+2+3+4+5 = 15.' },
+      q20: { correct: 'C', explanation: 'Negative indices count from the end. nums[-1] is the last element: 5.' },
+      q21: { correct: 'B', explanation: 'nums[1:4] gives indices 1,2,3: 7,2,9 → [7,2,9].' },
+      q22: { correct: 'A', explanation: 'append(8)→[4,7,2,9,1,5,8]. remove(2)→[4,7,9,1,5,8]. sort()→[1,4,5,7,8,9].' },
+      q23: { correct: 'C', explanation: 'print(m) prints each value on its own line. 72, 88, 90 each on a new line.' },
+      q24: { correct: 'B', explanation: 'totals: 1,3,6,10. After adding 4, total=10>6 → print "Over 6: 10", break. Then "Final total: 10".' },
+      q25: { correct: 'C', explanation: '"cat"=3 (not >3, skip), "elephant"=8 (>3, append "ELEPHANT"), "dog"=3 (skip), "ant"=3 (skip). Result: ["ELEPHANT"].' },
+      q26: { correct: 'A', explanation: 'x=5>y=3, so x=5-3=2, print "x is now 2". Then print "x=2, y=3".' },
+    };
 
-// Fill-in-the-blank answer definitions
-// Each question has an array of blank ids, accepted answers (lowercased, trimmed),
-// and per-blank explanations shown on submit.
-const fitbAnswers = {
-  q27: {
-    blanks: [
-      { id:'h1a', accepted:['int'], hint:'int() converts a string to an integer.' },
-      { id:'h1b', accepted:['1'],   hint:'14 + 1 = 15, so you add 1.' },
-    ],
-    explanation: 'int("14") converts the string to the integer 14, then 14 + 1 = 15.',
-  },
-  q28: {
-    blanks: [
-      { id:'h2a', accepted:['2'],  hint:'Start at 2 (first even number).' },
-      { id:'h2b', accepted:['11','12'], hint:'Stop must be > 10 since stop is exclusive. 11 or 12 both work.' },
-      { id:'h2c', accepted:['2'],  hint:'Step of 2 skips odd numbers.' },
-    ],
-    explanation: 'range(2, 11, 2) or range(2, 12, 2) → 2, 4, 6, 8, 10.',
-  },
-  q29: {
-    blanks: [
-      { id:'h3a', accepted:['elif'], hint:'elif means "else if" — used for additional conditions.' },
-      { id:'h3b', accepted:['80'],   hint:'Grade B starts at 80.' },
-      { id:'h3c', accepted:['elif'], hint:'Another elif for the next condition.' },
-      { id:'h3d', accepted:['else'], hint:'else catches everything below 70.' },
-    ],
-    explanation: 'elif score >= 80: → 85 >= 80 is True → prints "B".',
-  },
-  q30: {
-    blanks: [
-      { id:'h4a', accepted:['strip'],  hint:'strip() removes leading and trailing whitespace.' },
-      { id:'h4b', accepted:['lower'],  hint:'lower() converts to lowercase.' },
-    ],
-    explanation: '"  HELLO WORLD  ".strip() → "HELLO WORLD", then .lower() → "hello world".',
-  },
-  q31: {
-    blanks: [
-      { id:'h5a', accepted:['%'],  hint:'% is the modulo operator — gives the remainder.' },
-      { id:'h5b', accepted:['2'],  hint:'Divide by 2 to check odd/even.' },
-      { id:'h5c', accepted:['1'],  hint:'Odd numbers have remainder 1 when divided by 2.' },
-    ],
-    explanation: 'num % 2 == 1 is True for odd numbers: 1, 3, 5, 7, 9.',
-  },
-};
+    // Fill-in-the-blank answer definitions
+    // Each question has an array of blank ids, accepted answers (lowercased, trimmed),
+    // and per-blank explanations shown on submit.
+    const fitbAnswers = {
+      q27: {
+        blanks: [
+          { id: 'h1a', accepted: ['int'], hint: 'int() converts a string to an integer.' },
+          { id: 'h1b', accepted: ['1'], hint: '14 + 1 = 15, so you add 1.' },
+        ],
+        explanation: 'int("14") converts the string to the integer 14, then 14 + 1 = 15.',
+      },
+      q28: {
+        blanks: [
+          { id: 'h2a', accepted: ['2'], hint: 'Start at 2 (first even number).' },
+          { id: 'h2b', accepted: ['11', '12'], hint: 'Stop must be > 10 since stop is exclusive. 11 or 12 both work.' },
+          { id: 'h2c', accepted: ['2'], hint: 'Step of 2 skips odd numbers.' },
+        ],
+        explanation: 'range(2, 11, 2) or range(2, 12, 2) → 2, 4, 6, 8, 10.',
+      },
+      q29: {
+        blanks: [
+          { id: 'h3a', accepted: ['elif'], hint: 'elif means "else if" — used for additional conditions.' },
+          { id: 'h3b', accepted: ['80'], hint: 'Grade B starts at 80.' },
+          { id: 'h3c', accepted: ['elif'], hint: 'Another elif for the next condition.' },
+          { id: 'h3d', accepted: ['else'], hint: 'else catches everything below 70.' },
+        ],
+        explanation: 'elif score >= 80: → 85 >= 80 is True → prints "B".',
+      },
+      q30: {
+        blanks: [
+          { id: 'h4a', accepted: ['strip'], hint: 'strip() removes leading and trailing whitespace.' },
+          { id: 'h4b', accepted: ['lower'], hint: 'lower() converts to lowercase.' },
+        ],
+        explanation: '"  HELLO WORLD  ".strip() → "HELLO WORLD", then .lower() → "hello world".',
+      },
+      q31: {
+        blanks: [
+          { id: 'h5a', accepted: ['%'], hint: '% is the modulo operator — gives the remainder.' },
+          { id: 'h5b', accepted: ['2'], hint: 'Divide by 2 to check odd/even.' },
+          { id: 'h5c', accepted: ['1'], hint: 'Odd numbers have remainder 1 when divided by 2.' },
+        ],
+        explanation: 'num % 2 == 1 is True for odd numbers: 1, 3, 5, 7, 9.',
+      },
+    };
 
-function normBlank(val) { return val.trim().toLowerCase(); }
+    function normBlank(val) { return val.trim().toLowerCase(); }
 
-function markFitbAnswered(qId) {
-  const q = document.getElementById(qId);
-  const def = fitbAnswers[qId];
-  const anyFilled = def.blanks.some(b => document.getElementById(b.id).value.trim() !== '');
-  if (anyFilled) q.classList.add('answered');
-  else q.classList.remove('answered');
-  updateProgress();
-}
-
-function scoreFitb(qId) {
-  const def = fitbAnswers[qId];
-  let correct = 0;
-  def.blanks.forEach(b => {
-    const val = normBlank(document.getElementById(b.id).value);
-    if (b.accepted.includes(val)) correct++;
-  });
-  return { correct, total: def.blanks.length };
-}
-
-// Fix q24 — tracing: totals after each iteration: 1, 3, 6, 10. After num=4: total=10 > 6 → prints "Over 6: 10"
-answers.q24.correct = 'A';
-
-const sectionMap = {
-  H: { qs:['q27','q28','q29','q30','q31'], label:'Fill in the Blank', pts:10, prereq:'type conversion, loops, conditionals, string methods, and modulo' },
-  A: { qs:['q1','q2','q3','q4'],               label:'Variables & Data Types',  pts:8,  prereq:'variable assignment, data types, type conversion' },
-  B: { qs:['q5','q6','q7','q8'],               label:'Operators',               pts:8,  prereq:'arithmetic, comparison, and logical operators' },
-  C: { qs:['q9','q10','q11','q12'],            label:'Strings',                 pts:8,  prereq:'string indexing, slicing, and methods' },
-  D: { qs:['q13','q14','q15'],                 label:'Conditionals',            pts:10, prereq:'if/elif/else, boolean logic, syntax' },
-  E: { qs:['q16','q17','q18','q19'],           label:'Loops',                   pts:10, prereq:'for/while loops, range(), break, continue' },
-  F: { qs:['q20','q21','q22','q23'],           label:'Lists',                   pts:8,  prereq:'list indexing, slicing, and methods' },
-  G: { qs:['q24','q25','q26'],                 label:'Code Tracing',            pts:8,  prereq:'tracing code execution and predicting output' },
-};
-
-let userAnswers = {};
-let assessmentStartTime = null;
-
-function formatDuration(s) {
-  return Math.floor(s/60)+'m '+String(s%60).padStart(2,'0')+'s';
-}
-
-function startAssessment() {
-  document.getElementById('coverPage').style.display = 'none';
-  document.getElementById('assessmentPage').classList.add('active');
-  assessmentStartTime = Date.now();
-  updateProgress();
-}
-
-function selectMC(btn, qId, choice) {
-  document.getElementById(qId).querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  userAnswers[qId] = choice;
-  document.getElementById(qId).classList.add('answered');
-  updateProgress();
-}
-
-function updateProgress() {
-  const mcTotal   = Object.keys(answers).length;
-  const fitbTotal = Object.keys(fitbAnswers).length;
-  const total     = mcTotal + fitbTotal;
-  const mcDone    = Object.keys(userAnswers).length;
-  const fitbDone  = Object.keys(fitbAnswers).filter(qId =>
-    fitbAnswers[qId].blanks.some(b => document.getElementById(b.id).value.trim() !== '')
-  ).length;
-  document.getElementById('progressBar').style.width = ((mcDone + fitbDone) / total * 100) + '%';
-}
-
-function submitAssessment() {
-  const mcTotal   = Object.keys(answers).length;
-  const fitbTotal = Object.values(fitbAnswers).reduce((sum, d) => sum + d.blanks.length, 0);
-  const total     = mcTotal + fitbTotal;
-  const elapsedSeconds   = assessmentStartTime ? Math.round((Date.now()-assessmentStartTime)/1000) : null;
-  const elapsedFormatted = elapsedSeconds !== null ? formatDuration(elapsedSeconds) : 'N/A';
-
-  // Show per-question feedback
-  Object.keys(answers).forEach(qId => {
-    const ans = answers[qId], given = userAnswers[qId];
-    const fb = document.getElementById(qId+'-fb');
-    document.getElementById(qId).querySelectorAll('.choice-btn').forEach(btn => {
-      btn.disabled = true;
-      const c = btn.getAttribute('onclick').match(/'([A-D])'/)?.[1];
-      if (c === ans.correct) btn.classList.add('correct-ans');
-      else if (c === given && given !== ans.correct) btn.classList.add('wrong-ans');
-    });
-    fb.classList.add('show');
-    if (!given) {
-      fb.classList.add('fb-skipped');
-      fb.textContent = '— Skipped. ' + ans.explanation;
-    } else if (given === ans.correct) {
-      fb.classList.add('fb-correct');
-      fb.textContent = '✓ ' + ans.explanation;
-    } else {
-      fb.classList.add('fb-wrong');
-      fb.textContent = '✗ ' + ans.explanation;
+    function markFitbAnswered(qId) {
+      const q = document.getElementById(qId);
+      const def = fitbAnswers[qId];
+      const anyFilled = def.blanks.some(b => document.getElementById(b.id).value.trim() !== '');
+      if (anyFilled) q.classList.add('answered');
+      else q.classList.remove('answered');
+      updateProgress();
     }
-  });
 
-  // Score
-  let sectionScores = { H: { correct:0, total:0, pct:0 } }, totalCorrect = 0;
-  Object.entries(sectionMap).forEach(([sec,data]) => {
-    if (sec === 'H') return; // scored separately via fitb
-    const correct = data.qs.filter(q => userAnswers[q] === answers[q].correct).length;
-    sectionScores[sec] = { correct, total: data.qs.length, pct: Math.round(correct/data.qs.length*100) };
-    totalCorrect += correct;
-  });
-
-  // Score fill-in-the-blank questions
-  let fitbSectionCorrect = 0, fitbSectionTotal = 0;
-  Object.entries(fitbAnswers).forEach(([qId, def]) => {
-    const qEl = document.getElementById(qId);
-    let qCorrect = 0;
-    def.blanks.forEach(b => {
-      const inp = document.getElementById(b.id);
-      const val = normBlank(inp.value);
-      const ok  = b.accepted.includes(val);
-      inp.disabled = true;
-      if (ok) inp.classList.add('correct-blank');
-      else if (inp.value.trim()) inp.classList.add('wrong-blank');
-      else inp.classList.add('skipped-blank');
-      if (ok) qCorrect++;
-    });
-    fitbSectionCorrect += qCorrect;
-    fitbSectionTotal   += def.blanks.length;
-    totalCorrect       += qCorrect;
-    const fb = document.getElementById(qId + '-fb');
-    fb.classList.add('show');
-    const skippedBlanks = def.blanks.filter(b => document.getElementById(b.id).value.trim() === '').length;
-    const allSkipped = skippedBlanks === def.blanks.length;
-    if (allSkipped) {
-      fb.classList.add('fb-skipped');
-      fb.textContent = '— Skipped. ' + def.explanation;
-    } else if (qCorrect === def.blanks.length) {
-      fb.classList.add('fb-correct');
-      fb.textContent = '✓ All blanks correct! ' + def.explanation;
-    } else if (qCorrect > 0) {
-      fb.classList.add('fb-partial');
-      fb.textContent = `~ ${qCorrect}/${def.blanks.length} correct. ` + def.explanation
-        + ' — ' + def.blanks.filter(b => !b.accepted.includes(normBlank(document.getElementById(b.id).value)))
-                              .map(b => b.hint).join(' ');
-    } else {
-      fb.classList.add('fb-wrong');
-      fb.textContent = '✗ ' + def.explanation
-        + ' Tips: ' + def.blanks.map(b => b.hint).join(' | ');
+    function scoreFitb(qId) {
+      const def = fitbAnswers[qId];
+      let correct = 0;
+      def.blanks.forEach(b => {
+        const val = normBlank(document.getElementById(b.id).value);
+        if (b.accepted.includes(val)) correct++;
+      });
+      return { correct, total: def.blanks.length };
     }
-  });
 
-  // Update sectionScores for section H
-  sectionScores['H'] = {
-    correct: fitbSectionCorrect,
-    total:   fitbSectionTotal,
-    pct:     Math.round(fitbSectionCorrect / fitbSectionTotal * 100)
-  };
+    // Fix q24 — tracing: totals after each iteration: 1, 3, 6, 10. After num=4: total=10 > 6 → prints "Over 6: 10"
+    answers.q24.correct = 'A';
 
-  const pct   = Math.round(totalCorrect/total*100);
-  const grade = pct>=80?'A':pct>=65?'B':pct>=50?'C':pct>=40?'D':'F';
-  const msg   = pct>=80?'Strong foundation — you are ready for Python functions!'
-    :pct>=65?'Good base — a little review and you\'ll be set.'
-    :pct>=50?'Moderate readiness — some targeted review is recommended.'
-    :'Several gaps found — a structured review plan is needed.';
+    const sectionMap = {
+      H: { qs: ['q27', 'q28', 'q29', 'q30', 'q31'], label: 'Fill in the Blank', pts: 10, prereq: 'type conversion, loops, conditionals, string methods, and modulo' },
+      A: { qs: ['q1', 'q2', 'q3', 'q4'], label: 'Variables & Data Types', pts: 8, prereq: 'variable assignment, data types, type conversion' },
+      B: { qs: ['q5', 'q6', 'q7', 'q8'], label: 'Operators', pts: 8, prereq: 'arithmetic, comparison, and logical operators' },
+      C: { qs: ['q9', 'q10', 'q11', 'q12'], label: 'Strings', pts: 8, prereq: 'string indexing, slicing, and methods' },
+      D: { qs: ['q13', 'q14', 'q15'], label: 'Conditionals', pts: 10, prereq: 'if/elif/else, boolean logic, syntax' },
+      E: { qs: ['q16', 'q17', 'q18', 'q19'], label: 'Loops', pts: 10, prereq: 'for/while loops, range(), break, continue' },
+      F: { qs: ['q20', 'q21', 'q22', 'q23'], label: 'Lists', pts: 8, prereq: 'list indexing, slicing, and methods' },
+      G: { qs: ['q24', 'q25', 'q26'], label: 'Code Tracing', pts: 8, prereq: 'tracing code execution and predicting output' },
+    };
 
-  document.getElementById('assessmentPage').classList.remove('active');
-  document.getElementById('resultsPage').classList.add('active');
-  document.getElementById('rGrade').textContent = pct+'%';
-  document.getElementById('rSub').textContent = msg;
-  document.getElementById('rStats').innerHTML = `
+    let userAnswers = {};
+    let assessmentStartTime = null;
+
+    function formatDuration(s) {
+      return Math.floor(s / 60) + 'm ' + String(s % 60).padStart(2, '0') + 's';
+    }
+
+    function startAssessment() {
+      document.getElementById('coverPage').style.display = 'none';
+      document.getElementById('assessmentPage').classList.add('active');
+      assessmentStartTime = Date.now();
+      updateProgress();
+    }
+
+    function selectMC(btn, qId, choice) {
+      document.getElementById(qId).querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      userAnswers[qId] = choice;
+      document.getElementById(qId).classList.add('answered');
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const mcTotal = Object.keys(answers).length;
+      const fitbTotal = Object.keys(fitbAnswers).length;
+      const total = mcTotal + fitbTotal;
+      const mcDone = Object.keys(userAnswers).length;
+      const fitbDone = Object.keys(fitbAnswers).filter(qId =>
+        fitbAnswers[qId].blanks.some(b => document.getElementById(b.id).value.trim() !== '')
+      ).length;
+      document.getElementById('progressBar').style.width = ((mcDone + fitbDone) / total * 100) + '%';
+    }
+
+    function submitAssessment() {
+      const mcTotal = Object.keys(answers).length;
+      const fitbTotal = Object.values(fitbAnswers).reduce((sum, d) => sum + d.blanks.length, 0);
+      const total = mcTotal + fitbTotal;
+      const elapsedSeconds = assessmentStartTime ? Math.round((Date.now() - assessmentStartTime) / 1000) : null;
+      const elapsedFormatted = elapsedSeconds !== null ? formatDuration(elapsedSeconds) : 'N/A';
+
+      // Show per-question feedback
+      Object.keys(answers).forEach(qId => {
+        const ans = answers[qId], given = userAnswers[qId];
+        const fb = document.getElementById(qId + '-fb');
+        document.getElementById(qId).querySelectorAll('.choice-btn').forEach(btn => {
+          btn.disabled = true;
+          const c = btn.getAttribute('onclick').match(/'([A-D])'/)?.[1];
+          if (c === ans.correct) btn.classList.add('correct-ans');
+          else if (c === given && given !== ans.correct) btn.classList.add('wrong-ans');
+        });
+        fb.classList.add('show');
+        if (!given) {
+          fb.classList.add('fb-skipped');
+          fb.textContent = '— Skipped. ' + ans.explanation;
+        } else if (given === ans.correct) {
+          fb.classList.add('fb-correct');
+          fb.textContent = '✓ ' + ans.explanation;
+        } else {
+          fb.classList.add('fb-wrong');
+          fb.textContent = '✗ ' + ans.explanation;
+        }
+      });
+
+      // Score
+      let sectionScores = { H: { correct: 0, total: 0, pct: 0 } }, totalCorrect = 0;
+      Object.entries(sectionMap).forEach(([sec, data]) => {
+        if (sec === 'H') return; // scored separately via fitb
+        const correct = data.qs.filter(q => userAnswers[q] === answers[q].correct).length;
+        sectionScores[sec] = { correct, total: data.qs.length, pct: Math.round(correct / data.qs.length * 100) };
+        totalCorrect += correct;
+      });
+
+      // Score fill-in-the-blank questions
+      let fitbSectionCorrect = 0, fitbSectionTotal = 0;
+      Object.entries(fitbAnswers).forEach(([qId, def]) => {
+        const qEl = document.getElementById(qId);
+        let qCorrect = 0;
+        def.blanks.forEach(b => {
+          const inp = document.getElementById(b.id);
+          const val = normBlank(inp.value);
+          const ok = b.accepted.includes(val);
+          inp.disabled = true;
+          if (ok) inp.classList.add('correct-blank');
+          else if (inp.value.trim()) inp.classList.add('wrong-blank');
+          else inp.classList.add('skipped-blank');
+          if (ok) qCorrect++;
+        });
+        fitbSectionCorrect += qCorrect;
+        fitbSectionTotal += def.blanks.length;
+        totalCorrect += qCorrect;
+        const fb = document.getElementById(qId + '-fb');
+        fb.classList.add('show');
+        const skippedBlanks = def.blanks.filter(b => document.getElementById(b.id).value.trim() === '').length;
+        const allSkipped = skippedBlanks === def.blanks.length;
+        if (allSkipped) {
+          fb.classList.add('fb-skipped');
+          fb.textContent = '— Skipped. ' + def.explanation;
+        } else if (qCorrect === def.blanks.length) {
+          fb.classList.add('fb-correct');
+          fb.textContent = '✓ All blanks correct! ' + def.explanation;
+        } else if (qCorrect > 0) {
+          fb.classList.add('fb-partial');
+          fb.textContent = `~ ${qCorrect}/${def.blanks.length} correct. ` + def.explanation
+            + ' — ' + def.blanks.filter(b => !b.accepted.includes(normBlank(document.getElementById(b.id).value)))
+              .map(b => b.hint).join(' ');
+        } else {
+          fb.classList.add('fb-wrong');
+          fb.textContent = '✗ ' + def.explanation
+            + ' Tips: ' + def.blanks.map(b => b.hint).join(' | ');
+        }
+      });
+
+      // Update sectionScores for section H
+      sectionScores['H'] = {
+        correct: fitbSectionCorrect,
+        total: fitbSectionTotal,
+        pct: Math.round(fitbSectionCorrect / fitbSectionTotal * 100)
+      };
+
+      const pct = Math.round(totalCorrect / total * 100);
+      const grade = pct >= 80 ? 'A' : pct >= 65 ? 'B' : pct >= 50 ? 'C' : pct >= 40 ? 'D' : 'F';
+      const msg = pct >= 80 ? 'Strong foundation — you are ready for Python functions!'
+        : pct >= 65 ? 'Good base — a little review and you\'ll be set.'
+          : pct >= 50 ? 'Moderate readiness — some targeted review is recommended.'
+            : 'Several gaps found — a structured review plan is needed.';
+
+      document.getElementById('assessmentPage').classList.remove('active');
+      document.getElementById('resultsPage').classList.add('active');
+      document.getElementById('rGrade').textContent = pct + '%';
+      document.getElementById('rSub').textContent = msg;
+      document.getElementById('rStats').innerHTML = `
     <div class="stat-card"><div class="stat-num">${totalCorrect}</div><div class="stat-label">Correct</div></div>
-    <div class="stat-card"><div class="stat-num">${total-totalCorrect}</div><div class="stat-label">Incorrect</div></div>
+    <div class="stat-card"><div class="stat-num">${total - totalCorrect}</div><div class="stat-label">Incorrect</div></div>
     <div class="stat-card"><div class="stat-num">${grade}</div><div class="stat-label">Grade</div></div>
     <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">Questions</div></div>
     <div class="stat-card"><div class="stat-num" style="font-size:1.3rem">${elapsedFormatted}</div><div class="stat-label">Time Taken</div></div>`;
 
-  let secHtml='', priorities=[];
-  Object.entries(sectionMap).forEach(([sec,data]) => {
-    const sc=sectionScores[sec], p=sc.pct;
-    const cls    = p>=75?'strength':p>=50?'moderate':'weakness';
-    const bar    = p>=75?'#2ea043':p>=50?'#e3b341':'#cf222e';
-    const status = p>=75?'✓ Strong':p>=50?'~ Moderate':'✗ Needs Work';
-    const rec    = p>=75?'Solid understanding. Keep it up.'
-      :p>=50?`Review ${data.prereq} before the functions unit.`
-      :`Priority: revisit ${data.prereq} — practice writing and tracing code by hand.`;
-    secHtml += `<div class="section-result">
+      let secHtml = '', priorities = [];
+      Object.entries(sectionMap).forEach(([sec, data]) => {
+        const sc = sectionScores[sec], p = sc.pct;
+        const cls = p >= 75 ? 'strength' : p >= 50 ? 'moderate' : 'weakness';
+        const bar = p >= 75 ? '#2ea043' : p >= 50 ? '#e3b341' : '#cf222e';
+        const status = p >= 75 ? '✓ Strong' : p >= 50 ? '~ Moderate' : '✗ Needs Work';
+        const rec = p >= 75 ? 'Solid understanding. Keep it up.'
+          : p >= 50 ? `Review ${data.prereq} before the functions unit.`
+            : `Priority: revisit ${data.prereq} — practice writing and tracing code by hand.`;
+        secHtml += `<div class="section-result">
       <div class="sr-head"><span class="sr-title">${sec}. ${data.label}</span>
       <span class="sr-score ${cls}">${sc.correct}/${sc.total} &nbsp; ${status}</span></div>
       <div class="sr-bar-wrap">
         <div class="sr-bar-bg"><div class="sr-bar-fill" style="width:${p}%;background:${bar}"></div></div>
         <div class="sr-rec">${rec}</div></div></div>`;
-    if (p<75) priorities.push({label:data.label,prereq:data.prereq,pct:p,priority:p<50?'HIGH':'MEDIUM'});
-  });
-  document.getElementById('sectionResults').innerHTML = secHtml;
+        if (p < 75) priorities.push({ label: data.label, prereq: data.prereq, pct: p, priority: p < 50 ? 'HIGH' : 'MEDIUM' });
+      });
+      document.getElementById('sectionResults').innerHTML = secHtml;
 
-  priorities.sort((a,b)=>a.pct-b.pct);
-  let pHtml='<div class="priority-head">📋 Recommended Study Plan</div>';
-  if (!priorities.length) {
-    pHtml+='<div class="priority-item"><span>🎉 Strong across all sections. You\'re ready to dive into Python functions!</span></div>';
-  } else {
-    priorities.forEach(p=>{
-      const badge = p.priority==='HIGH'
-        ?'<span class="priority-badge badge-high">HIGH PRIORITY</span>'
-        :'<span class="priority-badge badge-med">REVIEW</span>';
-      pHtml+=`<div class="priority-item">${badge}<span><strong>${p.label}</strong> (${p.pct}%) — Practice ${p.prereq}. Write small programs by hand and trace through them step by step.</span></div>`;
-    });
-    const strong=Object.entries(sectionScores).filter(([,v])=>v.pct>=75).map(([k])=>sectionMap[k].label);
-    if (strong.length) pHtml+=`<div class="priority-item"><span class="priority-badge badge-low">STRENGTH</span><span>${strong.join(', ')} — Solid foundations here.</span></div>`;
-  }
-  document.getElementById('priorityList').innerHTML = pHtml;
-  window.scrollTo({top:0,behavior:'smooth'});
+      priorities.sort((a, b) => a.pct - b.pct);
+      let pHtml = '<div class="priority-head">📋 Recommended Study Plan</div>';
+      if (!priorities.length) {
+        pHtml += '<div class="priority-item"><span>🎉 Strong across all sections. You\'re ready to dive into Python functions!</span></div>';
+      } else {
+        priorities.forEach(p => {
+          const badge = p.priority === 'HIGH'
+            ? '<span class="priority-badge badge-high">HIGH PRIORITY</span>'
+            : '<span class="priority-badge badge-med">REVIEW</span>';
+          pHtml += `<div class="priority-item">${badge}<span><strong>${p.label}</strong> (${p.pct}%) — Practice ${p.prereq}. Write small programs by hand and trace through them step by step.</span></div>`;
+        });
+        const strong = Object.entries(sectionScores).filter(([, v]) => v.pct >= 75).map(([k]) => sectionMap[k].label);
+        if (strong.length) pHtml += `<div class="priority-item"><span class="priority-badge badge-low">STRENGTH</span><span>${strong.join(', ')} — Solid foundations here.</span></div>`;
+      }
+      document.getElementById('priorityList').innerHTML = pHtml;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  // ── Build rich summary strings ───────────────────────────
-  const section_summary = Object.entries(sectionMap).map(([sec,data]) => {
-    const sc=sectionScores[sec];
-    const status=sc.pct>=75?'✓ Strong':sc.pct>=50?'~ Moderate':'✗ Needs Work';
-    const rec=sc.pct>=75?'Solid understanding.'
-      :sc.pct>=50?`Review ${data.prereq} before the functions unit.`
-      :`Priority: revisit ${data.prereq}.`;
-    return `${sec}. ${data.label}  ${sc.correct}/${sc.total}  ${status}\n   ${rec}`;
-  }).join('\n\n');
+      // ── Build rich summary strings ───────────────────────────
+      const section_summary = Object.entries(sectionMap).map(([sec, data]) => {
+        const sc = sectionScores[sec];
+        const status = sc.pct >= 75 ? '✓ Strong' : sc.pct >= 50 ? '~ Moderate' : '✗ Needs Work';
+        const rec = sc.pct >= 75 ? 'Solid understanding.'
+          : sc.pct >= 50 ? `Review ${data.prereq} before the functions unit.`
+            : `Priority: revisit ${data.prereq}.`;
+        return `${sec}. ${data.label}  ${sc.correct}/${sc.total}  ${status}\n   ${rec}`;
+      }).join('\n\n');
 
-  const studyLines=[...priorities].map(p=>{
-    return `[${p.priority==='HIGH'?'HIGH PRIORITY':'REVIEW'}] ${p.label} (${p.pct}%) — Practice ${p.prereq}.`;
-  });
-  const strong=Object.entries(sectionScores).filter(([,v])=>v.pct>=75).map(([k])=>sectionMap[k].label);
-  if (strong.length) studyLines.push(`[STRENGTH] ${strong.join(', ')}`);
-  const study_plan = studyLines.length?studyLines.join('\n'):'Strong across all sections.';
+      const studyLines = [...priorities].map(p => {
+        return `[${p.priority === 'HIGH' ? 'HIGH PRIORITY' : 'REVIEW'}] ${p.label} (${p.pct}%) — Practice ${p.prereq}.`;
+      });
+      const strong = Object.entries(sectionScores).filter(([, v]) => v.pct >= 75).map(([k]) => sectionMap[k].label);
+      if (strong.length) studyLines.push(`[STRENGTH] ${strong.join(', ')}`);
+      const study_plan = studyLines.length ? studyLines.join('\n') : 'Strong across all sections.';
 
-  const questionDetail = Object.keys(answers).map(qId=>{
-    const given=userAnswers[qId];
-    if (!given) return `${qId}:skipped`;
-    const mark = given===answers[qId].correct?'✓':'✗';
-    return `${qId}:${given}(${mark})`;
-  }).join(', ');
+      const questionDetail = Object.keys(answers).map(qId => {
+        const given = userAnswers[qId];
+        if (!given) return `${qId}:skipped`;
+        const mark = given === answers[qId].correct ? '✓' : '✗';
+        return `${qId}:${given}(${mark})`;
+      }).join(', ');
 
-  submitToSupabase({sectionScores,totalCorrect,total,pct,grade,
-    section_summary,study_plan,questionDetail,elapsedSeconds,elapsedFormatted});
-}
-
-function submitToSupabase({sectionScores,totalCorrect,total,pct,grade,
-    section_summary,study_plan,questionDetail,elapsedSeconds,elapsedFormatted}) {
-
-  const statusEl = document.createElement('div');
-  statusEl.style.cssText='margin-top:1rem;font-family:JetBrains Mono,monospace;font-size:0.75rem;color:rgba(255,255,255,0.5);';
-  statusEl.textContent='⏳ Saving results…';
-  document.querySelector('.rh-inner').appendChild(statusEl);
-
-  const debugEl = document.createElement('div');
-  debugEl.style.cssText='margin-top:0.5rem;padding:0.75rem;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:4px;font-family:JetBrains Mono,monospace;font-size:0.68rem;color:rgba(255,255,255,0.55);white-space:pre-wrap;word-break:break-all;max-height:200px;overflow-y:auto;';
-  debugEl.textContent='── Debug Log ──\n';
-  document.querySelector('.rh-inner').appendChild(debugEl);
-
-  const dbg = msg => { console.log('[Supabase]',msg); debugEl.textContent+=msg+'\n'; debugEl.scrollTop=debugEl.scrollHeight; };
-
-  dbg('URL: '+SUPABASE_URL);
-  dbg('Key: '+(SUPABASE_ANON_KEY||'').slice(0,20)+'…');
-
-  if (!SUPABASE_URL||SUPABASE_URL==='YOUR_SUPABASE_URL_HERE') {
-    statusEl.textContent='⚠ Supabase URL not configured.'; statusEl.style.color='rgba(220,80,80,0.8)';
-    dbg('ERROR: SUPABASE_URL not set.'); return;
-  }
-  if (!SUPABASE_ANON_KEY||SUPABASE_ANON_KEY==='YOUR_SUPABASE_ANON_KEY_HERE') {
-    statusEl.textContent='⚠ Supabase anon key not configured.'; statusEl.style.color='rgba(220,80,80,0.8)';
-    dbg('ERROR: SUPABASE_ANON_KEY not set.'); return;
-  }
-
-  const record = {
-    first_name: document.getElementById('fname').value.trim()||'(blank)',
-    last_name:  document.getElementById('lname').value.trim()||'(blank)',
-    date_taken: document.getElementById('dateField').value.trim(),
-    total_correct: totalCorrect, total_questions: total, percentage: pct, grade,
-    time_taken_seconds: elapsedSeconds, time_taken_formatted: elapsedFormatted,
-    sec_a_score:`${sectionScores.A.correct}/${sectionScores.A.total}`, sec_a_pct:sectionScores.A.pct,
-    sec_b_score:`${sectionScores.B.correct}/${sectionScores.B.total}`, sec_b_pct:sectionScores.B.pct,
-    sec_c_score:`${sectionScores.C.correct}/${sectionScores.C.total}`, sec_c_pct:sectionScores.C.pct,
-    sec_d_score:`${sectionScores.D.correct}/${sectionScores.D.total}`, sec_d_pct:sectionScores.D.pct,
-    sec_e_score:`${sectionScores.E.correct}/${sectionScores.E.total}`, sec_e_pct:sectionScores.E.pct,
-    sec_f_score:`${sectionScores.F.correct}/${sectionScores.F.total}`, sec_f_pct:sectionScores.F.pct,
-    sec_g_score:`${sectionScores.G.correct}/${sectionScores.G.total}`, sec_g_pct:sectionScores.G.pct,
-    question_detail: questionDetail, section_summary, study_plan
-  };
-
-  const endpoint = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}`;
-  dbg('POST → '+endpoint);
-
-  fetch(endpoint,{
-    method:'POST',
-    headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON_KEY,
-              'Authorization':'Bearer '+SUPABASE_ANON_KEY,'Prefer':'return=minimal'},
-    body:JSON.stringify(record)
-  }).then(async res=>{
-    const body=await res.text();
-    dbg(`HTTP ${res.status} ${res.statusText}`);
-    if(body) dbg('Response: '+body);
-    if(res.ok){
-      statusEl.textContent='✓ Results saved.'; statusEl.style.color='rgba(100,220,120,0.85)';
-      dbg('SUCCESS — row inserted.');
-      setTimeout(()=>{debugEl.style.display='none';},4000);
-    } else {
-      statusEl.textContent=`⚠ Supabase error ${res.status} — see debug log.`;
-      statusEl.style.color='rgba(220,80,80,0.8)';
+      submitToSupabase({
+        sectionScores, totalCorrect, total, pct, grade,
+        section_summary, study_plan, questionDetail, elapsedSeconds, elapsedFormatted
+      });
     }
-  }).catch(err=>{
-    dbg('FETCH ERROR: '+err.message);
-    statusEl.textContent='⚠ Network error — see debug log.'; statusEl.style.color='rgba(220,80,80,0.8)';
-  });
-}
 
-function restartAssessment() {
-  userAnswers={}; assessmentStartTime=null;
-  document.querySelectorAll('.choice-btn').forEach(b=>{b.disabled=false;b.classList.remove('selected','correct-ans','wrong-ans');});
-  document.querySelectorAll('.feedback').forEach(f=>{f.classList.remove('show','fb-correct','fb-wrong','fb-partial');f.textContent='';});
-  document.querySelectorAll('.fitb-feedback').forEach(f=>{f.classList.remove('show','fb-correct','fb-wrong','fb-partial');f.textContent='';});
-  document.querySelectorAll('.blank').forEach(b=>{b.disabled=false;b.value='';b.classList.remove('correct-blank','wrong-blank','partial-blank');});
-  document.querySelectorAll('.question').forEach(q=>q.classList.remove('answered'));
-  document.getElementById('progressBar').style.width='0%';
-  document.getElementById('resultsPage').classList.remove('active');
-  document.getElementById('assessmentPage').classList.add('active');
-  window.scrollTo({top:0,behavior:'smooth'});
-}
+    function submitToSupabase({ sectionScores, totalCorrect, total, pct, grade,
+      section_summary, study_plan, questionDetail, elapsedSeconds, elapsedFormatted }) {
 
-document.getElementById('dateField').value=new Date().toLocaleDateString('en-GB');
-</script>
+      const statusEl = document.createElement('div');
+      statusEl.style.cssText = 'margin-top:1rem;font-family:JetBrains Mono,monospace;font-size:0.75rem;color:rgba(255,255,255,0.5);';
+      statusEl.textContent = '⏳ Saving results…';
+      document.querySelector('.rh-inner').appendChild(statusEl);
+
+      const debugEl = document.createElement('div');
+      debugEl.style.cssText = 'margin-top:0.5rem;padding:0.75rem;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:4px;font-family:JetBrains Mono,monospace;font-size:0.68rem;color:rgba(255,255,255,0.55);white-space:pre-wrap;word-break:break-all;max-height:200px;overflow-y:auto;';
+      debugEl.textContent = '── Debug Log ──\n';
+      document.querySelector('.rh-inner').appendChild(debugEl);
+
+      const dbg = msg => { console.log('[Supabase]', msg); debugEl.textContent += msg + '\n'; debugEl.scrollTop = debugEl.scrollHeight; };
+
+      dbg('URL: ' + SUPABASE_URL);
+      dbg('Key: ' + (SUPABASE_ANON_KEY || '').slice(0, 20) + '…');
+
+      if (!SUPABASE_URL || SUPABASE_URL === 'YOUR_SUPABASE_URL_HERE') {
+        statusEl.textContent = '⚠ Supabase URL not configured.'; statusEl.style.color = 'rgba(220,80,80,0.8)';
+        dbg('ERROR: SUPABASE_URL not set.'); return;
+      }
+      if (!SUPABASE_ANON_KEY || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY_HERE') {
+        statusEl.textContent = '⚠ Supabase anon key not configured.'; statusEl.style.color = 'rgba(220,80,80,0.8)';
+        dbg('ERROR: SUPABASE_ANON_KEY not set.'); return;
+      }
+
+      const record = {
+        first_name: document.getElementById('fname').value.trim() || '(blank)',
+        last_name: document.getElementById('lname').value.trim() || '(blank)',
+        date_taken: document.getElementById('dateField').value.trim(),
+        total_correct: totalCorrect, total_questions: total, percentage: pct, grade,
+        time_taken_seconds: elapsedSeconds, time_taken_formatted: elapsedFormatted,
+        sec_a_score: `${sectionScores.A.correct}/${sectionScores.A.total}`, sec_a_pct: sectionScores.A.pct,
+        sec_b_score: `${sectionScores.B.correct}/${sectionScores.B.total}`, sec_b_pct: sectionScores.B.pct,
+        sec_c_score: `${sectionScores.C.correct}/${sectionScores.C.total}`, sec_c_pct: sectionScores.C.pct,
+        sec_d_score: `${sectionScores.D.correct}/${sectionScores.D.total}`, sec_d_pct: sectionScores.D.pct,
+        sec_e_score: `${sectionScores.E.correct}/${sectionScores.E.total}`, sec_e_pct: sectionScores.E.pct,
+        sec_f_score: `${sectionScores.F.correct}/${sectionScores.F.total}`, sec_f_pct: sectionScores.F.pct,
+        sec_g_score: `${sectionScores.G.correct}/${sectionScores.G.total}`, sec_g_pct: sectionScores.G.pct,
+        question_detail: questionDetail, section_summary, study_plan
+      };
+
+      const endpoint = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}`;
+      dbg('POST → ' + endpoint);
+
+      fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json', 'apikey': SUPABASE_ANON_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(record)
+      }).then(async res => {
+        const body = await res.text();
+        dbg(`HTTP ${res.status} ${res.statusText}`);
+        if (body) dbg('Response: ' + body);
+        if (res.ok) {
+          statusEl.textContent = '✓ Results saved.'; statusEl.style.color = 'rgba(100,220,120,0.85)';
+          dbg('SUCCESS — row inserted.');
+          setTimeout(() => { debugEl.style.display = 'none'; }, 4000);
+        } else {
+          statusEl.textContent = `⚠ Supabase error ${res.status} — see debug log.`;
+          statusEl.style.color = 'rgba(220,80,80,0.8)';
+        }
+      }).catch(err => {
+        dbg('FETCH ERROR: ' + err.message);
+        statusEl.textContent = '⚠ Network error — see debug log.'; statusEl.style.color = 'rgba(220,80,80,0.8)';
+      });
+    }
+
+    function restartAssessment() {
+      userAnswers = {}; assessmentStartTime = null;
+      document.querySelectorAll('.choice-btn').forEach(b => { b.disabled = false; b.classList.remove('selected', 'correct-ans', 'wrong-ans'); });
+      document.querySelectorAll('.feedback').forEach(f => { f.classList.remove('show', 'fb-correct', 'fb-wrong', 'fb-partial'); f.textContent = ''; });
+      document.querySelectorAll('.fitb-feedback').forEach(f => { f.classList.remove('show', 'fb-correct', 'fb-wrong', 'fb-partial'); f.textContent = ''; });
+      document.querySelectorAll('.blank').forEach(b => { b.disabled = false; b.value = ''; b.classList.remove('correct-blank', 'wrong-blank', 'partial-blank'); });
+      document.querySelectorAll('.question').forEach(q => q.classList.remove('answered'));
+      document.getElementById('progressBar').style.width = '0%';
+      document.getElementById('resultsPage').classList.remove('active');
+      document.getElementById('assessmentPage').classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.getElementById('dateField').value = new Date().toLocaleDateString('en-GB');
+  </script>
 </body>
+
 </html>
