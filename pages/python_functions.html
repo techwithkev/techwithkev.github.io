@@ -662,6 +662,85 @@
       color: var(--correct);
     }
 
+    .q-breakdown {
+      margin-top: 0.6rem;
+      border-top: 1px solid var(--rule);
+      padding-top: 0.6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .q-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+      font-size: 0.78rem;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 2px 0;
+    }
+
+    .q-row-label {
+      color: var(--mid);
+      min-width: 2rem;
+      flex-shrink: 0;
+    }
+
+    .q-row-text {
+      color: var(--mid);
+      flex: 1;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
+    }
+
+    .q-row-result {
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .q-row.q-correct .q-row-result {
+      color: var(--correct);
+    }
+
+    .q-row.q-wrong .q-row-result {
+      color: var(--wrong);
+    }
+
+    .q-row.q-skipped .q-row-result {
+      color: var(--mid);
+    }
+
+    .q-row.q-partial .q-row-result {
+      color: var(--partial);
+    }
+
+    .q-row-blanks {
+      margin-left: 2.6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .q-blank-row {
+      display: flex;
+      gap: 0.5rem;
+      font-size: 0.74rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--mid);
+    }
+
+    .q-blank-row.b-correct {
+      color: var(--correct);
+    }
+
+    .q-blank-row.b-wrong {
+      color: var(--wrong);
+    }
+
+    .q-blank-row.b-skipped {
+      color: var(--mid);
+    }
+
     .restart-btn {
       margin-top: 2rem;
       background: var(--ink);
@@ -1674,11 +1753,48 @@
       return { correct, total: def.blanks.length };
     }
 
+    // ── Question metadata for breakdown report ───────────────────
+    const questionMeta = {
+      q1: { label: 'A1', text: 'Data type of 3.14' },
+      q2: { label: 'A2', text: 'Value of int(3.9)' },
+      q3: { label: 'A3', text: 'Trace: value of x after reassignment' },
+      q4: { label: 'A4', text: 'type("42") returns' },
+      q5: { label: 'B1', text: 'Result of 17 % 5' },
+      q6: { label: 'B2', text: 'Result of 3 + 4 * 2 - 1' },
+      q7: { label: 'B3', text: 'Evaluate: 10 > 3 and 5 < 2' },
+      q8: { label: 'B4', text: 'Result of 2 ** 4' },
+      q9: { label: 'C1', text: 'word[0] where word = "Python"' },
+      q10: { label: 'C2', text: 'word[1:4] where word = "Python"' },
+      q11: { label: 'C3', text: '.upper() output' },
+      q12: { label: 'C4', text: 'f-string output' },
+      q13: { label: 'D1', text: 'if/elif/else: x = 15' },
+      q14: { label: 'D2', text: 'Grade classifier: score = 72' },
+      q15: { label: 'D3', text: 'Find the syntax error line' },
+      q16: { label: 'E1', text: 'How many times does range(1,6) loop' },
+      q17: { label: 'E2', text: 'Last value printed by while n < 20' },
+      q18: { label: 'E3', text: 'Output with break and continue' },
+      q19: { label: 'E4', text: 'Sum via for loop: range(1,6)' },
+      q20: { label: 'F1', text: 'nums[-1]' },
+      q21: { label: 'F2', text: 'nums[1:4]' },
+      q22: { label: 'F3', text: 'State of nums after append/remove/sort' },
+      q23: { label: 'F4', text: 'Filter list with if m >= 70' },
+      q24: { label: 'G1', text: 'Trace: loop with accumulator and break' },
+      q25: { label: 'G2', text: 'Trace: build list with .upper()' },
+      q26: { label: 'G3', text: 'Trace: if/else with f-strings' },
+    };
+
+    const fitbMeta = {
+      q27: { label: 'H1', text: 'Type conversion: int() and + 1' },
+      q28: { label: 'H2', text: 'range() to print even numbers 2–10' },
+      q29: { label: 'H3', text: 'if/elif/else grade classifier keywords' },
+      q30: { label: 'H4', text: 'Chained string methods: strip().lower()' },
+      q31: { label: 'H5', text: 'Modulo to filter odd numbers' },
+    };
+
     // Fix q24 — tracing: totals after each iteration: 1, 3, 6, 10. After num=4: total=10 > 6 → prints "Over 6: 10"
     answers.q24.correct = 'A';
 
     const sectionMap = {
-      H: { qs: ['q27', 'q28', 'q29', 'q30', 'q31'], label: 'Fill in the Blank', pts: 10, prereq: 'type conversion, loops, conditionals, string methods, and modulo' },
       A: { qs: ['q1', 'q2', 'q3', 'q4'], label: 'Variables & Data Types', pts: 8, prereq: 'variable assignment, data types, type conversion' },
       B: { qs: ['q5', 'q6', 'q7', 'q8'], label: 'Operators', pts: 8, prereq: 'arithmetic, comparison, and logical operators' },
       C: { qs: ['q9', 'q10', 'q11', 'q12'], label: 'Strings', pts: 8, prereq: 'string indexing, slicing, and methods' },
@@ -1686,6 +1802,7 @@
       E: { qs: ['q16', 'q17', 'q18', 'q19'], label: 'Loops', pts: 10, prereq: 'for/while loops, range(), break, continue' },
       F: { qs: ['q20', 'q21', 'q22', 'q23'], label: 'Lists', pts: 8, prereq: 'list indexing, slicing, and methods' },
       G: { qs: ['q24', 'q25', 'q26'], label: 'Code Tracing', pts: 8, prereq: 'tracing code execution and predicting output' },
+      H: { qs: ['q27', 'q28', 'q29', 'q30', 'q31'], label: 'Fill in the Blank', pts: 10, prereq: 'type conversion, loops, conditionals, string methods, and modulo' },
     };
 
     let userAnswers = {};
@@ -1834,12 +1951,64 @@
         const rec = p >= 75 ? 'Solid understanding. Keep it up.'
           : p >= 50 ? `Review ${data.prereq} before the functions unit.`
             : `Priority: revisit ${data.prereq} — practice writing and tracing code by hand.`;
+
+        // Build per-question rows
+        let qRowsHtml = '<div class="q-breakdown">';
+        if (sec === 'H') {
+          // FITB section
+          Object.entries(fitbAnswers).forEach(([qId, def]) => {
+            const meta = fitbMeta[qId] || { label: qId, text: '' };
+            const blankScores = def.blanks.map(b => {
+              const val = document.getElementById(b.id).value.trim();
+              if (!val) return { ok: null, val: '' };
+              return { ok: b.accepted.includes(normBlank(val)), val };
+            });
+            const nCorrect = blankScores.filter(b => b.ok === true).length;
+            const nTotal = def.blanks.length;
+            const allSkip = blankScores.every(b => b.ok === null);
+            const rowCls = allSkip ? 'q-skipped' : nCorrect === nTotal ? 'q-correct' : nCorrect > 0 ? 'q-partial' : 'q-wrong';
+            const badge = allSkip ? '— skipped' : nCorrect + '/' + nTotal + ' correct';
+            qRowsHtml += '<div class="q-row ' + rowCls + '">'
+              + '<span class="q-row-label">' + meta.label + '</span>'
+              + '<span class="q-row-text">' + meta.text + '</span>'
+              + '<span class="q-row-result">' + badge + '</span>'
+              + '</div>';
+            // Per-blank detail
+            qRowsHtml += '<div class="q-row-blanks">';
+            def.blanks.forEach((b, i) => {
+              const bs = blankScores[i];
+              const bCls = bs.ok === null ? 'b-skipped' : bs.ok ? 'b-correct' : 'b-wrong';
+              const bLabel = bs.ok === null ? 'skipped' : '"' + bs.val + '" ' + (bs.ok ? '✓' : '✗ (accepted: ' + b.accepted.join('/') + ')');
+              qRowsHtml += '<div class="q-blank-row ' + bCls + '"><span>' + b.id + ':</span><span>' + bLabel + '</span></div>';
+            });
+            qRowsHtml += '</div>';
+          });
+        } else {
+          // MC section
+          data.qs.forEach(qId => {
+            const meta = questionMeta[qId] || { label: qId, text: '' };
+            const given = userAnswers[qId];
+            const ans = answers[qId];
+            const rowCls = !given ? 'q-skipped' : given === ans.correct ? 'q-correct' : 'q-wrong';
+            const badge = !given ? '— skipped'
+              : given === ans.correct ? '✓ correct'
+                : '✗ incorrect (ans: ' + ans.correct + ')';
+            qRowsHtml += '<div class="q-row ' + rowCls + '">'
+              + '<span class="q-row-label">' + meta.label + '</span>'
+              + '<span class="q-row-text">' + meta.text + '</span>'
+              + '<span class="q-row-result">' + badge + '</span>'
+              + '</div>';
+          });
+        }
+        qRowsHtml += '</div>';
+
         secHtml += `<div class="section-result">
       <div class="sr-head"><span class="sr-title">${sec}. ${data.label}</span>
       <span class="sr-score ${cls}">${sc.correct}/${sc.total} &nbsp; ${status}</span></div>
       <div class="sr-bar-wrap">
         <div class="sr-bar-bg"><div class="sr-bar-fill" style="width:${p}%;background:${bar}"></div></div>
-        <div class="sr-rec">${rec}</div></div></div>`;
+        <div class="sr-rec">${rec}</div>
+      </div>${qRowsHtml}</div>`;
         if (p < 75) priorities.push({ label: data.label, prereq: data.prereq, pct: p, priority: p < 50 ? 'HIGH' : 'MEDIUM' });
       });
       document.getElementById('sectionResults').innerHTML = secHtml;
@@ -1878,6 +2047,7 @@
       if (strong.length) studyLines.push(`[STRENGTH] ${strong.join(', ')}`);
       const study_plan = studyLines.length ? studyLines.join('\n') : 'Strong across all sections.';
 
+      // ── Per-question detail (MC) ─────────────────────────────
       const questionDetail = Object.keys(answers).map(qId => {
         const given = userAnswers[qId];
         if (!given) return `${qId}:skipped`;
@@ -1885,14 +2055,59 @@
         return `${qId}:${given}(${mark})`;
       }).join(', ');
 
+      // ── Per-blank detail (FITB) ───────────────────────────────
+      const fitbDetail = Object.entries(fitbAnswers).map(([qId, def]) => {
+        const blankResults = def.blanks.map(b => {
+          const val = document.getElementById(b.id).value.trim();
+          if (!val) return `${b.id}:skipped`;
+          const ok = b.accepted.includes(normBlank(val));
+          return `${b.id}:"${val}"(${ok ? '✓' : '✗'})`;
+        }).join(', ');
+        return `${qId}: ${blankResults}`;
+      }).join(' | ');
+
+      // ── Full question-by-question breakdown by section ────────
+      const NL = '\n';
+      const full_breakdown = Object.entries(sectionMap).map(([sec, data]) => {
+        const sc = sectionScores[sec];
+        const header = '=== ' + sec + '. ' + data.label + ' \u2014 ' + sc.correct + '/' + sc.total + ' ===';
+
+        let lines;
+        if (sec === 'H') {
+          lines = Object.entries(fitbAnswers).map(([qId, def]) => {
+            const meta = fitbMeta[qId] || { label: qId, text: '' };
+            const blankLines = def.blanks.map(b => {
+              const val = document.getElementById(b.id).value.trim();
+              if (!val) return '    ' + b.id + ': skipped  (accepted: ' + b.accepted.join('/') + ')';
+              const ok = b.accepted.includes(normBlank(val));
+              return '    ' + b.id + ': "' + val + '" ' + (ok ? '\u2713' : '\u2717') + '  (accepted: ' + b.accepted.join('/') + ')';
+            });
+            return '  ' + meta.label + '. ' + meta.text + NL + blankLines.join(NL);
+          });
+        } else {
+          lines = data.qs.map(qId => {
+            const meta = questionMeta[qId] || { label: qId, text: '' };
+            const given = userAnswers[qId];
+            const ans = answers[qId];
+            if (!given) {
+              return '  ' + meta.label + '. ' + meta.text + NL + '    \u2192 skipped  (correct: ' + ans.correct + ')';
+            }
+            const mark = given === ans.correct ? '\u2713' : '\u2717';
+            return '  ' + meta.label + '. ' + meta.text + NL + '    \u2192 ' + given + ' ' + mark + '  (correct: ' + ans.correct + ')';
+          });
+        }
+        return [header].concat(lines).join(NL);
+      }).join(NL + NL);
       submitToSupabase({
         sectionScores, totalCorrect, total, pct, grade,
-        section_summary, study_plan, questionDetail, elapsedSeconds, elapsedFormatted
+        section_summary, study_plan, questionDetail, fitbDetail, full_breakdown,
+        elapsedSeconds, elapsedFormatted
       });
     }
 
     function submitToSupabase({ sectionScores, totalCorrect, total, pct, grade,
-      section_summary, study_plan, questionDetail, elapsedSeconds, elapsedFormatted }) {
+      section_summary, study_plan, questionDetail, fitbDetail, full_breakdown,
+      elapsedSeconds, elapsedFormatted }) {
 
       const statusEl = document.createElement('div');
       statusEl.style.cssText = 'margin-top:1rem;font-family:JetBrains Mono,monospace;font-size:0.75rem;color:rgba(255,255,255,0.5);';
@@ -1931,7 +2146,12 @@
         sec_e_score: `${sectionScores.E.correct}/${sectionScores.E.total}`, sec_e_pct: sectionScores.E.pct,
         sec_f_score: `${sectionScores.F.correct}/${sectionScores.F.total}`, sec_f_pct: sectionScores.F.pct,
         sec_g_score: `${sectionScores.G.correct}/${sectionScores.G.total}`, sec_g_pct: sectionScores.G.pct,
-        question_detail: questionDetail, section_summary, study_plan
+        sec_h_score: `${sectionScores.H.correct}/${sectionScores.H.total}`, sec_h_pct: sectionScores.H.pct,
+        question_detail: questionDetail,
+        fitb_detail: fitbDetail,
+        full_breakdown: full_breakdown,
+        section_summary: section_summary,
+        study_plan: study_plan
       };
 
       const endpoint = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}`;
