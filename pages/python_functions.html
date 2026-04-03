@@ -903,6 +903,30 @@
         grid-template-columns: 1fr;
       }
     }
+
+    /* ── Score-based CTA block ─────────────────────────── */
+    .cta-card {
+      margin: 2rem 0;
+      padding: 2rem;
+      border-radius: 10px;
+      border: 1px solid #e0e0e0;
+      text-align: center;
+      background: #fff;
+    }
+    .cta-emoji { font-size: 2rem; margin-bottom: 0.5rem; }
+    .cta-title { margin: 0 0 0.5rem; font-size: 1.2rem; font-weight: 700; color: #1a1a1a; }
+    .cta-body  { margin: 0 0 1.25rem; color: #555; font-size: 0.95rem; }
+    .cta-btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .cta-btn-primary { background: #0070f3; color: #fff; }
+    .cta-btn-primary:hover { background: #005bb5; text-decoration: none; }
   </style>
 </head>
 
@@ -1646,6 +1670,7 @@
     </div>
     <div id="sectionResults"></div>
     <div class="priority-list" id="priorityList"></div>
+    <div id="ctaBlock"></div>
     <div style="text-align:center;margin-top:2rem">
       <button class="restart-btn" onclick="restartAssessment()">← Retake Assessment</button>
     </div>
@@ -2098,11 +2123,60 @@
         }
         return [header].concat(lines).join(NL);
       }).join(NL + NL);
+      showCTA(pct);
       submitToSupabase({
         sectionScores, totalCorrect, total, pct, grade,
         section_summary, study_plan, questionDetail, fitbDetail, full_breakdown,
         elapsedSeconds, elapsedFormatted
       });
+    }
+
+    function showCTA(pct) {
+      const el = document.getElementById('ctaBlock');
+      if (!el) return;
+      let html = '';
+      if (pct >= 85) {
+        html = `
+          <div class="cta-card">
+            <div class="cta-emoji">🎉</div>
+            <h3 class="cta-title">Strong result — you've got a solid foundation!</h3>
+            <p class="cta-body">Ready to keep building? Explore what's coming up in the course.</p>
+            <a href="/courses" class="cta-btn cta-btn-primary">Explore courses →</a>
+          </div>`;
+      } else if (pct >= 60) {
+        html = `
+          <div class="cta-card">
+            <div class="cta-emoji">📬</div>
+            <h3 class="cta-title">Want a personalised study plan?</h3>
+            <p class="cta-body">Drop your email and I'll send you targeted resources to close the gaps before the course starts.</p>
+            <div id="ckEmbed"></div>
+          </div>`;
+      } else {
+        html = `
+          <div class="cta-card">
+            <div class="cta-emoji">💡</div>
+            <h3 class="cta-title">Let's work on this together.</h3>
+            <p class="cta-body">A few 1-on-1 sessions can fill these gaps fast. Book a free intro call to get started.</p>
+            <a href="/pages/book.html" class="cta-btn cta-btn-primary">Book a session →</a>
+          </div>`;
+      }
+      el.innerHTML = html;
+
+      // Lazy-load ConvertKit email capture for the middle tier only.
+      // TODO: Replace the src below with your ConvertKit embed script URL.
+      // Find it in ConvertKit → Forms → your form → Embed → HTML/JS tab.
+      // It looks like: https://f.convertkit.com/XXXXXXXX/XXXXXXXX.js
+      if (pct >= 60 && pct < 85) {
+        const ckScript = document.createElement('script');
+        ckScript.src = 'https://f.convertkit.com/YOUR_FORM_UID/YOUR_EMBED_ID.js';
+        ckScript.async = true;
+        ckScript.onerror = function() {
+          document.getElementById('ckEmbed').innerHTML =
+            '<p style="color:#666;font-size:0.85rem;margin-top:0.75rem;">' +
+            'Email capture unavailable — <a href="/contact">contact me directly</a>.</p>';
+        };
+        document.getElementById('ckEmbed').appendChild(ckScript);
+      }
     }
 
     function submitToSupabase({ sectionScores, totalCorrect, total, pct, grade,
