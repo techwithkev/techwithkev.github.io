@@ -5,12 +5,14 @@ title: Home
 
 <section class="hero">
   <h1>Hi, I'm Kev.</h1>
-  <p>I build apps and teach people how to create incredible digital experiences. Welcome to my portfolio.</p>
-  <div class="mt-40">
-    <a href="/contact" class="button primary">Get in Touch</a>
+  <p>I help secondary students master coding and mathematics — through online courses, private tutoring, and free assessments.</p>
+  <div class="mt-40" style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+    <a href="/contact" class="button primary">Book a Session</a>
+    <a href="/pages/python_functions.html" class="button outline">Free Python Assessment</a>
   </div>
 </section>
 
+{% if site.apps.size > 0 %}
 <section id="apps" class="apps-section">
   <div class="wrapper">
     <h2 class="center">My Apps</h2>
@@ -25,3 +27,4 @@ title: Home
     </div>
   </div>
 </section>
+{% endif %}
