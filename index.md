@@ -25,7 +25,7 @@ title: Home
     </div>
     <div class="lg:col-span-5 relative flex items-center justify-center">
       <div class="relative w-full aspect-[4/5] rounded-xl overflow-hidden shadow-2xl">
-        <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-KJPIA8yJ1jDZcX3Ds3T74AwauADDP0Tmu9OEIuhXNNFEAeabBMlGbcPA7NOfGgULhjah3Ls5Arg1LaINQBciQo70ebfZAkxeZ6dZ0Eixn6oj7o586bYpSIQ-NWYhNNLBhd77ZIQUcLhxnieNbFxHCzWpYcaxp18VSOUrSOBT6lRbgGdbp_5GfgT9eLMfbZLiOPxAVmPHO0meewfYqM74vAbkRZtsJJnqSI1rHn1MLF1L1BI3NHL7HOVsjaa4vVlncwZdEsbXXco" alt="Kevin Ng, educator">
+        <img class="w-full h-full object-cover" src="../assets/img/kev.png" alt="Kevin Ng, educator">
         <div class="absolute bottom-6 left-6 right-6 bg-white/90 backdrop-blur-md p-6 rounded-lg border-l-4 border-[#c8f323]">
           <p class="text-primary font-bold font-headline text-lg">Kevin Ng</p>
           <p class="text-on-surface-variant text-sm">Founder &amp; Lead Educator</p>
