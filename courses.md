@@ -26,8 +26,8 @@ title: Methodology
       </div>
       <div class="absolute -bottom-6 -left-6 bg-primary p-8 rounded-lg shadow-xl hidden md:block">
         <div class="flex flex-col gap-1">
-          <span class="text-[#c8f323] font-black text-4xl font-headline">12+</span>
-          <span class="text-white text-xs uppercase tracking-widest font-bold">Years of Engineering Logic</span>
+          <span class="text-[#c8f323] font-black text-4xl font-headline">19+</span>
+          <span class="text-white text-xs uppercase tracking-widest font-bold">Years of Teaching Experience</span>
         </div>
       </div>
     </div>
@@ -48,11 +48,11 @@ title: Methodology
         </div>
         <span class="text-[#006a6a] font-bold text-sm tracking-widest uppercase mb-6 block">Foundation</span>
         <h3 class="font-headline font-bold text-3xl text-primary mb-4">Academic Excellence</h3>
-        <p class="text-on-surface-variant text-lg leading-relaxed mb-8 max-w-lg">B.Eng in Computer Engineering with a focus on Applied Mathematics. Kevin's background isn't just in teaching, but in the practical application of logic in high-stakes environments.</p>
+        <p class="text-on-surface-variant text-lg leading-relaxed mb-8 max-w-lg">Bachelor's Degree in Computing. Since 2007, Kevin has taught AP Computer Science, Java, Python, and AI Concepts — bringing real enterprise experience as a Lead Value Engineer directly into the classroom. Based in Toronto, he is a Gemini Certified Educator deeply invested in how emerging technologies shape the way we learn.</p>
         <div class="flex gap-8 border-t border-outline-variant/20 pt-8">
           <div>
-            <p class="text-primary font-black text-xl font-headline">NTU Alumni</p>
-            <p class="text-xs text-on-surface-variant uppercase font-bold">Engineering Distinction</p>
+            <p class="text-primary font-black text-xl font-headline">Gemini Certified</p>
+            <p class="text-xs text-on-surface-variant uppercase font-bold">Educator</p>
           </div>
           <div>
             <p class="text-primary font-black text-xl font-headline">500+ Students</p>
@@ -228,7 +228,7 @@ title: Methodology
     <div class="mt-16 pt-8 border-t border-outline-variant/30 inline-flex items-center gap-8">
       <div class="text-left">
         <p class="text-xs font-bold uppercase tracking-widest text-[#006a6a]">Verified Trust</p>
-        <p class="text-xl font-headline font-bold text-primary">Google Certified Educator</p>
+        <p class="text-xl font-headline font-bold text-primary">Gemini Certified Educator</p>
       </div>
       <div class="w-px h-10 bg-outline-variant/30"></div>
       <div class="text-left">
