@@ -166,7 +166,7 @@ title: Methodology
         <div class="flex justify-between items-start mb-12">
           <div class="flex flex-col">
             <span class="text-5xl font-black font-headline text-[#c8f323]">C5 → A1</span>
-            <span class="text-xs uppercase tracking-widest text-[#83bad6] font-bold mt-2">O-Level A-Math</span>
+            <span class="text-xs uppercase tracking-widest text-[#83bad6] font-bold mt-2">Secondary A-Math</span>
           </div>
           <span class="material-symbols-outlined text-4xl text-white/20">trending_up</span>
         </div>

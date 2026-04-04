@@ -10,7 +10,7 @@ title: Pricing
     Master Logic. <br/><span class="text-[#006a6a]">Execute Precision.</span>
   </h1>
   <p class="text-on-surface-variant max-w-2xl mx-auto text-lg leading-relaxed">
-    Highly targeted educational frameworks designed for Singapore's rigorous standards. Choose the path that matches your technical or mathematical ambitions.
+    Highly targeted educational frameworks designed for secondary school curricula. Choose the path that matches your technical or mathematical ambitions.
   </p>
 </section>
 
@@ -18,7 +18,7 @@ title: Pricing
 <section class="max-w-7xl mx-auto px-6 pb-20">
   <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
 
-    <!-- O-Level Math Intensive -->
+    <!-- Secondary Math Intensive -->
     <div class="flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden relative group">
       <div class="h-1 bg-primary absolute top-0 left-0 right-0"></div>
       <div class="p-8 flex flex-col h-full">
@@ -26,8 +26,8 @@ title: Pricing
           <span class="bg-surface-container-low text-primary px-3 py-1 rounded text-xs font-bold font-headline uppercase tracking-wider">Academic Excellence</span>
           <span class="material-symbols-outlined text-primary">functions</span>
         </div>
-        <h3 class="text-2xl font-headline font-bold text-primary mb-2">O-Level Math Intensive</h3>
-        <p class="text-sm text-on-surface-variant mb-6">Comprehensive drill-based approach for A-Math and E-Math mastery.</p>
+        <h3 class="text-2xl font-headline font-bold text-primary mb-2">Secondary Math Intensive</h3>
+        <p class="text-sm text-on-surface-variant mb-6">Comprehensive drill-based approach for advanced and core Math mastery.</p>
         <div class="mb-8">
           <span class="text-4xl font-black font-headline text-primary">$480</span>
           <span class="text-on-surface-variant text-sm"> / 4 sessions</span>
@@ -43,14 +43,14 @@ title: Pricing
           </li>
           <li class="flex items-start gap-3">
             <span class="material-symbols-outlined text-[#006a6a] text-sm mt-0.5" style="font-size:18px;">check_circle</span>
-            <span class="text-sm text-on-surface">Curated Singapore TYS solutions</span>
+            <span class="text-sm text-on-surface">Curated past exam solutions and practice sets</span>
           </li>
           <li class="flex items-start gap-3">
             <span class="material-symbols-outlined text-[#006a6a] text-sm mt-0.5" style="font-size:18px;">check_circle</span>
-            <span class="text-sm text-on-surface">Target: Sec 3/4 &amp; O-Level Candidates</span>
+            <span class="text-sm text-on-surface">Target: Sec 3/4 &amp; exam candidates</span>
           </li>
         </ul>
-        <a href="/contact" class="block w-full py-4 rounded-lg bg-surface-container-low text-primary font-bold font-headline border-2 border-transparent hover:border-primary transition-all text-center">Inquire Details</a>
+        <a href="/contact" class="block w-full py-4 rounded-lg bg-surface-container-low text-primary font-bold font-headline border-2 border-transparent hover:border-primary transition-all text-center">Enquire Details</a>
       </div>
     </div>
 

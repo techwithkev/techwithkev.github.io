@@ -45,7 +45,7 @@ title: Assessments
           </div>
           <div class="flex items-center gap-3">
             <span class="material-symbols-outlined text-[#006a6a]" style="font-variation-settings: 'FILL' 1; font-size:20px;">check_circle</span>
-            <span class="text-sm font-medium">Benchmarking against O-Level &amp; IP standards</span>
+            <span class="text-sm font-medium">Benchmarking against secondary school exam standards</span>
           </div>
         </div>
         <a href="/pages/g9_math_prerequisite_assessment.html" class="block w-full bg-surface-container-lowest text-primary py-4 rounded-lg font-headline font-bold tracking-wide border border-outline-variant/20 hover:bg-primary hover:text-on-primary transition-all duration-300 text-center">START DIAGNOSTIC</a>
@@ -115,7 +115,7 @@ title: Assessments
       <div class="absolute top-0 right-0 w-64 h-64 bg-[#006a6a]/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
       <div class="relative z-10">
         <h2 class="text-3xl font-headline font-bold text-on-primary mb-4">Not ready for a test?</h2>
-        <p class="text-[#96ceeb]/80 mb-8 max-w-xl mx-auto">Get in touch and I'll send you my "First Principles" guide on mastering O-Level Math and Python logic.</p>
+        <p class="text-[#96ceeb]/80 mb-8 max-w-xl mx-auto">Get in touch and I'll send you my "First Principles" guide on mastering secondary Math and Python logic.</p>
         <a href="/contact" class="inline-block bg-[#c8f323] text-[#171e00] px-8 py-4 rounded-lg font-headline font-bold hover:brightness-110 transition-all">GET IN TOUCH</a>
       </div>
     </div>

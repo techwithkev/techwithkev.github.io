@@ -10,13 +10,13 @@ title: Home
     <div class="lg:col-span-7 flex flex-col justify-center">
       <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#8cf3f3]/30 text-[#007070] rounded-full w-fit mb-6">
         <span class="w-2 h-2 rounded-full bg-[#006a6a]"></span>
-        <span class="text-xs font-bold tracking-widest uppercase font-label">Singapore's Premier Math + Python Lab</span>
+        <span class="text-xs font-bold tracking-widest uppercase font-label">Expert 1-on-1 Math + Python Tutoring</span>
       </div>
       <h1 class="font-headline text-5xl md:text-7xl font-bold text-primary leading-[1.1] tracking-tight mb-8">
-        Math + Python <br/> Mastery for <span class="text-[#006a6a]">Singapore</span> Students.
+        Math + Python <br/> Mastery for <span class="text-[#006a6a]">Secondary</span> Students.
       </h1>
       <p class="text-on-surface-variant text-lg md:text-xl max-w-xl mb-10 leading-relaxed">
-        Moving beyond rote memorisation. We teach high-level logic and engineering principles through the lens of O-Level Math and modern Python programming.
+        Moving beyond rote memorisation. We teach high-level logic and engineering principles through secondary school Math and modern Python programming.
       </p>
       <div class="flex flex-col sm:flex-row gap-4">
         <a href="/assessments" class="architect-gradient text-white px-8 py-4 rounded-lg font-bold text-lg shadow-xl shadow-primary/10 transition-all hover:brightness-110 active:scale-[0.98] text-center font-headline">Start Assessment</a>
@@ -66,7 +66,7 @@ title: Home
           <span class="material-symbols-outlined text-primary text-3xl">verified</span>
         </div>
         <h3 class="font-headline text-2xl font-bold text-primary mb-4">Exam Results Driven</h3>
-        <p class="text-on-surface-variant leading-relaxed">While we focus on logic, we never lose sight of the grade. Our students consistently outperform peers in MOE national examinations.</p>
+        <p class="text-on-surface-variant leading-relaxed">While we focus on logic, we never lose sight of the grade. Our students consistently achieve stronger results in national examinations.</p>
       </div>
     </div>
   </div>
@@ -97,7 +97,7 @@ title: Home
     </div>
     <div class="order-1 lg:order-2">
       <h2 class="font-headline text-4xl md:text-5xl font-bold text-primary mb-8 tracking-tight">The Modern Engineer's Approach to Learning.</h2>
-      <p class="text-on-surface-variant text-lg mb-8 leading-relaxed">Our course tracks are specifically designed for the Singapore syllabus, injecting Python programming as a way to visualise complex mathematical concepts.</p>
+      <p class="text-on-surface-variant text-lg mb-8 leading-relaxed">Our course tracks are designed around secondary school curricula, injecting Python programming as a way to visualise complex mathematical concepts.</p>
       <ul class="space-y-6">
         <li class="flex items-start gap-4">
           <span class="material-symbols-outlined text-[#006a6a] mt-1">check_circle</span>
@@ -109,7 +109,7 @@ title: Home
         <li class="flex items-start gap-4">
           <span class="material-symbols-outlined text-[#006a6a] mt-1">check_circle</span>
           <div>
-            <h4 class="font-bold text-primary">Advanced Algorithms (Secondary 3–4 / O-Level)</h4>
+            <h4 class="font-bold text-primary">Advanced Algorithms (Secondary 3–4)</h4>
             <p class="text-on-surface-variant text-sm">Translating Algebra and A-Math into efficient computational scripts and logic structures.</p>
           </div>
         </li>
@@ -121,7 +121,7 @@ title: Home
 <!-- Testimonials -->
 <section class="py-32 bg-surface-container-low">
   <div class="max-w-7xl mx-auto px-6 text-center mb-16">
-    <h2 class="font-headline text-4xl font-bold text-primary mb-4">Trusted by Singapore Families</h2>
+    <h2 class="font-headline text-4xl font-bold text-primary mb-4">Trusted by Families</h2>
     <p class="text-on-surface-variant">Real outcomes from our dedicated learning sessions.</p>
   </div>
   <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -150,7 +150,7 @@ title: Home
         <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
         <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
       </div>
-      <p class="text-on-surface-variant italic mb-6 leading-relaxed">"I used to struggle with math problems. Now I treat them like bugs in code. It makes O-Level preparation so much less intimidating."</p>
+      <p class="text-on-surface-variant italic mb-6 leading-relaxed">"I used to struggle with math problems. Now I treat them like bugs in code. It makes exam preparation so much less intimidating."</p>
       <div class="flex items-center gap-4">
         <div class="w-10 h-10 rounded-full bg-[#004b63] flex items-center justify-center text-white font-bold text-sm">ST</div>
         <div>
@@ -167,7 +167,7 @@ title: Home
         <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
         <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
       </div>
-      <p class="text-on-surface-variant italic mb-6 leading-relaxed">"The real-world logic focus is what Singapore needs. My daughter is now excited about Math homework because she gets to test her logic in Python."</p>
+      <p class="text-on-surface-variant italic mb-6 leading-relaxed">"The real-world logic focus is exactly what's needed. My daughter is now excited about Math homework because she gets to test her logic in Python."</p>
       <div class="flex items-center gap-4">
         <div class="w-10 h-10 rounded-full bg-[#004b63] flex items-center justify-center text-white font-bold text-sm">AK</div>
         <div>

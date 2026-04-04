@@ -2,7 +2,7 @@
 
 ## Product Context
 - **What this is:** A tutoring site for secondary school students (math + Python), run by one educator (Kevin Ng). Marketing site + lead generation via interactive assessments.
-- **Who it's for:** Secondary/high school students falling behind, and their parents. Singapore context. Deadline-driven — exam season, course prerequisites, grade cutoffs.
+- **Who it's for:** Secondary/high school students falling behind, and their parents. Deadline-driven — exam season, course prerequisites, grade cutoffs.
 - **Space/industry:** Private tutoring, edtech. Peers: Brilliant, Khan Academy, Wyzant. Deliberate positioning against them: solo expert vs. platform/marketplace.
 - **Project type:** Marketing site + lead gen assessments (Jekyll, GitHub Pages, static)
 

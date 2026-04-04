@@ -27,7 +27,7 @@ title: Contact
           </div>
           <div>
             <p class="font-bold text-primary font-headline">Sessions</p>
-            <p class="text-on-surface-variant text-sm">Online via video call, or in-person (Singapore)</p>
+            <p class="text-on-surface-variant text-sm">Online via video call, or in-person</p>
           </div>
         </div>
         <div class="flex items-start gap-4">
@@ -61,7 +61,7 @@ title: Contact
             <option value="">Select a topic...</option>
             <option value="1-on-1 tutoring">1-on-1 tutoring inquiry</option>
             <option value="python-course">Python Fundamentals course</option>
-            <option value="math-intensive">O-Level Math Intensive</option>
+            <option value="math-intensive">Secondary Math Intensive</option>
             <option value="assessment">Free assessment question</option>
             <option value="other">Other</option>
           </select>
