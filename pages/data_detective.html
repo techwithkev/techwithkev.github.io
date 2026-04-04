@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Exploration Exercise</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-color: #f8fafc;
+            --text-main: #0f172a;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            margin-top: 0;
+            color: var(--text-main);
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-bottom: 2rem;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        #dataset-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th,
+        td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #f1f5f9;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        #data-container {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Data Exploration Exercise</h1>
+            <p>Click the button below to load a random dataset. Analyze the data to discover hidden patterns.</p>
+            <button id="generate-btn">Generate Random Dataset</button>
+        </header>
+
+        <div id="data-container">
+            <div id="dataset-title"></div>
+            <div class="table-responsive">
+                <table id="data-table">
+                    <thead id="table-head"></thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const datasets = [
+            {
+                name: "Dataset 1: Student Study Habits & Performance",
+                headers: ["Student_ID", "Hours_Studied_Per_Week", "Average_Sleep_Hours", "Favorite_Subject", "Final_Test_Score"],
+                rows: [
+                    ["S01", "12", "8.0", "Math", "92"],
+                    ["S02", "4", "6.0", "History", "65"],
+                    ["S03", "15", "7.5", "Science", "95"],
+                    ["S04", "2", "5.5", "Art", "58"],
+                    ["S05", "8", "7.0", "Math", "78"],
+                    ["S06", "10", "8.5", "English", "88"],
+                    ["S07", "5", "6.5", "Science", "70"],
+                    ["S08", "14", "8.0", "History", "94"],
+                    ["S09", "3", "5.0", "Art", "60"],
+                    ["S10", "11", "7.5", "English", "85"],
+                    ["S11", "7", "6.5", "Math", "75"],
+                    ["S12", "16", "8.0", "Science", "98"],
+                    ["S13", "1", "4.5", "History", "50"],
+                    ["S14", "9", "7.0", "Art", "80"],
+                    ["S15", "13", "8.5", "Math", "91"]
+                ]
+            },
+            {
+                name: "Dataset 2: Coffee Shop Daily Sales",
+                headers: ["Day_ID", "Temperature_C", "Weather_Condition", "Hot_Coffees_Sold", "Iced_Coffees_Sold"],
+                rows: [
+                    ["D01", "10", "Rainy", "150", "20"],
+                    ["D02", "12", "Cloudy", "145", "25"],
+                    ["D03", "18", "Sunny", "110", "60"],
+                    ["D04", "25", "Sunny", "70", "130"],
+                    ["D05", "30", "Hot", "40", "180"],
+                    ["D06", "28", "Sunny", "50", "160"],
+                    ["D07", "15", "Rainy", "135", "30"],
+                    ["D08", "9", "Snowy", "180", "10"],
+                    ["D09", "11", "Cloudy", "140", "22"],
+                    ["D10", "22", "Sunny", "85", "95"],
+                    ["D11", "32", "Hot", "30", "195"],
+                    ["D12", "26", "Cloudy", "60", "140"],
+                    ["D13", "14", "Rainy", "130", "35"],
+                    ["D14", "8", "Snowy", "175", "5"],
+                    ["D15", "19", "Sunny", "95", "70"]
+                ]
+            },
+            {
+                name: "Dataset 3: Movie Streaming Platform",
+                headers: ["User_ID", "User_Age", "Subscription_Type", "Favorite_Genre", "Avg_Watch_Time_Mins", "Review_Snippet"],
+                rows: [
+                    ["U101", "19", "Basic", "Action", "45", "\"Needs more explosions.\""],
+                    ["U102", "45", "Premium", "Documentary", "120", "\"Very informative and well-researched.\""],
+                    ["U103", "22", "Basic", "Sci-Fi", "50", "\"Cool special effects!\""],
+                    ["U104", "55", "Premium", "Drama", "140", "\"Acting was superb and touching.\""],
+                    ["U105", "16", "Basic", "Action", "40", "\"Fast paced and fun.\""],
+                    ["U106", "62", "Premium", "Documentary", "110", "\"Fascinating look at nature.\""],
+                    ["U107", "25", "Premium", "Sci-Fi", "130", "\"Loved the alien designs.\""],
+                    ["U108", "48", "Basic", "Drama", "60", "\"A bit slow, but good.\""],
+                    ["U109", "20", "Basic", "Action", "55", "\"Awesome fight scenes.\""],
+                    ["U110", "50", "Premium", "Documentary", "115", "\"I learned so much from this.\""],
+                    ["U111", "18", "Basic", "Comedy", "45", "\"Hilarious, laughed out loud.\""],
+                    ["U112", "58", "Premium", "Drama", "135", "\"A masterpiece of storytelling.\""],
+                    ["U113", "21", "Basic", "Sci-Fi", "50", "\"The ending was confusing.\""],
+                    ["U114", "42", "Premium", "Documentary", "125", "\"Great historical footage.\""],
+                    ["U115", "17", "Basic", "Comedy", "40", "\"Pretty funny movie.\""]
+                ]
+            },
+            {
+                name: "Dataset 4: Plant Growth Experiment",
+                headers: ["Plant_ID", "Water_Amount_ml", "Sunlight_Hours", "Fertilizer_Type", "Growth_cm", "Growth_Photo_File"],
+                rows: [
+                    ["P01", "50", "2", "None", "2.1", "plant_01_small.jpg"],
+                    ["P02", "100", "6", "Type_A", "8.5", "plant_02_large.jpg"],
+                    ["P03", "200", "8", "Type_B", "4.2", "plant_03_med.jpg"],
+                    ["P04", "50", "8", "Type_A", "3.5", "plant_04_small.jpg"],
+                    ["P05", "100", "2", "Type_B", "3.0", "plant_05_small.jpg"],
+                    ["P06", "100", "6", "Type_A", "8.8", "plant_06_large.jpg"],
+                    ["P07", "200", "2", "None", "1.5", "plant_07_tiny.jpg"],
+                    ["P08", "100", "6", "Type_A", "8.4", "plant_08_large.jpg"],
+                    ["P09", "50", "4", "Type_B", "2.8", "plant_09_small.jpg"],
+                    ["P10", "200", "6", "None", "3.8", "plant_10_med.jpg"],
+                    ["P11", "100", "6", "Type_A", "8.7", "plant_11_large.jpg"],
+                    ["P12", "50", "8", "None", "2.5", "plant_12_small.jpg"],
+                    ["P13", "200", "8", "Type_A", "5.0", "plant_13_med.jpg"],
+                    ["P14", "100", "4", "Type_B", "4.5", "plant_14_med.jpg"],
+                    ["P15", "100", "6", "Type_A", "8.6", "plant_15_large.jpg"]
+                ]
+            },
+            {
+                name: "Dataset 5: Animal Shelter Adoptions",
+                headers: ["Animal_ID", "Species", "Age_Months", "Weight_kg", "Days_in_Shelter", "Intake_Audio_Recording"],
+                rows: [
+                    ["A01", "Dog", "2", "4.5", "3", "bark_happy.wav"],
+                    ["A02", "Cat", "36", "5.0", "45", "meow_quiet.wav"],
+                    ["A03", "Dog", "60", "22.0", "80", "bark_deep.wav"],
+                    ["A04", "Rabbit", "4", "1.2", "12", "silent.wav"],
+                    ["A05", "Cat", "3", "1.0", "5", "purr_loud.wav"],
+                    ["A06", "Dog", "84", "18.5", "110", "whimper.wav"],
+                    ["A07", "Dog", "4", "6.0", "4", "bark_playful.wav"],
+                    ["A08", "Cat", "48", "6.2", "60", "hiss.wav"],
+                    ["A09", "Rabbit", "24", "2.0", "35", "silent.wav"],
+                    ["A10", "Dog", "12", "15.0", "20", "bark_normal.wav"],
+                    ["A11", "Cat", "2", "0.8", "2", "meow_tiny.wav"],
+                    ["A12", "Dog", "120", "20.0", "150", "snore.wav"],
+                    ["A13", "Cat", "72", "4.5", "90", "meow_raspy.wav"],
+                    ["A14", "Rabbit", "6", "1.5", "15", "silent.wav"],
+                    ["A15", "Dog", "6", "8.0", "7", "panting.wav"]
+                ]
+            },
+            {
+                name: "Dataset 6: Smart Fitness Tracker",
+                headers: ["User_ID", "Daily_Steps", "Active_Minutes", "Avg_Heart_Rate", "Sleep_Quality"],
+                rows: [
+                    ["F01", "12500", "60", "68", "Excellent"],
+                    ["F02", "3200", "10", "82", "Poor"],
+                    ["F03", "15000", "75", "65", "Excellent"],
+                    ["F04", "5400", "20", "78", "Fair"],
+                    ["F05", "9800", "45", "72", "Good"],
+                    ["F06", "11000", "50", "70", "Good"],
+                    ["F07", "2500", "5", "85", "Poor"],
+                    ["F08", "14200", "65", "66", "Excellent"],
+                    ["F09", "6100", "25", "76", "Fair"],
+                    ["F10", "13000", "55", "69", "Excellent"],
+                    ["F11", "4000", "15", "80", "Poor"],
+                    ["F12", "10500", "48", "71", "Good"],
+                    ["F13", "16000", "80", "64", "Excellent"],
+                    ["F14", "4800", "18", "79", "Fair"],
+                    ["F15", "8500", "40", "74", "Good"]
+                ]
+            },
+            {
+                name: "Dataset 7: Online Store Product Reviews",
+                headers: ["Review_ID", "Category", "Price_USD", "Star_Rating", "Review_Text"],
+                rows: [
+                    ["R01", "Electronics", "899", "2", "\"Broke after a week. Not worth the high price.\""],
+                    ["R02", "Clothing", "25", "5", "\"Soft, fits well, great value!\""],
+                    ["R03", "Home", "45", "4", "\"Looks nice in my living room.\""],
+                    ["R04", "Electronics", "1200", "1", "\"Terrible customer service for such an expensive item.\""],
+                    ["R05", "Toys", "15", "5", "\"My kids love this cheap little toy.\""],
+                    ["R06", "Clothing", "30", "4", "\"Good shirt, a bit tight.\""],
+                    ["R07", "Electronics", "950", "2", "\"Glitchy screen. Expected better for the cost.\""],
+                    ["R08", "Home", "50", "5", "\"Perfect lamp for my desk.\""],
+                    ["R09", "Clothing", "20", "5", "\"Bought three of these, amazing price.\""],
+                    ["R10", "Electronics", "1500", "1", "\"Overpriced garbage. Do not buy.\""],
+                    ["R11", "Toys", "12", "4", "\"Simple and fun.\""],
+                    ["R12", "Home", "60", "3", "\"It's okay, nothing special.\""],
+                    ["R13", "Electronics", "850", "2", "\"Battery dies too fast on this premium model.\""],
+                    ["R14", "Clothing", "22", "5", "\"Very comfortable.\""],
+                    ["R15", "Toys", "18", "5", "\"Great birthday gift for the price.\""]
+                ]
+            },
+            {
+                name: "Dataset 8: Multiplayer Video Game Stats",
+                headers: ["Player_Tag", "Level", "In_A_Guild", "Quests_Completed", "Virtual_Gold_Collected"],
+                rows: [
+                    ["P_001", "5", "No", "12", "1500"],
+                    ["P_002", "45", "Yes", "110", "85000"],
+                    ["P_003", "8", "No", "15", "2200"],
+                    ["P_004", "60", "Yes", "155", "120000"],
+                    ["P_005", "12", "No", "25", "4000"],
+                    ["P_006", "55", "Yes", "140", "105000"],
+                    ["P_007", "4", "No", "10", "1200"],
+                    ["P_008", "48", "Yes", "125", "92000"],
+                    ["P_009", "15", "No", "30", "5500"],
+                    ["P_010", "65", "Yes", "170", "150000"],
+                    ["P_011", "9", "No", "20", "3000"],
+                    ["P_012", "50", "Yes", "130", "98000"],
+                    ["P_013", "6", "No", "14", "1800"],
+                    ["P_014", "42", "Yes", "105", "80000"],
+                    ["P_015", "11", "No", "22", "3500"]
+                ]
+            },
+            {
+                name: "Dataset 9: City Commuter Travel Times",
+                headers: ["Trip_ID", "Transport_Mode", "Distance_km", "Traffic_Level", "Travel_Time_Mins"],
+                rows: [
+                    ["C01", "Car", "5.0", "High", "45"],
+                    ["C02", "Bicycle", "5.0", "High", "25"],
+                    ["C03", "Subway", "10.0", "Low", "15"],
+                    ["C04", "Car", "5.0", "Low", "12"],
+                    ["C05", "Bicycle", "5.0", "Low", "20"],
+                    ["C06", "Subway", "10.0", "High", "18"],
+                    ["C07", "Car", "8.0", "High", "65"],
+                    ["C08", "Bicycle", "8.0", "High", "38"],
+                    ["C09", "Subway", "15.0", "Low", "22"],
+                    ["C10", "Car", "8.0", "Low", "18"],
+                    ["C11", "Bicycle", "8.0", "Low", "32"],
+                    ["C12", "Subway", "15.0", "High", "25"],
+                    ["C13", "Car", "3.0", "High", "30"],
+                    ["C14", "Bicycle", "3.0", "High", "15"],
+                    ["C15", "Car", "3.0", "Low", "8"]
+                ]
+            },
+            {
+                name: "Dataset 10: Smart Home Voice Commands",
+                headers: ["Command_ID", "Time_of_Day", "User_Profile", "Spoken_Text", "Audio_File_Name", "Device_Action"],
+                rows: [
+                    ["V01", "07:00", "Adult", "\"Turn on the coffee maker\"", "cmd_883.wav", "Appliance_On"],
+                    ["V02", "15:30", "Child", "\"Play cartoon theme songs\"", "cmd_884.wav", "Music_Play"],
+                    ["V03", "22:00", "Adult", "\"Turn off all the lights\"", "cmd_885.wav", "Lights_Off"],
+                    ["V04", "07:15", "Adult", "\"Read the morning news\"", "cmd_886.wav", "News_Brief"],
+                    ["V05", "16:00", "Child", "\"Tell me a joke\"", "cmd_887.wav", "Voice_Game"],
+                    ["V06", "22:30", "Adult", "\"Set alarm for 6 AM\"", "cmd_888.wav", "Alarm_Set"],
+                    ["V07", "07:30", "Adult", "\"What is the weather today?\"", "cmd_889.wav", "Weather_Check"],
+                    ["V08", "15:45", "Child", "\"Play animal sounds\"", "cmd_890.wav", "Music_Play"],
+                    ["V09", "23:00", "Adult", "\"Lock the front door\"", "cmd_891.wav", "Security_Lock"],
+                    ["V10", "06:45", "Adult", "\"Turn on kitchen lights\"", "cmd_892.wav", "Lights_On"],
+                    ["V11", "16:30", "Child", "\"How do you spell dinosaur?\"", "cmd_893.wav", "Web_Search"],
+                    ["V12", "22:15", "Adult", "\"Turn down the thermostat\"", "cmd_894.wav", "Climate_Control"],
+                    ["V13", "08:00", "Adult", "\"Start the robot vacuum\"", "cmd_895.wav", "Appliance_On"],
+                    ["V14", "17:00", "Child", "\"Play pop music\"", "cmd_896.wav", "Music_Play"],
+                    ["V15", "23:30", "Adult", "\"Turn off the TV\"", "cmd_897.wav", "Appliance_Off"]
+                ]
+            }
+        ];
+
+        document.getElementById('generate-btn').addEventListener('click', () => {
+            // Select a random dataset
+            const randomIndex = Math.floor(Math.random() * datasets.length);
+            const dataset = datasets[randomIndex];
+
+            // Render Title
+            document.getElementById('dataset-title').textContent = dataset.name;
+
+            // Render Headers
+            const thead = document.getElementById('table-head');
+            thead.innerHTML = '';
+            const headerRow = document.createElement('tr');
+            dataset.headers.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header;
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+
+            // Render Rows
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+            dataset.rows.forEach(rowData => {
+                const tr = document.createElement('tr');
+                rowData.forEach(cellData => {
+                    const td = document.createElement('td');
+                    td.textContent = cellData;
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+
+            // Show container
+            document.getElementById('data-container').style.display = 'block';
+        });
+    </script>
+</body>
+
+</html>
