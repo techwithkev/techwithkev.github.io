@@ -1,57 +1,138 @@
 <!DOCTYPE html>
-<html lang="{{ page.lang | default: site.lang | default: 'en' }}">
+<html class="light" lang="{{ page.lang | default: site.lang | default: 'en' }}">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   {%- seo -%}
   <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-container-lowest": "#ffffff",
+            "surface-bright": "#f9f9fc",
+            "primary-container": "#004b63",
+            "surface-container-highest": "#e2e2e5",
+            "surface-container-low": "#f3f3f6",
+            "inverse-primary": "#96ceeb",
+            "on-tertiary": "#ffffff",
+            "on-surface": "#1a1c1e",
+            "on-primary-container": "#83bad6",
+            "background": "#f9f9fc",
+            "on-background": "#1a1c1e",
+            "surface": "#f9f9fc",
+            "outline-variant": "#c0c7cd",
+            "on-primary": "#ffffff",
+            "tertiary-container": "#3c4b00",
+            "secondary-container": "#8cf3f3",
+            "primary": "#003345",
+            "tertiary-fixed": "#c8f323",
+            "on-tertiary-fixed": "#171e00",
+            "primary-fixed-dim": "#96ceeb",
+            "surface-dim": "#dadadc",
+            "surface-variant": "#e2e2e5",
+            "on-secondary-container": "#007070",
+            "on-surface-variant": "#40484c",
+            "inverse-on-surface": "#f0f0f3",
+            "error": "#ba1a1a",
+            "secondary": "#006a6a",
+            "surface-container": "#eeeef0",
+            "surface-container-high": "#e8e8ea",
+            "outline": "#71787d"
+          },
+          borderRadius: {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          fontFamily: {
+            "headline": ["Space Grotesk", "sans-serif"],
+            "body": ["Inter", "sans-serif"],
+            "label": ["Inter", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
   {%- feed_meta -%}
 </head>
-<body>
-  <header class="site-header">
-    <div class="wrapper">
-      <a class="site-title" rel="author" href="{{ '/' | relative_url }}">Tech With Kev</a>
-      <nav class="site-nav">
-        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
-        <label for="nav-trigger">
-          <span class="menu-icon">
-            <svg viewBox="0 0 18 15" width="18px" height="15px">
-              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
-            </svg>
-          </span>
-        </label>
+<body class="bg-surface text-on-surface font-body selection:bg-[#c8f323] selection:text-[#171e00]">
 
-        <div class="trigger">
-          <a class="page-link" href="{{ '/courses' | relative_url }}">Courses</a>
-          <a class="page-link" href="{{ '/contact' | relative_url }}">Contact</a>
-          <a class="page-link page-link--cta" href="{{ '/pages/book.html' | relative_url }}">Book a session</a>
-        </div>
-      </nav>
+<!-- Nav -->
+<nav class="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md shadow-sm transition-colors duration-300">
+  <div class="flex justify-between items-center max-w-7xl mx-auto px-6 py-4">
+    <a class="text-xl font-black text-[#003345] tracking-tighter font-headline" href="{{ '/' | relative_url }}">Tech With Kev</a>
+    <div class="hidden md:flex items-center gap-8">
+      <a class="{% if page.url contains '/courses' %}text-[#006a6a] font-bold border-b-2 border-[#006a6a] pb-1{% else %}text-slate-600 hover:text-[#003345]{% endif %} transition-all duration-200 font-medium font-headline" href="{{ '/courses' | relative_url }}">Methodology</a>
+      <a class="{% if page.url contains '/assessments' %}text-[#006a6a] font-bold border-b-2 border-[#006a6a] pb-1{% else %}text-slate-600 hover:text-[#003345]{% endif %} transition-all duration-200 font-medium font-headline" href="{{ '/assessments' | relative_url }}">Assessments</a>
+      <a class="{% if page.url contains '/pricing' %}text-[#006a6a] font-bold border-b-2 border-[#006a6a] pb-1{% else %}text-slate-600 hover:text-[#003345]{% endif %} transition-all duration-200 font-medium font-headline" href="{{ '/pricing' | relative_url }}">Pricing</a>
+      <a class="architect-gradient text-white px-6 py-2.5 rounded-lg font-bold transition-all duration-200 active:opacity-80 active:scale-[0.98] hover:brightness-110 font-headline" href="{{ '/pages/book.html' | relative_url }}">Get Started</a>
     </div>
-  </header>
+    <button class="md:hidden text-primary" id="mobile-menu-btn">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+  </div>
+  <!-- Mobile menu -->
+  <div class="hidden md:hidden px-6 pb-4 flex flex-col gap-3" id="mobile-menu">
+    <a class="text-slate-600 hover:text-[#003345] font-medium font-headline py-2" href="{{ '/courses' | relative_url }}">Methodology</a>
+    <a class="text-slate-600 hover:text-[#003345] font-medium font-headline py-2" href="{{ '/assessments' | relative_url }}">Assessments</a>
+    <a class="text-slate-600 hover:text-[#003345] font-medium font-headline py-2" href="{{ '/pricing' | relative_url }}">Pricing</a>
+    <a class="architect-gradient text-white px-6 py-2.5 rounded-lg font-bold text-center font-headline" href="{{ '/pages/book.html' | relative_url }}">Get Started</a>
+  </div>
+</nav>
 
-  <main class="page-content" aria-label="Content">
-    {{ content }}
-  </main>
+<script>
+  document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+    var menu = document.getElementById('mobile-menu');
+    menu.classList.toggle('hidden');
+  });
+</script>
 
-  <footer class="site-footer">
-    <div class="wrapper">
-      <div class="footer-col-wrapper">
-        <div class="footer-col">
-          <p style="margin:0;">&copy; {{ "now" | date: "%Y" }} Tech With Kev. All rights reserved.</p>
-        </div>
-        <div class="footer-col">
-          <ul class="social-media-list">
-            <li><a href="https://youtube.com/@techwithkev">YouTube</a></li>
-            <li><a href="https://twitter.com/techwithkev">Twitter</a></li>
-          </ul>
-        </div>
-      </div>
+<main aria-label="Content">
+  {{ content }}
+</main>
+
+<!-- Footer -->
+<footer class="bg-slate-50 w-full">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-12 max-w-7xl mx-auto px-8 py-16">
+    <div class="md:col-span-1">
+      <p class="text-lg font-bold text-[#003345] mb-4 font-headline">Tech With Kev</p>
+      <p class="text-slate-500 text-sm leading-relaxed">Elevating Singapore students through mathematical precision and Python mastery.</p>
     </div>
-  </footer>
+    <div>
+      <h4 class="font-bold text-primary mb-6 font-headline">Programmes</h4>
+      <ul class="space-y-4">
+        <li><a class="text-slate-500 hover:text-[#006a6a] transition-colors text-sm" href="{{ '/courses' | relative_url }}">Methodology</a></li>
+        <li><a class="text-slate-500 hover:text-[#006a6a] transition-colors text-sm" href="{{ '/assessments' | relative_url }}">Assessments</a></li>
+        <li><a class="text-slate-500 hover:text-[#006a6a] transition-colors text-sm" href="{{ '/pricing' | relative_url }}">Pricing</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="font-bold text-primary mb-6 font-headline">Resources</h4>
+      <ul class="space-y-4">
+        <li><a class="text-slate-500 hover:text-[#006a6a] transition-colors text-sm" href="https://youtube.com/@techwithkev" target="_blank" rel="noopener">YouTube</a></li>
+        <li><a class="text-slate-500 hover:text-[#006a6a] transition-colors text-sm" href="https://twitter.com/techwithkev" target="_blank" rel="noopener">Twitter</a></li>
+        <li><a class="text-slate-500 hover:text-[#006a6a] transition-colors text-sm" href="{{ '/pages/python_functions.html' | relative_url }}">Free Python Assessment</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="font-bold text-primary mb-6 font-headline">Support</h4>
+      <ul class="space-y-4">
+        <li><a class="text-slate-500 hover:text-[#006a6a] transition-colors text-sm" href="{{ '/contact' | relative_url }}">Contact</a></li>
+        <li><a class="text-slate-500 hover:text-[#006a6a] transition-colors text-sm" href="{{ '/pages/book.html' | relative_url }}">Book a Session</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="max-w-7xl mx-auto px-8 py-6 border-t border-outline-variant/20">
+    <p class="text-slate-500 text-sm">&copy; {{ "now" | date: "%Y" }} Tech With Kev. Precision in Math &amp; Python.</p>
+  </div>
+</footer>
+
 </body>
 </html>

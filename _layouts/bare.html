@@ -1,17 +1,51 @@
 <!DOCTYPE html>
-<html lang="{{ page.lang | default: site.lang | default: 'en' }}">
+<html class="light" lang="{{ page.lang | default: site.lang | default: 'en' }}">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   {%- seo -%}
   <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "surface-container-lowest": "#ffffff",
+            "primary-container": "#004b63",
+            "surface-container-low": "#f3f3f6",
+            "on-surface": "#1a1c1e",
+            "on-primary-container": "#83bad6",
+            "surface": "#f9f9fc",
+            "outline-variant": "#c0c7cd",
+            "on-primary": "#ffffff",
+            "primary": "#003345",
+            "tertiary-fixed": "#c8f323",
+            "on-tertiary-fixed": "#171e00",
+            "on-surface-variant": "#40484c",
+            "secondary": "#006a6a",
+            "surface-container-high": "#e8e8ea",
+            "outline": "#71787d"
+          },
+          borderRadius: {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          fontFamily: {
+            "headline": ["Space Grotesk", "sans-serif"],
+            "body": ["Inter", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
 </head>
-<body>
-  <main class="page-content" aria-label="Content">
+<body class="bg-surface text-on-surface font-body">
+  <main aria-label="Content">
     {{ content }}
   </main>
 </body>

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tech With Kev | Math + Python Mastery</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#171e00",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#044d65",
+                        "on-primary-fixed": "#001f2b",
+                        "inverse-surface": "#2f3133",
+                        "on-tertiary-fixed-variant": "#3d4d00",
+                        "surface-bright": "#f9f9fc",
+                        "primary-container": "#004b63",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#2a657e",
+                        "on-tertiary-container": "#9dc000",
+                        "surface-container-highest": "#e2e2e5",
+                        "tertiary": "#283300",
+                        "surface-container-low": "#f3f3f6",
+                        "inverse-primary": "#96ceeb",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#1a1c1e",
+                        "secondary-fixed": "#8cf3f3",
+                        "on-primary-container": "#83bad6",
+                        "background": "#f9f9fc",
+                        "on-background": "#1a1c1e",
+                        "surface": "#f9f9fc",
+                        "outline-variant": "#c0c7cd",
+                        "on-error": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "outline": "#71787d",
+                        "surface-container-high": "#e8e8ea",
+                        "primary-fixed": "#bfe8ff",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#3c4b00",
+                        "secondary-container": "#8cf3f3",
+                        "primary": "#003345",
+                        "tertiary-fixed": "#c8f323",
+                        "on-secondary-fixed-variant": "#004f4f",
+                        "primary-fixed-dim": "#96ceeb",
+                        "surface-dim": "#dadadc",
+                        "tertiary-fixed-dim": "#aed500",
+                        "surface-variant": "#e2e2e5",
+                        "on-secondary-container": "#007070",
+                        "on-secondary-fixed": "#002020",
+                        "on-surface-variant": "#40484c",
+                        "inverse-on-surface": "#f0f0f3",
+                        "error": "#ba1a1a",
+                        "secondary": "#006a6a",
+                        "surface-container": "#eeeef0",
+                        "secondary-fixed-dim": "#6fd7d6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .math-grid-bg {
+            background-image: radial-gradient(circle, #c0c7cd 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.05;
+        }
+        .architect-gradient {
+            background: linear-gradient(135deg, #003345 0%, #004b63 100%);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-tertiary-fixed selection:text-on-tertiary-fixed">
+<!-- TopNavBar -->
+<nav class="sticky top-0 z-50 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm dark:shadow-none border-none transition-colors duration-300">
+<div class="flex justify-between items-center max-w-7xl mx-auto px-6 py-4">
+<a class="text-xl font-black text-[#003345] dark:text-[#004b63] tracking-tighter font-headline" href="#">Tech With Kev</a>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-slate-600 dark:text-slate-400 hover:text-[#003345] transition-all duration-200 font-medium" href="#">Methodology</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-[#003345] transition-all duration-200 font-medium" href="#">Assessments</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-[#003345] transition-all duration-200 font-medium" href="#">Pricing</a>
+<button class="architect-gradient text-white px-6 py-2.5 rounded-lg font-bold transition-all duration-200 active:opacity-80 active:scale-[0.98]">
+                    Get Started
+                </button>
+</div>
+<button class="md:hidden text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</nav>
+<main>
+<!-- Hero Section -->
+<section class="relative min-h-[921px] flex items-center overflow-hidden pt-12">
+<div class="absolute inset-0 math-grid-bg"></div>
+<div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 relative z-10">
+<div class="lg:col-span-7 flex flex-col justify-center">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-secondary-container/30 text-on-secondary-container rounded-full w-fit mb-6">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="text-xs font-bold tracking-widest uppercase font-label">Singapore's Premier Math + Python Lab</span>
+</div>
+<h1 class="font-headline text-5xl md:text-7xl font-bold text-primary leading-[1.1] tracking-tight mb-8">
+                        Math + Python <br/> Mastery for <span class="text-secondary">Singapore</span> Students.
+                    </h1>
+<p class="text-on-surface-variant text-lg md:text-xl max-w-xl mb-10 leading-relaxed">
+                        Moving beyond rote memorization. We teach high-level logic and engineering principles through the lens of PSLE/O-Level Math and modern Python programming.
+                    </p>
+<div class="flex flex-col sm:flex-row gap-4">
+<button class="architect-gradient text-white px-8 py-4 rounded-lg font-bold text-lg shadow-xl shadow-primary/10 transition-all hover:brightness-110 active:scale-[0.98]">
+                            Start Assessment
+                        </button>
+<button class="px-8 py-4 rounded-lg font-bold text-lg text-primary border border-outline-variant/30 hover:bg-surface-container-low transition-all">
+                            View Curriculum
+                        </button>
+</div>
+</div>
+<div class="lg:col-span-5 relative flex items-center justify-center">
+<div class="relative w-full aspect-[4/5] rounded-xl overflow-hidden shadow-2xl">
+<img class="w-full h-full object-cover" data-alt="Professional portrait of Kevin Ng, an Asian male educator in a modern office, friendly expression, high-end studio lighting, tech-focused aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-KJPIA8yJ1jDZcX3Ds3T74AwauADDP0Tmu9OEIuhXNNFEAeabBMlGbcPA7NOfGgULhjah3Ls5Arg1LaINQBciQo70ebfZAkxeZ6dZ0Eixn6oj7o586bYpSIQ-NWYhNNLBhd77ZIQUcLhxnieNbFxHCzWpYcaxp18VSOUrSOBT6lRbgGdbp_5GfgT9eLMfbZLiOPxAVmPHO0meewfYqM74vAbkRZtsJJnqSI1rHn1MLF1L1BI3NHL7HOVsjaa4vVlncwZdEsbXXco"/>
+<div class="absolute bottom-6 left-6 right-6 bg-white/90 backdrop-blur-md p-6 rounded-lg border-l-4 border-tertiary-fixed">
+<p class="text-primary font-bold font-headline text-lg">Kevin Ng</p>
+<p class="text-on-surface-variant text-sm">Founder &amp; Lead Educator</p>
+<p class="text-secondary text-sm font-semibold mt-1 italic">"Logic is the foundation of everything."</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Value Propositions (Bento Style) -->
+<section class="py-32 bg-surface-container-low">
+<div class="max-w-7xl mx-auto px-6">
+<div class="mb-16">
+<span class="text-secondary font-bold font-label tracking-widest uppercase text-sm block mb-4">The Methodology</span>
+<h2 class="font-headline text-4xl md:text-5xl font-bold text-primary">Designed for Precision.</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Prop 1 -->
+<div class="bg-surface-container-lowest p-10 rounded-xl relative overflow-hidden group">
+<div class="absolute top-0 left-0 w-1 h-full bg-tertiary-fixed transition-all group-hover:w-2"></div>
+<div class="mb-6 inline-flex items-center justify-center w-14 h-14 bg-surface-container-high rounded-lg">
+<span class="material-symbols-outlined text-primary text-3xl">psychology</span>
+</div>
+<h3 class="font-headline text-2xl font-bold text-primary mb-4">Individual Attention</h3>
+<p class="text-on-surface-variant leading-relaxed">
+                            No overcrowded classrooms. Each student receives a bespoke learning path tailored to their specific mathematical logic gaps and coding potential.
+                        </p>
+</div>
+<!-- Prop 2 -->
+<div class="bg-surface-container-lowest p-10 rounded-xl relative overflow-hidden group">
+<div class="absolute top-0 left-0 w-1 h-full bg-secondary transition-all group-hover:w-2"></div>
+<div class="mb-6 inline-flex items-center justify-center w-14 h-14 bg-surface-container-high rounded-lg">
+<span class="material-symbols-outlined text-primary text-3xl">terminal</span>
+</div>
+<h3 class="font-headline text-2xl font-bold text-primary mb-4">Real-world Logic</h3>
+<p class="text-on-surface-variant leading-relaxed">
+                            We bridge the gap between textbook Math and real Python syntax. Students build algorithms that solve the very problems they see in exams.
+                        </p>
+</div>
+<!-- Prop 3 -->
+<div class="bg-surface-container-lowest p-10 rounded-xl relative overflow-hidden group">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary transition-all group-hover:w-2"></div>
+<div class="mb-6 inline-flex items-center justify-center w-14 h-14 bg-surface-container-high rounded-lg">
+<span class="material-symbols-outlined text-primary text-3xl">verified</span>
+</div>
+<h3 class="font-headline text-2xl font-bold text-primary mb-4">Exam Results Driven</h3>
+<p class="text-on-surface-variant leading-relaxed">
+                            While we focus on logic, we never lose sight of the grade. Our students consistently outperform peers in MOE national examinations.
+                        </p>
+</div>
+</div>
+</div>
+</section>
+<!-- Python Code / Tech Section -->
+<section class="py-32 bg-white">
+<div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+<div class="order-2 lg:order-1">
+<div class="bg-primary p-8 rounded-xl shadow-2xl font-mono text-sm leading-relaxed relative overflow-hidden">
+<div class="flex gap-2 mb-6 border-b border-white/10 pb-4">
+<div class="w-3 h-3 rounded-full bg-red-400"></div>
+<div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+<div class="w-3 h-3 rounded-full bg-green-400"></div>
+</div>
+<p class="text-[#83bad6] mb-2"><span class="text-tertiary-fixed">class</span> StudentMastery:</p>
+<p class="pl-4 text-[#83bad6] mb-2">def __init__(self, name, current_math):</p>
+<p class="pl-8 text-white">self.name = name</p>
+<p class="pl-8 text-white">self.logic_score = current_math</p>
+<p class="pl-4 text-[#83bad6] mb-2 mt-4">def apply_tech_with_kev(self):</p>
+<p class="pl-8 text-white">self.critical_thinking = True</p>
+<p class="pl-8 text-white">self.logic_score += 40</p>
+<p class="pl-8 text-tertiary-fixed">return "A+ Result Achieved"</p>
+<div class="mt-8 p-4 bg-[#004b63] rounded border-l-4 border-tertiary-fixed italic text-white/80">
+                            # Students don't just learn to code, they learn to think like engineers.
+                        </div>
+</div>
+</div>
+<div class="order-1 lg:order-2">
+<h2 class="font-headline text-4xl md:text-5xl font-bold text-primary mb-8 tracking-tight">The Modern Engineer's Approach to Learning.</h2>
+<p class="text-on-surface-variant text-lg mb-8 leading-relaxed">
+                        Our course tracks are specifically designed for the Singapore syllabus, injecting Python programming as a way to visualize complex mathematical concepts.
+                    </p>
+<ul class="space-y-6">
+<li class="flex items-start gap-4">
+<span class="material-symbols-outlined text-secondary mt-1">check_circle</span>
+<div>
+<h4 class="font-bold text-primary">Foundational Logic (Primary 5-6)</h4>
+<p class="text-on-surface-variant text-sm">Visualizing ratios and geometry through block-based Python logic.</p>
+</div>
+</li>
+<li class="flex items-start gap-4">
+<span class="material-symbols-outlined text-secondary mt-1">check_circle</span>
+<div>
+<h4 class="font-bold text-primary">Advanced Algorithms (Secondary 1-4)</h4>
+<p class="text-on-surface-variant text-sm">Translating Algebra and Calculus into efficient computational scripts.</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</section>
+<!-- Testimonials -->
+<section class="py-32 bg-surface-container-low">
+<div class="max-w-7xl mx-auto px-6 text-center mb-16">
+<h2 class="font-headline text-4xl font-bold text-primary mb-4">Trusted by Singapore Families</h2>
+<p class="text-on-surface-variant">Real outcomes from our dedicated learning lab.</p>
+</div>
+<div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="bg-surface p-8 rounded-xl shadow-sm">
+<div class="flex text-tertiary-fixed mb-4">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="text-on-surface-variant italic mb-6 leading-relaxed">"Kevin's approach is unique. My son finally understood Algebra when he saw it as a reusable Python function. His grades jumped from C to A* in 6 months."</p>
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-white font-bold">LW</div>
+<div>
+<p class="text-sm font-bold text-primary">Mrs. Lim Wei</p>
+<p class="text-xs text-on-surface-variant">Parent of P6 Student</p>
+</div>
+</div>
+</div>
+<div class="bg-surface p-8 rounded-xl shadow-sm">
+<div class="flex text-tertiary-fixed mb-4">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="text-on-surface-variant italic mb-6 leading-relaxed">"I used to struggle with math problems. Now I treat them like bugs in a code. It makes the 'O' Level preparation so much less intimidating."</p>
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-white font-bold">ST</div>
+<div>
+<p class="text-sm font-bold text-primary">Shaun T.</p>
+<p class="text-xs text-on-surface-variant">Sec 4 Student</p>
+</div>
+</div>
+</div>
+<div class="bg-surface p-8 rounded-xl shadow-sm">
+<div class="flex text-tertiary-fixed mb-4">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<p class="text-on-surface-variant italic mb-6 leading-relaxed">"The real-world logic focus is what Singapore needs. My daughter is now excited about Math homework because she gets to test her logic in Python scripts."</p>
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-white font-bold">AK</div>
+<div>
+<p class="text-sm font-bold text-primary">Anand K.</p>
+<p class="text-xs text-on-surface-variant">Parent of Sec 2 Student</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="py-24 bg-primary relative overflow-hidden">
+<div class="absolute inset-0 opacity-10">
+<div class="math-grid-bg w-full h-full"></div>
+</div>
+<div class="max-w-4xl mx-auto px-6 text-center relative z-10">
+<h2 class="font-headline text-4xl md:text-5xl font-bold text-white mb-6">Ready to upgrade your logic?</h2>
+<p class="text-primary-fixed-dim text-lg mb-10">Book a complimentary 30-minute diagnostic assessment to see where your student stands in Math &amp; Python logic.</p>
+<div class="flex flex-col sm:flex-row gap-4 justify-center">
+<button class="bg-tertiary-fixed text-on-tertiary-fixed px-10 py-5 rounded-lg font-bold text-xl hover:brightness-105 transition-all">
+                        Start Assessment
+                    </button>
+<button class="bg-transparent text-white border border-white/20 px-10 py-5 rounded-lg font-bold text-xl hover:bg-white/5 transition-all">
+                        Contact Kev
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-slate-50 dark:bg-[#001f2b] w-full rounded-none">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 max-w-7xl mx-auto px-8 py-16">
+<div class="md:col-span-1">
+<p class="text-lg font-bold text-[#003345] dark:text-[#f9f9fc] mb-6">Tech With Kev</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
+                    Elevating the next generation of Singaporean engineers through mathematical precision and technical mastery.
+                </p>
+</div>
+<div>
+<h4 class="font-bold text-primary dark:text-white mb-6">Curriculum</h4>
+<ul class="space-y-4">
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors text-sm" href="#">Primary Tracks</a></li>
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors text-sm" href="#">Secondary Tracks</a></li>
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors text-sm" href="#">Python Mastery</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-primary dark:text-white mb-6">Resources</h4>
+<ul class="space-y-4">
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors text-sm" href="#">Newsletter</a></li>
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors text-sm" href="#">LinkedIn</a></li>
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors text-sm" href="#">Instagram</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-primary dark:text-white mb-6">Support</h4>
+<ul class="space-y-4">
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors text-sm" href="#">Contact</a></li>
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors text-sm" href="#">Privacy Policy</a></li>
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors text-sm" href="#">FAQ</a></li>
+</ul>
+</div>
+</div>
+<div class="max-w-7xl mx-auto px-8 py-8 border-t border-outline-variant/10">
+<p class="text-slate-500 dark:text-slate-400 text-sm">© 2024 Tech With Kev. Precision in Math &amp; Python.</p>
+</div>
+</footer>
+</body></html>

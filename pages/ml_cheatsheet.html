@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pandas & Scikit-Learn Cheatsheet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        pre {
+            background-color: #fdfdfd;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: #334155;
+            margin-top: 0.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.02);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans leading-relaxed p-6 md:p-12 max-w-4xl mx-auto">
+
+    <header class="mb-10">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 border-b-2 border-gray-300 pb-4">
+            Python Data Science Cheatsheet for Students
+        </h1>
+    </header>
+
+    <main>
+        <!-- Pandas Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-blue-700 mb-6 border-b border-blue-200 pb-2">
+                Pandas: Data Manipulation & Analysis
+            </h2>
+
+            <article>
+                <h3 class="text-lg font-semibold text-gray-900 mt-6 mb-2">1. Importing & Exporting Data</h3>
+                <pre><code>import pandas as pd
+
+# Load data
+df = pd.read_csv('file.csv')         # Read from CSV
+df = pd.read_excel('file.xlsx')      # Read from Excel
+df = pd.read_json('file.json')       # Read from JSON
+
+# Save data
+df.to_csv('output.csv', index=False) # Save to CSV (without index column)</code></pre>
+            </article>
+
+            <article>
+                <h3 class="text-lg font-semibold text-gray-900 mt-6 mb-2">2. Viewing & Inspecting Data</h3>
+                <pre><code>df.head(5)               # First 5 rows
+df.tail(5)               # Last 5 rows
+df.info()                # Data types, non-null counts, memory usage
+df.describe()            # Summary statistics for numerical columns
+df.shape                 # Tuple of (rows, columns)
+df.columns               # List of column names
+df['column_name'].value_counts() # Count of unique values in a column</code></pre>
+            </article>
+
+            <article>
+                <h3 class="text-lg font-semibold text-gray-900 mt-6 mb-2">3. Selecting & Filtering</h3>
+                <pre><code># Selecting columns
+df['col1']               # Returns a Series (1 column)
+df[['col1', 'col2']]     # Returns a DataFrame (multiple columns)
+
+# Filtering rows (Boolean Indexing)
+df[df['age'] > 25]                 # Rows where age > 25
+df[(df['age'] > 25) & (df['gender'] == 'M')] # Multiple conditions (AND)
+df[(df['age'] < 20) | (df['age'] > 60)]      # Multiple conditions (OR)
+df[df['name'].isin(['Alice', 'Bob'])]        # Match against a list
+
+# Selecting by index/position
+df.iloc[0:5]             # First 5 rows by index position
+df.loc[0:5, ['col1']]    # Rows by index label, specific columns</code></pre>
+            </article>
+
+            <article>
+                <h3 class="text-lg font-semibold text-gray-900 mt-6 mb-2">4. Data Cleaning</h3>
+                <pre><code># Handling missing values
+df.isna().sum()          # Count missing values per column
+df.dropna()              # Drop rows with any missing values
+df.fillna(0)             # Replace missing values with 0
+df['age'].fillna(df['age'].mean(), inplace=True) # Fill with mean
+
+# Renaming and dropping
+df.rename(columns={'old_name': 'new_name'}, inplace=True)
+df.drop('col_name', axis=1)        # Drop a column (axis=1)
+df.drop([0, 1, 2], axis=0)         # Drop rows by index (axis=0)
+
+# Removing duplicates
+df.drop_duplicates(inplace=True)</code></pre>
+            </article>
+
+            <article>
+                <h3 class="text-lg font-semibold text-gray-900 mt-6 mb-2">5. Grouping & Aggregation</h3>
+                <pre><code># Group by a column and calculate mean
+df.groupby('category')['price'].mean()
+
+# Multiple aggregations at once
+df.groupby('category').agg({'price': ['mean', 'min', 'max'], 'sales': 'sum'})</code></pre>
+            </article>
+        </section>
+
+        <!-- Scikit-Learn Section -->
+        <section>
+            <h2 class="text-2xl font-bold text-teal-700 mt-12 mb-6 border-b border-teal-200 pb-2">
+                Scikit-Learn (sklearn): Machine Learning
+            </h2>
+
+            <article>
+                <h3 class="text-lg font-semibold text-gray-900 mt-6 mb-2">1. Essential Imports</h3>
+                <pre><code>from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, OneHotEncoder
+from sklearn.metrics import accuracy_score, mean_squared_error, classification_report</code></pre>
+            </article>
+
+            <article>
+                <h3 class="text-lg font-semibold text-gray-900 mt-6 mb-2">2. Data Preprocessing</h3>
+                <pre><code># Split data into training and testing sets
+X = df.drop('target_variable', axis=1) # Features
+y = df['target_variable']              # Target
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42 # 80% train, 20% test
+)
+
+# Feature Scaling (Fit on train, transform on both!)
+scaler = StandardScaler() # (mean=0, variance=1)
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Encoding Categorical Variables
+encoder = OneHotEncoder(drop='first', sparse_output=False)
+encoded_cols = encoder.fit_transform(df[['categorical_col']])</code></pre>
+            </article>
+
+            <article>
+                <h3 class="text-lg font-semibold text-gray-900 mt-6 mb-2">3. The ML Workflow (Fit-Predict Pattern)</h3>
+                <p class="text-gray-700 mb-3 text-sm">All Scikit-Learn models follow the same basic 3-step API:</p>
+                <pre><code># 1. Instantiate the model
+model = LinearRegression() 
+
+# 2. Fit the model on training data
+model.fit(X_train_scaled, y_train)
+
+# 3. Predict on new/test data
+predictions = model.predict(X_test_scaled)</code></pre>
+            </article>
+
+            <article>
+                <h3 class="text-lg font-semibold text-gray-900 mt-6 mb-2">4. Common Algorithms</h3>
+                <pre><code># --- Regression ---
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+
+reg_model = RandomForestRegressor(n_estimators=100, random_state=42)
+
+# --- Classification ---
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+
+clf_model = LogisticRegression(max_iter=1000)</code></pre>
+            </article>
+
+            <article>
+                <h3 class="text-lg font-semibold text-gray-900 mt-6 mb-2">5. Model Evaluation</h3>
+                <pre><code># Classification Metrics
+print(accuracy_score(y_test, predictions))
+print(classification_report(y_test, predictions)) # Precision, recall, f1-score
+
+# Regression Metrics
+from sklearn.metrics import r2_score
+print("MSE:", mean_squared_error(y_test, predictions))
+print("R2:", r2_score(y_test, predictions))</code></pre>
+            </article>
+
+            <article>
+                <h3 class="text-lg font-semibold text-gray-900 mt-6 mb-2">6. Cross-Validation (Advanced but crucial!)
+                </h3>
+                <pre><code>from sklearn.model_selection import cross_val_score
+
+# Performs 5-fold cross-validation and returns accuracy for each fold
+scores = cross_val_score(clf_model, X, y, cv=5, scoring='accuracy')
+print(f"Average Accuracy: {scores.mean():.2f}")</code></pre>
+            </article>
+        </section>
+    </main>
+
+</body>
+
+</html>
