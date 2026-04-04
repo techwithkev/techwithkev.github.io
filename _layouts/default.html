@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   {%- feed_meta -%}
 </head>
 <body>
@@ -26,26 +26,23 @@
         </label>
 
         <div class="trigger">
-          <a class="page-link" href="{{ '/' | relative_url }}">Home</a>
           <a class="page-link" href="{{ '/courses' | relative_url }}">Courses</a>
-          <a class="page-link" href="{{ '/#apps' | relative_url }}">Apps</a>
           <a class="page-link" href="{{ '/contact' | relative_url }}">Contact</a>
+          <a class="page-link page-link--cta" href="{{ '/pages/book.html' | relative_url }}">Book a session</a>
         </div>
       </nav>
     </div>
   </header>
 
   <main class="page-content" aria-label="Content">
-    <div class="wrapper">
-      {{ content }}
-    </div>
+    {{ content }}
   </main>
 
   <footer class="site-footer">
     <div class="wrapper">
       <div class="footer-col-wrapper">
         <div class="footer-col">
-          <p>&copy; {{ "now" | date: "%Y" }} Tech With Kev. All rights reserved.</p>
+          <p style="margin:0;">&copy; {{ "now" | date: "%Y" }} Tech With Kev. All rights reserved.</p>
         </div>
         <div class="footer-col">
           <ul class="social-media-list">

@@ -5,114 +5,135 @@ title: Book a Session — Tech With Kev
 
 <style>
   body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: #f9f9f9;
-    margin: 0;
-    padding: 0;
-    color: #1a1a1a;
+    background: var(--chalk, #F5F0E8);
   }
 
   .book-wrapper {
-    max-width: 700px;
+    max-width: 560px;
     margin: 0 auto;
-    padding: 60px 20px 80px;
+    padding: 48px 24px 80px;
   }
 
   .back-link {
-    display: inline-block;
+    font-family: 'Instrument Sans', sans-serif;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     font-size: 0.875rem;
-    color: #666;
+    font-weight: 500;
+    color: var(--muted, #7A7060);
     text-decoration: none;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
+    transition: color 150ms ease-out;
   }
-  .back-link:hover { color: #0070f3; }
+  .back-link:hover { color: var(--ember, #E05C20); }
 
   .book-header {
-    text-align: center;
     margin-bottom: 2.5rem;
   }
+  .book-header .book-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ember, #E05C20);
+    display: block;
+    margin-bottom: 16px;
+  }
   .book-header h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    margin: 0 0 0.5rem;
-    letter-spacing: -0.5px;
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--slate, #1A1A2E);
+    margin: 0 0 10px;
+    line-height: 1.1;
   }
   .book-header p {
-    color: #555;
+    font-family: 'Instrument Sans', sans-serif;
+    color: var(--muted, #7A7060);
     font-size: 1rem;
     margin: 0;
+    line-height: 1.6;
   }
 
-  /* Calendly inline widget */
+  /* Calendly widget */
   .calendly-wrapper {
     background: #fff;
-    border: 1px solid #eaeaea;
-    border-radius: 12px;
+    border: 1.5px solid var(--grid, #C4BAA8);
+    border-radius: 10px;
     overflow: hidden;
     margin-bottom: 2rem;
     min-height: 660px;
   }
 
   .divider {
-    text-align: center;
-    color: #999;
-    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted, #7A7060);
     margin: 1.5rem 0;
-    position: relative;
   }
   .divider::before,
   .divider::after {
     content: '';
-    position: absolute;
-    top: 50%;
-    width: calc(50% - 2rem);
+    flex: 1;
     height: 1px;
-    background: #eaeaea;
+    background: var(--grid, #C4BAA8);
   }
-  .divider::before { left: 0; }
-  .divider::after { right: 0; }
 
   .payment-card {
-    background: #fff;
-    border: 1px solid #eaeaea;
-    border-radius: 12px;
-    padding: 2rem;
-    text-align: center;
+    background: var(--surface, #EDE8DF);
+    border: 1.5px solid var(--grid, #C4BAA8);
+    border-radius: 8px;
+    padding: 28px;
   }
   .payment-card h2 {
-    font-size: 1.1rem;
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.125rem;
     font-weight: 700;
-    margin: 0 0 0.5rem;
+    color: var(--slate, #1A1A2E);
+    margin: 0 0 8px;
+    letter-spacing: -0.02em;
   }
   .payment-card p {
-    color: #555;
-    font-size: 0.9rem;
-    margin: 0 0 1.25rem;
+    font-family: 'Instrument Sans', sans-serif;
+    color: var(--muted, #7A7060);
+    font-size: 0.9375rem;
+    margin: 0 0 20px;
+    line-height: 1.55;
   }
   .pay-btn {
     display: inline-block;
-    padding: 0.75rem 2rem;
-    background: #0070f3;
+    padding: 11px 22px;
+    background: var(--ember, #E05C20);
     color: #fff;
-    border-radius: 8px;
+    border-radius: 6px;
+    font-family: 'Instrument Sans', sans-serif;
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 0.9375rem;
     text-decoration: none;
-    transition: background 0.2s;
+    transition: background 150ms ease-out;
   }
-  .pay-btn:hover { background: #005bb5; text-decoration: none; }
+  .pay-btn:hover { background: #c94e18; text-decoration: none; }
 
   .footer-note {
-    text-align: center;
     margin-top: 2rem;
-    font-size: 0.8rem;
-    color: #999;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 0.875rem;
+    color: var(--muted, #7A7060);
   }
-  .footer-note a { color: #0070f3; }
+  .footer-note a {
+    color: var(--cobalt, #2A52CC);
+  }
 
   @media screen and (max-width: 600px) {
-    .book-header h1 { font-size: 1.5rem; }
-    .book-wrapper { padding: 40px 16px 60px; }
+    .book-wrapper { padding: 32px 20px 60px; }
   }
 </style>
 
@@ -120,7 +141,8 @@ title: Book a Session — Tech With Kev
   <a href="/" class="back-link">← Tech With Kev</a>
 
   <div class="book-header">
-    <h1>Book a 1-on-1 Session</h1>
+    <span class="book-label">1-on-1 session</span>
+    <h1>Book a session</h1>
     <p>Pick a time that works for you. Sessions are 60 minutes via video call.</p>
   </div>
 
@@ -133,8 +155,8 @@ title: Book a Session — Tech With Kev
          style="min-width:320px;height:660px;"></div>
     <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
     <noscript>
-      <p style="text-align:center;padding:2rem;color:#666;">
-        To book, visit <a href="YOUR_CALENDLY_URL">your Calendly page</a> directly.
+      <p style="text-align:center;padding:2rem;color:#7A7060;">
+        To book, visit <a href="YOUR_CALENDLY_URL" style="color:#2A52CC;">your Calendly page</a> directly.
       </p>
     </noscript>
   </div>
@@ -146,9 +168,7 @@ title: Book a Session — Tech With Kev
   <div class="payment-card">
     <h2>Pay before your session</h2>
     <p>Secure checkout via Stripe. Once payment is confirmed, book your slot above.</p>
-    <a href="YOUR_STRIPE_PAYMENT_LINK" class="pay-btn" target="_blank" rel="noopener">
-      Pay now →
-    </a>
+    <a href="YOUR_STRIPE_PAYMENT_LINK" class="pay-btn" target="_blank" rel="noopener">Pay now →</a>
   </div>
 
   <p class="footer-note">
