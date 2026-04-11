@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Class 8 Exam - Cheatsheet</title>
+  <style>
+    /* ── Print settings ── */
+    @page {
+      size: A4;
+      margin: 10mm 10mm 10mm 10mm;
+    }
+
+    @media print {
+      body {
+        margin: 0;
+      }
+
+      .no-print {
+        display: none;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 9.5px;
+      color: #111;
+      background: #fff;
+      width: 190mm;
+      margin: 0 auto;
+      padding: 6px 0;
+    }
+
+    /* ── Top header bar ── */
+    .top-bar {
+      background: #1B2A4A;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 10px;
+      margin-bottom: 6px;
+    }
+
+    .top-bar .title {
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: .02em;
+    }
+
+    .top-bar .subtitle {
+      font-size: 9px;
+      color: #C7E9F3;
+    }
+
+    .top-bar .meta {
+      font-size: 9px;
+      color: #aaa;
+      text-align: right;
+    }
+
+    /* ── Two-column layout ── */
+    .columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .col {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    /* ── Section blocks ── */
+    .block {
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .block-header {
+      padding: 3px 7px;
+      font-size: 9px;
+      font-weight: bold;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .block-header .class-tag {
+      font-size: 8px;
+      font-weight: normal;
+      opacity: .85;
+    }
+
+    .bh-navy {
+      background: #1B2A4A;
+    }
+
+    .bh-teal {
+      background: #0D6E8A;
+    }
+
+    .bh-mint {
+      background: #027D78;
+    }
+
+    .bh-gold {
+      background: #8B5A00;
+    }
+
+    .bh-red {
+      background: #8B1A1A;
+    }
+
+    .bh-gray {
+      background: #3D5166;
+    }
+
+    .block-body {
+      padding: 5px 7px;
+      line-height: 1.55;
+    }
+
+    /* ── Formula rows ── */
+    .formula-row {
+      display: flex;
+      gap: 4px;
+      align-items: baseline;
+      padding: 2px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .formula-row:last-child {
+      border-bottom: none;
+    }
+
+    .f-label {
+      font-weight: bold;
+      color: #1B2A4A;
+      min-width: 90px;
+      font-size: 9px;
+      flex-shrink: 0;
+    }
+
+    .f-val {
+      font-family: 'Courier New', monospace;
+      font-size: 9px;
+      color: #111;
+      word-break: break-all;
+    }
+
+    .f-note {
+      color: #555;
+      font-size: 8.5px;
+      margin-left: auto;
+      padding-left: 4px;
+      flex-shrink: 0;
+      text-align: right;
+    }
+
+    /* ── Code blocks ── */
+    pre {
+      font-family: 'Courier New', monospace;
+      font-size: 8.5px;
+      background: #1E2D3D;
+      color: #E2E8F0;
+      padding: 5px 7px;
+      border-radius: 2px;
+      margin-top: 4px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .kw {
+      color: #C084FC;
+    }
+
+    .fn {
+      color: #6EE7B7;
+    }
+
+    .cm {
+      color: #64748B;
+    }
+
+    .st {
+      color: #F8C555;
+    }
+
+    .num {
+      color: #F8C555;
+    }
+
+    .bl {
+      color: #F8C555;
+      font-weight: bold;
+    }
+
+    /* blank highlight */
+
+    /* ── Table ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8.5px;
+      margin-top: 3px;
+    }
+
+    th {
+      background: #E8EEF5;
+      color: #1B2A4A;
+      padding: 2px 5px;
+      text-align: left;
+      font-size: 8px;
+      border: 1px solid #ccc;
+    }
+
+    td {
+      padding: 2px 5px;
+      border: 1px solid #ddd;
+      vertical-align: top;
+      color: #111;
+    }
+
+    tr:nth-child(even) td {
+      background: #F7FAFC;
+    }
+
+    /* ── Inline items ── */
+    .kv-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px 8px;
+      margin-top: 2px;
+    }
+
+    .kv {
+      font-size: 8.5px;
+      padding: 1px 0;
+    }
+
+    .kv b {
+      color: #0D6E8A;
+    }
+
+    p {
+      font-size: 9px;
+      line-height: 1.5;
+      margin-top: 3px;
+    }
+
+    .tip {
+      background: #FFF8E1;
+      border-left: 3px solid #C87A00;
+      padding: 3px 6px;
+      font-size: 8.5px;
+      color: #5a3800;
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    .tip b {
+      color: #8B5A00;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #E8EEF5;
+      color: #1B2A4A;
+      border-radius: 2px;
+      padding: 0 4px;
+      font-size: 8px;
+      font-weight: bold;
+      margin-right: 2px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #e0e0e0;
+      margin: 4px 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── TOP BAR ─────────────────────────────────────────────────────────── -->
+  <div class="top-bar">
+    <div>
+      <div class="title">Class 8 Midterm - Cheatsheet</div>
+    </div>
+  </div>
+
+  <!-- ── TWO COLUMNS ────────────────────────────────────────────────────── -->
+  <div class="columns">
+
+    <!-- ═══════════════════════ LEFT COLUMN ════════════════════════════════ -->
+    <div class="col">
+
+      <!-- AI TYPES -->
+      <div class="block">
+        <div class="block-header bh-navy">AI Types &amp; Core Concepts <span class="class-tag">Class 1</span></div>
+        <div class="block-body">
+          <div class="kv-grid">
+            <div class="kv"><b>ANI</b> Narrow AI - one task only (e.g. spam filter)</div>
+            <div class="kv"><b>AGI</b> General AI - any human-level task</div>
+            <div class="kv"><b>ASI</b> Super AI - surpasses all human intelligence</div>
+            <div class="kv"><b>ML</b> Learns patterns from data (features)</div>
+            <div class="kv"><b>Deep Learning</b> ML with multi-layer neural networks</div>
+            <div class="kv"><b>CV / NLP</b> Computer Vision / Natural Language Processing</div>
+          </div>
+          <hr class="divider">
+          <div class="formula-row">
+            <span class="f-label">NumPy array shape</span>
+            <span class="f-val">arr.shape → (rows, cols)</span>
+          </div>
+          <div class="formula-row">
+            <span class="f-label">Matrix multiply</span>
+            <span class="f-val">np.dot(A, B) or A @ B</span>
+          </div>
+          <div class="formula-row">
+            <span class="f-label">Transpose</span>
+            <span class="f-val">A.T or A.transpose()</span>
+          </div>
+          <div class="formula-row">
+            <span class="f-label">Slice rows/cols</span>
+            <span class="f-val">C[:2, :2] → first 2 rows, first 2 cols</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BIAS & ETHICS -->
+      <div class="block">
+        <div class="block-header bh-navy">Bias, Ethics &amp; Fairness <span class="class-tag">Class 2</span></div>
+        <div class="block-body">
+          <div class="kv-grid">
+            <div class="kv"><b>Data bias</b> Skewed training data → skewed predictions</div>
+            <div class="kv"><b>Design bias</b> Wrong choice of labels or features</div>
+            <div class="kv"><b>FAT</b> Fairness · Accountability · Transparency</div>
+            <div class="kv"><b>Variance</b> How spread out data is around the mean</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DATA PREPROCESSING -->
+      <div class="block">
+        <div class="block-header bh-teal">Data Preprocessing <span class="class-tag">Class 3</span></div>
+        <div class="block-body">
+          <div class="formula-row">
+            <span class="f-label">Min-Max scaling</span>
+            <span class="f-val">x' = (x − min) / (max − min)</span>
+            <span class="f-note">range → [0, 1]</span>
+          </div>
+          <div class="formula-row">
+            <span class="f-label">Standard (Z-score)</span>
+            <span class="f-val">z = (x − μ) / σ</span>
+            <span class="f-note">mean=0, std=1</span>
+          </div>
+          <div class="formula-row">
+            <span class="f-label">One-Hot Encoding</span>
+            <span class="f-val">1 binary column per category value</span>
+            <span class="f-note">drop='first' removes 1 col</span>
+          </div>
+          <div class="tip"><b>Why scale before gradient descent?</b> Features with large ranges produce large gradients
+            → training is unstable. StandardScaler centres all features at 0.</div>
+          <pre><span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> MinMaxScaler, StandardScaler
+scaler = StandardScaler()
+X_train_sc = scaler.<span class="fn">fit_transform</span>(X_train)  <span class="cm"># fit + transform on train</span>
+X_test_sc  = scaler.<span class="fn">transform</span>(X_test)       <span class="cm"># transform only on test!</span></pre>
+          <hr class="divider">
+          <div class="formula-row">
+            <span class="f-label">fillna</span>
+            <span class="f-val">df['col'].fillna(0) or .fillna(df['col'].mean())</span>
+          </div>
+          <div class="formula-row">
+            <span class="f-label">loc / iloc</span>
+            <span class="f-val">df.loc[condition, cols] · df.iloc[row_idx, col_idx]</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- VALIDATION -->
+      <div class="block">
+        <div class="block-header bh-teal">Model Validation &amp; Cross-Validation <span class="class-tag">Class 4</span>
+        </div>
+        <div class="block-body">
+          <div class="kv-grid">
+            <div class="kv"><b>Train set</b> Fit model weights</div>
+            <div class="kv"><b>Val set</b> Tune hyperparameters</div>
+            <div class="kv"><b>Test set</b> Final honest evaluation - never touch early</div>
+            <div class="kv"><b>K-Fold</b> Split into k folds; train on k-1, test on 1, repeat k times, average</div>
+            <div class="kv"><b>Overfitting</b> Low train error, HIGH test error - memorised training data</div>
+            <div class="kv"><b>Underfitting</b> HIGH train error, high test error - model too simple</div>
+            <div class="kv"><b>Hyperparameter</b> Set before training (e.g. k, C, depth)</div>
+            <div class="kv"><b>Parameter</b> Learned during training (e.g. w, b)</div>
+          </div>
+          <pre>X_train, X_test, y_train, y_test = <span class="fn">train_test_split</span>(
+    X, y, test_size=<span class="num">0.2</span>, random_state=<span class="num">42</span>, stratify=y)</pre>
+          <div class="tip"><b>stratify=y</b> keeps the same class balance (e.g. 80/20) in both splits.</div>
+        </div>
+      </div>
+
+      <!-- LINEAR REGRESSION -->
+      <div class="block">
+        <div class="block-header bh-mint">Linear Regression <span class="class-tag">Class 5</span></div>
+        <div class="block-body">
+          <div class="formula-row">
+            <span class="f-label">Hypothesis</span>
+            <span class="f-val">f(x) = wx + b</span>
+            <span class="f-note">w=slope, b=intercept</span>
+          </div>
+          <div class="formula-row">
+            <span class="f-label">MSE cost</span>
+            <span class="f-val">J = (1/2m) × Σ(f(xᵢ) − yᵢ)²</span>
+            <span class="f-note">m = # examples</span>
+          </div>
+          <div class="formula-row">
+            <span class="f-label">Gradient descent</span>
+            <span class="f-val">w := w − α × (∂J/∂w)</span>
+            <span class="f-note">α = learning rate</span>
+          </div>
+          <div class="formula-row">
+            <span class="f-label">R² score</span>
+            <span class="f-val">1 − (SS_res / SS_tot)</span>
+            <span class="f-note">1.0 = perfect fit</span>
+          </div>
+          <pre>model = <span class="fn">LinearRegression</span>()
+model.<span class="fn">fit</span>(X_train, y_train)
+y_pred = model.<span class="fn">predict</span>(X_test)
+r2 = <span class="fn">r2_score</span>(y_test, y_pred)       <span class="cm"># e.g. 0.976</span>
+model.coef_[<span class="num">0</span>]  <span class="cm"># learned weight w</span>
+model.intercept_  <span class="cm"># learned bias b</span></pre>
+          <div class="tip"><b>Regularisation C (Logistic) / λ (Ridge):</b> Smaller C = stronger penalty = simpler model
+            → may underfit. Larger C = weaker penalty → may overfit.</div>
+        </div>
+      </div>
+
+    </div><!-- end left col -->
+
+    <!-- ═══════════════════════ RIGHT COLUMN ═══════════════════════════════ -->
+    <div class="col">
+
+      <!-- LOGISTIC REGRESSION & METRICS -->
+      <div class="block">
+        <div class="block-header bh-mint">Logistic Regression &amp; Classification Metrics <span class="class-tag">Class
+            6</span></div>
+        <div class="block-body">
+          <div class="formula-row">
+            <span class="f-label">Sigmoid</span>
+            <span class="f-val">σ(z) = 1 / (1 + e⁻ᶻ)</span>
+            <span class="f-note">output ∈ (0, 1)</span>
+          </div>
+          <div class="formula-row">
+            <span class="f-label">σ(0)</span>
+            <span class="f-val">= 0.5</span>
+            <span class="f-note">σ(+large) ≈ 1 · σ(−large) ≈ 0</span>
+          </div>
+          <div class="formula-row">
+            <span class="f-label">Predict</span>
+            <span class="f-val">ŷ = 1 if σ(z) ≥ 0.5, else 0</span>
+            <span class="f-note">threshold = 0.5 default</span>
+          </div>
+          <hr class="divider">
+          <table>
+            <tr>
+              <th>Metric</th>
+              <th>Formula</th>
+              <th>Meaning</th>
+            </tr>
+            <tr>
+              <td><b>Accuracy</b></td>
+              <td>(TP+TN) / total</td>
+              <td>Overall correct rate</td>
+            </tr>
+            <tr>
+              <td><b>Precision</b></td>
+              <td>TP / (TP+FP)</td>
+              <td>Of predicted +, how many truly +?</td>
+            </tr>
+            <tr>
+              <td><b>Recall</b></td>
+              <td>TP / (TP+FN)</td>
+              <td>Of true +, how many did we catch?</td>
+            </tr>
+            <tr>
+              <td><b>F1</b></td>
+              <td>2·P·R / (P+R)</td>
+              <td>Harmonic mean of precision &amp; recall</td>
+            </tr>
+          </table>
+          <hr class="divider">
+          <table>
+            <tr>
+              <th colspan="3" style="text-align:center">Confusion Matrix</th>
+            </tr>
+            <tr>
+              <th></th>
+              <th>Pred Positive</th>
+              <th>Pred Negative</th>
+            </tr>
+            <tr>
+              <td><b>True Positive</b></td>
+              <td>TP ✓</td>
+              <td>FN ✗ (missed)</td>
+            </tr>
+            <tr>
+              <td><b>True Negative</b></td>
+              <td>FP ✗ (false alarm)</td>
+              <td>TN ✓</td>
+            </tr>
+          </table>
+          <hr class="divider">
+          <pre><span class="kw">from</span> sklearn.metrics <span class="kw">import</span> accuracy_score, confusion_matrix
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> precision_score, recall_score, f1_score
+
+y_pred = model.<span class="fn">predict</span>(X_val)
+acc  = <span class="fn">accuracy_score</span>(y_val, y_pred)
+f1   = <span class="fn">f1_score</span>(y_val, y_pred, pos_label=<span class="num">0</span>, zero_division=<span class="num">0</span>)
+prec = <span class="fn">precision_score</span>(y_val, y_pred, pos_label=<span class="num">0</span>, zero_division=<span class="num">0</span>)
+rec  = <span class="fn">recall_score</span>(y_val, y_pred, pos_label=<span class="num">0</span>, zero_division=<span class="num">0</span>)
+cm   = <span class="fn">confusion_matrix</span>(y_val, y_pred)   <span class="cm"># shape (2, 2)</span></pre>
+          <div class="tip"><b>pos_label=0</b> treats class 0 (loan default) as the positive class. Use this when class 0
+            is the rare/important class.</div>
+        </div>
+      </div>
+
+      <!-- K-MEANS -->
+      <div class="block">
+        <div class="block-header bh-gray">k-Means Clustering <span class="class-tag">Class 7</span></div>
+        <div class="block-body">
+          <div class="formula-row">
+            <span class="f-label">Euclidean dist</span>
+            <span class="f-val">d = √(Σ(xᵢ − yᵢ)²)</span>
+            <span class="f-note">e.g. d([1,2],[4,6]) = √(9+16) = 5</span>
+          </div>
+          <div class="formula-row">
+            <span class="f-label">Assignment step</span>
+            <span class="f-val">each point → nearest centroid</span>
+          </div>
+          <div class="formula-row">
+            <span class="f-label">Update step</span>
+            <span class="f-val">new centroid = mean of assigned points</span>
+          </div>
+          <div class="tip">
+            <b>Worked example:</b> data = [1, 3, 5, 9, 11], C₁=2, C₂=10<br>
+            Distances: 1→C₁=1, 1→C₂=9 → cluster 1 &nbsp;|&nbsp; 9→C₁=7, 9→C₂=1 → cluster 2<br>
+            Cluster 1 = {1,3,5} → new C₁ = 3.0 &nbsp;|&nbsp; Cluster 2 = {9,11} → new C₂ = 10.0
+          </div>
+        </div>
+      </div>
+
+      <!-- KERNEL TRICK -->
+      <div class="block">
+        <div class="block-header bh-gray">Kernel Methods <span class="class-tag">Class 7</span></div>
+        <div class="block-body">
+          <div class="formula-row">
+            <span class="f-label">Kernel trick</span>
+            <span class="f-val">K(x, x') = ⟨φ(x), φ(x')⟩</span>
+            <span class="f-note">no explicit φ needed</span>
+          </div>
+          <div class="formula-row">
+            <span class="f-label">Quadratic kernel</span>
+            <span class="f-val">K(x, x') = (x·x' + 1)²</span>
+            <span class="f-note">K(2,3) = (6+1)² = 49</span>
+          </div>
+          <div class="formula-row">
+            <span class="f-label">RBF kernel</span>
+            <span class="f-val">K(x, x') = exp(−γ‖x−x'‖²)</span>
+            <span class="f-note">infinite dimensions</span>
+          </div>
+          <div class="formula-row">
+            <span class="f-label">Inner product</span>
+            <span class="f-val">⟨a, b⟩ = Σ aᵢbᵢ</span>
+            <span class="f-note">⟨[2,3],[1,4]⟩ = 2+12 = 14</span>
+          </div>
+          <div class="tip"><b>Q20:</b> The kernel trick allows SVM to compute dot products in feature space <b>without
+              explicitly mapping</b> the data.</div>
+        </div>
+      </div>
+
+      <!-- ROUND 2 SKLEARN PIPELINE -->
+      <div class="block">
+        <div class="block-header bh-red">Round 2 - sklearn Pipeline Reference <span class="class-tag">Classes 3, 4,
+            6</span></div>
+        <div class="block-body">
+          <pre><span class="kw">from</span> sklearn.preprocessing   <span class="kw">import</span> StandardScaler, OneHotEncoder
+<span class="kw">from</span> sklearn.compose         <span class="kw">import</span> ColumnTransformer
+<span class="kw">from</span> sklearn.pipeline        <span class="kw">import</span> Pipeline
+<span class="kw">from</span> sklearn.linear_model    <span class="kw">import</span> LogisticRegression
+
+<span class="cm"># 1. Build preprocessor</span>
+preprocessor = <span class="fn">ColumnTransformer</span>([
+    (<span class="st">'num'</span>, <span class="fn">StandardScaler</span>(), numerical_features),
+    (<span class="st">'cat'</span>, <span class="fn">OneHotEncoder</span>(drop=<span class="st">'first'</span>,
+                              handle_unknown=<span class="st">'ignore'</span>,
+                              sparse_output=<span class="bl">False</span>),
+                              categorical_features),
+], remainder=<span class="st">'drop'</span>)
+
+<span class="cm"># 2. Build classifier</span>
+lr_clf = <span class="fn">LogisticRegression</span>(
+    C=<span class="num">1.0</span>,                    <span class="cm"># regularisation (smaller = stronger)</span>
+    max_iter=<span class="num">1000</span>,
+    class_weight=<span class="st">'balanced'</span>, <span class="cm"># compensates for 80/20 imbalance</span>
+    random_state=<span class="num">42</span>,
+)
+
+<span class="cm"># 3. Assemble pipeline</span>
+pipeline = <span class="fn">Pipeline</span>([
+    (<span class="st">'preprocessor'</span>, preprocessor),
+    (<span class="st">'classifier'</span>,   lr_clf),
+])
+
+<span class="cm"># 4. Extract X, y and split</span>
+X = train_full[numerical_features + categorical_features]
+y = train_full[<span class="st">'loan_paid_back'</span>]
+X_train, X_val, y_train, y_val = <span class="fn">train_test_split</span>(
+    X, y, test_size=<span class="num">0.25</span>, random_state=<span class="num">42</span>, stratify=y)
+
+<span class="cm"># 5. Train, predict, evaluate</span>
+pipeline.<span class="fn">fit</span>(X_train, y_train)
+y_pred = pipeline.<span class="fn">predict</span>(X_val)
+
+<span class="cm"># 6. Retrain on full data + generate submission</span>
+pipeline.<span class="fn">fit</span>(X, y)
+X_test      = test_df[numerical_features + categorical_features]
+predictions = (pipeline.<span class="fn">predict_proba</span>(X_test)[:, <span class="num">1</span>] > <span class="num">0.5</span>).<span class="fn">astype</span>(<span class="fn">int</span>)</pre>
+        </div>
+      </div>
+
+      <!-- QUICK REFERENCE -->
+      <div class="block">
+        <div class="block-header bh-gold">Quick Reference - Key Numbers &amp; Facts</div>
+        <div class="block-body">
+          <table>
+            <tr>
+              <th>Item</th>
+              <th>Value / Rule</th>
+            </tr>
+            <tr>
+              <td>sigmoid(0)</td>
+              <td>= 0.5 exactly</td>
+            </tr>
+            <tr>
+              <td>sigmoid(large+)</td>
+              <td>≈ 1.0 &nbsp;|&nbsp; sigmoid(large−) ≈ 0.0</td>
+            </tr>
+            <tr>
+              <td>K-Fold val fold size</td>
+              <td>n / k &nbsp; (e.g. k=5, n=100 → 20 per fold)</td>
+            </tr>
+            <tr>
+              <td>Min-Max: x=7, min=2, max=12</td>
+              <td>(7−2)/(12−2) = 5/10 = <b>0.50</b></td>
+            </tr>
+            <tr>
+              <td>Z-score: x=9, μ=6, σ=3</td>
+              <td>(9−6)/3 = <b>1.00</b></td>
+            </tr>
+            <tr>
+              <td>MSE: f(x)=2x+1 on (1,4),(2,6),(3,7)</td>
+              <td>J = (1/6)×2 = <b>0.333</b></td>
+            </tr>
+            <tr>
+              <td>K(2,3) quadratic kernel</td>
+              <td>(2×3+1)² = 7² = <b>49</b></td>
+            </tr>
+            <tr>
+              <td>Inner product ⟨[2,3],[1,4]⟩</td>
+              <td>2×1 + 3×4 = <b>14</b></td>
+            </tr>
+            <tr>
+              <td>Precision: TP=8, FP=2</td>
+              <td>8/(8+2) = <b>0.80</b></td>
+            </tr>
+            <tr>
+              <td>Recall: TP=8, FN=3</td>
+              <td>8/(8+3) = <b>0.727</b></td>
+            </tr>
+            <tr>
+              <td>F1: P=0.80, R=0.727</td>
+              <td>2×0.80×0.727/(0.80+0.727) = <b>0.762</b></td>
+            </tr>
+            <tr>
+              <td>Naïve baseline F1 (Default=0)</td>
+              <td><b>0.000</b> (never predicts class 0)</td>
+            </tr>
+            <tr>
+              <td>Logistic Reg baseline F1 (Default)</td>
+              <td>~<b>0.696</b></td>
+            </tr>
+            <tr>
+              <td>Overfitting detection</td>
+              <td>J_train low, J_val HIGH → high variance</td>
+            </tr>
+            <tr>
+              <td>Underfitting detection</td>
+              <td>Both J_train and J_val HIGH → high bias</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- end right col -->
+  </div><!-- end columns -->
+
+</body>
+
+</html>
