@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Armed Bandit: Exploration vs. Exploitation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes pulse-green {
+            0% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(34, 197, 94, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+            }
+        }
+
+        @keyframes pulse-red {
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(239, 68, 68, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+        }
+
+        .win-flash {
+            animation: pulse-green 0.6s ease-out;
+        }
+
+        .loss-flash {
+            animation: pulse-red 0.6s ease-out;
+        }
+
+        .bar-transition {
+            transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .truth-bar {
+            background: repeating-linear-gradient(45deg, #e2e8f0, #e2e8f0 5px, #cbd5e1 5px, #cbd5e1 10px);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        
+        <!-- Navigation -->
+        <nav class="mb-6 pt-4 no-print" style="max-width: 1000px; margin-left: auto; margin-right: auto;">
+            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 transition-colors" style="text-decoration: none; color: #9ca3af;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Course Hub
+            </a>
+        </nav>
+
+        <!-- Header -->
+        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <h1 class="text-4xl font-black tracking-tight text-gray-900">THE BANDIT <span
+                        class="text-blue-600">LAB</span></h1>
+                <p class="text-gray-500 font-medium italic">Visualizing Exploration vs. Exploitation</p>
+            </div>
+            <div id="status-badge"
+                class="px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-white border border-gray-200 text-gray-400 shadow-sm transition-all duration-300">
+                Waiting to Start
+            </div>
+        </header>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Reward Meter -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="text-xs font-bold text-gray-400 uppercase mb-1">Your Total Reward</div>
+                <div id="reward-val" class="text-4xl font-mono font-black text-green-600">0</div>
+                <div class="text-[10px] text-gray-500 mt-2 uppercase">Actual wins obtained</div>
+            </div>
+
+            <!-- Best Possible Meter -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="text-xs font-bold text-gray-400 uppercase mb-1">Theoretical Max</div>
+                <div id="max-reward-val" class="text-4xl font-mono font-black text-blue-600">0.0</div>
+                <div class="text-[10px] text-gray-500 mt-2 uppercase">Expected value of best machine</div>
+            </div>
+
+            <!-- Regret Meter -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="text-xs font-bold text-gray-400 uppercase mb-1">Cumulative Regret</div>
+                <div id="regret-val" class="text-4xl font-mono font-black text-red-500">0.0</div>
+                <div class="text-[10px] text-gray-500 mt-2 leading-tight uppercase">Money left on the table</div>
+            </div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm mb-8">
+            <div class="flex flex-col md:flex-row gap-8 items-center">
+                <!-- Epsilon Slider -->
+                <div class="flex-1 w-full">
+                    <div class="flex justify-between mb-4">
+                        <label class="text-sm font-bold text-gray-500 uppercase">Exploration Rate (ε)</label>
+                        <span id="eps-val" class="text-2xl font-mono text-blue-600 font-bold">0.10</span>
+                    </div>
+                    <input type="range" id="epsilon" min="0" max="1" step="0.01" value="0.1"
+                        class="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                    <div
+                        class="flex justify-between mt-2 text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
+                        <span>Pure Exploitation (Greedy)</span>
+                        <span>Pure Exploration (Random)</span>
+                    </div>
+                </div>
+
+                <!-- Simulation Controls -->
+                <div class="flex items-center gap-3 w-full md:w-auto">
+                    <button id="run-btn"
+                        class="flex-1 md:flex-none bg-blue-600 hover:bg-blue-700 text-white font-black px-8 py-4 rounded-xl transition-all active:scale-95 shadow-md">
+                        PLAY 100 ROUNDS
+                    </button>
+                    <button id="reset-btn"
+                        class="bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold px-6 py-4 rounded-xl transition-all">
+                        RESET
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Display -->
+        <div class="grid grid-cols-5 gap-3 md:gap-6 h-[350px] items-end mb-8 relative">
+            <!-- Machine Template -->
+            <template id="machine-template">
+                <div class="machine-col flex flex-col items-center h-full group">
+                    <!-- Labels -->
+                    <div class="mb-4 text-center">
+                        <div class="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1">Agent Belief
+                        </div>
+                        <div class="avg-label font-mono text-xl font-black text-blue-600">0%</div>
+                    </div>
+
+                    <!-- The Visual Machine -->
+                    <div
+                        class="relative w-full flex-1 bg-white rounded-2xl border-2 border-gray-200 overflow-hidden flex items-end shadow-sm">
+                        <!-- Truth Ghost (The "Invisible" reality) -->
+                        <div class="truth-bar absolute bottom-0 left-0 w-full opacity-40" style="height: 0%"></div>
+
+                        <!-- Agent's Estimate Bar -->
+                        <div class="estimate-bar w-full bg-blue-500/20 border-t-4 border-blue-500 bar-transition"
+                            style="height: 0%"></div>
+
+                        <!-- Pull Count Badge -->
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <span
+                                class="count-label text-3xl font-black text-gray-200 group-hover:text-gray-300 transition-colors">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="mt-4 w-full text-center">
+                        <div
+                            class="py-2 rounded-xl bg-gray-100 text-[10px] font-black tracking-widest text-gray-500 id-label">
+                            M1</div>
+                    </div>
+                </div>
+            </template>
+            <div id="machines-container" class="contents"></div>
+        </div>
+
+        <!-- Lesson Overlay -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-blue-50 border border-blue-100 p-5 rounded-2xl">
+                <h3 class="text-blue-700 font-black text-sm uppercase mb-3 flex items-center gap-2">
+                    Visual Legend
+                </h3>
+                <ul class="text-xs space-y-3 text-gray-600 font-medium">
+                    <li class="flex items-center gap-3">
+                        <div class="w-4 h-4 truth-bar opacity-60 rounded border border-gray-300"></div> <span><strong
+                                class="text-gray-900">Ground Truth:</strong> The real (hidden) win probability.</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <div class="w-4 h-4 bg-blue-500/30 border-t-2 border-blue-500 rounded"></div> <span><strong
+                                class="text-gray-900">Agent Belief:</strong> Estimated probability from
+                            experience.</span>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <div class="w-4 h-4 bg-red-500 rounded-full"></div> <span><strong
+                                class="text-red-600 uppercase font-bold">Regret:</strong> Efficiency lost by picking bad
+                            machines.</span>
+                    </li>
+                </ul>
+            </div>
+            <div
+                class="bg-gray-100 p-6 rounded-2xl border border-gray-200 text-sm text-gray-500 italic flex items-center leading-relaxed">
+                "Compare your Reward to the Theoretical Max. A perfect agent would match the Max, but in the real world,
+                we pay for knowledge with exploration."
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const config = {
+            numMachines: 5,
+            totalRounds: 100,
+            trueRates: [0.15, 0.35, 0.85, 0.45, 0.20].sort(() => Math.random() - 0.5)
+        };
+
+        const maxRate = Math.max(...config.trueRates);
+
+        let state = {
+            epsilon: 0.1,
+            roundsPlayed: 0,
+            totalReward: 0,
+            maxPossibleReward: 0,
+            cumulativeRegret: 0,
+            counts: Array(5).fill(0),
+            estimates: Array(5).fill(0),
+            isPlaying: false
+        };
+
+        const container = document.getElementById('machines-container');
+        const template = document.getElementById('machine-template');
+
+        function init() {
+            container.innerHTML = '';
+            for (let i = 0; i < config.numMachines; i++) {
+                const clone = template.content.cloneNode(true);
+                clone.querySelector('.id-label').textContent = `BANDIT ${i + 1}`;
+                clone.querySelector('.truth-bar').style.height = `${config.trueRates[i] * 100}%`;
+                container.appendChild(clone);
+            }
+            updateUI();
+        }
+
+        function updateUI(activeIdx = -1, result = null, isExploring = false) {
+            document.getElementById('eps-val').textContent = state.epsilon.toFixed(2);
+            document.getElementById('regret-val').textContent = state.cumulativeRegret.toFixed(1);
+            document.getElementById('reward-val').textContent = state.totalReward;
+            document.getElementById('max-reward-val').textContent = state.maxPossibleReward.toFixed(1);
+
+            const badge = document.getElementById('status-badge');
+            if (activeIdx !== -1) {
+                badge.textContent = isExploring ? "🚀 Exploring (Random)" : "💰 Exploiting (Best Known)";
+                badge.className = isExploring
+                    ? "px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-amber-50 text-amber-800 border border-amber-200 shadow-sm"
+                    : "px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-green-50 text-green-800 border border-green-200 shadow-sm";
+            }
+
+            const columns = document.querySelectorAll('.machine-col');
+            const estimates = document.querySelectorAll('.estimate-bar');
+            const counts = document.querySelectorAll('.count-label');
+            const avgs = document.querySelectorAll('.avg-label');
+
+            state.estimates.forEach((est, i) => {
+                estimates[i].style.height = `${est * 100}%`;
+                counts[i].textContent = state.counts[i];
+                avgs[i].textContent = `${Math.round(est * 100)}%`;
+
+                const machineBody = columns[i].querySelector('.relative');
+                machineBody.classList.remove('win-flash', 'loss-flash');
+
+                if (i === activeIdx) {
+                    machineBody.classList.add(result === 1 ? 'win-flash' : 'loss-flash');
+                }
+            });
+        }
+
+        async function playSession() {
+            if (state.isPlaying || state.roundsPlayed >= config.totalRounds) return;
+            state.isPlaying = true;
+
+            for (let r = state.roundsPlayed; r < config.totalRounds; r++) {
+                let choice;
+                let exploring = false;
+
+                if (Math.random() < state.epsilon) {
+                    choice = Math.floor(Math.random() * config.numMachines);
+                    exploring = true;
+                } else {
+                    const maxEst = Math.max(...state.estimates);
+                    const bestIndices = state.estimates.map((e, i) => e === maxEst ? i : -1).filter(i => i !== -1);
+                    choice = bestIndices[Math.floor(Math.random() * bestIndices.length)];
+                }
+
+                const reward = Math.random() < config.trueRates[choice] ? 1 : 0;
+
+                state.maxPossibleReward += maxRate;
+                state.cumulativeRegret += (maxRate - config.trueRates[choice]);
+                state.counts[choice]++;
+                state.totalReward += reward;
+                state.estimates[choice] += (reward - state.estimates[choice]) / state.counts[choice];
+                state.roundsPlayed++;
+
+                updateUI(choice, reward, exploring);
+
+                const delay = Math.max(10, 100 - (r * 0.8));
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+            state.isPlaying = false;
+            document.getElementById('status-badge').textContent = "SIMULATION COMPLETE";
+            document.getElementById('status-badge').className = "px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-white border border-gray-200 text-gray-500 shadow-sm";
+        }
+
+        document.getElementById('epsilon').oninput = (e) => {
+            state.epsilon = parseFloat(e.target.value);
+            document.getElementById('eps-val').textContent = state.epsilon.toFixed(2);
+        };
+
+        document.getElementById('run-btn').onclick = playSession;
+
+        document.getElementById('reset-btn').onclick = () => {
+            state = {
+                epsilon: parseFloat(document.getElementById('epsilon').value),
+                roundsPlayed: 0,
+                totalReward: 0,
+                maxPossibleReward: 0,
+                cumulativeRegret: 0,
+                counts: Array(5).fill(0),
+                estimates: Array(5).fill(0),
+                isPlaying: false
+            };
+            config.trueRates = [...config.trueRates].sort(() => Math.random() - 0.5);
+            init();
+        };
+
+        init();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAE vs RMSE: The Outlier Penalty</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .metric-bar {
+            transition: width 0.1s ease-out;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        
+        <!-- Navigation -->
+        <nav class="mb-6 pt-4 no-print" style="max-width: 1000px; margin-left: auto; margin-right: auto;">
+            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 transition-colors" style="text-decoration: none; color: #9ca3af;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Course Hub
+            </a>
+        </nav>
+
+        <!-- Header -->
+        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <h1 class="text-4xl font-black tracking-tight text-gray-900">THE OUTLIER <span class="text-blue-600">PENALTY</span></h1>
+                <p class="text-gray-500 font-medium italic">MAE vs RMSE: Visualizing the impact of squaring errors</p>
+            </div>
+            <div id="status-badge"
+                class="px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-white border border-gray-200 text-gray-400 shadow-sm transition-all duration-300">
+                Interactive Concept
+            </div>
+        </header>
+
+        <!-- Main Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            
+            <!-- Left Panel: Visualization (Takes up 2 columns) -->
+            <div class="lg:col-span-2 bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col">
+                <div class="mb-4 flex justify-between items-end">
+                    <div>
+                        <h2 class="text-xs font-bold text-gray-400 uppercase mb-1">Interactive Plot</h2>
+                        <p class="text-sm text-gray-500 font-medium">Drag the red <strong class="text-red-500">outlier</strong> to see how it affects the regression line and MSE.</p>
+                    </div>
+                </div>
+
+                <!-- Canvas Container -->
+                <div class="flex-grow bg-white border-2 border-gray-200 rounded-2xl overflow-hidden relative min-h-[450px]">
+                    <canvas id="plotCanvas" class="w-full h-full cursor-pointer touch-none absolute inset-0"></canvas>
+                </div>
+
+                <div class="mt-4 flex flex-wrap justify-between items-center text-xs font-bold text-gray-400 uppercase tracking-tighter px-2">
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-blue-600"></div> NORMAL DATA
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-4 h-4 rounded-full border-2 border-red-500 bg-red-100"></div> DRAGGABLE OUTLIER
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-0.5 border-t-2 border-dashed border-gray-400"></div> RESIDUAL (ERROR)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Metrics & Math -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-6">
+                <div>
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-tighter mb-4 border-b border-gray-100 pb-2">Error Metrics</h3>
+                    
+                    <!-- MAE Section -->
+                    <div class="mb-6">
+                        <div class="flex justify-between items-end mb-1">
+                            <span class="text-sm font-bold text-gray-500 uppercase">MAE <span class="text-[10px] text-gray-400 tracking-tighter">(Absolute)</span></span>
+                            <span id="maeValue" class="font-mono font-black text-green-600 text-2xl">0.00</span>
+                        </div>
+                        <div class="text-[10px] text-gray-500 mb-2 uppercase">Grows linearly</div>
+                        <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+                            <div id="maeBar" class="bg-green-500 h-3 rounded-full metric-bar" style="width: 10%"></div>
+                        </div>
+                    </div>
+
+                    <!-- RMSE Section -->
+                    <div class="mb-6">
+                        <div class="flex justify-between items-end mb-1">
+                            <span class="text-sm font-bold text-gray-500 uppercase">RMSE <span class="text-[10px] text-gray-400 tracking-tighter">(Root Squared)</span></span>
+                            <span id="rmseValue" class="font-mono font-black text-amber-500 text-2xl">0.00</span>
+                        </div>
+                        <div class="text-[10px] text-gray-500 mb-2 uppercase">Penalizes large errors</div>
+                        <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+                            <div id="rmseBar" class="bg-amber-400 h-3 rounded-full metric-bar" style="width: 10%"></div>
+                        </div>
+                    </div>
+
+                    <!-- MSE Section -->
+                    <div class="mb-6">
+                        <div class="flex justify-between items-end mb-1">
+                            <span class="text-sm font-bold text-gray-500 uppercase">MSE <span class="text-[10px] text-gray-400 tracking-tighter">(Squared)</span></span>
+                            <span id="mseValue" class="font-mono font-black text-red-500 text-3xl transition-colors duration-300">0.00</span>
+                        </div>
+                        <div class="text-[10px] text-gray-500 mb-2 uppercase">Grows quadratically (Explodes!)</div>
+                        <div class="w-full bg-gray-100 rounded-full h-4 overflow-hidden relative">
+                            <div id="mseBar" class="bg-red-500 h-4 rounded-full metric-bar" style="width: 10%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Math Breakdown Panel -->
+                <div class="mt-auto bg-gray-50 border border-gray-200 rounded-xl p-5">
+                    <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-200 pb-2 text-center">Outlier Breakdown</h3>
+                    <div class="grid grid-cols-2 gap-y-3 text-sm items-center">
+                        <div class="text-xs font-bold text-gray-500 uppercase">Distance ($e$)</div>
+                        <div id="errDistance" class="font-mono font-bold text-right text-gray-900 text-lg">0.00</div>
+
+                        <div class="text-xs font-bold text-gray-500 uppercase">Absolute ($|e|$)</div>
+                        <div id="errAbs" class="font-mono font-bold text-right text-green-600 text-lg">0.00</div>
+
+                        <div class="text-xs font-bold text-gray-500 uppercase">Squared ($e^2$)</div>
+                        <div id="errSq" class="font-mono font-black text-right text-red-500 text-xl">0.00</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Dynamic State Indicator -->
+        <div id="stateIndicator" class="rounded-xl p-5 border-l-4 transition-colors duration-300">
+            <h2 id="stateTitle" class="font-black text-sm uppercase tracking-wider mb-2">Balanced Fit</h2>
+            <p id="stateDesc" class="text-xs font-medium"></p>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 1. State & Setup ---
+        const canvas = document.getElementById('plotCanvas');
+        const ctx = canvas.getContext('2d');
+        const stateIndicator = document.getElementById('stateIndicator');
+        const stateTitle = document.getElementById('stateTitle');
+        const stateDesc = document.getElementById('stateDesc');
+        const mseValue = document.getElementById('mseValue');
+
+        // Data points: [ {x, y, isOutlier} ]
+        let points = [
+            { x: 1, y: 1.2, isOutlier: false },
+            { x: 2, y: 2.1, isOutlier: false },
+            { x: 3, y: 2.8, isOutlier: false },
+            { x: 4, y: 4.2, isOutlier: false },
+            { x: 5, y: 4.9, isOutlier: false },
+            { x: 6, y: 6.1, isOutlier: false },
+            { x: 7, y: 6.8, isOutlier: false },
+            // The outlier
+            { x: 8, y: 8.0, isOutlier: true }
+        ];
+
+        let draggedPoint = null;
+        let isDragging = false;
+
+        // Viewport bounds
+        const MIN_X = 0, MAX_X = 10;
+        const MIN_Y = 0, MAX_Y = 15;
+
+        // --- 2. Math Helpers ---
+
+        // Simple Linear Regression (Ordinary Least Squares)
+        function calculateOLS(data) {
+            let n = data.length;
+            let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+
+            for (let p of data) {
+                sumX += p.x;
+                sumY += p.y;
+                sumXY += p.x * p.y;
+                sumXX += p.x * p.x;
+            }
+
+            let m = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+            let b = (sumY - m * sumX) / n;
+            return { m, b };
+        }
+
+        // Calculate Regression Metrics
+        function calculateMetrics(data, m, b) {
+            let maeSum = 0;
+            let mseSum = 0;
+            let outlierResidual = 0;
+
+            for (let p of data) {
+                let predictedY = m * p.x + b;
+                let residual = p.y - predictedY;
+
+                maeSum += Math.abs(residual);
+                mseSum += residual * residual;
+
+                if (p.isOutlier) {
+                    outlierResidual = residual;
+                }
+            }
+
+            return {
+                mae: maeSum / data.length,
+                mse: mseSum / data.length,
+                rmse: Math.sqrt(mseSum / data.length),
+                outlierE: outlierResidual
+            };
+        }
+
+        // --- 3. Coordinate Mapping ---
+
+        function mapX(x) {
+            // Leave a little padding
+            const pad = 30;
+            return pad + ((x - MIN_X) / (MAX_X - MIN_X)) * (canvas.width - pad * 2);
+        }
+
+        function mapY(y) {
+            const pad = 30;
+            return canvas.height - pad - ((y - MIN_Y) / (MAX_Y - MIN_Y)) * (canvas.height - pad * 2);
+        }
+
+        function unmapX(px) {
+            const pad = 30;
+            return MIN_X + ((px - pad) / (canvas.width - pad * 2)) * (MAX_X - MIN_X);
+        }
+
+        function unmapY(py) {
+            const pad = 30;
+            return MIN_Y + ((canvas.height - pad - py) / (canvas.height - pad * 2)) * (MAX_Y - MIN_Y);
+        }
+
+        // --- 4. Rendering ---
+
+        function updateUIState(metrics) {
+            const e = Math.abs(metrics.outlierE);
+            
+            if (e < 1.0) {
+                stateIndicator.className = "rounded-xl p-5 border-l-4 transition-colors duration-300 bg-green-50 border-green-500 text-green-900";
+                stateTitle.innerText = "Balanced Fit (Normal)";
+                stateDesc.innerHTML = "The outlier is behaving normally. The regression line easily balances the errors across all data points.";
+                mseValue.classList.remove('animate-pulse', 'text-red-800');
+                mseValue.classList.add('text-red-500');
+            } else if (e < 2.5) {
+                stateIndicator.className = "rounded-xl p-5 border-l-4 transition-colors duration-300 bg-amber-50 border-amber-500 text-amber-900";
+                stateTitle.innerText = "Growing Penalty";
+                stateDesc.innerHTML = "The point is pulling away. Notice how the geometric red square ($e^2$) starts to rapidly grow compared to the other errors.";
+                mseValue.classList.remove('animate-pulse', 'text-red-800');
+                mseValue.classList.add('text-red-500');
+            } else {
+                stateIndicator.className = "rounded-xl p-5 border-l-4 transition-colors duration-300 bg-red-50 border-red-500 text-red-900";
+                stateTitle.innerText = "The Outlier Penalty! (Explosion)";
+                stateDesc.innerHTML = "Notice how the red square ($e^2$) has exploded in size! The regression line is forced to tilt violently just to minimize this single massive geometric penalty, ruining the fit for the normal data.";
+                mseValue.classList.add('animate-pulse', 'text-red-800');
+                mseValue.classList.remove('text-red-500');
+            }
+        }
+
+        function draw() {
+            // Resize handler ensures internal res matches display
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Draw Grid
+            ctx.strokeStyle = '#f3f4f6'; // gray-100
+            ctx.lineWidth = 1;
+            for (let i = 1; i <= 14; i++) {
+                let py = mapY(i);
+                ctx.beginPath(); ctx.moveTo(0, py); ctx.lineTo(canvas.width, py); ctx.stroke();
+            }
+            for (let i = 1; i <= 9; i++) {
+                let px = mapX(i);
+                ctx.beginPath(); ctx.moveTo(px, 0); ctx.lineTo(px, canvas.height); ctx.stroke();
+            }
+
+            // 2. Compute Regression
+            let { m, b } = calculateOLS(points);
+            let metrics = calculateMetrics(points, m, b);
+
+            // 3. Draw Residuals (Dashed lines and Geometric Squares)
+            ctx.lineWidth = 1.5;
+            points.forEach(p => {
+                let predY = m * p.x + b;
+                
+                let px = mapX(p.x);
+                let py = mapY(p.y);
+                let lineY = mapY(predY);
+
+                // Draw the geometric square for the outlier
+                if (p.isOutlier) {
+                    let side = Math.abs(py - lineY);
+                    
+                    // Draw square to the right of the line
+                    ctx.beginPath();
+                    // Math.min gets the top-most point on the canvas (smaller Y value)
+                    ctx.rect(px, Math.min(py, lineY), side, side);
+                    ctx.fillStyle = 'rgba(239, 68, 68, 0.15)'; // red-500 light opacity
+                    ctx.fill();
+                    ctx.strokeStyle = 'rgba(239, 68, 68, 0.5)'; // red-500 medium opacity
+                    ctx.stroke();
+                }
+
+                ctx.beginPath();
+                ctx.moveTo(px, py);
+                ctx.lineTo(px, lineY);
+
+                if (p.isOutlier) {
+                    ctx.strokeStyle = '#ef4444'; // Red-500 for outlier residual
+                    ctx.setLineDash([4, 4]);
+                } else {
+                    ctx.strokeStyle = '#9ca3af'; // Gray-400 for normal
+                    ctx.setLineDash([2, 2]);
+                }
+                ctx.stroke();
+            });
+            ctx.setLineDash([]); // reset
+
+            // 4. Draw Regression Line
+            ctx.beginPath();
+            ctx.moveTo(mapX(MIN_X), mapY(m * MIN_X + b));
+            ctx.lineTo(mapX(MAX_X), mapY(m * MAX_X + b));
+            ctx.strokeStyle = '#111827'; // Gray 900
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // 5. Draw Points
+            points.forEach(p => {
+                ctx.beginPath();
+                if (p.isOutlier) {
+                    // Outlier gets a prominent red pulsing style
+                    ctx.arc(mapX(p.x), mapY(p.y), isDragging ? 10 : 8, 0, Math.PI * 2);
+                    ctx.fillStyle = '#fee2e2'; // red-100
+                    ctx.fill();
+                    ctx.lineWidth = 3;
+                    ctx.strokeStyle = '#ef4444'; // red-500
+                    ctx.stroke();
+                } else {
+                    // Normal points
+                    ctx.arc(mapX(p.x), mapY(p.y), 5, 0, Math.PI * 2);
+                    ctx.fillStyle = '#2563eb'; // blue-600
+                    ctx.fill();
+                }
+            });
+
+            // 6. Update UI DOM Elements
+            updateUI(metrics);
+            updateUIState(metrics);
+        }
+
+        function updateUI(metrics) {
+            // Values
+            document.getElementById('maeValue').innerText = metrics.mae.toFixed(2);
+            document.getElementById('rmseValue').innerText = metrics.rmse.toFixed(2);
+            document.getElementById('mseValue').innerText = metrics.mse.toFixed(2);
+
+            // Visual Bars (Scale max based on typical constraints)
+            // MAE max ~ 5, RMSE max ~ 6, MSE max ~ 36
+            const maxMAE = 3.0;
+            const maxRMSE = 4.0;
+            const maxMSE = 16.0;
+
+            const maePct = Math.min(100, (metrics.mae / maxMAE) * 100);
+            const rmsePct = Math.min(100, (metrics.rmse / maxRMSE) * 100);
+            const msePct = Math.min(100, (metrics.mse / maxMSE) * 100);
+
+            document.getElementById('maeBar').style.width = `${maePct}%`;
+            document.getElementById('rmseBar').style.width = `${rmsePct}%`;
+            document.getElementById('mseBar').style.width = `${msePct}%`;
+
+            // Outlier breakdown
+            const e = metrics.outlierE;
+            document.getElementById('errDistance').innerText = e.toFixed(2);
+            document.getElementById('errAbs').innerText = Math.abs(e).toFixed(2);
+            document.getElementById('errSq').innerText = (e * e).toFixed(2);
+        }
+
+        // --- 5. Interaction Logic ---
+
+        function getMousePos(evt) {
+            const rect = canvas.getBoundingClientRect();
+            // Handle both touch and mouse
+            let clientX = evt.clientX;
+            let clientY = evt.clientY;
+
+            if (evt.touches && evt.touches.length > 0) {
+                clientX = evt.touches[0].clientX;
+                clientY = evt.touches[0].clientY;
+            }
+
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+
+        function handlePointerDown(e) {
+            e.preventDefault(); // Prevent scrolling on touch
+            const pos = getMousePos(e);
+            const dataX = unmapX(pos.x);
+            const dataY = unmapY(pos.y);
+
+            // Find if we clicked near the outlier
+            const outlier = points.find(p => p.isOutlier);
+
+            // Check distance in screen pixels for easier grabbing
+            const distPx = Math.hypot(mapX(outlier.x) - pos.x, mapY(outlier.y) - pos.y);
+
+            if (distPx < 30) { // 30px hit radius
+                draggedPoint = outlier;
+                isDragging = true;
+                canvas.style.cursor = 'grabbing';
+                draw();
+            }
+        }
+
+        function handlePointerMove(e) {
+            if (!isDragging || !draggedPoint) return;
+            e.preventDefault();
+
+            const pos = getMousePos(e);
+            let newY = unmapY(pos.y);
+
+            // Clamp Y to viewport limits
+            newY = Math.max(MIN_Y, Math.min(MAX_Y, newY));
+
+            draggedPoint.y = newY;
+
+            // Request animation frame for smooth rendering
+            requestAnimationFrame(draw);
+        }
+
+        function handlePointerUp(e) {
+            if (isDragging) {
+                isDragging = false;
+                draggedPoint = null;
+                canvas.style.cursor = 'pointer';
+                draw();
+            }
+        }
+
+        // Add Listeners
+        canvas.addEventListener('mousedown', handlePointerDown);
+        canvas.addEventListener('mousemove', handlePointerMove);
+        window.addEventListener('mouseup', handlePointerUp);
+
+        // Touch support for mobile/tablets
+        canvas.addEventListener('touchstart', handlePointerDown, { passive: false });
+        canvas.addEventListener('touchmove', handlePointerMove, { passive: false });
+        window.addEventListener('touchend', handlePointerUp);
+
+        // Handle window resize
+        window.addEventListener('resize', draw);
+
+        // Initial draw
+        setTimeout(draw, 10);
+    </script>
+</body>
+
+</html>

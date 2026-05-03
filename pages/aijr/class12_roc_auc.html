@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROC Curve & AUC Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        
+        <!-- Navigation -->
+        <nav class="mb-6 pt-4 no-print" style="max-width: 1000px; margin-left: auto; margin-right: auto;">
+            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 transition-colors" style="text-decoration: none; color: #9ca3af;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Course Hub
+            </a>
+        </nav>
+
+        <!-- Header -->
+        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <h1 class="text-4xl font-black tracking-tight text-gray-900">ROC CURVE & <span class="text-blue-600">AUC</span></h1>
+                <p class="text-gray-500 font-medium italic">Visualizing class overlap and decision thresholds</p>
+            </div>
+            <div id="status-badge"
+                class="px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-white border border-gray-200 text-gray-400 shadow-sm transition-all duration-300">
+                Interactive Concept
+            </div>
+        </header>
+
+        <!-- Main Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            
+            <!-- Left Side: Distributions -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col justify-between">
+                <div>
+                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-tighter mb-4 border-b border-gray-100 pb-2">1. Class Distributions & Threshold</h2>
+
+                    <!-- Distribution Canvas -->
+                    <div class="bg-gray-50 border-2 border-gray-200 rounded-xl relative h-64 w-full mb-6 overflow-hidden">
+                        <canvas id="distCanvas" class="w-full h-full absolute inset-0"></canvas>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="space-y-6 mb-6">
+                        <!-- Separation Slider -->
+                        <div>
+                            <div class="flex justify-between items-end mb-2">
+                                <label class="text-sm font-bold text-gray-500 uppercase">Push Curves Apart (Model Quality)</label>
+                                <span id="sepDisplay"
+                                    class="text-xs font-black uppercase tracking-widest bg-blue-50 text-blue-800 border border-blue-200 px-3 py-1 rounded-full">Medium</span>
+                            </div>
+                            <input type="range" id="sepSlider" min="0.5" max="3.5" step="0.1" value="1.5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                            <div class="flex justify-between text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-tighter">
+                                <span>High Overlap (Random)</span>
+                                <span>Perfect Separation</span>
+                            </div>
+                        </div>
+
+                        <!-- Threshold Slider -->
+                        <div>
+                            <div class="flex justify-between items-end mb-2">
+                                <label class="text-sm font-bold text-gray-500 uppercase">Decision Threshold</label>
+                                <span id="threshDisplay"
+                                    class="text-xs font-mono font-black bg-gray-100 text-gray-800 border border-gray-200 px-3 py-1 rounded-full">0.00</span>
+                            </div>
+                            <input type="range" id="threshSlider" min="-4" max="4" step="0.05" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                            <div class="flex justify-between text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-tighter">
+                                <span>Predict All Positive</span>
+                                <span>Predict All Negative</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dynamic State Indicator -->
+                <div id="stateIndicator" class="rounded-xl p-5 border-l-4 transition-colors duration-300">
+                    <h2 id="stateTitle" class="font-black text-sm uppercase tracking-wider mb-2">High Overlap</h2>
+                    <p id="stateDesc" class="text-xs font-medium"></p>
+                </div>
+            </div>
+
+            <!-- Right Side: ROC Curve -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col">
+                <h2 class="text-xs font-bold text-gray-400 uppercase tracking-tighter mb-4 border-b border-gray-100 pb-2">2. ROC Curve</h2>
+
+                <!-- ROC Canvas -->
+                <div
+                    class="bg-gray-50 border-2 border-gray-200 rounded-xl relative w-full aspect-square md:h-auto md:flex-grow mb-6 overflow-hidden min-h-[300px]">
+                    <canvas id="rocCanvas" class="w-full h-full absolute inset-0"></canvas>
+                </div>
+
+                <!-- Metrics Panel -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div
+                        class="bg-blue-50 rounded-xl p-4 border border-blue-100 flex flex-col justify-center items-center">
+                        <span class="text-[10px] uppercase tracking-widest text-blue-600 font-black mb-1">AUC (Area Under Curve)</span>
+                        <span id="aucDisplay" class="text-4xl font-mono font-black text-blue-700">0.000</span>
+                    </div>
+                    <div class="grid grid-rows-2 gap-2">
+                        <div
+                            class="bg-green-50 rounded-lg p-3 border border-green-200 flex justify-between items-center">
+                            <span class="text-[10px] text-green-700 font-bold uppercase">True Pos. Rate (Recall)</span>
+                            <span id="tprDisplay" class="text-lg font-mono font-black text-green-600">0.00</span>
+                        </div>
+                        <div
+                            class="bg-red-50 rounded-lg p-3 border border-red-200 flex justify-between items-center">
+                            <span class="text-[10px] text-red-700 font-bold uppercase">False Pos. Rate</span>
+                            <span id="fprDisplay" class="text-lg font-mono font-black text-red-600">0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- Math Utilities ---
+
+        // Approximation of the Error Function for Gaussian CDF
+        function erf(x) {
+            const sign = (x >= 0) ? 1 : -1;
+            x = Math.abs(x);
+            const a1 = 0.254829592;
+            const a2 = -0.284496736;
+            const a3 = 1.421413741;
+            const a4 = -1.453152027;
+            const a5 = 1.061405429;
+            const p = 0.3275911;
+            const t = 1.0 / (1.0 + p * x);
+            const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+            return sign * y;
+        }
+
+        // Gaussian Probability Density Function (PDF)
+        function pdf(x, mean, std) {
+            return Math.exp(-0.5 * Math.pow((x - mean) / std, 2)) / (std * Math.sqrt(2 * Math.PI));
+        }
+
+        // Gaussian Cumulative Distribution Function (CDF)
+        function cdf(x, mean, std) {
+            return 0.5 * (1 + erf((x - mean) / (std * Math.sqrt(2))));
+        }
+
+        // --- State Variables ---
+
+        let thresh = 0;
+        let sep = 1.5;
+
+        // Distribution parameters
+        let std_neg = 1.0;
+        let std_pos = 1.0;
+        let mean_neg = -sep / 2;
+        let mean_pos = sep / 2;
+
+        // --- Elements ---
+
+        const distCanvas = document.getElementById('distCanvas');
+        const distCtx = distCanvas.getContext('2d');
+        const rocCanvas = document.getElementById('rocCanvas');
+        const rocCtx = rocCanvas.getContext('2d');
+
+        const sepSlider = document.getElementById('sepSlider');
+        const threshSlider = document.getElementById('threshSlider');
+        const sepDisplay = document.getElementById('sepDisplay');
+        const threshDisplay = document.getElementById('threshDisplay');
+        const aucDisplay = document.getElementById('aucDisplay');
+        const tprDisplay = document.getElementById('tprDisplay');
+        const fprDisplay = document.getElementById('fprDisplay');
+
+        const stateIndicator = document.getElementById('stateIndicator');
+        const stateTitle = document.getElementById('stateTitle');
+        const stateDesc = document.getElementById('stateDesc');
+
+        // --- Drawing Logic ---
+
+        function resizeCanvases() {
+            distCanvas.width = distCanvas.parentElement.clientWidth;
+            distCanvas.height = distCanvas.parentElement.clientHeight;
+            rocCanvas.width = rocCanvas.parentElement.clientWidth;
+            rocCanvas.height = rocCanvas.parentElement.clientHeight;
+            updateVisuals();
+        }
+
+        function updateUIState() {
+            if (sep < 1.2) {
+                stateIndicator.className = "rounded-xl p-5 border-l-4 transition-colors duration-300 bg-red-50 border-red-500 text-red-900";
+                stateTitle.innerText = "High Overlap (Poor Model)";
+                stateDesc.innerText = "The model struggles to distinguish between classes. The solid red and gray error regions are large, forcing the ROC curve close to the diagonal 'Random Guess' line.";
+            } else if (sep < 2.5) {
+                stateIndicator.className = "rounded-xl p-5 border-l-4 transition-colors duration-300 bg-amber-50 border-amber-500 text-amber-900";
+                stateTitle.innerText = "Moderate Overlap (Fair Model)";
+                stateDesc.innerText = "The classes are somewhat separated. Notice how moving the threshold lets you trade off False Positives (solid red) for False Negatives (solid gray).";
+            } else {
+                stateIndicator.className = "rounded-xl p-5 border-l-4 transition-colors duration-300 bg-green-50 border-green-500 text-green-900";
+                stateTitle.innerText = "Perfect Separation (Excellent Model)";
+                stateDesc.innerText = "The model easily distinguishes the classes! There is almost no overlap (errors), allowing the ROC curve to hit the perfect top-left corner (AUC ≈ 1.0).";
+            }
+        }
+
+        function updateVisuals() {
+            sep = parseFloat(sepSlider.value);
+            thresh = parseFloat(threshSlider.value);
+
+            mean_neg = -sep / 2;
+            mean_pos = sep / 2;
+
+            // Labels
+            threshDisplay.innerText = thresh.toFixed(2);
+            if (sep < 1.0) sepDisplay.innerText = "Poor";
+            else if (sep < 2.0) sepDisplay.innerText = "Fair";
+            else if (sep < 3.0) sepDisplay.innerText = "Good";
+            else sepDisplay.innerText = "Excellent";
+
+            updateUIState();
+            drawDistributions();
+            drawROC();
+        }
+
+        function drawDistributions() {
+            distCtx.clearRect(0, 0, distCanvas.width, distCanvas.height);
+
+            const w = distCanvas.width;
+            const h = distCanvas.height;
+            const xMin = -5;
+            const xMax = 5;
+
+            // Map data X to canvas X
+            const mapX = (x) => ((x - xMin) / (xMax - xMin)) * w;
+            // Map probability Y to canvas Y (scaled so max peak takes ~80% height)
+            const maxPdf = pdf(mean_pos, mean_pos, std_pos);
+            const mapY = (y) => h - (y / maxPdf) * (h * 0.8) - 10;
+
+            const tX = mapX(thresh);
+
+            // --- Draw Negative Class (Red) ---
+            
+            // Base light fill
+            distCtx.beginPath();
+            distCtx.moveTo(mapX(xMin), h);
+            for (let i = 0; i <= w; i += 2) {
+                let x = xMin + (i / w) * (xMax - xMin);
+                distCtx.lineTo(i, mapY(pdf(x, mean_neg, std_neg)));
+            }
+            distCtx.lineTo(w, h);
+            distCtx.fillStyle = 'rgba(239, 68, 68, 0.1)'; // Light Red for True Negatives
+            distCtx.fill();
+            distCtx.strokeStyle = 'rgb(239, 68, 68)';
+            distCtx.lineWidth = 2;
+            distCtx.stroke();
+
+            // Shade False Positives (Right of Threshold)
+            distCtx.beginPath();
+            distCtx.moveTo(tX, h);
+            for (let i = tX; i <= w; i += 2) {
+                let x = xMin + (i / w) * (xMax - xMin);
+                distCtx.lineTo(i, mapY(pdf(x, mean_neg, std_neg)));
+            }
+            distCtx.lineTo(w, h);
+            distCtx.fillStyle = 'rgba(239, 68, 68, 0.6)'; // Solid Red for False Positives
+            distCtx.fill();
+
+            // --- Draw Positive Class (Green) ---
+            
+            // Base light fill
+            distCtx.beginPath();
+            distCtx.moveTo(mapX(xMin), h);
+            for (let i = 0; i <= w; i += 2) {
+                let x = xMin + (i / w) * (xMax - xMin);
+                distCtx.lineTo(i, mapY(pdf(x, mean_pos, std_pos)));
+            }
+            distCtx.lineTo(w, h);
+            distCtx.fillStyle = 'rgba(22, 163, 74, 0.1)'; // Light Green for True Positives
+            distCtx.fill();
+            distCtx.strokeStyle = 'rgb(22, 163, 74)';
+            distCtx.lineWidth = 2;
+            distCtx.stroke();
+
+            // Shade False Negatives (Left of Threshold)
+            distCtx.beginPath();
+            distCtx.moveTo(mapX(xMin), h);
+            for (let i = 0; i <= tX; i += 2) {
+                let x = xMin + (i / w) * (xMax - xMin);
+                distCtx.lineTo(i, mapY(pdf(x, mean_pos, std_pos)));
+            }
+            distCtx.lineTo(tX, h);
+            distCtx.fillStyle = 'rgba(107, 114, 128, 0.6)'; // Solid Gray for False Negatives
+            distCtx.fill();
+
+
+            // Draw Threshold Line
+            distCtx.beginPath();
+            distCtx.moveTo(tX, 0);
+            distCtx.lineTo(tX, h);
+            distCtx.strokeStyle = '#111827'; // Gray-900
+            distCtx.lineWidth = 2;
+            distCtx.setLineDash([5, 5]);
+            distCtx.stroke();
+            distCtx.setLineDash([]); // Reset
+
+            // Labels for distributions
+            distCtx.fillStyle = '#ef4444'; // Red-500
+            distCtx.font = "bold 12px sans-serif";
+            distCtx.fillText("Negative Class", mapX(mean_neg) - 40, 20);
+
+            distCtx.fillStyle = '#16a34a'; // Green-600
+            distCtx.fillText("Positive Class", mapX(mean_pos) - 40, 20);
+            
+            // Labels for shaded regions
+            distCtx.font = "bold 10px sans-serif";
+            // False Positives
+            if (thresh < 3) {
+                distCtx.fillStyle = '#b91c1c'; // Dark Red
+                distCtx.fillText("False Positives", Math.max(tX + 10, mapX(mean_neg + 0.5)), h - 15);
+            }
+            // False Negatives
+            if (thresh > -3) {
+                distCtx.fillStyle = '#374151'; // Dark Gray
+                let fnLabelX = Math.min(tX - 85, mapX(mean_pos - 1.5));
+                distCtx.fillText("False Negatives", fnLabelX, h - 15);
+            }
+        }
+
+        function drawROC() {
+            rocCtx.clearRect(0, 0, rocCanvas.width, rocCanvas.height);
+
+            // Pad canvas for axes
+            const pad = 40;
+            const w = rocCanvas.width - pad * 2;
+            const h = rocCanvas.height - pad * 2;
+
+            const mapX = (fpr) => pad + fpr * w;
+            const mapY = (tpr) => pad + h - tpr * h;
+
+            // Draw Grid & Axes
+            rocCtx.strokeStyle = '#e5e7eb'; // Gray-200
+            rocCtx.lineWidth = 1;
+            rocCtx.beginPath();
+            for (let i = 0; i <= 1; i += 0.2) {
+                rocCtx.moveTo(mapX(0), mapY(i)); rocCtx.lineTo(mapX(1), mapY(i));
+                rocCtx.moveTo(mapX(i), mapY(0)); rocCtx.lineTo(mapX(i), mapY(1));
+            }
+            rocCtx.stroke();
+
+            // Axis labels
+            rocCtx.fillStyle = '#6b7280'; // Gray-500
+            rocCtx.font = "11px sans-serif";
+            rocCtx.fillText("0.0", mapX(0) - 10, mapY(0) + 15);
+            rocCtx.fillText("1.0", mapX(1) - 10, mapY(0) + 15);
+            rocCtx.fillText("1.0", mapX(0) - 25, mapY(1) + 5);
+            rocCtx.fillText("False Positive Rate (FPR)", mapX(0.3), mapY(0) + 30);
+
+            rocCtx.save();
+            rocCtx.translate(mapX(0) - 30, mapY(0.7));
+            rocCtx.rotate(-Math.PI / 2);
+            rocCtx.fillText("True Positive Rate (TPR)", 0, 0);
+            rocCtx.restore();
+
+            // Draw Random Guess Line (Diagonal)
+            rocCtx.beginPath();
+            rocCtx.moveTo(mapX(0), mapY(0));
+            rocCtx.lineTo(mapX(1), mapY(1));
+            rocCtx.strokeStyle = '#d1d5db'; // Gray-300
+            rocCtx.setLineDash([4, 4]);
+            rocCtx.lineWidth = 2;
+            rocCtx.stroke();
+            rocCtx.setLineDash([]);
+
+            // Generate ROC Curve points by sliding a dummy threshold from +5 to -5
+            rocCtx.beginPath();
+            rocCtx.moveTo(mapX(0), mapY(0));
+
+            let auc = 0;
+            let prevFPR = 0;
+            let prevTPR = 0;
+
+            for (let t = 5; t >= -5; t -= 0.05) {
+                let tpr = 1 - cdf(t, mean_pos, std_pos);
+                let fpr = 1 - cdf(t, mean_neg, std_neg);
+                rocCtx.lineTo(mapX(fpr), mapY(tpr));
+
+                // Numerical integration for AUC (Trapezoidal rule)
+                auc += (fpr - prevFPR) * (tpr + prevTPR) / 2;
+                prevFPR = fpr;
+                prevTPR = tpr;
+            }
+            rocCtx.lineTo(mapX(1), mapY(1));
+            auc += (1 - prevFPR) * (1 + prevTPR) / 2; // Final piece
+
+            rocCtx.strokeStyle = '#2563eb'; // Blue-600
+            rocCtx.lineWidth = 3;
+            rocCtx.stroke();
+
+            // Fill under curve
+            rocCtx.lineTo(mapX(1), mapY(0));
+            rocCtx.lineTo(mapX(0), mapY(0));
+            rocCtx.fillStyle = 'rgba(37, 99, 235, 0.1)';
+            rocCtx.fill();
+
+            // Calculate current metrics based on actual slider threshold
+            let currentTPR = 1 - cdf(thresh, mean_pos, std_pos);
+            let currentFPR = 1 - cdf(thresh, mean_neg, std_neg);
+
+            // Draw Current Threshold Dot
+            rocCtx.beginPath();
+            rocCtx.arc(mapX(currentFPR), mapY(currentTPR), 6, 0, Math.PI * 2);
+            rocCtx.fillStyle = '#111827'; // Gray-900
+            rocCtx.fill();
+            rocCtx.strokeStyle = 'white';
+            rocCtx.lineWidth = 2;
+            rocCtx.stroke();
+
+            // Update Text Displays
+            // Analytical AUC for two Gaussians: Phi((mu_pos - mu_neg) / sqrt(sigma_pos^2 + sigma_neg^2))
+            let exactAUC = cdf((mean_pos - mean_neg) / Math.sqrt(std_pos * std_pos + std_neg * std_neg), 0, 1);
+
+            aucDisplay.innerText = exactAUC.toFixed(3);
+            tprDisplay.innerText = currentTPR.toFixed(2);
+            fprDisplay.innerText = currentFPR.toFixed(2);
+        }
+
+        // --- Initialization ---
+
+        window.addEventListener('resize', resizeCanvases);
+        sepSlider.addEventListener('input', updateVisuals);
+        threshSlider.addEventListener('input', updateVisuals);
+
+        setTimeout(resizeCanvases, 0);
+    </script>
+</body>
+</html>

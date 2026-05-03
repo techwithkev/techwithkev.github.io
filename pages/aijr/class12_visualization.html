@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L2 Regularization & Bias-Variance Tradeoff</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        
+        <!-- Navigation -->
+        <nav class="mb-6 pt-4 no-print" style="max-width: 1000px; margin-left: auto; margin-right: auto;">
+            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 transition-colors" style="text-decoration: none; color: #9ca3af;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Course Hub
+            </a>
+        </nav>
+
+        <!-- Header -->
+        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <h1 class="text-4xl font-black tracking-tight text-gray-900">BIAS-VARIANCE <span class="text-blue-600">TRADEOFF</span></h1>
+                <p class="text-gray-500 font-medium italic">Visualizing L2 Regularization on a Degree-9 Polynomial</p>
+            </div>
+            <div id="status-badge"
+                class="px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-white border border-gray-200 text-gray-400 shadow-sm transition-all duration-300">
+                Interactive Concept
+            </div>
+        </header>
+
+        <!-- Main Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            
+            <!-- Left Panel: Controls -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col justify-between">
+                <div>
+                    <!-- Slider Control -->
+                    <div class="mb-8">
+                        <div class="flex justify-between items-end mb-2">
+                            <label for="lambdaSlider" class="text-sm font-bold text-gray-500 uppercase">Regularization (&lambda;)</label>
+                            <span id="lambdaValueDisplay"
+                                class="text-xs font-mono font-black bg-blue-50 text-blue-800 border border-blue-200 px-3 py-1 rounded-full">0.00</span>
+                        </div>
+                        <input type="range" id="lambdaSlider" min="-5" max="3" step="0.1" value="-5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600 mb-2">
+                        <div class="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
+                            <span>Low Penalty<br />(Complex)</span>
+                            <span class="text-right">High Penalty<br />(Simple)</span>
+                        </div>
+                    </div>
+
+                    <!-- Live Metrics -->
+                    <div class="bg-gray-50 rounded-xl p-5 border border-gray-200 mb-6">
+                        <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 border-b border-gray-200 pb-2">Model Performance</h3>
+
+                        <div class="flex justify-between items-center mb-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+                                <span class="text-xs font-bold text-gray-500 uppercase">Train Error (MSE)</span>
+                            </div>
+                            <span id="trainErrorDisplay" class="font-mono font-black text-blue-600 text-lg">0.000</span>
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 rounded-full border-2 border-red-500 bg-white"></div>
+                                <span class="text-xs font-bold text-gray-500 uppercase">Test Error (MSE)</span>
+                            </div>
+                            <span id="testErrorDisplay" class="font-mono font-black text-red-500 text-lg">0.000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dynamic State Indicator -->
+                <div id="stateIndicator" class="rounded-xl p-5 border-l-4 transition-colors duration-300">
+                    <h2 id="stateTitle" class="font-black text-sm uppercase tracking-wider mb-2">Overfitting</h2>
+                    <p id="stateDesc" class="text-xs font-medium"></p>
+                </div>
+            </div>
+
+            <!-- Right Panel: Visualization -->
+            <div class="lg:col-span-2 bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col">
+                <div
+                    class="flex-grow bg-white border-2 border-gray-200 rounded-2xl relative overflow-hidden flex items-center justify-center min-h-[400px]">
+                    <canvas id="plotCanvas" class="w-full h-full cursor-crosshair absolute inset-0"></canvas>
+                </div>
+                <div class="mt-4 flex flex-wrap justify-center gap-6 text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 rounded-full bg-blue-500 opacity-80"></div> TRAINING DATA
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 rounded-full border-2 border-red-500"></div> UNSEEN TEST DATA
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-1 bg-gray-900"></div> MODEL PREDICTION
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. Math & Matrix Utilities (Self-contained logic) ---
+
+        function transpose(m) {
+            return m[0].map((_, colIndex) => m.map(row => row[colIndex]));
+        }
+
+        function multiply(a, b) {
+            let aRows = a.length, aCols = a[0].length, bCols = b[0].length, m = new Array(aRows);
+            for (let r = 0; r < aRows; ++r) {
+                m[r] = new Array(bCols);
+                for (let c = 0; c < bCols; ++c) {
+                    m[r][c] = 0;
+                    for (let i = 0; i < aCols; ++i) m[r][c] += a[r][i] * b[i][c];
+                }
+            }
+            return m;
+        }
+
+        function add(a, b) {
+            return a.map((row, i) => row.map((val, j) => val + b[i][j]));
+        }
+
+        function identity(size) {
+            let m = [];
+            for (let i = 0; i < size; i++) {
+                m[i] = [];
+                for (let j = 0; j < size; j++) m[i][j] = (i === j) ? 1 : 0;
+            }
+            return m;
+        }
+
+        // Matrix Inversion using Gaussian elimination with partial pivoting
+        function invert(matrix) {
+            let n = matrix.length;
+            let a = matrix.map(row => [...row]);
+            let I = identity(n);
+
+            for (let i = 0; i < n; i++) {
+                let maxEl = Math.abs(a[i][i]);
+                let maxRow = i;
+                for (let k = i + 1; k < n; k++) {
+                    if (Math.abs(a[k][i]) > maxEl) { maxEl = Math.abs(a[k][i]); maxRow = k; }
+                }
+
+                for (let k = i; k < n; k++) { let tmp = a[maxRow][k]; a[maxRow][k] = a[i][k]; a[i][k] = tmp; }
+                for (let k = 0; k < n; k++) { let tmp = I[maxRow][k]; I[maxRow][k] = I[i][k]; I[i][k] = tmp; }
+
+                let pivot = a[i][i];
+                if (Math.abs(pivot) < 1e-10) { pivot += 1e-8; } // Prevent singular matrix failure
+
+                for (let k = i; k < n; k++) a[i][k] /= pivot;
+                for (let k = 0; k < n; k++) I[i][k] /= pivot;
+
+                for (let j = 0; j < n; j++) {
+                    if (i !== j) {
+                        let factor = a[j][i];
+                        for (let k = i; k < n; k++) a[j][k] -= factor * a[i][k];
+                        for (let k = 0; k < n; k++) I[j][k] -= factor * I[i][k];
+                    }
+                }
+            }
+            return I;
+        }
+
+        // Create polynomial features: [1, x, x^2, ..., x^degree]
+        function polyFeatures(x, degree) {
+            let row = [];
+            for (let i = 0; i <= degree; i++) {
+                row.push(Math.pow(x, i));
+            }
+            return row;
+        }
+
+        // --- 2. Data Generation ---
+
+        const DEGREE = 9;
+        const NUM_TRAIN = 15;
+        const NUM_TEST = 15;
+        let trainData = [];
+        let testData = [];
+
+        function trueFunction(x) {
+            return Math.sin(x * Math.PI);
+        }
+
+        function generateData() {
+            let seed = 12345;
+            function random() {
+                let x = Math.sin(seed++) * 10000;
+                return x - Math.floor(x);
+            }
+
+            for (let i = 0; i < NUM_TRAIN; i++) {
+                let x = (i / (NUM_TRAIN - 1)) * 2 - 1;
+                let noise = (random() - 0.5) * 0.5;
+                trainData.push({ x: x, y: trueFunction(x) + noise });
+            }
+
+            for (let i = 0; i < NUM_TEST; i++) {
+                let x = (random() * 2) - 1;
+                let noise = (random() - 0.5) * 0.5;
+                testData.push({ x: x, y: trueFunction(x) + noise });
+            }
+        }
+
+        // --- 3. Machine Learning (Ridge Regression) ---
+
+        function trainRidgeRegression(data, lambda, degree) {
+            let X = [];
+            let Y = [];
+
+            data.forEach(p => {
+                X.push(polyFeatures(p.x, degree));
+                Y.push([p.y]);
+            });
+
+            let X_T = transpose(X);
+            let X_T_X = multiply(X_T, X);
+
+            let regMatrix = identity(degree + 1);
+            regMatrix[0][0] = 0; // Don't regularize bias
+
+            for (let i = 0; i < regMatrix.length; i++) {
+                for (let j = 0; j < regMatrix[0].length; j++) {
+                    regMatrix[i][j] *= lambda;
+                }
+            }
+
+            let invMatrix = invert(add(X_T_X, regMatrix));
+            let X_T_Y = multiply(X_T, Y);
+            let weights = multiply(invMatrix, X_T_Y);
+
+            return weights;
+        }
+
+        function predict(x, weights, degree) {
+            let features = polyFeatures(x, degree);
+            let y_pred = 0;
+            for (let i = 0; i <= degree; i++) {
+                y_pred += features[i] * weights[i][0];
+            }
+            return y_pred;
+        }
+
+        function calculateMSE(data, weights, degree) {
+            let sumSqErr = 0;
+            data.forEach(p => {
+                let y_pred = predict(p.x, weights, degree);
+                sumSqErr += Math.pow(y_pred - p.y, 2);
+            });
+            return sumSqErr / data.length;
+        }
+
+        // --- 4. Rendering & UI Logic ---
+
+        const canvas = document.getElementById('plotCanvas');
+        const ctx = canvas.getContext('2d');
+        const lambdaSlider = document.getElementById('lambdaSlider');
+        const lambdaValueDisplay = document.getElementById('lambdaValueDisplay');
+        const trainErrorDisplay = document.getElementById('trainErrorDisplay');
+        const testErrorDisplay = document.getElementById('testErrorDisplay');
+        const stateIndicator = document.getElementById('stateIndicator');
+        const stateTitle = document.getElementById('stateTitle');
+        const stateDesc = document.getElementById('stateDesc');
+
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            updateModelAndDraw();
+        }
+
+        function mapX(x) { return ((x + 1.1) / 2.2) * canvas.width; }
+        function mapY(y) { return canvas.height - (((y + 2) / 4) * canvas.height); }
+
+        function drawPoint(x, y, color, style = 'fill') {
+            let px = mapX(x);
+            let py = mapY(y);
+            ctx.beginPath();
+            ctx.arc(px, py, 5, 0, 2 * Math.PI);
+            if (style === 'fill') {
+                ctx.fillStyle = color;
+                ctx.fill();
+            } else {
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        }
+
+        function drawCurve(weights, degree) {
+            ctx.beginPath();
+            ctx.strokeStyle = '#111827'; // Gray 900
+            ctx.lineWidth = 3;
+            ctx.lineJoin = 'round';
+
+            let first = true;
+            for (let px = 0; px <= canvas.width; px += 2) {
+                let dataX = (px / canvas.width) * 2.2 - 1.1;
+                let dataY = predict(dataX, weights, degree);
+                let py = mapY(dataY);
+
+                if (first) {
+                    ctx.moveTo(px, py);
+                    first = false;
+                } else {
+                    ctx.lineTo(px, py);
+                }
+            }
+            ctx.stroke();
+        }
+
+        function updateUIState(trainMSE, testMSE) {
+            trainErrorDisplay.innerText = trainMSE.toFixed(3);
+            testErrorDisplay.innerText = testMSE.toFixed(3);
+
+            // CORRECTED LOGIC:
+            // 1. If training error is high, the model is too rigid to even fit the training data (High Bias / Underfitting)
+            if (trainMSE >= 0.20) {
+                stateIndicator.className = "rounded-xl p-5 border-l-4 transition-colors duration-300 bg-amber-50 border-amber-500 text-amber-900";
+                stateTitle.innerText = "Underfitting (High Bias)";
+                stateDesc.innerText = "The penalty is too strong. The model has become too rigid (approaching a flat line) and cannot capture the underlying pattern of the data.";
+            }
+            // 2. If training error is near zero, it is perfectly memorizing the noise (High Variance / Overfitting)
+            else if (trainMSE <= 0.04 || (testMSE / (trainMSE + 0.001) > 2.5 && testMSE > 0.1)) {
+                stateIndicator.className = "rounded-xl p-5 border-l-4 transition-colors duration-300 bg-red-50 border-red-500 text-red-900";
+                stateTitle.innerText = "Overfitting (High Variance)";
+                stateDesc.innerText = "The model is too complex. It perfectly memorizes the training data (including the noise!) but fails to generalize to unseen test data.";
+            }
+            // 3. Otherwise, it's balancing the two (Sweet Spot)
+            else {
+                stateIndicator.className = "rounded-xl p-5 border-l-4 transition-colors duration-300 bg-green-50 border-green-500 text-green-900";
+                stateTitle.innerText = "Optimal Fit (Sweet Spot)";
+                stateDesc.innerText = "Just right! Regularization is balancing complexity and simplicity. The model ignores the noise but captures the true underlying shape.";
+            }
+        }
+
+        function updateModelAndDraw() {
+            if (!canvas.width) return;
+
+            let sliderVal = parseFloat(lambdaSlider.value);
+            let lambda = Math.pow(10, sliderVal);
+
+            if (lambda < 0.01) lambdaValueDisplay.innerText = lambda.toExponential(1);
+            else if (lambda > 100) lambdaValueDisplay.innerText = lambda.toFixed(0);
+            else lambdaValueDisplay.innerText = lambda.toFixed(3);
+
+            let weights = trainRidgeRegression(trainData, lambda, DEGREE);
+
+            let trainMSE = calculateMSE(trainData, weights, DEGREE);
+            let testMSE = calculateMSE(testData, weights, DEGREE);
+
+            updateUIState(trainMSE, testMSE);
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.strokeStyle = '#f3f4f6'; // Gray 100
+            ctx.lineWidth = 1;
+            for (let i = 1; i < 4; i++) {
+                ctx.beginPath(); ctx.moveTo(0, canvas.height * i / 4); ctx.lineTo(canvas.width, canvas.height * i / 4); ctx.stroke();
+            }
+
+            drawCurve(weights, DEGREE);
+
+            trainData.forEach(p => drawPoint(p.x, p.y, '#2563eb', 'fill')); // Blue 600
+            testData.forEach(p => drawPoint(p.x, p.y, '#ef4444', 'stroke')); // Red 500
+        }
+
+        // --- 5. Initialization ---
+
+        generateData();
+        window.addEventListener('resize', resizeCanvas);
+        lambdaSlider.addEventListener('input', updateModelAndDraw);
+
+        setTimeout(resizeCanvas, 0);
+
+    </script>
+</body>
+</html>
