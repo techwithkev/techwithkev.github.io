@@ -413,6 +413,14 @@
     }
 
     /* ── Name gate ─────────────────────────────────────────────────────────── */
+    #access-code-gate {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+    }
+
     #name-gate {
       min-height: 100vh;
       display: flex;
@@ -552,6 +560,11 @@
       background: var(--teal);
     }
 
+    .gate-btn:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+
     /* ── Hidden until name entered ─────────────────────────────────────────── */
     #app {
       display: none;
@@ -601,8 +614,21 @@
 
 <body>
 
+  <!-- ── Access Code Gate ── -->
+  <div id="access-code-gate">
+    <div class="gate-card">
+      <div class="gate-logo">AI Junior Competition</div>
+      <h2>Homework Access</h2>
+      <p class="gate-sub">Enter your access code to begin.</p>
+      <label class="gate-label" for="access-code">Access Code</label>
+      <input class="gate-input" type="text" id="access-code" placeholder="e.g. XYZABC" autocomplete="off">
+      <div class="gate-err" id="code-err"></div>
+      <button class="gate-btn" id="code-btn" onclick="validateAccessCode()">Continue →</button>
+    </div>
+  </div>
+
   <!-- ── Name Gate ── -->
-  <div id="name-gate">
+  <div id="name-gate" style="display: none;">
     <div class="gate-card">
       <div class="gate-logo">AI Junior Competition · Class 11</div>
       <h2>Unsupervised Learning<br>Homework</h2>
@@ -1184,12 +1210,115 @@ X_pca = pca.fit_transform(X_scaled)</pre>
     const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
 
-    const { createClient } = supabase;
-    const db = createClient(SUPABASE_URL, SUPABASE_ANON);
 
-    // ── Student state ──────────────────────────────────────────────────────────
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+      auth: { persistSession: false }
+    });
+
+    // ── Global state ───────────────────────────────────────────────────────────
     let studentName = '';
+    let validatedClassNumber = null;
+    let validatedAccessCode = null;
     const startedAt = new Date().toISOString();
+
+    // ── Class metadata (for dynamic name gate content) ─────────────────────────
+    const classMetadata = {
+      11: {
+        title: 'Unsupervised Learning',
+        subtitle: 'k-Means · PCA · t-SNE',
+        description: 'Complete all 20 questions and receive instant feedback.'
+      }
+    };
+
+    // ── Access code validation ─────────────────────────────────────────────────
+    async function validateAccessCode() {
+      const codeInput = document.getElementById('access-code');
+      const codeErr = document.getElementById('code-err');
+      const codeBtn = document.getElementById('code-btn');
+      const code = codeInput.value.trim().toUpperCase();
+
+      codeInput.classList.remove('err');
+      codeErr.style.display = 'none';
+
+      if (!code) {
+        codeInput.classList.add('err');
+        codeErr.textContent = 'Enter an access code.';
+        codeErr.style.display = 'block';
+        return;
+      }
+
+      codeBtn.disabled = true;
+      codeBtn.textContent = '⏳ Validating...';
+
+      try {
+        const { data, error } = await db
+          .from('access_codes')
+          .select('id, class_number, max_uses, uses_count, is_active')
+          .eq('code', code)
+          .single();
+
+        if (error || !data) {
+          codeInput.classList.add('err');
+          codeErr.textContent = 'Invalid code. Try again.';
+          codeErr.style.display = 'block';
+          codeBtn.disabled = false;
+          codeBtn.textContent = 'Continue →';
+          return;
+        }
+
+        if (!data.is_active) {
+          codeErr.textContent = 'This code has been deactivated.';
+          codeErr.style.display = 'block';
+          codeBtn.disabled = false;
+          codeBtn.textContent = 'Continue →';
+          return;
+        }
+
+        if (data.uses_count >= data.max_uses) {
+          codeErr.textContent = 'This code has reached its use limit.';
+          codeErr.style.display = 'block';
+          codeBtn.disabled = false;
+          codeBtn.textContent = 'Continue →';
+          return;
+        }
+
+        // Increment use count
+        const { error: updateErr } = await db
+          .from('access_codes')
+          .update({ uses_count: data.uses_count + 1 })
+          .eq('id', data.id);
+
+        if (updateErr) {
+          codeErr.textContent = 'Error validating code. Please try again.';
+          codeErr.style.display = 'block';
+          codeBtn.disabled = false;
+          codeBtn.textContent = 'Continue →';
+          return;
+        }
+
+        // Store validated info
+        validatedClassNumber = data.class_number;
+        validatedAccessCode = code;
+
+        // Hide access gate, show name gate
+        document.getElementById('access-code-gate').style.display = 'none';
+        document.getElementById('name-gate').style.display = 'flex';
+        codeInput.value = '';
+        codeBtn.disabled = false;
+        codeBtn.textContent = 'Continue →';
+
+      } catch (err) {
+        console.error('Access code validation error:', err);
+        codeErr.textContent = 'Validation error. Please try again.';
+        codeErr.style.display = 'block';
+        codeBtn.disabled = false;
+        codeBtn.textContent = 'Continue →';
+      }
+    }
+
+    document.getElementById('access-code').addEventListener('keydown', e => {
+      if (e.key === 'Enter') validateAccessCode();
+    });
 
     // ── Name gate ──────────────────────────────────────────────────────────────
     function startHomework() {
@@ -1197,7 +1326,6 @@ X_pca = pca.fit_transform(X_scaled)</pre>
       const err = document.getElementById('gate-err');
       const name = input.value.trim();
 
-      // Require at least two words (first + last name)
       if (!name || name.split(/\s+/).filter(Boolean).length < 2) {
         input.classList.add('err');
         err.style.display = 'block';
@@ -1212,7 +1340,6 @@ X_pca = pca.fit_transform(X_scaled)</pre>
       initStrikes();
     }
 
-    // Allow Enter key on name input
     document.getElementById('student-name').addEventListener('keydown', e => {
       if (e.key === 'Enter') startHomework();
     });
@@ -1247,8 +1374,7 @@ X_pca = pca.fit_transform(X_scaled)</pre>
 
       const card = document.getElementById(qid);
       const feedback = document.getElementById(qid.replace('q', 'f'));
-      const strikeDotId = `sd${qid.slice(1)}_${s.strikes}`;
-      const strikeDot = document.getElementById(strikeDotId);
+      const strikeDot = document.getElementById(`sd${qid.slice(1)}_${s.strikes}`);
 
       if (isCorrect) {
         s.done = true;
@@ -1286,7 +1412,6 @@ X_pca = pca.fit_transform(X_scaled)</pre>
       document.getElementById('progress-label').textContent = `${answered} / ${TOTAL} answered`;
       document.getElementById('progress-fill').style.width = `${(answered / TOTAL) * 100}%`;
       document.getElementById('score-display').textContent = `Score: ${correct} / ${TOTAL}`;
-
       if (answered === TOTAL) showCompletion(correct);
     }
 
@@ -1305,7 +1430,7 @@ X_pca = pca.fit_transform(X_scaled)</pre>
       document.getElementById('completion-msg').textContent = msg;
       banner.scrollIntoView({ behavior: 'smooth' });
 
-      // ── Build per-question detail for Supabase ──────────────────────────────
+      // Build per-question detail
       const questionDetail = {};
       for (let i = 1; i <= TOTAL; i++) {
         const s = state[`q${i}`];
@@ -1316,19 +1441,21 @@ X_pca = pca.fit_transform(X_scaled)</pre>
         };
       }
 
+      const meta = classMetadata[validatedClassNumber] || {};
       const payload = {
         student_name: studentName,
-        class_number: 11,
-        homework_title: 'Unsupervised Learning — k-Means, PCA & t-SNE',
-        score: score,
+        class_number: validatedClassNumber,
+        homework_title: meta.title || 'Unsupervised Learning — k-Means, PCA & t-SNE',
+        score,
         total: TOTAL,
-        pct: pct,
+        pct,
         question_detail: questionDetail,
         started_at: startedAt,
         submitted_at: new Date().toISOString(),
+        access_code: validatedAccessCode,
       };
 
-      // ── Upload ──────────────────────────────────────────────────────────────
+      // Upload to Supabase
       const statusEl = document.getElementById('upload-status');
       statusEl.textContent = '⏳ Saving your results…';
       statusEl.className = 'uploading';
