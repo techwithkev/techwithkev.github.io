@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Class 10 Homework — AI Search</title>
+  <title>Homework — AI Junior Competition</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
 
@@ -35,19 +35,71 @@
       min-height: 100vh;
     }
 
-    /* ── Access Code Gate ─────────────────────────────────────────────── */
-    #access-code-gate {
+    /* ── Loading screen ─────────────────────────────────────────────────── */
+    #loading-screen {
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 2rem 1.5rem;
+      gap: 1rem;
+      color: var(--gray);
     }
 
-    /* ── Name Gate ─────────────────────────────────────────────────────── */
-    #name-gate {
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid #dde4ed;
+      border-top-color: var(--teal);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    #loading-screen p {
+      font-size: 0.9rem;
+    }
+
+    /* ── Error screen ───────────────────────────────────────────────────── */
+    #error-screen {
+      display: none;
       min-height: 100vh;
-      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .error-card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1.5px solid #f5c2c2;
+      padding: 2.5rem 2rem;
+      max-width: 460px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .error-card h2 {
+      color: var(--red);
+      margin-bottom: 0.75rem;
+    }
+
+    .error-card p {
+      color: var(--gray);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    /* ── Gates ──────────────────────────────────────────────────────────── */
+    #access-code-gate,
+    #name-gate {
+      display: none;
+      min-height: 100vh;
       align-items: center;
       justify-content: center;
       padding: 2rem 1.5rem;
@@ -84,7 +136,7 @@
       line-height: 1.2;
     }
 
-    .gate-card .gate-sub {
+    .gate-sub {
       font-size: 0.9rem;
       color: var(--gray);
       margin-bottom: 1.8rem;
@@ -185,16 +237,16 @@
     }
 
     .gate-btn:disabled {
-      background: #ccc;
+      background: #aaa;
       cursor: not-allowed;
     }
 
-    /* ── App hidden until gates pass ────────────────────────────────── */
+    /* ── App ────────────────────────────────────────────────────────────── */
     #app {
       display: none;
     }
 
-    /* ── Header ─────────────────────────────────────────────────────── */
+    /* ── Header ─────────────────────────────────────────────────────────── */
     header {
       background: var(--navy);
       padding: 2rem 2.5rem 1.5rem;
@@ -250,6 +302,7 @@
       gap: 0.5rem;
       margin-top: 0.8rem;
       padding-left: 0.5rem;
+      flex-wrap: wrap;
     }
 
     .badge {
@@ -276,7 +329,7 @@
       color: #fff;
     }
 
-    /* ── Progress bar ──────────────────────────────────────────────── */
+    /* ── Progress bar ──────────────────────────────────────────────────── */
     #progress-bar-wrap {
       background: #fff;
       border-bottom: 1px solid #dde4ed;
@@ -329,14 +382,25 @@
       white-space: nowrap;
     }
 
-    /* ── Main layout ───────────────────────────────────────────────── */
+    /* ── Main layout ───────────────────────────────────────────────────── */
     main {
       max-width: 860px;
       margin: 0 auto;
       padding: 2rem 1.5rem 4rem;
     }
 
-    /* ── Section headers ───────────────────────────────────────────── */
+    /* ── Questions loading state ────────────────────────────────────────── */
+    #questions-loading {
+      text-align: center;
+      padding: 3rem;
+      color: var(--gray);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    /* ── Section headers ───────────────────────────────────────────────── */
     .section-header {
       display: flex;
       align-items: center;
@@ -372,14 +436,14 @@
       margin-left: auto;
     }
 
-    /* ── Question cards ────────────────────────────────────────────── */
+    /* ── Question cards ────────────────────────────────────────────────── */
     .question-card {
       background: #fff;
       border-radius: 8px;
       border: 1.5px solid #dde4ed;
       margin-bottom: 1rem;
       overflow: hidden;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      transition: border-color 0.2s;
     }
 
     .question-card.answered-correct {
@@ -426,7 +490,7 @@
       padding: 0.8rem 1rem 0.9rem;
     }
 
-    /* ── MCQ options ───────────────────────────────────────────────── */
+    /* ── MCQ options ───────────────────────────────────────────────────── */
     .options {
       display: flex;
       flex-direction: column;
@@ -478,7 +542,21 @@
       padding-top: 0.05rem;
     }
 
-    /* ── Strikes ───────────────────────────────────────────────────── */
+    /* ── Code snippets ──────────────────────────────────────────────────── */
+    .code-snippet {
+      background: var(--code-bg);
+      color: var(--code-fg);
+      font-family: 'Fira Code', monospace;
+      font-size: 0.82rem;
+      padding: 0.7rem 1rem;
+      border-radius: 6px;
+      margin: 0.5rem 0 0.75rem;
+      overflow-x: auto;
+      line-height: 1.55;
+      white-space: pre;
+    }
+
+    /* ── Strikes ───────────────────────────────────────────────────────── */
     .strikes {
       display: flex;
       gap: 0.3rem;
@@ -504,7 +582,7 @@
       border-color: var(--green);
     }
 
-    /* ── Feedback ───────────────────────────────────────────────────── */
+    /* ── Feedback ───────────────────────────────────────────────────────── */
     .feedback {
       font-size: 0.83rem;
       padding: 0.4rem 0.65rem;
@@ -526,11 +604,17 @@
       border-left: 3px solid var(--red);
     }
 
+    .feedback.hint {
+      background: #fff8e1;
+      color: #7a5500;
+      border-left: 3px solid var(--gold);
+    }
+
     .feedback.show {
       display: block;
     }
 
-    /* ── Completion banner ─────────────────────────────────────────── */
+    /* ── Completion banner ─────────────────────────────────────────────── */
     #completion-banner {
       display: none;
       background: var(--navy);
@@ -563,7 +647,7 @@
       margin: 0.5rem 0;
     }
 
-    /* ── Upload status ─────────────────────────────────────────────── */
+    /* ── Upload status ─────────────────────────────────────────────────── */
     #upload-status {
       margin-top: 1.2rem;
       padding: 0.75rem 1rem;
@@ -596,63 +680,67 @@
 
 <body>
 
+  <!-- ── Loading screen ── -->
+  <div id="loading-screen">
+    <div class="spinner"></div>
+    <p>Loading…</p>
+  </div>
+
+  <!-- ── Error screen ── -->
+  <div id="error-screen">
+    <div class="error-card">
+      <h2>⚠ Something went wrong</h2>
+      <p id="error-message">Unable to load homework. Check your connection and try again.</p>
+    </div>
+  </div>
+
   <!-- ── Access Code Gate ── -->
   <div id="access-code-gate">
     <div class="gate-card">
       <div class="gate-logo">AI Junior Competition</div>
       <h2>Homework Access</h2>
       <p class="gate-sub">Enter your access code to begin.</p>
-
       <label class="gate-label" for="access-code">Access Code</label>
       <input class="gate-input" type="text" id="access-code" placeholder="e.g. XYZABC" autocomplete="off">
       <div class="gate-err" id="code-err"></div>
-
       <button class="gate-btn" id="code-btn" onclick="validateAccessCode()">Continue →</button>
     </div>
   </div>
 
   <!-- ── Name Gate ── -->
-  <div id="name-gate" style="display: none;">
+  <div id="name-gate">
     <div class="gate-card">
-      <div class="gate-logo" id="name-gate-logo">AI Junior Competition · Class 10</div>
-      <h2 id="name-gate-title">AI Search<br>Homework</h2>
-      <p class="gate-sub" id="name-gate-sub">BFS · DFS · UCS · A* · Weighted A*<br>Complete all 20 questions and receive
-        instant feedback.</p>
+      <div class="gate-logo" id="name-gate-logo">AI Junior Competition</div>
+      <h2 id="name-gate-title">Homework</h2>
+      <p class="gate-sub" id="name-gate-sub">Complete all 20 questions and receive instant feedback.</p>
       <div class="gate-stats">
         <div class="gate-stat">
           <div class="gs-label">Questions</div>
-          <div class="gs-val">20</div>
+          <div class="gs-val" id="stat-questions">20</div>
         </div>
         <div class="gate-stat">
           <div class="gs-label">Sections</div>
-          <div class="gs-val">5</div>
+          <div class="gs-val" id="stat-sections">5</div>
         </div>
         <div class="gate-stat">
           <div class="gs-label">Strikes</div>
           <div class="gs-val">3 ×</div>
         </div>
       </div>
-
       <label class="gate-label" for="student-name">Full Name — Required to Begin</label>
       <input class="gate-input" type="text" id="student-name" placeholder="e.g. Sophie Tremblay" autocomplete="name">
-      <div class="gate-err" id="gate-err"></div>
-
+      <div class="gate-err" id="gate-err">Please enter your first and last name.</div>
       <button class="gate-btn" onclick="startHomework()">Begin Homework →</button>
     </div>
   </div>
 
   <!-- ── App ── -->
   <div id="app">
-
     <header>
-      <div class="header-label">AI Junior Competition · Class 10</div>
-      <h1>AI Search Homework</h1>
-      <p class="subtitle">BFS · DFS · UCS · A* · Weighted A* · 20 exercises · 3 strikes per question</p>
-      <div class="badges">
-        <span class="badge badge-teal">SEARCH</span>
-        <span class="badge badge-red">★★★ MODULE 3</span>
-        <span class="badge badge-teal">EXAM: Q11 · Q12 · Q35</span>
-      </div>
+      <div class="header-label" id="header-label">AI Junior Competition</div>
+      <h1 id="header-title">Homework</h1>
+      <p class="subtitle" id="header-subtitle">20 exercises · 3 strikes per question</p>
+      <div class="badges" id="header-badges"></div>
     </header>
 
     <div id="progress-bar-wrap">
@@ -664,157 +752,20 @@
       <span id="score-display">Score: 0</span>
     </div>
 
-    <main>
-
-      <!-- ══════════════════════════════════════════════════════════════════════ -->
-      <!-- SECTION 1: State Space & Graph Fundamentals (4 questions)             -->
-      <!-- ══════════════════════════════════════════════════════════════════════ -->
-      <div class="section-header">
-        <div class="section-num">1</div>
-        <div class="section-title">State Space & Graph Fundamentals</div>
-        <div class="section-subtitle">4 questions</div>
+    <main id="questions-container">
+      <div id="questions-loading">
+        <div class="spinner"></div>
+        <p>Loading questions…</p>
       </div>
-
-      <div class="question-card" id="q1">
-        <div class="q-header"><span class="q-num">Q1</span><span class="q-text">In AI search, a <strong>state
-              space</strong> is best described as:</span></div>
-        <div class="q-body">
-          <div class="strikes" id="s1"></div>
-          <div class="options">
-            <button class="option-btn"
-              onclick="answer('q1',this,false,'A dataset is a collection of labelled examples for training — not a search space.')"><span
-                class="option-letter">A</span>A labelled dataset used for training a model</button>
-            <button class="option-btn"
-              onclick="answer('q1',this,true,'Correct! A state space is the set of all possible configurations (nodes) the agent can be in, with edges representing valid transitions between them.')"><span
-                class="option-letter">B</span>The set of all possible configurations the agent can be in, connected by
-              transitions</button>
-            <button class="option-btn"
-              onclick="answer('q1',this,false,'A cost matrix is a tool used within search, not the definition of a state space.')"><span
-                class="option-letter">C</span>A matrix of edge costs between every pair of nodes</button>
-            <button class="option-btn"
-              onclick="answer('q1',this,false,'The frontier is the set of nodes currently being considered — a subset of the state space, not the space itself.')"><span
-                class="option-letter">D</span>The set of nodes currently in the search frontier</button>
-          </div>
-          <div class="feedback" id="f1"></div>
-        </div>
-      </div>
-
-      <div class="question-card" id="q2">
-        <div class="q-header"><span class="q-num">Q2</span><span class="q-text">What data structure does BFS use to
-            manage its frontier?</span></div>
-        <div class="q-body">
-          <div class="strikes" id="s2"></div>
-          <div class="options">
-            <button class="option-btn"
-              onclick="answer('q2',this,false,'A stack implements LIFO — that is DFS, not BFS.')"><span
-                class="option-letter">A</span>Stack (LIFO)</button>
-            <button class="option-btn"
-              onclick="answer('q2',this,true,'Correct! BFS uses a queue (FIFO — First In, First Out). Nodes are explored in the order they were discovered, guaranteeing the shallowest goal is found first.')"><span
-                class="option-letter">B</span>Queue (FIFO)</button>
-            <button class="option-btn"
-              onclick="answer('q2',this,false,'A priority queue is used by UCS and A*, not BFS.')"><span
-                class="option-letter">C</span>Priority queue (min-heap)</button>
-            <button class="option-btn"
-              onclick="answer('q2',this,false,'A hash set is used for the visited/explored set, not the frontier.')"><span
-                class="option-letter">D</span>Hash set</button>
-          </div>
-          <div class="feedback" id="f2"></div>
-        </div>
-      </div>
-
-      <div class="question-card" id="q3">
-        <div class="q-header"><span class="q-num">Q3</span><span class="q-text">What data structure does DFS use to
-            manage its frontier?</span></div>
-        <div class="q-body">
-          <div class="strikes" id="s3"></div>
-          <div class="options">
-            <button class="option-btn"
-              onclick="answer('q3',this,true,'Correct! DFS uses a stack (LIFO — Last In, First Out). The most recently discovered node is explored first, diving deep before backtracking.')"><span
-                class="option-letter">A</span>Stack (LIFO)</button>
-            <button class="option-btn"
-              onclick="answer('q3',this,false,'A queue (FIFO) is used by BFS — it explores breadth before depth.')"><span
-                class="option-letter">B</span>Queue (FIFO)</button>
-            <button class="option-btn" onclick="answer('q3',this,false,'A priority queue is used by UCS and A*.')"><span
-                class="option-letter">C</span>Priority queue (min-heap)</button>
-            <button class="option-btn"
-              onclick="answer('q3',this,false,'A deque can implement both, but DFS specifically uses LIFO ordering.')"><span
-                class="option-letter">D</span>Deque with random access</button>
-          </div>
-          <div class="feedback" id="f3"></div>
-        </div>
-      </div>
-
-      <div class="question-card" id="q4">
-        <div class="q-header"><span class="q-num">Q4</span><span class="q-text">The <strong>branching factor</strong> b
-            of a search tree is 3 and the goal is at depth d = 4. Approximately how many nodes does BFS expand?</span>
-        </div>
-        <div class="q-body">
-          <div class="strikes" id="s4"></div>
-          <div class="options">
-            <button class="option-btn"
-              onclick="answer('q4',this,false,'3×4 = 12 — this multiplies b and d linearly, which is wrong. BFS is exponential in depth.')"><span
-                class="option-letter">A</span>12 (b × d)</button>
-            <button class="option-btn"
-              onclick="answer('q4',this,false,'4^3 = 64 — this swaps b and d. The formula is b^d.')"><span
-                class="option-letter">B</span>64 (d^b)</button>
-            <button class="option-btn"
-              onclick="answer('q4',this,true,'Correct! BFS has time complexity O(b^d). With b=3 and d=4: 3^4 = 81 nodes in the worst case.')"><span
-                class="option-letter">C</span>~81 (b^d = 3^4)</button>
-            <button class="option-btn"
-              onclick="answer('q4',this,false,'b+d = 7 — this is a linear combination, not the correct complexity formula.')"><span
-                class="option-letter">D</span>7 (b + d)</button>
-          </div>
-          <div class="feedback" id="f4"></div>
-        </div>
-      </div>
-
-      <!-- ══════════════════════════════════════════════════════════════════════ -->
-      <!-- SECTION 2-5: Placeholder (full content in the actual file)            -->
-      <!-- ══════════════════════════════════════════════════════════════════════ -->
-      <!-- Remaining 16 questions go here (same content as before, abbreviated for space) -->
-
-      <div class="section-header">
-        <div class="section-num">2</div>
-        <div class="section-title">BFS vs DFS — Properties</div>
-        <div class="section-subtitle">4 questions</div>
-      </div>
-
-      <!-- Q5–Q8 would go here (same as previous version) -->
-
-      <div class="section-header">
-        <div class="section-num">3</div>
-        <div class="section-title">Uniform Cost Search</div>
-        <div class="section-subtitle">4 questions · Exam Q12</div>
-      </div>
-
-      <!-- Q9–Q12 would go here -->
-
-      <div class="section-header">
-        <div class="section-num">4</div>
-        <div class="section-title">A* and Weighted A*</div>
-        <div class="section-subtitle">5 questions · Exam Q11</div>
-      </div>
-
-      <!-- Q13–Q17 would go here -->
-
-      <div class="section-header">
-        <div class="section-num">5</div>
-        <div class="section-title">Algorithm Selection & Open-Ended Reasoning</div>
-        <div class="section-subtitle">3 questions · Exam Q35</div>
-      </div>
-
-      <!-- Q18–Q20 would go here -->
-
-      <!-- Completion banner -->
-      <div id="completion-banner">
-        <h2>🎉 Homework Complete!</h2>
-        <span class="score-big" id="final-score-display"></span>
-        <p id="completion-msg"></p>
-        <div id="upload-status"></div>
-      </div>
-
     </main>
-  </div><!-- /#app -->
+
+    <div id="completion-banner">
+      <h2>🎉 Homework Complete!</h2>
+      <span class="score-big" id="final-score-display"></span>
+      <p id="completion-msg"></p>
+      <div id="upload-status"></div>
+    </div>
+  </div>
 
   <script>
     // ── Supabase config ────────────────────────────────────────────────────────
@@ -826,26 +777,75 @@
     });
 
     // ── Global state ───────────────────────────────────────────────────────────
+    const urlParams = new URLSearchParams(window.location.search);
+    const expectedClass = parseInt(urlParams.get('class'));
+    let classConfig = null;
+    let questions = [];
     let studentName = '';
     let validatedClassNumber = null;
     let validatedAccessCode = null;
     const startedAt = new Date().toISOString();
+    const MAX_STRIKES = 3;
+    let TOTAL = 0;
+    const state = {};
+    const questionData = {}; // lookup: qNum -> { explanation, hint_1, hint_2 }
 
-    // ── CLASS METADATA ─────────────────────────────────────────────────────────
-    const classMetadata = {
-      10: {
-        title: 'AI Search',
-        subtitle: 'BFS · DFS · UCS · A* · Weighted A*',
-        description: 'Complete all 20 questions and receive instant feedback.'
-      },
-      11: {
-        title: 'Unsupervised Learning',
-        subtitle: 'k-Means · PCA · t-SNE',
-        description: 'Complete all 20 questions and receive instant feedback.'
+    // ── Helpers ────────────────────────────────────────────────────────────────
+    function show(id, flex = false) {
+      const el = document.getElementById(id);
+      el.style.display = flex ? 'flex' : 'block';
+    }
+    function hide(id) { document.getElementById(id).style.display = 'none'; }
+
+    function showError(msg) {
+      hide('loading-screen');
+      document.getElementById('error-message').textContent = msg;
+      show('error-screen', true);
+    }
+
+    function escapeHtml(str) {
+      const d = document.createElement('div');
+      d.textContent = str || '';
+      return d.innerHTML;
+    }
+
+    // ── Page init ──────────────────────────────────────────────────────────────
+    async function init() {
+      if (!expectedClass || isNaN(expectedClass)) {
+        showError('No class specified. Use a link like homework.html?class=11');
+        return;
       }
-    };
 
-    // ── ACCESS CODE VALIDATION ─────────────────────────────────────────────────
+      try {
+        // Load class config from Supabase
+        const { data, error } = await db
+          .from('class_config')
+          .select('*')
+          .eq('class_number', expectedClass)
+          .single();
+
+        if (error || !data) {
+          showError(`Class ${expectedClass} not found. Check with your teacher.`);
+          return;
+        }
+
+        classConfig = data;
+
+        // Populate name gate with class info
+        document.getElementById('name-gate-logo').textContent = `AI Junior Competition · Class ${expectedClass}`;
+        document.getElementById('name-gate-title').innerHTML = `${classConfig.title}<br>Homework`;
+        document.getElementById('name-gate-sub').textContent = classConfig.description;
+
+        // Show access code gate
+        hide('loading-screen');
+        show('access-code-gate', true);
+
+      } catch (err) {
+        showError('Connection error. Check your internet and try again.');
+      }
+    }
+
+    // ── Access code validation ─────────────────────────────────────────────────
     async function validateAccessCode() {
       const codeInput = document.getElementById('access-code');
       const codeErr = document.getElementById('code-err');
@@ -862,12 +862,10 @@
         return;
       }
 
-      // Disable button during validation
       codeBtn.disabled = true;
-      codeBtn.textContent = '⏳ Validating...';
+      codeBtn.textContent = '⏳ Validating…';
 
       try {
-        // Query the database for the access code
         const { data, error } = await db
           .from('access_codes')
           .select('id, class_number, max_uses, uses_count, is_active')
@@ -883,7 +881,15 @@
           return;
         }
 
-        // Check if code is still active
+        // Validate code belongs to THIS class
+        if (data.class_number !== expectedClass) {
+          codeErr.textContent = `This code is for Class ${data.class_number}, not Class ${expectedClass}. Use your Class ${expectedClass} code.`;
+          codeErr.style.display = 'block';
+          codeBtn.disabled = false;
+          codeBtn.textContent = 'Continue →';
+          return;
+        }
+
         if (!data.is_active) {
           codeErr.textContent = 'This code has been deactivated.';
           codeErr.style.display = 'block';
@@ -892,7 +898,6 @@
           return;
         }
 
-        // Check if code has been used up
         if (data.uses_count >= data.max_uses) {
           codeErr.textContent = 'This code has reached its use limit.';
           codeErr.style.display = 'block';
@@ -901,7 +906,7 @@
           return;
         }
 
-        // Code is valid — increment use count
+        // Increment use count
         const { error: updateErr } = await db
           .from('access_codes')
           .update({ uses_count: data.uses_count + 1 })
@@ -915,27 +920,16 @@
           return;
         }
 
-        // Store validated info
         validatedClassNumber = data.class_number;
         validatedAccessCode = code;
 
-        // Update name gate with class-specific info
-        const meta = classMetadata[validatedClassNumber];
-        if (meta) {
-          document.getElementById('name-gate-logo').textContent = `AI Junior Competition · Class ${validatedClassNumber}`;
-          document.getElementById('name-gate-title').innerHTML = `${meta.title}<br>Homework`;
-          document.getElementById('name-gate-sub').innerHTML = `${meta.subtitle}<br>${meta.description}`;
-        }
-
-        // Hide access code gate, show name gate
-        document.getElementById('access-code-gate').style.display = 'none';
-        document.getElementById('name-gate').style.display = 'flex';
+        hide('access-code-gate');
+        show('name-gate', true);
         codeInput.value = '';
         codeBtn.disabled = false;
         codeBtn.textContent = 'Continue →';
 
       } catch (err) {
-        console.error('Access code validation error:', err);
         codeErr.textContent = 'Validation error. Please try again.';
         codeErr.style.display = 'block';
         codeBtn.disabled = false;
@@ -943,12 +937,11 @@
       }
     }
 
-    // Allow Enter key on access code input
     document.getElementById('access-code').addEventListener('keydown', e => {
       if (e.key === 'Enter') validateAccessCode();
     });
 
-    // ── NAME GATE ──────────────────────────────────────────────────────────────
+    // ── Name gate ──────────────────────────────────────────────────────────────
     function startHomework() {
       const input = document.getElementById('student-name');
       const err = document.getElementById('gate-err');
@@ -962,45 +955,183 @@
       }
 
       studentName = name;
-      document.getElementById('name-gate').style.display = 'none';
-      document.getElementById('app').style.display = 'block';
+      hide('name-gate');
+      show('app');
+
       document.getElementById('student-chip').textContent = '👤 ' + name;
-      initStrikes();
+
+      // Populate header from class config
+      document.getElementById('header-label').textContent = `AI Junior Competition · Class ${validatedClassNumber}`;
+      document.getElementById('header-title').textContent = classConfig.title + ' Homework';
+      document.getElementById('header-subtitle').textContent = `${classConfig.subtitle} · 20 exercises · 3 strikes per question`;
+
+      // Render badges
+      const badgesEl = document.getElementById('header-badges');
+      if (classConfig.module_badge) {
+        badgesEl.innerHTML += `<span class="badge badge-teal">${classConfig.module_badge}</span>`;
+      }
+      if (classConfig.difficulty_badge) {
+        badgesEl.innerHTML += `<span class="badge badge-red">${classConfig.difficulty_badge}</span>`;
+      }
+      if (classConfig.exam_links) {
+        badgesEl.innerHTML += `<span class="badge badge-teal">EXAM: ${classConfig.exam_links}</span>`;
+      }
+
+      loadQuestions();
     }
 
     document.getElementById('student-name').addEventListener('keydown', e => {
       if (e.key === 'Enter') startHomework();
     });
 
-    // ── HOMEWORK STATE ─────────────────────────────────────────────────────────
-    const MAX_STRIKES = 3;
-    const TOTAL = 20;
-    const state = {};
-    for (let i = 1; i <= TOTAL; i++) {
-      state[`q${i}`] = { strikes: 0, done: false, correct: false };
+    // ── Load and render questions ───────────────────────────────────────────────
+    async function loadQuestions() {
+      try {
+        const { data, error } = await db
+          .from('questions')
+          .select('*')
+          .eq('class_number', validatedClassNumber)
+          .order('question_number', { ascending: true });
+
+        if (error || !data || data.length === 0) {
+          document.getElementById('questions-loading').innerHTML =
+            '<p style="color:var(--red)">⚠ Questions failed to load. Please try again or contact your teacher.</p>';
+          return;
+        }
+
+        questions = data;
+        TOTAL = questions.length;
+
+        // Init state for each question
+        questions.forEach(q => {
+          state[`q${q.question_number}`] = { strikes: 0, done: false, correct: false };
+        });
+
+        // Update progress bar total
+        document.getElementById('progress-label').textContent = `0 / ${TOTAL} answered`;
+        document.getElementById('score-display').textContent = `Score: 0 / ${TOTAL}`;
+
+        // Update name gate stats
+        document.getElementById('stat-questions').textContent = TOTAL;
+        const sectionCount = new Set(questions.map(q => q.section_number)).size;
+        document.getElementById('stat-sections').textContent = sectionCount;
+
+        renderQuestions();
+
+      } catch (err) {
+        document.getElementById('questions-loading').innerHTML =
+          `<p style="color:var(--red)">⚠ Connection error: ${err.message}</p>`;
+      }
     }
 
+    function renderQuestions() {
+      const container = document.getElementById('questions-container');
+      container.innerHTML = ''; // clear loading spinner
+
+      let currentSection = null;
+      const sectionCounts = {};
+      questions.forEach(q => {
+        sectionCounts[q.section_number] = (sectionCounts[q.section_number] || 0) + 1;
+      });
+
+      questions.forEach(q => {
+        const qn = q.question_number;
+
+        // Section header
+        if (currentSection !== q.section_number) {
+          currentSection = q.section_number;
+          const header = document.createElement('div');
+          header.className = 'section-header';
+          const examNote = q.section_exam_note ? ` · ${q.section_exam_note}` : '';
+          header.innerHTML = `
+        <div class="section-num">${q.section_number}</div>
+        <div class="section-title">${escapeHtml(q.section_title)}</div>
+        <div class="section-subtitle">${sectionCounts[q.section_number]} question${sectionCounts[q.section_number] > 1 ? 's' : ''}${examNote}</div>
+      `;
+          container.appendChild(header);
+        }
+
+        // Question label
+        const qLabel = q.is_exam_linked
+          ? `Q${qn} ⭐ Exam ${q.exam_q_reference}`
+          : `Q${qn}`;
+
+        // Code snippet (optional)
+        const codeBlock = q.code_snippet
+          ? `<div class="code-snippet">${escapeHtml(q.code_snippet)}</div>`
+          : '';
+
+        // Store explanation and hints in lookup — never embed text in onclick attributes
+        questionData[qn] = {
+          explanation: q.explanation || '',
+          hint_1: q.hint_1 || null,
+          hint_2: q.hint_2 || null,
+        };
+
+        // Build answer options
+        const options = ['A', 'B', 'C', 'D'];
+        const optionTexts = [q.option_a, q.option_b, q.option_c, q.option_d];
+        const optionsHtml = options.map((letter, i) => {
+          const isCorrect = (i + 1) === q.correct_answer;
+          const text = escapeHtml(optionTexts[i] || '');
+          if (!text) return '';
+          return `
+        <button class="option-btn" onclick="answer('q${qn}', this, ${isCorrect})">
+          <span class="option-letter">${letter}</span>${text}
+        </button>`;
+        }).join('');
+
+        // Question card
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `q${qn}`;
+        card.innerHTML = `
+      <div class="q-header">
+        <span class="q-num">${qLabel}</span>
+        <span class="q-text">${escapeHtml(q.question_text)}</span>
+      </div>
+      <div class="q-body">
+        <div class="strikes" id="s${qn}"></div>
+        ${codeBlock}
+        <div class="options">${optionsHtml}</div>
+        <div class="feedback" id="f${qn}"></div>
+      </div>
+    `;
+        container.appendChild(card);
+      });
+
+      // Completion banner (append after questions)
+      const banner = document.getElementById('completion-banner');
+      container.parentElement.appendChild(banner);
+
+      initStrikes();
+    }
+
+    // ── Strikes ────────────────────────────────────────────────────────────────
     function initStrikes() {
-      for (let i = 1; i <= TOTAL; i++) {
-        const el = document.getElementById(`s${i}`);
-        if (!el) continue;
+      questions.forEach(q => {
+        const el = document.getElementById(`s${q.question_number}`);
+        if (!el) return;
         el.innerHTML = '';
         for (let j = 0; j < MAX_STRIKES; j++) {
           const d = document.createElement('div');
           d.className = 'strike-dot alive';
-          d.id = `sd${i}_${j}`;
+          d.id = `sd${q.question_number}_${j}`;
           el.appendChild(d);
         }
-      }
+      });
     }
 
-    function answer(qid, btn, isCorrect, explanation) {
+    // ── Answer handler ──────────────────────────────────────────────────────────
+    function answer(qid, btn, isCorrect) {
       const s = state[qid];
-      if (s.done) return;
+      if (!s || s.done) return;
 
       const card = document.getElementById(qid);
       const feedback = document.getElementById(qid.replace('q', 'f'));
-      const dot = document.getElementById(`sd${qid.slice(1)}_${s.strikes}`);
+      const qNum = qid.replace('q', '');
+      const strikeDot = document.getElementById(`sd${qNum}_${s.strikes}`);
+      const explanation = questionData[qNum]?.explanation || '';
 
       if (isCorrect) {
         s.done = true; s.correct = true;
@@ -1011,24 +1142,30 @@
         card.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
       } else {
         s.strikes++;
-        if (dot) { dot.classList.remove('alive'); dot.classList.add('used'); }
+        if (strikeDot) { strikeDot.classList.remove('alive'); strikeDot.classList.add('used'); }
         btn.classList.add('wrong');
         btn.disabled = true;
 
         if (s.strikes >= MAX_STRIKES) {
+          // 3rd strike — full explanation, red
           s.done = true; s.correct = false;
           card.classList.add('answered-wrong');
           feedback.className = 'feedback wrong show';
           feedback.textContent = '✗ 3 strikes — ' + explanation;
           card.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
         } else {
-          feedback.className = 'feedback wrong show';
-          feedback.textContent = `✗ Not quite — ${MAX_STRIKES - s.strikes} attempt${MAX_STRIKES - s.strikes > 1 ? 's' : ''} left. ` + explanation;
+          // 1st or 2nd strike — show hint, gold
+          const qd = questionData[qNum];
+          const hint = s.strikes === 1 ? qd?.hint_1 : qd?.hint_2;
+          const left = MAX_STRIKES - s.strikes;
+          feedback.className = 'feedback hint show';
+          feedback.textContent = `💡 ${left} attempt${left > 1 ? 's' : ''} left — ${hint || 'Think carefully and try again.'}`;
         }
       }
       updateProgress();
     }
 
+    // ── Progress ────────────────────────────────────────────────────────────────
     function updateProgress() {
       const answered = Object.values(state).filter(s => s.done).length;
       const correct = Object.values(state).filter(s => s.done && s.correct).length;
@@ -1038,6 +1175,7 @@
       if (answered === TOTAL) showCompletion(correct);
     }
 
+    // ── Completion + upload ────────────────────────────────────────────────────
     async function showCompletion(score) {
       const pct = Math.round((score / TOTAL) * 100);
       const banner = document.getElementById('completion-banner');
@@ -1045,28 +1183,28 @@
       document.getElementById('final-score-display').textContent = `${score} / ${TOTAL}  (${pct}%)`;
 
       let msg = '';
-      if (pct === 100) msg = "Perfect score! You're ready for the exam questions.";
-      else if (pct >= 80) msg = 'Great work! Review any questions you got on the second or third try.';
-      else if (pct >= 60) msg = 'Good effort. Review the key algorithm differences before the exam.';
-      else msg = 'Keep practising. Focus on the search algorithm comparisons and f(n) formulas.';
+      if (pct === 100) msg = classConfig.msg_perfect || "Perfect score! Well done.";
+      else if (pct >= 80) msg = classConfig.msg_good || 'Great work! Review any questions you got on the second or third try.';
+      else if (pct >= 60) msg = classConfig.msg_ok || 'Good effort. Review the key sections before the exam.';
+      else msg = classConfig.msg_retry || 'Keep practising. Focus on the core concepts.';
       document.getElementById('completion-msg').textContent = msg;
       banner.scrollIntoView({ behavior: 'smooth' });
 
       // Build per-question detail
       const questionDetail = {};
-      for (let i = 1; i <= TOTAL; i++) {
-        const s = state[`q${i}`];
-        questionDetail[`q${i}`] = {
+      questions.forEach(q => {
+        const s = state[`q${q.question_number}`];
+        questionDetail[`q${q.question_number}`] = {
           correct: s.correct,
           strikes_used: s.strikes,
           attempts: s.strikes + (s.correct ? 1 : 0),
         };
-      }
+      });
 
       const payload = {
         student_name: studentName,
         class_number: validatedClassNumber,
-        homework_title: classMetadata[validatedClassNumber]?.title || `Class ${validatedClassNumber}`,
+        homework_title: classConfig.homework_title || classConfig.title,
         score,
         total: TOTAL,
         pct,
@@ -1076,7 +1214,6 @@
         access_code: validatedAccessCode,
       };
 
-      // Upload to Supabase
       const statusEl = document.getElementById('upload-status');
       statusEl.textContent = '⏳ Saving your results…';
       statusEl.className = 'uploading';
@@ -1088,15 +1225,16 @@
           .insert([payload]);
 
         if (error) throw error;
-
-        statusEl.textContent = '✓ Results saved successfully. Your teacher can see your submission.';
+        statusEl.textContent = '✓ Results saved. Your teacher can see your submission.';
         statusEl.className = 'success';
       } catch (err) {
-        console.error('Supabase upload error:', err);
         statusEl.textContent = `⚠ Could not save results (${err?.message || 'network error'}). Screenshot your score and send it to your teacher.`;
         statusEl.className = 'failed';
       }
     }
+
+    // ── Boot ───────────────────────────────────────────────────────────────────
+    init();
   </script>
 </body>
 
