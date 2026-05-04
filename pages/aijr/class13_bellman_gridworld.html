@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bellman Gridworld: Value Iteration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .grid-cell {
+            transition: background-color 0.4s ease, transform 0.1s ease;
+        }
+        .grid-cell:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        <!-- Navigation -->
+        <nav class="mb-6 pt-4 no-print">
+            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 transition-colors" style="text-decoration: none;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Course Hub
+            </a>
+        </nav>
+
+        <!-- Header -->
+        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <h1 class="text-4xl font-black tracking-tight text-gray-900">BELLMAN <span class="text-blue-600">GRIDWORLD</span></h1>
+                <p class="text-gray-500 font-medium italic">Visualizing Value Iteration and the Discount Factor (γ)</p>
+            </div>
+            <div id="status-badge"
+                class="px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-white border border-gray-200 text-gray-400 shadow-sm transition-all duration-300">
+                Interactive Concept
+            </div>
+        </header>
+
+        <!-- Main Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            
+            <!-- Left Panel: Controls -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-6">
+                <div>
+                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-tighter mb-4 border-b border-gray-100 pb-2">The Concept</h2>
+                    <p class="text-sm text-gray-600 leading-relaxed mb-4">
+                        The <strong>Bellman Equation</strong> calculates the value of a state by looking at the best possible action, plus the discounted value of the state it leads to.
+                    </p>
+                    <div class="bg-blue-50 border border-blue-100 p-3 rounded-lg mb-4 text-center">
+                        <code class="text-blue-800 text-xs font-bold font-mono block">V(s) = max [ R(s,a) + γ * V(s') ]</code>
+                    </div>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        Click <strong>Step</strong> to run one iteration. Watch how the "heat" of the +1 Goal and -1 Trap radiates backwards through the grid!
+                    </p>
+                </div>
+
+                <div class="mt-2 space-y-6">
+                    <!-- Discount Factor Slider -->
+                    <div>
+                        <div class="flex justify-between items-end mb-2">
+                            <label class="text-sm font-bold text-gray-500 uppercase">Discount Factor (γ)</label>
+                            <span id="gammaDisplay" class="text-xs font-mono font-black bg-blue-50 text-blue-800 border border-blue-200 px-3 py-1 rounded-full">0.90</span>
+                        </div>
+                        <input type="range" id="gammaSlider" min="0.1" max="1.0" step="0.05" value="0.9" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                        <div class="flex justify-between text-[10px] font-bold text-gray-400 mt-2 uppercase tracking-tighter">
+                            <span>Myopic (Short-sighted)</span>
+                            <span>Far-sighted</span>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col gap-3">
+                        <button id="stepBtn" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold uppercase tracking-widest text-sm transition-colors shadow-sm active:transform active:scale-95 flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            Step: Value Update
+                        </button>
+                        <button id="resetBtn" class="w-full py-3 bg-white hover:bg-gray-50 border-2 border-gray-200 text-gray-600 rounded-xl font-bold uppercase tracking-widest text-sm transition-colors active:transform active:scale-95">
+                            Reset Grid
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Iteration Counter & Narrative -->
+                <div class="mt-auto bg-gray-50 rounded-xl p-4 border border-gray-200 flex flex-col gap-4">
+                    <div id="narrativeBox" class="text-sm font-medium text-blue-800 bg-blue-50/50 p-3 rounded-lg border border-blue-100 transition-all duration-300">
+                        <strong>Initialization:</strong> The grid starts blank. Only the Terminal states (+1 Goal, -1 Trap) have value. Click Step to begin.
+                    </div>
+                    <div class="flex justify-between items-center border-t border-gray-200 pt-3">
+                        <span class="text-xs font-bold text-gray-500 uppercase">Iteration (k)</span>
+                        <span id="iterationDisplay" class="text-2xl font-mono font-black text-gray-900">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Gridworld Environment -->
+            <div class="lg:col-span-2 bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col">
+                <div class="mb-4 flex justify-between items-end">
+                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-tighter border-b border-gray-100 pb-2 w-full">The Environment</h2>
+                </div>
+
+                <!-- CSS Grid Container -->
+                <div id="gridContainer" class="flex-grow bg-gray-100 border-2 border-gray-200 rounded-2xl p-2 md:p-4 grid grid-cols-4 grid-rows-3 gap-2 md:gap-4 aspect-video min-h-[400px]">
+                    <!-- Cells injected by JS -->
+                </div>
+
+                <!-- Legend -->
+                <div class="mt-6 flex flex-wrap justify-center gap-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 rounded-md bg-blue-100 shadow-sm border border-blue-200 flex items-center justify-center text-blue-800 font-serif">S</div> Start
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 rounded-md bg-green-500 shadow-sm border border-green-600"></div> Goal (+1)
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 rounded-md bg-red-500 shadow-sm border border-red-600"></div> Trap (-1)
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 rounded-md bg-gray-800 shadow-sm border border-gray-900"></div> Wall
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- 1. State & Setup ---
+        const ROWS = 3;
+        const COLS = 4;
+        
+        let V = [];
+        let policy = [];
+        let iterationCount = 0;
+        let gamma = 0.90;
+
+        const ACTIONS = [
+            { dr: -1, dc: 0, symbol: '↑' }, // Up
+            { dr: 1, dc: 0, symbol: '↓' },  // Down
+            { dr: 0, dc: -1, symbol: '←' }, // Left
+            { dr: 0, dc: 1, symbol: '→' }   // Right
+        ];
+
+        // UI Elements
+        const gridContainer = document.getElementById('gridContainer');
+        const gammaSlider = document.getElementById('gammaSlider');
+        const gammaDisplay = document.getElementById('gammaDisplay');
+        const stepBtn = document.getElementById('stepBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const iterationDisplay = document.getElementById('iterationDisplay');
+
+        // Helpers
+        const isTerminal = (r, c) => (r === 0 && c === 3) || (r === 1 && c === 3);
+        const isWall = (r, c) => (r === 1 && c === 1);
+
+        function initGrid() {
+            V = Array(ROWS).fill().map(() => Array(COLS).fill(0));
+            policy = Array(ROWS).fill().map(() => Array(COLS).fill(''));
+            
+            // Set Terminals
+            V[0][3] = 1.0;
+            V[1][3] = -1.0;
+            
+            iterationCount = 0;
+            updateUI();
+        }
+
+        // --- 2. Math & Logic ---
+        
+        function getNextState(r, c, a) {
+            let nr = r + a.dr;
+            let nc = c + a.dc;
+            // Bounce off walls and edges
+            if (nr < 0 || nr >= ROWS || nc < 0 || nc >= COLS || isWall(nr, nc)) {
+                return { r, c }; 
+            }
+            return { r: nr, c: nc };
+        }
+
+        function stepValueIteration() {
+            let newV = Array(ROWS).fill().map(() => Array(COLS).fill(0));
+            let newPolicy = Array(ROWS).fill().map(() => Array(COLS).fill(''));
+
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS; c++) {
+                    if (isTerminal(r, c)) {
+                        newV[r][c] = V[r][c]; // Terminals hold their value
+                        continue;
+                    }
+                    if (isWall(r, c)) continue;
+
+                    let maxVal = -Infinity;
+                    let bestAction = '';
+
+                    // Evaluate all actions (Deterministic Transitions)
+                    for (let a of ACTIONS) {
+                        let ns = getNextState(r, c, a);
+                        // Bellman: R + γ * V(s')
+                        // Reward is 0 everywhere except implicit in terminal states
+                        let val = gamma * V[ns.r][ns.c];
+                        
+                        // Small tie-breaker logic to prefer non-bouncing actions if all 0
+                        // (Makes initial arrows look a bit more reasonable, though mathematically all 0 is fine)
+                        if (val > maxVal) {
+                            maxVal = val;
+                            bestAction = a.symbol;
+                        }
+                    }
+                    
+                    // If maxVal is exactly 0, don't show an arrow yet to reduce noise
+                    newV[r][c] = maxVal;
+                    newPolicy[r][c] = (maxVal !== 0) ? bestAction : '';
+                }
+            }
+            
+            V = newV;
+            policy = newPolicy;
+            iterationCount++;
+            updateUI();
+        }
+
+        // --- 3. Rendering ---
+
+        function updateUI() {
+            gridContainer.innerHTML = ''; // Clear current grid
+            gammaDisplay.innerText = gamma.toFixed(2);
+            iterationDisplay.innerText = iterationCount;
+
+            // Update Narrative
+            const narrativeBox = document.getElementById('narrativeBox');
+            if (iterationCount === 0) {
+                narrativeBox.innerHTML = `<strong>Initialization:</strong> The grid starts blank. Only the Terminal states (+1 Goal, -1 Trap) have value. Click Step to begin.`;
+                narrativeBox.className = 'text-sm font-medium text-blue-800 bg-blue-50 p-3 rounded-lg border border-blue-200 transition-all duration-300';
+            } else if (iterationCount === 1) {
+                narrativeBox.innerHTML = `<strong>First Sweep:</strong> The states directly adjacent to the Goal/Trap discover their value! The "heat" begins to radiate backward.`;
+                narrativeBox.className = 'text-sm font-medium text-blue-800 bg-blue-50 p-3 rounded-lg border border-blue-200 transition-all duration-300';
+            } else if (iterationCount === 2 || iterationCount === 3) {
+                narrativeBox.innerHTML = `<strong>Propagation:</strong> Values continue to spread. Notice how the Discount Factor (γ=${gamma.toFixed(2)}) scales down the reward the further we get from the goal.`;
+                narrativeBox.className = 'text-sm font-medium text-purple-800 bg-purple-50 p-3 rounded-lg border border-purple-200 transition-all duration-300';
+            } else if (gamma <= 0.4 && iterationCount > 3) {
+                narrativeBox.innerHTML = `<strong>Short-Sighted Agent:</strong> Because γ is low, the values quickly drop to zero. The agent is too myopic to "see" the goal from the start!`;
+                narrativeBox.className = 'text-sm font-medium text-amber-800 bg-amber-50 p-3 rounded-lg border border-amber-200 transition-all duration-300';
+            } else if (iterationCount > 3 && iterationCount < 7) {
+                narrativeBox.innerHTML = `<strong>Policy Forming:</strong> Arrows appear as the agent determines the optimal action (argmax) for each state based on its neighboring values.`;
+                narrativeBox.className = 'text-sm font-medium text-blue-800 bg-blue-50 p-3 rounded-lg border border-blue-200 transition-all duration-300';
+            } else {
+                narrativeBox.innerHTML = `<strong>Convergence (Solved!):</strong> The grid is complete! The <strong>numbers</strong> show the expected future reward from that square. The <strong>arrows</strong> are the optimal policy—the agent's exact GPS directions to the +1 Goal.`;
+                narrativeBox.className = 'text-sm font-medium text-green-800 bg-green-50 p-3 rounded-lg border border-green-200 transition-all duration-300';
+            }
+
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'grid-cell rounded-xl flex flex-col items-center justify-center relative shadow-sm border border-gray-200/50';
+                    
+                    if (isWall(r, c)) {
+                        cell.className += ' bg-gray-800 border-gray-900 shadow-inner';
+                        // Add some stripes for the wall
+                        cell.style.backgroundImage = 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.05) 10px, rgba(255,255,255,0.05) 20px)';
+                    } else if (isTerminal(r, c)) {
+                        let val = V[r][c];
+                        if (val > 0) {
+                            cell.className += ' bg-green-500 text-white border-green-600 shadow-md ring-4 ring-green-100';
+                            cell.innerHTML = `
+                                <span class="font-bold uppercase tracking-widest text-[10px] opacity-80 mb-1">Goal</span>
+                                <span class="text-2xl md:text-3xl font-mono font-black">+1.00</span>
+                            `;
+                        } else {
+                            cell.className += ' bg-red-500 text-white border-red-600 shadow-md ring-4 ring-red-100';
+                            cell.innerHTML = `
+                                <span class="font-bold uppercase tracking-widest text-[10px] opacity-80 mb-1">Trap</span>
+                                <span class="text-2xl md:text-3xl font-mono font-black">-1.00</span>
+                            `;
+                        }
+                    } else {
+                        let val = V[r][c];
+                        
+                        // Calculate Heatmap Color
+                        if (val > 0) {
+                            // Green scale
+                            cell.style.backgroundColor = `rgba(34, 197, 94, ${Math.max(0.05, val)})`;
+                            if (val > 0.5) cell.classList.add('text-white');
+                            else cell.classList.add('text-green-900');
+                        } else if (val < 0) {
+                            // Red scale
+                            let absVal = Math.abs(val);
+                            cell.style.backgroundColor = `rgba(239, 68, 68, ${Math.max(0.05, absVal)})`;
+                            if (absVal > 0.5) cell.classList.add('text-white');
+                            else cell.classList.add('text-red-900');
+                        } else {
+                            // Empty/Zero
+                            cell.className += ' bg-white text-gray-400';
+                        }
+
+                        // Add content (Value + Arrow + Start Badge)
+                        let arrowHtml = policy[r][c] ? `<div class="absolute bottom-2 right-3 text-xl font-black opacity-60">${policy[r][c]}</div>` : '';
+                        let startHtml = (r === 2 && c === 0) ? `<div class="absolute top-2 left-2 text-[8px] md:text-[10px] font-black uppercase tracking-widest bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded shadow-sm border border-blue-200">Start</div>` : '';
+                        
+                        cell.innerHTML = `
+                            ${startHtml}
+                            <span class="text-xl md:text-2xl font-mono font-bold">${val === 0 ? '0.00' : val.toFixed(2)}</span>
+                            ${arrowHtml}
+                        `;
+                    }
+
+                    gridContainer.appendChild(cell);
+                }
+            }
+        }
+
+        // --- 4. Event Listeners ---
+        gammaSlider.addEventListener('input', (e) => {
+            gamma = parseFloat(e.target.value);
+            gammaDisplay.innerText = gamma.toFixed(2);
+            // If they change gamma mid-run, we should probably reset so the math is clean
+            if (iterationCount > 0) {
+                initGrid();
+            }
+        });
+
+        stepBtn.addEventListener('click', stepValueIteration);
+        resetBtn.addEventListener('click', initGrid);
+
+        // Run setup
+        initGrid();
+
+    </script>
+</body>
+
+</html>

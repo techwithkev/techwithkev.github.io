@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosine Similarity: Vector Spaces</title>
+    <!-- Tailwind CSS for UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js Core -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Three.js OrbitControls -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- CSS2DRenderer for Text Labels -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
+    <style>
+        .axis-label {
+            color: #9ca3af; /* text-gray-400 */
+            font-family: monospace;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 2px 4px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 4px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <!-- Navigation -->
+        <nav class="mb-6 pt-4 no-print">
+            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 transition-colors" style="text-decoration: none;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Course Hub
+            </a>
+        </nav>
+
+        <!-- Header -->
+        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <h1 class="text-4xl font-black tracking-tight text-gray-900">COSINE <span class="text-blue-600">SIMILARITY</span></h1>
+                <p class="text-gray-500 font-medium italic">Measuring distance in multi-dimensional vector spaces</p>
+            </div>
+            <div id="status-badge"
+                class="px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-white border border-gray-200 text-gray-400 shadow-sm transition-all duration-300">
+                Interactive Concept
+            </div>
+        </header>
+
+        <!-- Main Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            
+            <!-- Left Panel: Controls & Explanation -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-6 h-fit">
+                <div>
+                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-tighter mb-4 border-b border-gray-100 pb-2">The Concept</h2>
+                    <p class="text-sm text-gray-600 leading-relaxed mb-4">
+                        Recommender systems treat user tastes as a <strong>Vector</strong> pointing into a multi-dimensional space. 
+                    </p>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        To find out how similar two users are, we don't look at the length of their arrows—we look at the <strong>Angle (θ)</strong> between them. A smaller angle means they point in the same direction!
+                    </p>
+                </div>
+
+                <!-- Sliders for User B -->
+                <div>
+                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-tighter mb-4 border-b border-gray-100 pb-2">User B's Ratings</h2>
+                    
+                    <div class="space-y-4">
+                        <!-- Action Slider -->
+                        <div>
+                            <div class="flex justify-between items-end mb-1">
+                                <label class="text-[11px] font-bold text-red-500 uppercase">Action (X-Axis)</label>
+                                <span id="valAction" class="text-xs font-mono font-black text-gray-700">3.0</span>
+                            </div>
+                            <input type="range" id="slideAction" min="0" max="5" step="0.1" value="3.0" class="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-red-500">
+                        </div>
+                        
+                        <!-- Comedy Slider -->
+                        <div>
+                            <div class="flex justify-between items-end mb-1">
+                                <label class="text-[11px] font-bold text-green-500 uppercase">Comedy (Y-Axis)</label>
+                                <span id="valComedy" class="text-xs font-mono font-black text-gray-700">3.0</span>
+                            </div>
+                            <input type="range" id="slideComedy" min="0" max="5" step="0.1" value="3.0" class="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-green-500">
+                        </div>
+
+                        <!-- Sci-Fi Slider -->
+                        <div>
+                            <div class="flex justify-between items-end mb-1">
+                                <label class="text-[11px] font-bold text-blue-500 uppercase">Sci-Fi (Z-Axis)</label>
+                                <span id="valSciFi" class="text-xs font-mono font-black text-gray-700">3.0</span>
+                            </div>
+                            <input type="range" id="slideSciFi" min="0" max="5" step="0.1" value="3.0" class="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Math Readout -->
+                <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <span class="text-[10px] font-black uppercase text-blue-600 tracking-widest block mb-1">User A (Target)</span>
+                            <span class="text-sm font-mono font-bold text-gray-800">[5.0, 1.0, 4.0]</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] font-black uppercase text-green-600 tracking-widest block mb-1">User B (You)</span>
+                            <span id="vecBDisplay" class="text-sm font-mono font-bold text-gray-800">[3.0, 3.0, 3.0]</span>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-gray-200 pt-4 flex justify-between items-center">
+                        <span class="text-xs font-bold text-gray-500 uppercase">Cosine Similarity (cos θ)</span>
+                        <span id="simDisplay" class="text-3xl font-mono font-black text-blue-600">0.000</span>
+                    </div>
+                </div>
+
+                <!-- Dynamic Narrative -->
+                <div id="narrativeBox" class="text-sm font-medium text-gray-800 bg-gray-100 p-3 rounded-lg border border-gray-200 transition-all duration-300">
+                    Adjust User B's ratings to see the vector rotate!
+                </div>
+
+            </div>
+
+            <!-- Right Panel: 3D Visualization -->
+            <div class="lg:col-span-2 bg-slate-900 border-2 border-slate-800 p-2 rounded-2xl shadow-inner relative flex flex-col min-h-[500px] md:min-h-[600px]">
+                <div id="canvas-container" class="w-full h-full absolute inset-0 rounded-xl overflow-hidden cursor-move touch-none"></div>
+                
+                <div class="absolute bottom-4 left-4 pointer-events-none bg-slate-800/80 backdrop-blur-md p-3 rounded-lg text-[10px] uppercase font-bold text-slate-400 border border-slate-700 flex flex-col gap-1">
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-blue-500"></span> User A (Fixed Target)</div>
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-green-500"></span> User B (Interactive)</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        window.onload = function () {
+            // --- UI Elements ---
+            const slideAction = document.getElementById('slideAction');
+            const slideComedy = document.getElementById('slideComedy');
+            const slideSciFi = document.getElementById('slideSciFi');
+            
+            const valAction = document.getElementById('valAction');
+            const valComedy = document.getElementById('valComedy');
+            const valSciFi = document.getElementById('valSciFi');
+            
+            const vecBDisplay = document.getElementById('vecBDisplay');
+            const simDisplay = document.getElementById('simDisplay');
+            const narrativeBox = document.getElementById('narrativeBox');
+
+            // User A is fixed: High Action, Low Comedy, High Sci-Fi
+            const vectorA = new THREE.Vector3(5, 1, 4);
+            let vectorB = new THREE.Vector3(3, 3, 3);
+
+            // --- Setup Three.js Scene ---
+            const container = document.getElementById('canvas-container');
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0f172a); // Tailwind slate-900
+
+            // Camera setup
+            const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+            camera.position.set(10, 8, 12); 
+
+            // Renderer setup
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            // CSS2DRenderer for text labels
+            const labelRenderer = new THREE.CSS2DRenderer();
+            labelRenderer.setSize(container.clientWidth, container.clientHeight);
+            labelRenderer.domElement.style.position = 'absolute';
+            labelRenderer.domElement.style.top = '0px';
+            labelRenderer.domElement.style.pointerEvents = 'none';
+            container.appendChild(labelRenderer.domElement);
+
+            // Controls setup
+            // Attach OrbitControls to the CSS2D domElement so we can still drag the canvas
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.target.set(2.5, 2.5, 2.5); // Look at the center of the 5x5x5 box
+
+            // --- Grid & Axes ---
+            // Draw a bounding box for [0,5] on all axes
+            const gridHelperY = new THREE.GridHelper(5, 5, 0x334155, 0x1e293b);
+            gridHelperY.position.set(2.5, 0, 2.5);
+            scene.add(gridHelperY);
+            
+            const gridHelperZ = new THREE.GridHelper(5, 5, 0x334155, 0x1e293b);
+            gridHelperZ.rotation.x = Math.PI / 2;
+            gridHelperZ.position.set(2.5, 2.5, 0);
+            scene.add(gridHelperZ);
+
+            const gridHelperX = new THREE.GridHelper(5, 5, 0x334155, 0x1e293b);
+            gridHelperX.rotation.z = Math.PI / 2;
+            gridHelperX.position.set(0, 2.5, 2.5);
+            scene.add(gridHelperX);
+
+            // Main Axes Lines
+            const origin = new THREE.Vector3(0, 0, 0);
+            const xAxis = new THREE.ArrowHelper(new THREE.Vector3(1,0,0), origin, 5.5, 0xef4444, 0.2, 0.1); // Red
+            const yAxis = new THREE.ArrowHelper(new THREE.Vector3(0,1,0), origin, 5.5, 0x22c55e, 0.2, 0.1); // Green
+            const zAxis = new THREE.ArrowHelper(new THREE.Vector3(0,0,1), origin, 5.5, 0x3b82f6, 0.2, 0.1); // Blue
+            scene.add(xAxis, yAxis, zAxis);
+
+            // Text Labels for Axes
+            function createLabel(text, position) {
+                const div = document.createElement('div');
+                div.className = 'axis-label';
+                div.textContent = text;
+                const label = new THREE.CSS2DObject(div);
+                label.position.copy(position);
+                scene.add(label);
+            }
+            createLabel("Action (X)", new THREE.Vector3(6, 0, 0));
+            createLabel("Comedy (Y)", new THREE.Vector3(0, 6, 0));
+            createLabel("Sci-Fi (Z)", new THREE.Vector3(0, 0, 6));
+
+            // --- Vectors ---
+            // User A (Fixed, Blue)
+            const dirA = vectorA.clone().normalize();
+            const lengthA = vectorA.length();
+            const arrowA = new THREE.ArrowHelper(dirA, origin, lengthA, 0x3b82f6, 0.4, 0.2);
+            scene.add(arrowA);
+
+            // User B (Interactive, Green)
+            const dirB = vectorB.clone().normalize();
+            const lengthB = vectorB.length();
+            const arrowB = new THREE.ArrowHelper(dirB, origin, lengthB, 0x22c55e, 0.4, 0.2);
+            scene.add(arrowB);
+
+            // Angle Arc (Visualizing theta)
+            let arcLine;
+            function updateArc() {
+                if (arcLine) scene.remove(arcLine);
+
+                // Create a smooth arc between normalized vector A and B
+                const points = [];
+                const vA = vectorA.clone().normalize().multiplyScalar(2); // Draw arc at radius 2
+                const vB = vectorB.clone().normalize().multiplyScalar(2);
+                
+                // Interpolate using quaternions for a perfect spherical arc
+                const qA = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(1,0,0), vA.clone().normalize());
+                const qB = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(1,0,0), vB.clone().normalize());
+
+                for (let i = 0; i <= 20; i++) {
+                    const t = i / 20;
+                    const qM = new THREE.Quaternion().slerpQuaternions(qA, qB, t);
+                    const vM = new THREE.Vector3(1,0,0).applyQuaternion(qM).multiplyScalar(2);
+                    points.push(vM);
+                }
+
+                const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                const material = new THREE.LineBasicMaterial({ color: 0xeab308, linewidth: 2 }); // Yellow arc
+                arcLine = new THREE.Line(geometry, material);
+                scene.add(arcLine);
+            }
+            updateArc();
+
+            // --- Math & UI Logic ---
+            function updateMath() {
+                // Get values
+                const x = parseFloat(slideAction.value);
+                const y = parseFloat(slideComedy.value);
+                const z = parseFloat(slideSciFi.value);
+                vectorB.set(x, y, z);
+
+                // Update UI Labels
+                valAction.innerText = x.toFixed(1);
+                valComedy.innerText = y.toFixed(1);
+                valSciFi.innerText = z.toFixed(1);
+                vecBDisplay.innerText = `[${x.toFixed(1)}, ${y.toFixed(1)}, ${z.toFixed(1)}]`;
+
+                // Update 3D Arrow
+                // Prevent zero-length vector crash
+                if (vectorB.length() < 0.01) {
+                    arrowB.setLength(0.01);
+                } else {
+                    arrowB.setDirection(vectorB.clone().normalize());
+                    arrowB.setLength(vectorB.length(), 0.4, 0.2);
+                }
+                
+                // Calculate Cosine Similarity
+                // cos(theta) = (A dot B) / (|A| * |B|)
+                let sim = 0;
+                if (vectorA.length() > 0 && vectorB.length() > 0) {
+                    sim = vectorA.dot(vectorB) / (vectorA.length() * vectorB.length());
+                }
+                
+                simDisplay.innerText = sim.toFixed(3);
+
+                // Update Narrative based on score
+                if (sim >= 0.95) {
+                    narrativeBox.innerHTML = `<strong>Virtually Identical! (cos θ ≈ 1.0)</strong><br>The angle between the vectors is almost zero. A recommender system would confidently suggest User A's favorite movies to User B.`;
+                    narrativeBox.className = 'text-sm font-medium text-green-800 bg-green-50 p-3 rounded-lg border border-green-200 transition-all duration-300';
+                } else if (sim >= 0.75) {
+                    narrativeBox.innerHTML = `<strong>Very Similar! (cos θ > 0.75)</strong><br>They share strong tastes in Action and Sci-Fi. The angle is small.`;
+                    narrativeBox.className = 'text-sm font-medium text-blue-800 bg-blue-50 p-3 rounded-lg border border-blue-200 transition-all duration-300';
+                } else if (sim >= 0.4) {
+                    narrativeBox.innerHTML = `<strong>Somewhat Similar. (cos θ ≈ 0.5)</strong><br>They have some overlap, but User B's preferences are pulling their vector away from User A.`;
+                    narrativeBox.className = 'text-sm font-medium text-purple-800 bg-purple-50 p-3 rounded-lg border border-purple-200 transition-all duration-300';
+                } else {
+                    narrativeBox.innerHTML = `<strong>Orthogonal / Unrelated. (cos θ ≈ 0.0)</strong><br>The vectors are approaching a 90-degree angle. These users have completely different tastes in movies!`;
+                    narrativeBox.className = 'text-sm font-medium text-red-800 bg-red-50 p-3 rounded-lg border border-red-200 transition-all duration-300';
+                }
+
+                // Redraw the visual angle arc
+                updateArc();
+            }
+
+            // Bind Events
+            slideAction.addEventListener('input', updateMath);
+            slideComedy.addEventListener('input', updateMath);
+            slideSciFi.addEventListener('input', updateMath);
+
+            // Initial calculation
+            updateMath();
+
+            // --- Animation Loop ---
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update(); // required if controls.enableDamping is true
+                renderer.render(scene, camera);
+                labelRenderer.render(scene, camera);
+            }
+
+            // Handle Resize
+            window.addEventListener('resize', () => {
+                if (!container) return;
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                labelRenderer.setSize(container.clientWidth, container.clientHeight);
+            }, false);
+
+            // Initial fit
+            setTimeout(() => {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+                labelRenderer.setSize(container.clientWidth, container.clientHeight);
+            }, 50);
+
+            animate();
+        };
+    </script>
+</body>
+
+</html>
