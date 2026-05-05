@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q-Learning & TD Error | Tech With Kev</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .fade-in { animation: fadeIn 0.4s ease-in-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .highlight-pulse { animation: pulseBg 1.5s ease-in-out infinite; }
+        @keyframes pulseBg { 
+            0% { background-color: rgba(254, 240, 138, 0); } 
+            50% { background-color: rgba(254, 240, 138, 0.5); } 
+            100% { background-color: rgba(254, 240, 138, 0); } 
+        }
+
+        .math-box { font-family: 'Courier New', Courier, monospace; }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <!-- Navigation -->
+        <nav class="mb-6 pt-4 no-print">
+            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 transition-colors" style="text-decoration: none;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Course Hub
+            </a>
+        </nav>
+
+        <!-- Header -->
+        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <h1 class="text-4xl font-black tracking-tight text-gray-900">Q-LEARNING <span class="text-blue-600">UPDATE</span></h1>
+                <p class="text-gray-500 font-medium italic">TD Error, Surprise, and Model-Free Learning</p>
+            </div>
+            <div class="px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-white border border-gray-200 text-gray-400 shadow-sm transition-all duration-300">
+                Equation Breakdown
+            </div>
+        </header>
+
+        <!-- Main Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+            
+            <!-- Left Panel: Q-Table & Controls -->
+            <div class="lg:col-span-5 bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-6">
+                
+                <!-- Q-Table -->
+                <div>
+                    <h2 class="text-sm font-black uppercase tracking-widest text-slate-800 mb-4 border-b border-gray-100 pb-2">The Q-Table <span class="font-serif italic lowercase font-normal ml-1">Q(S, A)</span></h2>
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl overflow-hidden shadow-inner">
+                        <table class="w-full text-center text-sm">
+                            <thead>
+                                <tr class="bg-slate-100 border-b border-slate-200 text-slate-600 font-bold uppercase tracking-wider text-[10px]">
+                                    <th class="py-3 px-4 border-r border-slate-200">State</th>
+                                    <th class="py-3 px-4 border-r border-slate-200">Action: Left</th>
+                                    <th class="py-3 px-4">Action: Right</th>
+                                </tr>
+                            </thead>
+                            <tbody class="font-mono text-slate-800" id="qTableBody">
+                                <tr class="border-b border-slate-200" id="row-S1">
+                                    <td class="py-4 px-4 border-r border-slate-200 font-bold bg-slate-50">S1</td>
+                                    <td class="py-4 px-4 border-r border-slate-200 transition-colors duration-300" id="cell-S1-Left">0.00</td>
+                                    <td class="py-4 px-4 transition-colors duration-300" id="cell-S1-Right">0.00</td>
+                                </tr>
+                                <tr id="row-S2">
+                                    <td class="py-4 px-4 border-r border-slate-200 font-bold bg-slate-50">S2</td>
+                                    <td class="py-4 px-4 border-r border-slate-200 transition-colors duration-300" id="cell-S2-Left">0.00</td>
+                                    <td class="py-4 px-4 transition-colors duration-300" id="cell-S2-Right">0.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Hyperparameters -->
+                <div>
+                    <h2 class="text-sm font-black uppercase tracking-widest text-slate-800 mb-4 border-b border-gray-100 pb-2">Hyperparameters</h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <label class="text-xs font-bold text-slate-600 uppercase">Learning Rate (<span class="font-serif italic lowercase text-blue-600">&alpha;</span>)</label>
+                                <span id="alphaVal" class="text-xs font-mono font-bold text-blue-600">0.1</span>
+                            </div>
+                            <input type="range" id="alphaSlider" min="0" max="1" step="0.1" value="0.1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                            <p class="text-[10px] text-gray-500 mt-1">How much the Q-value updates toward the new target.</p>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <label class="text-xs font-bold text-slate-600 uppercase">Discount Factor (<span class="font-serif italic lowercase text-emerald-600">&gamma;</span>)</label>
+                                <span id="gammaVal" class="text-xs font-mono font-bold text-emerald-600">0.9</span>
+                            </div>
+                            <input type="range" id="gammaSlider" min="0" max="1" step="0.1" value="0.9" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600">
+                            <p class="text-[10px] text-gray-500 mt-1">How much the agent cares about future rewards.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <button id="stepBtn" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black uppercase tracking-widest text-sm transition-all shadow-md active:transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    Simulate 1 Step Update
+                </button>
+
+            </div>
+
+            <!-- Right Panel: Equation Breakdown -->
+            <div class="lg:col-span-7 bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl flex flex-col relative overflow-hidden">
+                <h2 class="text-sm font-black uppercase tracking-widest text-slate-400 mb-6 border-b border-slate-800 pb-2 flex justify-between">
+                    <span>The Update Calculation</span>
+                    <span id="phaseIndicator" class="text-indigo-400">Waiting for interaction...</span>
+                </h2>
+
+                <div id="equationContainer" class="flex flex-col gap-6 h-full relative">
+                    
+                    <!-- Step 1: The Experience -->
+                    <div id="step1" class="opacity-0 transition-opacity duration-500 bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">1. The Experience Tuple</h3>
+                        <div class="flex items-center gap-3 font-mono text-sm text-slate-300 bg-slate-950/50 p-3 rounded-lg border border-slate-800">
+                            <span class="text-blue-400">S = <span id="expS">?</span></span>
+                            <span class="text-slate-600">|</span>
+                            <span class="text-purple-400">A = <span id="expA">?</span></span>
+                            <span class="text-slate-600">|</span>
+                            <span class="text-emerald-400">R = <span id="expR">?</span></span>
+                            <span class="text-slate-600">|</span>
+                            <span class="text-amber-400">S' = <span id="expSNext">?</span></span>
+                        </div>
+                        <p class="text-[10px] text-slate-400 mt-2 font-sans">The agent took an action, received a reward, and transitioned to a new state.</p>
+                    </div>
+
+                    <!-- Step 2: The Target -->
+                    <div id="step2" class="opacity-0 transition-opacity duration-500 bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">2. Calculate Target (Expected Return)</h3>
+                        <div class="math-box text-sm text-slate-300 bg-slate-950/50 p-3 rounded-lg border border-slate-800 overflow-x-auto">
+                            Target = R + <span class="italic font-serif text-emerald-400">&gamma;</span> &times; <span class="bg-amber-900/30 text-amber-300 px-1 rounded">max Q(S', a')</span>
+                            <br><br>
+                            <span class="text-slate-500">&rarr; Target = </span>
+                            <span id="targetR" class="text-emerald-400">?</span> + 
+                            <span id="targetGamma" class="text-emerald-400">?</span> &times; 
+                            <span id="targetMaxQ" class="text-amber-400 font-bold">?</span>
+                            <span class="text-slate-500"> = </span>
+                            <span id="targetResult" class="text-white font-bold bg-slate-700 px-2 py-1 rounded">?</span>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: TD Error -->
+                    <div id="step3" class="opacity-0 transition-opacity duration-500 bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">3. Calculate TD Error ("The Surprise")</h3>
+                        <div class="math-box text-sm text-slate-300 bg-slate-950/50 p-3 rounded-lg border border-slate-800 overflow-x-auto">
+                            TD_Error = Target - <span class="bg-blue-900/30 text-blue-300 px-1 rounded">Old Q(S, A)</span>
+                            <br><br>
+                            <span class="text-slate-500">&rarr; TD_Error = </span>
+                            <span id="tdTarget" class="text-white">?</span> - 
+                            <span id="tdOldQ" class="text-blue-400">?</span>
+                            <span class="text-slate-500"> = </span>
+                            <span id="tdResult" class="text-rose-400 font-bold bg-rose-900/30 px-2 py-1 rounded">?</span>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: The Update -->
+                    <div id="step4" class="opacity-0 transition-opacity duration-500 bg-slate-800/50 p-4 rounded-xl border border-slate-700 border-l-4 border-l-indigo-500">
+                        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">4. Apply Update Rule</h3>
+                        <div class="math-box text-sm text-slate-300 bg-slate-950/50 p-3 rounded-lg border border-slate-800 overflow-x-auto">
+                            New Q(S, A) = Old Q(S, A) + <span class="italic font-serif text-blue-400">&alpha;</span> &times; TD_Error
+                            <br><br>
+                            <span class="text-slate-500">&rarr; New Q = </span>
+                            <span id="updateOldQ" class="text-blue-400">?</span> + 
+                            <span id="updateAlpha" class="text-blue-400">?</span> &times; 
+                            <span id="updateTD" class="text-rose-400">?</span>
+                            <span class="text-slate-500"> = </span>
+                            <span id="updateResult" class="text-white font-bold bg-indigo-600 px-2 py-1 rounded shadow-[0_0_15px_rgba(79,70,229,0.5)]">?</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Explainer -->
+        <div class="bg-indigo-50 border border-indigo-100 p-6 rounded-2xl shadow-sm text-indigo-900 leading-relaxed font-medium">
+            <h3 class="font-black text-sm uppercase tracking-widest text-indigo-700 mb-2">Key Exam Concepts:</h3>
+            <ul class="list-disc list-inside space-y-2 text-sm text-slate-700">
+                <li><strong class="text-indigo-800">Model-Free:</strong> Notice that Q-learning never asks for <span class="italic font-serif">P(S'|S,A)</span>. It simply experiences a transition and updates based on the result.</li>
+                <li><strong class="text-indigo-800">TD Error (Temporal Difference):</strong> This is the "Surprise". If the TD error is positive, the outcome was better than expected. If negative, it was worse.</li>
+                <li><strong class="text-indigo-800">Off-Policy:</strong> Q-learning calculates the target using <span class="italic font-serif">max Q(S',a')</span>, assuming the agent will act optimally in the future, regardless of its current exploration policy.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const alphaSlider = document.getElementById('alphaSlider');
+        const gammaSlider = document.getElementById('gammaSlider');
+        const alphaVal = document.getElementById('alphaVal');
+        const gammaVal = document.getElementById('gammaVal');
+        const stepBtn = document.getElementById('stepBtn');
+        const phaseIndicator = document.getElementById('phaseIndicator');
+
+        // State Data
+        const Q = {
+            'S1': { 'Left': 0.00, 'Right': 0.00 },
+            'S2': { 'Left': 0.00, 'Right': 0.00 }
+        };
+
+        // Environment Model (hidden from agent)
+        const env = {
+            'S1': {
+                'Left': { next: 'S1', reward: -1 },
+                'Right': { next: 'S2', reward: 0 }
+            },
+            'S2': {
+                'Left': { next: 'S1', reward: 0 },
+                'Right': { next: 'S2', reward: 10 } // Jackpot
+            }
+        };
+
+        let isAnimating = false;
+
+        // Sync Sliders
+        alphaSlider.oninput = () => alphaVal.innerText = parseFloat(alphaSlider.value).toFixed(1);
+        gammaSlider.oninput = () => gammaVal.innerText = parseFloat(gammaSlider.value).toFixed(1);
+
+        // UI Helpers
+        function updateQTableUI() {
+            document.getElementById('cell-S1-Left').innerText = Q['S1']['Left'].toFixed(2);
+            document.getElementById('cell-S1-Right').innerText = Q['S1']['Right'].toFixed(2);
+            document.getElementById('cell-S2-Left').innerText = Q['S2']['Left'].toFixed(2);
+            document.getElementById('cell-S2-Right').innerText = Q['S2']['Right'].toFixed(2);
+        }
+
+        function highlightCell(state, action, colorClass, duration) {
+            const cell = document.getElementById(`cell-${state}-${action}`);
+            cell.className = `py-4 px-4 transition-colors duration-300 ${colorClass}`;
+            if (duration) {
+                setTimeout(() => {
+                    cell.className = `py-4 px-4 transition-colors duration-300`;
+                }, duration);
+            }
+        }
+
+        function highlightRow(state, duration) {
+            const row = document.getElementById(`row-${state}`);
+            row.className = `bg-amber-50 transition-colors duration-300`;
+            if (duration) {
+                setTimeout(() => {
+                    row.className = `border-b border-slate-200 transition-colors duration-300`;
+                }, duration);
+            }
+        }
+
+        function setOpacity(id, val) {
+            document.getElementById(id).style.opacity = val;
+        }
+
+        function setHTML(id, val) {
+            document.getElementById(id).innerHTML = val;
+        }
+
+        // The Update Simulation
+        function simulateStep() {
+            if (isAnimating) return;
+            isAnimating = true;
+            stepBtn.disabled = true;
+
+            // Reset UI
+            setOpacity('step1', '0');
+            setOpacity('step2', '0');
+            setOpacity('step3', '0');
+            setOpacity('step4', '0');
+
+            // 1. Generate random experience
+            const s = Math.random() > 0.5 ? 'S1' : 'S2';
+            const a = Math.random() > 0.5 ? 'Left' : 'Right';
+            const r = env[s][a].reward;
+            const sNext = env[s][a].next;
+
+            const alpha = parseFloat(alphaSlider.value);
+            const gamma = parseFloat(gammaSlider.value);
+
+            // Math variables
+            const oldQ = Q[s][a];
+            const maxQNext = Math.max(Q[sNext]['Left'], Q[sNext]['Right']);
+            const target = r + gamma * maxQNext;
+            const tdError = target - oldQ;
+            const newQ = oldQ + alpha * tdError;
+
+            // --- ANIMATION SEQUENCE ---
+
+            // Phase 1: Experience
+            phaseIndicator.innerText = "Processing Experience...";
+            setHTML('expS', s);
+            setHTML('expA', a);
+            setHTML('expR', r > 0 ? `+${r}` : r);
+            setHTML('expSNext', sNext);
+            
+            highlightCell(s, a, 'bg-blue-100 text-blue-900 font-bold highlight-pulse', 0); // leave highlighted
+            setOpacity('step1', '1');
+
+            // Phase 2: Target
+            setTimeout(() => {
+                phaseIndicator.innerText = "Calculating Target...";
+                highlightRow(sNext, 0); // highlight next state row
+                
+                // Bold the max Q in the next state row
+                const maxAction = Q[sNext]['Left'] >= Q[sNext]['Right'] ? 'Left' : 'Right';
+                highlightCell(sNext, maxAction, 'text-amber-600 font-bold', 0);
+
+                setHTML('targetR', r);
+                setHTML('targetGamma', gamma.toFixed(1));
+                setHTML('targetMaxQ', maxQNext.toFixed(2));
+                setHTML('targetResult', target.toFixed(2));
+                
+                setOpacity('step2', '1');
+            }, 1500);
+
+            // Phase 3: TD Error
+            setTimeout(() => {
+                phaseIndicator.innerText = "Computing TD Error...";
+                setHTML('tdTarget', target.toFixed(2));
+                setHTML('tdOldQ', oldQ.toFixed(2));
+                
+                const tdStr = tdError >= 0 ? `+${tdError.toFixed(2)}` : tdError.toFixed(2);
+                setHTML('tdResult', tdStr);
+                
+                setOpacity('step3', '1');
+            }, 3000);
+
+            // Phase 4: Update
+            setTimeout(() => {
+                phaseIndicator.innerText = "Updating Q-Table...";
+                setHTML('updateOldQ', oldQ.toFixed(2));
+                setHTML('updateAlpha', alpha.toFixed(1));
+                const tdStr2 = tdError >= 0 ? `+${tdError.toFixed(2)}` : tdError.toFixed(2);
+                setHTML('updateTD', tdStr2);
+                setHTML('updateResult', newQ.toFixed(2));
+                
+                setOpacity('step4', '1');
+
+                // Apply to underlying table
+                Q[s][a] = newQ;
+                
+                // Flash the table cell
+                setTimeout(() => {
+                    updateQTableUI();
+                    highlightCell(s, a, 'bg-indigo-600 text-white font-black scale-110 shadow-lg', 1000);
+                    
+                    // Cleanup table highlights
+                    setTimeout(() => {
+                        highlightRow(sNext, 1); // remove row highlight
+                        highlightCell(sNext, 'Left', '', 1);
+                        highlightCell(sNext, 'Right', '', 1);
+                        highlightCell(s, a, '', 1); // remove original highlight
+                        
+                        phaseIndicator.innerText = "Ready for next step.";
+                        isAnimating = false;
+                        stepBtn.disabled = false;
+                    }, 1000);
+                }, 500);
+
+            }, 4500);
+        }
+
+        stepBtn.addEventListener('click', simulateStep);
+
+        // Initial setup
+        updateQTableUI();
+
+    </script>
+</body>
+</html>

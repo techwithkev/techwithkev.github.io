@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markov Decision Process | Tech With Kev</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .log-container::-webkit-scrollbar { width: 6px; }
+        .log-container::-webkit-scrollbar-track { background: transparent; }
+        .log-container::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
+        
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Spinner animation */
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .spinner { animation: spin 0.1s linear infinite; }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        <!-- Navigation -->
+        <nav class="mb-6 pt-4 no-print">
+            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 transition-colors" style="text-decoration: none;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Course Hub
+            </a>
+        </nav>
+
+        <!-- Header -->
+        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <h1 class="text-4xl font-black tracking-tight text-gray-900">MARKOV DECISION <span class="text-blue-600">PROCESS</span></h1>
+                <p class="text-gray-500 font-medium italic">Probabilistic Transitions and the Markov Property</p>
+            </div>
+            <div class="px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-white border border-gray-200 text-gray-400 shadow-sm transition-all duration-300">
+                Interactive Concept
+            </div>
+        </header>
+
+        <!-- Main Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            
+            <!-- Left Panel: Controls, Log -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-6 h-[550px]">
+                
+                <!-- Reward Tracker -->
+                <div class="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl p-4 text-white shadow-md flex justify-between items-center relative group">
+                    <div>
+                        <div class="text-[10px] font-black uppercase tracking-widest opacity-80 mb-1">Return (Sum of Rewards)</div>
+                        <div id="rewardScore" class="text-3xl font-black leading-none">0</div>
+                    </div>
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-2xl">
+                        💎
+                    </div>
+                    
+                    <!-- Tooltip for Return vs Reward -->
+                    <div class="absolute top-full mt-2 left-0 bg-slate-800 text-white text-[10px] p-3 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 w-full border border-slate-700">
+                        <strong class="text-amber-400 uppercase tracking-wider block mb-1">Exam Tip</strong>
+                        <span class="block mb-2">Do not confuse Return with Reward!</span>
+                        <ul class="space-y-1">
+                            <li><strong class="text-emerald-300">Reward (R):</strong> The immediate signal from a single transition.</li>
+                            <li><strong class="text-blue-300">Return:</strong> The total accumulated sum over the episode.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div id="controlsContainer">
+                    <!-- Javascript will inject context-aware buttons here -->
+                </div>
+
+                <!-- Timestep Log -->
+                <div class="flex-grow flex flex-col min-h-0">
+                    <div class="flex justify-between items-end mb-2 border-b border-gray-100 pb-2">
+                        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-tighter">Timestep Log</h2>
+                        <span id="timeBadge" class="text-[10px] font-mono font-black bg-gray-100 text-gray-600 px-2 py-0.5 rounded">t = 0</span>
+                    </div>
+                    <div id="logContainer" class="flex-grow overflow-y-auto log-container bg-slate-900 rounded-xl p-4 font-mono text-xs text-slate-300 space-y-2 shadow-inner border border-slate-800">
+                        <div class="text-emerald-400 fade-in">> MDP Initialized.</div>
+                        <div class="fade-in">> Agent begins in <span class="text-white">S<sub class="text-[8px]">1</sub> (Safe Zone)</span>.</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Panel: Visualization -->
+            <div class="lg:col-span-2 bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col h-[550px] relative">
+                
+                <!-- Dynamic Narrative Box -->
+                <div id="narrativeBox" class="mb-4 bg-blue-50 border border-blue-200 p-4 rounded-xl transition-all duration-300 flex items-start gap-4 shadow-sm z-10">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                        <span class="text-blue-600 font-black">ℹ</span>
+                    </div>
+                    <div>
+                        <h3 id="narrativeTitle" class="font-black text-sm text-blue-900 uppercase tracking-wider mb-1">The Markov Property</h3>
+                        <p id="narrativeDesc" class="text-sm text-blue-800 font-medium">The future state depends <span class="font-bold underline">only</span> on the current state and action. The Environment doesn't care how you got here.</p>
+                    </div>
+                </div>
+
+                <!-- Dice Roll Overlay (Hidden by default) -->
+                <div id="diceOverlay" class="absolute inset-0 bg-white/80 backdrop-blur-sm z-20 hidden flex-col items-center justify-center rounded-2xl">
+                    <div class="bg-white border-2 border-indigo-200 p-6 rounded-2xl shadow-xl flex flex-col items-center max-w-sm text-center">
+                        <h3 class="text-xs font-black uppercase tracking-widest text-indigo-500 mb-2">Sampling Distribution...</h3>
+                        <div id="spinnerTarget" class="text-4xl mb-4 font-mono font-black text-slate-800 tabular-nums">00%</div>
+                        <div id="diceExplanation" class="text-sm text-slate-600 font-medium">
+                            Calculating probability of next state...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Diagram Area -->
+                <div class="flex-grow relative bg-slate-50 rounded-xl border-2 border-slate-200 overflow-hidden">
+                    <canvas id="mdpCanvas" class="w-full h-full absolute inset-0"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Explainer -->
+        <div class="bg-indigo-50 border border-indigo-100 p-6 rounded-2xl shadow-sm text-indigo-900 mb-8">
+            <h3 class="font-black text-sm uppercase tracking-widest text-indigo-700 mb-4">The 5 Components of an MDP</h3>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-indigo-100">
+                    <div class="text-2xl font-serif italic text-blue-600 mb-1">S</div>
+                    <div class="font-bold text-xs uppercase mb-1 text-slate-800">States</div>
+                    <div class="text-[10px] text-slate-500 font-medium">The set of all possible situations (e.g. S1, S2, S3).</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-indigo-100">
+                    <div class="text-2xl font-serif italic text-blue-600 mb-1">A</div>
+                    <div class="font-bold text-xs uppercase mb-1 text-slate-800">Actions</div>
+                    <div class="text-[10px] text-slate-500 font-medium">The choices available to the agent.</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-indigo-100">
+                    <div class="text-2xl font-serif italic text-blue-600 mb-1">P(S'|S,A)</div>
+                    <div class="font-bold text-xs uppercase mb-1 text-slate-800">Transitions</div>
+                    <div class="text-[10px] text-slate-500 font-medium">Probability of reaching state S' given action A in state S.</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-indigo-100">
+                    <div class="text-2xl font-serif italic text-blue-600 mb-1">R(S,A)</div>
+                    <div class="font-bold text-xs uppercase mb-1 text-slate-800">Immediate Reward</div>
+                    <div class="text-[10px] text-slate-500 font-medium">The immediate signal received right after an action.</div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-indigo-100">
+                    <div class="text-2xl font-serif italic text-blue-600 mb-1">&gamma;</div>
+                    <div class="font-bold text-xs uppercase mb-1 text-slate-800">Discount Factor</div>
+                    <div class="text-[10px] text-slate-500 font-medium">How much future rewards are valued vs immediate ones.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('mdpCanvas');
+        const ctx = canvas.getContext('2d');
+        const controlsContainer = document.getElementById('controlsContainer');
+        const logContainer = document.getElementById('logContainer');
+        const timeBadge = document.getElementById('timeBadge');
+        const rewardScore = document.getElementById('rewardScore');
+        
+        const diceOverlay = document.getElementById('diceOverlay');
+        const spinnerTarget = document.getElementById('spinnerTarget');
+        const diceExplanation = document.getElementById('diceExplanation');
+
+        // MDP Definition
+        const states = {
+            'S1': { id: 'S1', name: 'Safe Zone', x: 0.2, y: 0.5, color: '#3b82f6', icon: '🏕️' },
+            'S2': { id: 'S2', name: 'Ice Patch', x: 0.5, y: 0.5, color: '#0ea5e9', icon: '🧊' },
+            'S3': { id: 'S3', name: 'Goal', x: 0.8, y: 0.5, color: '#10b981', icon: '🏆' }
+        };
+
+        const mdp = {
+            'S1': [
+                {
+                    name: 'Step Onto Ice',
+                    desc: '100% chance to reach Ice Patch.',
+                    color: 'bg-blue-600 hover:bg-blue-700',
+                    transitions: [ { next: 'S2', prob: 1.0, reward: 0 } ]
+                }
+            ],
+            'S2': [
+                {
+                    name: 'Run Fast',
+                    desc: '70% Goal (+10), 30% Slip to Start (-2)',
+                    color: 'bg-indigo-600 hover:bg-indigo-700',
+                    transitions: [
+                        { next: 'S3', prob: 0.70, reward: 10 },
+                        { next: 'S1', prob: 0.30, reward: -2 }
+                    ]
+                },
+                {
+                    name: 'Walk Slowly',
+                    desc: '90% Stay on Ice (-1), 10% Goal (+10)',
+                    color: 'bg-sky-600 hover:bg-sky-700',
+                    transitions: [
+                        { next: 'S2', prob: 0.90, reward: -1 },
+                        { next: 'S3', prob: 0.10, reward: 10 }
+                    ]
+                }
+            ],
+            'S3': [
+                {
+                    name: 'Restart',
+                    desc: '100% chance to return to Safe Zone.',
+                    color: 'bg-slate-600 hover:bg-slate-700',
+                    transitions: [ { next: 'S1', prob: 1.0, reward: 0 } ]
+                }
+            ]
+        };
+
+        // State Variables
+        let t = 0;
+        let totalReward = 0;
+        let currentStateId = 'S1';
+        let isAnimating = false;
+        
+        // Agent visual tracking
+        let agentPos = { x: 0.2, y: 0.5 }; // normalized coords
+
+        function resizeCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            draw();
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        function addToLog(message, isHighlight = false) {
+            const div = document.createElement('div');
+            div.className = `fade-in ${isHighlight ? 'text-amber-400 font-bold' : ''}`;
+            div.innerHTML = `> ${message}`;
+            logContainer.appendChild(div);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function setNarrative(title, desc) {
+            const narrativeTitle = document.getElementById('narrativeTitle');
+            const narrativeDesc = document.getElementById('narrativeDesc');
+            narrativeTitle.innerText = title;
+            narrativeDesc.innerHTML = desc;
+        }
+
+        function updateControls() {
+            controlsContainer.innerHTML = `
+                <h2 class="text-xs font-bold text-gray-400 uppercase tracking-tighter mb-3 border-b border-gray-100 pb-2">Available Actions from ${states[currentStateId].name}</h2>
+            `;
+            
+            const btnGroup = document.createElement('div');
+            btnGroup.className = 'flex flex-col gap-3';
+            
+            const actions = mdp[currentStateId];
+            actions.forEach((action, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `w-full py-3 ${action.color} text-white rounded-xl font-black uppercase tracking-widest text-xs transition-all shadow-md active:transform active:scale-95 flex flex-col items-center justify-center gap-1`;
+                btn.disabled = isAnimating;
+                btn.style.opacity = isAnimating ? '0.5' : '1';
+                btn.style.cursor = isAnimating ? 'not-allowed' : 'pointer';
+                
+                btn.innerHTML = `
+                    <span>A<sub class="text-[8px] ml-0.5">${t}</sub>: ${action.name}</span>
+                    <span class="text-[9px] opacity-80 font-mono tracking-normal normal-case font-medium">${action.desc}</span>
+                `;
+                
+                btn.onclick = () => takeAction(action);
+                btnGroup.appendChild(btn);
+            });
+            controlsContainer.appendChild(btnGroup);
+
+            // Update Narrative based on State
+            if (currentStateId === 'S1') {
+                setNarrative("State S1: Deterministic Environment", "In State S1, the transition function <span class='italic font-serif'>P(S'|S1,A)</span> has a probability of 1.0. This means the outcome of the action is entirely predictable and guaranteed.");
+            } else if (currentStateId === 'S2') {
+                setNarrative("State S2: Probabilistic Environment", "In State S2, transitions are stochastic. The outcome of an action is defined by a probability distribution <span class='italic font-serif'>P(S'|S2,A)</span>. The Agent cannot guarantee which state it will enter next.");
+            } else if (currentStateId === 'S3') {
+                setNarrative("State S3: Terminal State", "State S3 represents a terminal goal state. In many MDPs, reaching a terminal state concludes the episode, allowing the Agent to evaluate total return and restart.");
+            }
+        }
+
+        function takeAction(action) {
+            if (isAnimating) return;
+            isAnimating = true;
+            updateControls(); // disable buttons
+
+            addToLog(`Agent chooses Action: ${action.name}`);
+
+            // If deterministic (100% prob), skip the long dice roll animation
+            if (action.transitions.length === 1 && action.transitions[0].prob === 1.0) {
+                setNarrative("Computing Transition (Deterministic)", `The Agent selected action "${action.name}". Since <span class='italic font-serif'>P(S'|S,A) = 1.0</span>, the Environment will transition the Agent deterministically.`);
+                executeTransition(action.transitions[0]);
+                return;
+            }
+
+            // Probabilistic: Show Dice Roll
+            setNarrative("Resolving Probabilistic Transition", `The Agent selected action "${action.name}". The Environment is currently sampling from the probability distribution <span class='italic font-serif'>P(S'|S,A)</span> to determine the next state.`);
+            diceOverlay.style.display = 'flex';
+            diceExplanation.innerHTML = `Sampling transition probabilities for action <strong>${action.name}</strong>...`;
+            
+            let rollCount = 0;
+            const rollInterval = setInterval(() => {
+                spinnerTarget.innerText = Math.floor(Math.random() * 100) + '%';
+                rollCount++;
+                if (rollCount > 15) {
+                    clearInterval(rollInterval);
+                    
+                    // Actual roll logic
+                    const randomVal = Math.random();
+                    let cumulative = 0;
+                    let selectedTransition = null;
+                    
+                    for (const t of action.transitions) {
+                        cumulative += t.prob;
+                        if (randomVal <= cumulative) {
+                            selectedTransition = t;
+                            break;
+                        }
+                    }
+
+                    // Display Result
+                    const rollPercent = Math.floor(randomVal * 100);
+                    spinnerTarget.innerText = `${rollPercent}%`;
+                    spinnerTarget.className = "text-4xl mb-4 font-mono font-black text-emerald-600 tabular-nums";
+                    
+                    diceExplanation.innerHTML = `Sampled ${rollPercent}. Transitioning to <strong>${states[selectedTransition.next].name}</strong>.`;
+
+                    setTimeout(() => {
+                        diceOverlay.style.display = 'none';
+                        spinnerTarget.className = "text-4xl mb-4 font-mono font-black text-slate-800 tabular-nums"; // reset
+                        executeTransition(selectedTransition);
+                    }, 2000);
+                }
+            }, 50);
+        }
+
+        function executeTransition(transition) {
+            const nextStateId = transition.next;
+            const reward = transition.reward;
+            const nextState = states[nextStateId];
+
+            addToLog(`Environment Transition: P(S'|S,A) resolves to ${nextState.name}.`, true);
+            if (reward !== 0) {
+                addToLog(`Reward Received: ${reward > 0 ? '+' : ''}${reward}`);
+                totalReward += reward;
+                rewardScore.innerText = totalReward;
+            }
+
+            setNarrative("State Transition Complete", `The transition has resolved. The Agent has entered state <strong>${nextState.name}</strong> and the Environment returned a reward signal of <strong class='font-mono'>R = ${reward}</strong>.`);
+
+            // Animate Agent moving
+            const startX = agentPos.x;
+            const startY = agentPos.y;
+            const endX = nextState.x;
+            const endY = nextState.y;
+            
+            let startTime = null;
+            const duration = 800; // ms
+
+            function animateMove(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const progress = Math.min((timestamp - startTime) / duration, 1.0);
+                
+                // Ease in out
+                const ease = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+                
+                // Add a little arc to the movement
+                const arcH = Math.sin(ease * Math.PI) * 0.15; // arc height
+                
+                agentPos.x = startX + (endX - startX) * ease;
+                // if moving right to left or jumping, curve it up
+                agentPos.y = startY + (endY - startY) * ease - arcH;
+
+                draw();
+
+                if (progress < 1.0) {
+                    requestAnimationFrame(animateMove);
+                } else {
+                    // Done
+                    agentPos.x = endX;
+                    agentPos.y = endY;
+                    currentStateId = nextStateId;
+                    t++;
+                    timeBadge.innerText = `t = ${t}`;
+                    addToLog(`--- Timestep t=${t} begins ---`);
+                    
+                    isAnimating = false;
+                    updateControls();
+                    draw();
+                }
+            }
+            requestAnimationFrame(animateMove);
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const w = canvas.width;
+            const h = canvas.height;
+
+            // Draw connecting lines between states first
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 4;
+            ctx.setLineDash([8, 8]);
+            ctx.beginPath();
+            ctx.moveTo(states['S1'].x * w, states['S1'].y * h);
+            ctx.lineTo(states['S2'].x * w, states['S2'].y * h);
+            ctx.lineTo(states['S3'].x * w, states['S3'].y * h);
+            ctx.stroke();
+
+            // S2 -> S1 curve (slip back)
+            ctx.beginPath();
+            ctx.moveTo(states['S2'].x * w, states['S2'].y * h);
+            ctx.quadraticCurveTo(
+                (states['S1'].x * w + states['S2'].x * w) / 2, 
+                h * 0.2, 
+                states['S1'].x * w, states['S1'].y * h
+            );
+            ctx.stroke();
+
+            // S3 -> S1 curve (reset)
+            ctx.beginPath();
+            ctx.moveTo(states['S3'].x * w, states['S3'].y * h);
+            ctx.quadraticCurveTo(
+                (states['S1'].x * w + states['S3'].x * w) / 2, 
+                h * 0.8, 
+                states['S1'].x * w, states['S1'].y * h
+            );
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Draw States
+            Object.values(states).forEach(state => {
+                const sx = state.x * w;
+                const sy = state.y * h;
+                const radius = 40;
+
+                // State glow if current
+                if (state.id === currentStateId && !isAnimating) {
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = state.color;
+                }
+
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                ctx.arc(sx, sy, radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = state.color;
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                // Text
+                ctx.fillStyle = '#0f172a';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(state.id, sx, sy - radius - 10);
+                
+                ctx.fillStyle = '#64748b';
+                ctx.font = '10px sans-serif';
+                ctx.fillText(state.name, sx, sy + radius + 15);
+
+                // Icon
+                ctx.font = '24px sans-serif';
+                ctx.fillText(state.icon, sx, sy + 8);
+            });
+
+            // Draw Agent
+            const ax = agentPos.x * w;
+            const ay = agentPos.y * h;
+            
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = 'rgba(0,0,0,0.3)';
+            ctx.fillStyle = '#1e293b'; // slate-800
+            ctx.beginPath();
+            ctx.arc(ax, ay - 25, 18, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#fff';
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 16px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('🤖', ax, ay - 19);
+        }
+
+        // Init
+        setTimeout(() => {
+            resizeCanvas();
+            updateControls();
+        }, 100);
+
+    </script>
+</body>
+</html>
