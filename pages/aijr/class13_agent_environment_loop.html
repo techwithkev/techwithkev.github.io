@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent-Environment Loop | Tech With Kev</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Smooth scrolling for the log */
+        .log-container::-webkit-scrollbar { width: 6px; }
+        .log-container::-webkit-scrollbar-track { background: transparent; }
+        .log-container::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
+        
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        <!-- Navigation -->
+        <nav class="mb-6 pt-4 no-print">
+            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 transition-colors" style="text-decoration: none;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Course Hub
+            </a>
+        </nav>
+
+        <!-- Header -->
+        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <h1 class="text-4xl font-black tracking-tight text-gray-900">AGENT-ENVIRONMENT <span class="text-blue-600">LOOP</span></h1>
+                <p class="text-gray-500 font-medium italic">The fundamental cycle of Reinforcement Learning</p>
+            </div>
+            <div class="px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-white border border-gray-200 text-gray-400 shadow-sm transition-all duration-300">
+                Interactive Concept
+            </div>
+        </header>
+
+        <!-- Main Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            
+            <!-- Left Panel: Controls, Log, Narrative -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-6 h-[500px]">
+                
+                <!-- Controls -->
+                <div>
+                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-tighter mb-4 border-b border-gray-100 pb-2">Step 1: Agent Policy</h2>
+                    <div class="flex gap-3">
+                        <button id="actionPosBtn" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black uppercase tracking-widest text-xs transition-all shadow-md active:transform active:scale-95 flex flex-col items-center justify-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <span class="text-[10px] opacity-80 font-mono">A<sub class="text-[8px] ml-0.5">t</sub> = Help</span>
+                            Good Action
+                        </button>
+                        <button id="actionNegBtn" class="flex-1 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-black uppercase tracking-widest text-xs transition-all shadow-md active:transform active:scale-95 flex flex-col items-center justify-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <span class="text-[10px] opacity-80 font-mono">A<sub class="text-[8px] ml-0.5">t</sub> = Steal</span>
+                            Bad Action
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Timestep Log -->
+                <div class="flex-grow flex flex-col min-h-0">
+                    <div class="flex justify-between items-end mb-2 border-b border-gray-100 pb-2">
+                        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-tighter">Timestep Log</h2>
+                        <span id="timeBadge" class="text-[10px] font-mono font-black bg-gray-100 text-gray-600 px-2 py-0.5 rounded">t = 0</span>
+                    </div>
+                    <div id="logContainer" class="flex-grow overflow-y-auto log-container bg-slate-900 rounded-xl p-4 font-mono text-xs text-slate-300 space-y-2 shadow-inner border border-slate-800">
+                        <div class="text-emerald-400 fade-in">> System initialized.</div>
+                        <div class="fade-in">> Agent observes initial State S<sub class="text-[8px]">0</sub></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Panel: Visualization -->
+            <div class="lg:col-span-2 bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col h-[500px]">
+                <!-- Dynamic Narrative Box (Top of vis) -->
+                <div id="narrativeBox" class="mb-4 bg-blue-50 border border-blue-200 p-4 rounded-xl transition-all duration-300 flex items-start gap-4">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                        <span class="text-blue-600 font-black">1</span>
+                    </div>
+                    <div>
+                        <h3 id="narrativeTitle" class="font-black text-sm text-blue-900 uppercase tracking-wider mb-1">Waiting for Action</h3>
+                        <p id="narrativeDesc" class="text-sm text-blue-800 font-medium">The Agent is currently in State <strong class="font-mono bg-white px-1 py-0.5 rounded text-xs shadow-sm">S<sub class="text-[9px]">t</sub></strong>. It must consult its policy and choose an action.</p>
+                    </div>
+                </div>
+
+                <!-- Interactive Diagram Area -->
+                <div class="flex-grow relative bg-slate-50 rounded-xl border-2 border-slate-200 overflow-hidden">
+                    <canvas id="diagramCanvas" class="w-full h-full absolute inset-0"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Explainer -->
+        <div class="bg-indigo-50 border border-indigo-100 p-6 rounded-2xl shadow-sm text-xs text-indigo-900 leading-relaxed font-medium">
+            <span class="font-black uppercase tracking-widest text-indigo-700 mr-2">Key Principle:</span> 
+            The subscript <strong class="font-mono bg-white px-1 py-0.5 rounded shadow-sm text-indigo-600">t</strong> represents the current timestep. The Agent takes an action at time <span class="italic font-serif">t</span> (<span class="italic font-serif">A</span><sub class="text-[9px]">t</sub>), which alters the Environment. The Environment then transitions and yields a reward at the next timestep, <span class="italic font-serif">t+1</span> (<span class="italic font-serif">R</span><sub class="text-[9px]">t+1</sub>, <span class="italic font-serif">S</span><sub class="text-[9px]">t+1</sub>).
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('diagramCanvas');
+        const ctx = canvas.getContext('2d');
+        const actionPosBtn = document.getElementById('actionPosBtn');
+        const actionNegBtn = document.getElementById('actionNegBtn');
+        const logContainer = document.getElementById('logContainer');
+        const timeBadge = document.getElementById('timeBadge');
+        const narrativeBox = document.getElementById('narrativeBox');
+        const narrativeTitle = document.getElementById('narrativeTitle');
+        const narrativeDesc = document.getElementById('narrativeDesc');
+
+        // State Variables
+        let t = 0;
+        let animationPhase = 'idle'; // idle, action_pulse, env_process, return_pulse, policy_update
+        let animationProgress = 0; // 0 to 1
+        let lastTimestamp = 0;
+        let envFlash = 0;
+        let agentFlash = 0;
+        let currentActionType = 'positive';
+
+        function resizeCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            draw();
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        // Utility to draw rounded rects
+        function roundedRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
+
+        // Draw an arrowhead
+        function drawArrowhead(ctx, x, y, angle) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(-12, -6);
+            ctx.lineTo(-12, 6);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function addToLog(message, isHighlight = false) {
+            const div = document.createElement('div');
+            let color = isHighlight ? 'text-amber-400 font-bold' : '';
+            if (isHighlight && currentActionType === 'positive') color = 'text-emerald-400 font-bold';
+            if (isHighlight && currentActionType === 'negative') color = 'text-red-400 font-bold';
+            
+            div.className = `fade-in ${color}`;
+            div.innerHTML = `> ${message}`;
+            logContainer.appendChild(div);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function setNarrative(stepNum, title, desc, colorClass) {
+            // Colors: blue, amber, emerald, red
+            const colors = {
+                blue: { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-900', p: 'text-blue-800', badgeBg: 'bg-blue-100', badgeText: 'text-blue-600' },
+                amber: { bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-900', p: 'text-amber-800', badgeBg: 'bg-amber-100', badgeText: 'text-amber-600' },
+                emerald: { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-900', p: 'text-emerald-800', badgeBg: 'bg-emerald-100', badgeText: 'text-emerald-600' },
+                red: { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-900', p: 'text-red-800', badgeBg: 'bg-red-100', badgeText: 'text-red-600' }
+            };
+            const c = colors[colorClass] || colors.blue;
+            
+            narrativeBox.className = `mb-4 ${c.bg} border ${c.border} p-4 rounded-xl transition-all duration-300 flex items-start gap-4 shadow-sm`;
+            narrativeBox.innerHTML = `
+                <div class="w-8 h-8 rounded-full ${c.badgeBg} flex items-center justify-center flex-shrink-0">
+                    <span class="${c.badgeText} font-black">${stepNum}</span>
+                </div>
+                <div>
+                    <h3 class="font-black text-sm ${c.text} uppercase tracking-wider mb-1">${title}</h3>
+                    <p class="text-sm ${c.p} font-medium leading-relaxed">${desc}</p>
+                </div>
+            `;
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const w = canvas.width;
+            const h = canvas.height;
+
+            // Geometry
+            const boxW = 140;
+            const boxH = 140;
+            const agentX = w * 0.2 - boxW/2;
+            const agentY = h * 0.5 - boxH/2;
+            const envX = w * 0.8 - boxW/2;
+            const envY = h * 0.5 - boxH/2;
+
+            // Lines Paths
+            const topY = h * 0.35;
+            const bottomY = h * 0.65;
+            const lineStartX = agentX + boxW;
+            const lineEndX = envX;
+
+            const isPos = currentActionType === 'positive';
+            const actionColor = isPos ? '#10b981' : '#ef4444';
+            const actionDark = isPos ? '#047857' : '#b91c1c';
+            const actionLabel = isPos ? 'Help' : 'Steal';
+            const rewardVal = isPos ? '+10' : '-5';
+
+            // 1. Draw Connecting Arrows
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            
+            // Top Arrow (Action)
+            ctx.strokeStyle = '#cbd5e1'; 
+            ctx.beginPath();
+            ctx.moveTo(lineStartX, topY);
+            ctx.lineTo(lineEndX - 4, topY);
+            ctx.stroke();
+            ctx.fillStyle = '#cbd5e1';
+            drawArrowhead(ctx, lineEndX - 2, topY, 0);
+
+            // Bottom Arrow (Reward/State)
+            ctx.beginPath();
+            ctx.moveTo(lineEndX, bottomY);
+            ctx.lineTo(lineStartX + 4, bottomY);
+            ctx.stroke();
+            drawArrowhead(ctx, lineStartX + 2, bottomY, Math.PI);
+
+            // Labels for paths
+            ctx.fillStyle = '#64748b'; 
+            ctx.font = 'bold 12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Action (A)`, w/2, topY - 15);
+            ctx.fillText(`Reward (R) & State (S)`, w/2, bottomY + 25);
+
+            // 2. Draw Pulses based on Animation Phase
+            if (animationPhase === 'action_pulse') {
+                const px = lineStartX + (lineEndX - lineStartX) * animationProgress;
+                
+                // Glow
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = actionColor;
+                ctx.fillStyle = actionColor;
+                ctx.beginPath();
+                ctx.arc(px, topY, 8, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                // Floating Math Label
+                ctx.fillStyle = actionDark;
+                ctx.font = 'bold 14px monospace';
+                ctx.fillText(`A${t} = ${actionLabel}`, px, topY - 20);
+            }
+            else if (animationPhase === 'return_pulse') {
+                const px = lineEndX - (lineEndX - lineStartX) * animationProgress;
+                
+                // Glow
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = actionColor;
+                ctx.fillStyle = actionColor; 
+                ctx.beginPath();
+                ctx.arc(px, bottomY, 8, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                // Floating Math Label
+                ctx.fillStyle = actionDark;
+                ctx.font = 'bold 14px monospace';
+                ctx.fillText(`R${t+1} = ${rewardVal}, S${t+1}`, px, bottomY - 20);
+            }
+
+            // 3. Draw Agent Box
+            ctx.shadowBlur = agentFlash > 0 ? 20 : 10;
+            let agentGlow = actionColor;
+            ctx.shadowColor = agentFlash > 0 ? agentGlow : 'rgba(0,0,0,0.05)';
+            ctx.fillStyle = 'white';
+            roundedRect(ctx, agentX, agentY, boxW, boxH, 16);
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = agentFlash > 0 ? agentGlow : '#e2e8f0'; 
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            // Agent Icon/Text
+            ctx.fillStyle = '#0f172a'; // slate-900
+            ctx.font = '900 20px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('AGENT', agentX + boxW/2, agentY + boxH/2 - 10);
+            
+            // Brain icon
+            ctx.fillStyle = '#3b82f6'; // blue-500
+            ctx.font = 'bold 24px sans-serif';
+            ctx.fillText('🤖', agentX + boxW/2, agentY + boxH/2 + 25);
+
+            // 4. Draw Environment Box
+            ctx.shadowBlur = envFlash > 0 ? 20 : 10;
+            let envGlow = actionColor;
+            ctx.shadowColor = envFlash > 0 ? envGlow : 'rgba(0,0,0,0.05)';
+            ctx.fillStyle = 'white';
+            roundedRect(ctx, envX, envY, boxW, boxH, 16);
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = envFlash > 0 ? envGlow : '#e2e8f0';
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            // Environment Icon/Text
+            ctx.fillStyle = '#0f172a'; // slate-900
+            ctx.font = '900 20px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('ENV', envX + boxW/2, envY + boxH/2 - 10);
+            
+            ctx.fillStyle = '#10b981'; // emerald-500
+            ctx.font = 'bold 24px sans-serif';
+            ctx.fillText('🌍', envX + boxW/2, envY + boxH/2 + 25);
+        }
+
+        function loop(timestamp) {
+            if (!lastTimestamp) lastTimestamp = timestamp;
+            const dt = timestamp - lastTimestamp;
+            lastTimestamp = timestamp;
+
+            // Decay flashes
+            if (agentFlash > 0) agentFlash = Math.max(0, agentFlash - dt * 0.002);
+            if (envFlash > 0) envFlash = Math.max(0, envFlash - dt * 0.002);
+
+            // Animation Logic
+            if (animationPhase === 'action_pulse') {
+                animationProgress += dt * 0.0015; // speed
+                if (animationProgress >= 1.0) {
+                    animationPhase = 'env_process';
+                    animationProgress = 0;
+                    envFlash = 1.0;
+                    
+                    addToLog(`Action A<sub class="text-[8px]">${t}</sub> received by Environment.`);
+                    setNarrative('2', 'Environment Transitions', `The Environment evaluates the action. It computes the new state <strong class="font-mono bg-white/50 px-1 py-0.5 rounded shadow-sm text-xs">S<sub class="text-[9px]">${t+1}</sub></strong> and a reward signal <strong class="font-mono bg-white/50 px-1 py-0.5 rounded shadow-sm text-xs">R<sub class="text-[9px]">${t+1}</sub></strong>.`, 'blue');
+                    
+                    // Hold in environment for a moment
+                    setTimeout(() => {
+                        animationPhase = 'return_pulse';
+                        const rewardVal = currentActionType === 'positive' ? '+10' : '-5';
+                        addToLog(`Environment emits R<sub class="text-[8px]">${t+1}</sub> = ${rewardVal}.`, true);
+                    }, 1000);
+                }
+            }
+            else if (animationPhase === 'return_pulse') {
+                animationProgress += dt * 0.0015;
+                if (animationProgress >= 1.0) {
+                    animationPhase = 'policy_update';
+                    animationProgress = 0;
+                    agentFlash = 1.0;
+                    
+                    addToLog(`Agent receives Reward and new State.`);
+                    
+                    if (currentActionType === 'positive') {
+                        setNarrative('3', 'Reinforcement (Policy Update)', `The Agent receives <strong class="text-emerald-700">+10 Reward</strong>. This is positive reinforcement! The Agent updates its policy to take this action MORE often in the future.`, 'emerald');
+                    } else {
+                        setNarrative('3', 'Penalization (Policy Update)', `The Agent receives <strong class="text-red-700">-5 Reward</strong>. This is negative reinforcement (a penalty). The Agent updates its policy to avoid this action in the future.`, 'red');
+                    }
+
+                    setTimeout(() => {
+                        animationPhase = 'idle';
+                        t++;
+                        timeBadge.innerText = `t = ${t}`;
+                        addToLog(`--- Timestep t=${t} begins ---`);
+                        setNarrative('1', 'Waiting for Action', `The Agent is now in the new state <strong class="font-mono bg-white px-1 py-0.5 rounded text-xs shadow-sm">S<sub class="text-[9px]">${t}</sub></strong>. It uses its updated policy to choose the next action.`, 'blue');
+                        
+                        actionPosBtn.disabled = false;
+                        actionNegBtn.disabled = false;
+                    }, 3500);
+                }
+            }
+
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        // Interaction
+        function handleActionClick(type) {
+            if (animationPhase !== 'idle') return;
+            
+            actionPosBtn.disabled = true;
+            actionNegBtn.disabled = true;
+            
+            currentActionType = type;
+            animationPhase = 'action_pulse';
+            animationProgress = 0;
+            agentFlash = 0.5;
+
+            const actionLabel = type === 'positive' ? 'Help' : 'Steal';
+            addToLog(`Agent executes Action A<sub class="text-[8px]">${t}</sub> = ${actionLabel}.`);
+            setNarrative('1', 'Agent Acts', `Based on its policy <span class="italic font-serif">π(A|S)</span>, the Agent selects the action <strong class="font-mono bg-white px-1 py-0.5 rounded shadow-sm text-xs">A<sub class="text-[9px]">${t}</sub> = ${actionLabel}</strong> and applies it to the Environment.`, 'blue');
+        }
+
+        actionPosBtn.addEventListener('click', () => handleActionClick('positive'));
+        actionNegBtn.addEventListener('click', () => handleActionClick('negative'));
+
+        // Start
+        setTimeout(() => {
+            resizeCanvas();
+            requestAnimationFrame(loop);
+        }, 100);
+
+    </script>
+</body>
+</html>
