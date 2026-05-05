@@ -115,13 +115,13 @@
                 <div class="mt-auto bg-gray-50 border border-gray-200 rounded-xl p-5">
                     <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-200 pb-2 text-center">Outlier Breakdown</h3>
                     <div class="grid grid-cols-2 gap-y-3 text-sm items-center">
-                        <div class="text-xs font-bold text-gray-500 uppercase">Distance ($e$)</div>
+                        <div class="text-xs font-bold text-gray-500 uppercase">Distance (e)</div>
                         <div id="errDistance" class="font-mono font-bold text-right text-gray-900 text-lg">0.00</div>
 
-                        <div class="text-xs font-bold text-gray-500 uppercase">Absolute ($|e|$)</div>
+                        <div class="text-xs font-bold text-gray-500 uppercase">Absolute (|e|)</div>
                         <div id="errAbs" class="font-mono font-bold text-right text-green-600 text-lg">0.00</div>
 
-                        <div class="text-xs font-bold text-gray-500 uppercase">Squared ($e^2$)</div>
+                        <div class="text-xs font-bold text-gray-500 uppercase">Squared (e&sup2;)</div>
                         <div id="errSq" class="font-mono font-black text-right text-red-500 text-xl">0.00</div>
                     </div>
                 </div>
@@ -241,22 +241,19 @@
             
             if (e < 1.0) {
                 stateIndicator.className = "rounded-xl p-5 border-l-4 transition-colors duration-300 bg-green-50 border-green-500 text-green-900";
-                stateTitle.innerText = "Balanced Fit (Normal)";
-                stateDesc.innerHTML = "The outlier is behaving normally. The regression line easily balances the errors across all data points.";
-                mseValue.classList.remove('animate-pulse', 'text-red-800');
-                mseValue.classList.add('text-red-500');
-            } else if (e < 2.5) {
-                stateIndicator.className = "rounded-xl p-5 border-l-4 transition-colors duration-300 bg-amber-50 border-amber-500 text-amber-900";
+            if (absErr < 1.0) {
+                stateTitle.innerText = "Balanced Fit";
+                stateDesc.innerHTML = "The outlier is close to the regression line. The MSE penalty is small.";
+                stateIndicator.className = "rounded-xl p-5 border-l-4 transition-colors duration-300 bg-green-50 border-green-500 text-green-800";
+            } else if (absErr < 3.0) {
                 stateTitle.innerText = "Growing Penalty";
-                stateDesc.innerHTML = "The point is pulling away. Notice how the geometric red square ($e^2$) starts to rapidly grow compared to the other errors.";
-                mseValue.classList.remove('animate-pulse', 'text-red-800');
-                mseValue.classList.add('text-red-500');
+                stateDesc.innerHTML = "The point is pulling away. Notice how the geometric red square (e&sup2;) starts to rapidly grow compared to the other errors.";
+                stateIndicator.className = "rounded-xl p-5 border-l-4 transition-colors duration-300 bg-amber-50 border-amber-500 text-amber-800";
             } else {
-                stateIndicator.className = "rounded-xl p-5 border-l-4 transition-colors duration-300 bg-red-50 border-red-500 text-red-900";
-                stateTitle.innerText = "The Outlier Penalty! (Explosion)";
-                stateDesc.innerHTML = "Notice how the red square ($e^2$) has exploded in size! The regression line is forced to tilt violently just to minimize this single massive geometric penalty, ruining the fit for the normal data.";
-                mseValue.classList.add('animate-pulse', 'text-red-800');
-                mseValue.classList.remove('text-red-500');
+                stateTitle.innerText = "Outlier Explosion!";
+                stateTitle.className = "font-black text-sm uppercase tracking-wider mb-2 text-red-700 animate-pulse";
+                stateDesc.innerHTML = "Notice how the red square (e&sup2;) has exploded in size! The regression line is forced to tilt violently just to minimize this single massive geometric penalty, ruining the fit for the normal data.";
+                stateIndicator.className = "rounded-xl p-5 border-l-4 transition-colors duration-300 bg-red-50 border-red-500 text-red-800";
             }
         }
 

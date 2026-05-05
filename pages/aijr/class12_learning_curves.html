@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Curves Visualizer | Tech With Kev</title>
+    <!-- Tailwind CSS for UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .radio-card {
+            transition: all 0.2s ease;
+        }
+        .radio-input:checked + .radio-card {
+            border-color: #3b82f6; /* blue-500 */
+            background-color: #eff6ff; /* blue-50 */
+        }
+        .radio-input:checked + .radio-card .radio-title {
+            color: #1d4ed8; /* blue-700 */
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        <!-- Navigation -->
+        <nav class="mb-6 pt-4 no-print">
+            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 transition-colors" style="text-decoration: none;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Course Hub
+            </a>
+        </nav>
+
+        <!-- Header -->
+        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <h1 class="text-4xl font-black tracking-tight text-gray-900">LEARNING <span class="text-blue-600">CURVES</span></h1>
+                <p class="text-gray-500 font-medium italic">Diagnosing Bias and Variance using Training Set Size</p>
+            </div>
+            <div class="px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-white border border-gray-200 text-gray-400 shadow-sm transition-all duration-300">
+                Diagnostic Lab
+            </div>
+        </header>
+
+        <!-- Main Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            
+            <!-- Left Panel: Controls & Narrative -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-6 h-fit">
+                
+                <!-- Controls -->
+                <div>
+                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-tighter mb-4 border-b border-gray-100 pb-2">Select Scenario</h2>
+                    
+                    <div class="flex flex-col gap-3">
+                        <label class="cursor-pointer relative">
+                            <input type="radio" name="scenario" value="high_bias" class="radio-input absolute opacity-0 pointer-events-none" checked>
+                            <div class="radio-card border-2 border-gray-200 rounded-xl p-4 hover:border-gray-300">
+                                <div class="font-black uppercase tracking-widest text-sm text-gray-700 radio-title">High Bias</div>
+                                <div class="text-xs text-gray-500 font-medium mt-1">Underfitting Model</div>
+                            </div>
+                        </label>
+
+                        <label class="cursor-pointer relative">
+                            <input type="radio" name="scenario" value="optimal" class="radio-input absolute opacity-0 pointer-events-none">
+                            <div class="radio-card border-2 border-gray-200 rounded-xl p-4 hover:border-gray-300">
+                                <div class="font-black uppercase tracking-widest text-sm text-gray-700 radio-title">Optimal Fit</div>
+                                <div class="text-xs text-gray-500 font-medium mt-1">The Sweet Spot</div>
+                            </div>
+                        </label>
+
+                        <label class="cursor-pointer relative">
+                            <input type="radio" name="scenario" value="high_variance" class="radio-input absolute opacity-0 pointer-events-none">
+                            <div class="radio-card border-2 border-gray-200 rounded-xl p-4 hover:border-gray-300">
+                                <div class="font-black uppercase tracking-widest text-sm text-gray-700 radio-title">High Variance</div>
+                                <div class="text-xs text-gray-500 font-medium mt-1">Overfitting Model</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Dynamic Narrative Panel -->
+                <div id="narrativePanel" class="flex flex-col gap-4 transition-opacity duration-300">
+                    <!-- Javascript will inject the narrative here -->
+                </div>
+
+            </div>
+
+            <!-- Right Panel: Visualization -->
+            <div class="lg:col-span-2 bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col">
+                <div class="mb-4 flex justify-between items-end">
+                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-tighter border-b border-gray-100 pb-2 w-full">Error vs. Training Size</h2>
+                </div>
+
+                <!-- Canvas -->
+                <div class="relative bg-white rounded-xl overflow-hidden aspect-[16/10] border border-gray-200 flex-grow shadow-inner p-4">
+                    <canvas id="plotCanvas" class="w-full h-full"></canvas>
+                </div>
+
+                <!-- Legend -->
+                <div class="mt-6 flex flex-wrap justify-center gap-6 text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-1 bg-blue-600"></div> TRAINING ERROR
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-1 bg-red-500"></div> VALIDATION ERROR
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-0.5 border-t-2 border-dashed border-gray-400"></div> DESIRED PERFORMANCE
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="bg-gray-100 border border-gray-200 p-6 rounded-2xl text-xs text-gray-600 leading-relaxed font-medium">
+            <span class="font-black text-gray-800 uppercase tracking-widest mr-2">Key Principle:</span> 
+            Learning Curves plot Error against Training Set Size (m). By observing how the training and validation errors evolve as you add more data, you can diagnose whether your model suffers from High Bias, High Variance, or if you simply need more data.
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('plotCanvas');
+        const ctx = canvas.getContext('2d');
+        const radios = document.querySelectorAll('input[name="scenario"]');
+        const narrativePanel = document.getElementById('narrativePanel');
+
+        // Chart bounds and padding
+        let padding = { top: 20, right: 20, bottom: 40, left: 50 };
+        let currentAnimation = 0; // Animation frame tracker
+
+        // Narrative Content Mapping
+        const narratives = {
+            "high_bias": `
+                <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl">
+                    <h3 class="font-black text-amber-900 uppercase tracking-widest text-xs mb-2">High Bias (Underfitting)</h3>
+                    <p class="text-sm text-amber-800 font-medium mb-4">Both the training error and validation error are high, and they converge very quickly.</p>
+                    <p class="text-sm text-amber-800 font-medium">Because the model is too simple to capture the underlying pattern, adding more training data will not help. The curves have already plateaued.</p>
+                </div>
+                <!-- Exam Note Callout -->
+                <div class="bg-[#eefcf9] border border-teal-400 border-l-[3px] p-4 text-sm text-gray-800 font-medium shadow-sm rounded-r-xl mt-2">
+                    <strong class="text-teal-700 block mb-1">Exam answer for Q17:</strong>
+                    The learning curve shows high training error and high validation error that do not separate as training size grows - this is a signature of underfitting (high bias). The model needs more complexity, not more data.
+                </div>
+            `,
+            "optimal": `
+                <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-xl">
+                    <h3 class="font-black text-green-900 uppercase tracking-widest text-xs mb-2">Optimal Fit</h3>
+                    <p class="text-sm text-green-800 font-medium mb-2">The model has the right amount of complexity.</p>
+                    <p class="text-sm text-green-800 font-medium">The training error stays low, and as we add more data, the validation error steadily decreases until it is very close to the training error, near our desired performance level.</p>
+                </div>
+            `,
+            "high_variance": `
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-xl">
+                    <h3 class="font-black text-red-900 uppercase tracking-widest text-xs mb-2">High Variance (Overfitting)</h3>
+                    <p class="text-sm text-red-800 font-medium mb-2">The training error is extremely low (the model memorizes the data), but the validation error remains high.</p>
+                    <p class="text-sm text-red-800 font-medium mb-2">Notice the large, stubborn gap between the two curves.</p>
+                    <p class="text-sm text-red-800 font-medium italic">If the curves are still converging, adding more data might actually help this model!</p>
+                </div>
+            `
+        };
+
+        function resizeCanvas() {
+            // Need actual px sizes, take parent constraints
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            startAnimation();
+        }
+
+        // Mathematical curves
+        // x represents training size from 0.0 to 1.0
+        function getErrorValues(scenario, x) {
+            // Offset x slightly so log functions don't explode at 0
+            let t = x + 0.05; 
+            
+            if (scenario === 'high_bias') {
+                // High Bias: Converge at high error (e.g. 0.7)
+                let target = 0.7;
+                let train = target - 0.6 * Math.exp(-8 * t);
+                let val = target + 0.3 * Math.exp(-8 * t);
+                return { train, val };
+            } 
+            else if (scenario === 'high_variance') {
+                // High Variance: Train stays low, Val stays high. Gap remains.
+                let train = 0.1 + 0.1 * t; // creeps up slightly
+                let val = 0.5 + 0.4 * Math.exp(-5 * t); // comes down but plateaus high
+                return { train, val };
+            } 
+            else if (scenario === 'optimal') {
+                // Optimal: Converge at low error (e.g. 0.2)
+                let target = 0.2;
+                let train = target - 0.15 * Math.exp(-8 * t);
+                let val = target + 0.6 * Math.exp(-6 * t);
+                return { train, val };
+            }
+            return { train: 0, val: 0 };
+        }
+
+        function drawAxes() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            let cw = canvas.width;
+            let ch = canvas.height;
+            let w = cw - padding.left - padding.right;
+            let h = ch - padding.top - padding.bottom;
+
+            // Desired Performance Baseline (Y = 0.15)
+            let desiredY = padding.top + h - (0.15 * h);
+            ctx.strokeStyle = '#9ca3af'; // gray-400
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(padding.left, desiredY);
+            ctx.lineTo(padding.left + w, desiredY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            ctx.fillStyle = '#9ca3af';
+            ctx.font = "bold 10px sans-serif";
+            ctx.fillText("Desired Error", padding.left + w - 80, desiredY - 5);
+
+            // Draw Y axis and lines
+            ctx.strokeStyle = '#e5e7eb'; // gray-200
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            for (let i = 0; i <= 5; i++) {
+                let y = padding.top + (i / 5) * h;
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(padding.left + w, y);
+            }
+            ctx.stroke();
+
+            // Y Axis Label
+            ctx.save();
+            ctx.translate(15, padding.top + h / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.textAlign = "center";
+            ctx.fillStyle = '#6b7280'; // gray-500
+            ctx.font = "bold 11px sans-serif";
+            ctx.fillText("Error", 0, 0);
+            ctx.restore();
+
+            // X Axis Label
+            ctx.textAlign = "center";
+            ctx.fillText("Training Set Size (m)", padding.left + w / 2, ch - 10);
+            
+            // X Axis Line
+            ctx.strokeStyle = '#9ca3af';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(padding.left, padding.top + h);
+            ctx.lineTo(padding.left + w, padding.top + h);
+            ctx.stroke();
+
+            // Y Axis Line
+            ctx.beginPath();
+            ctx.moveTo(padding.left, padding.top);
+            ctx.lineTo(padding.left, padding.top + h);
+            ctx.stroke();
+        }
+
+        function drawCurve(scenario, progress) {
+            drawAxes();
+            
+            let w = canvas.width - padding.left - padding.right;
+            let h = canvas.height - padding.top - padding.bottom;
+
+            // Draw Training Error Curve
+            ctx.strokeStyle = '#2563eb'; // blue-600
+            ctx.lineWidth = 4;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            
+            let numPoints = 100;
+            let endPoint = Math.floor(numPoints * progress);
+            
+            for (let i = 0; i <= endPoint; i++) {
+                let x = i / numPoints; // 0 to 1
+                let vals = getErrorValues(scenario, x);
+                let px = padding.left + x * w;
+                let py = padding.top + h - (vals.train * h); // invert Y
+                
+                if (i === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+
+            // Draw Validation Error Curve
+            ctx.strokeStyle = '#ef4444'; // red-500
+            ctx.beginPath();
+            
+            for (let i = 0; i <= endPoint; i++) {
+                let x = i / numPoints; // 0 to 1
+                let vals = getErrorValues(scenario, x);
+                let px = padding.left + x * w;
+                let py = padding.top + h - (vals.val * h); // invert Y
+                
+                if (i === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+            
+            // Draw end points if fully animated
+            if (progress >= 1.0) {
+                let lastX = 1.0;
+                let vals = getErrorValues(scenario, lastX);
+                let px = padding.left + w;
+                
+                // Train point
+                ctx.fillStyle = '#2563eb';
+                ctx.beginPath();
+                ctx.arc(px, padding.top + h - (vals.train * h), 5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Val point
+                ctx.fillStyle = '#ef4444';
+                ctx.beginPath();
+                ctx.arc(px, padding.top + h - (vals.val * h), 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function startAnimation() {
+            let selected = document.querySelector('input[name="scenario"]:checked').value;
+            
+            // Update Narrative Panel
+            narrativePanel.style.opacity = 0;
+            setTimeout(() => {
+                narrativePanel.innerHTML = narratives[selected];
+                narrativePanel.style.opacity = 1;
+            }, 150);
+
+            // Animate Chart
+            cancelAnimationFrame(currentAnimation);
+            let startTime = null;
+            let duration = 800; // ms
+
+            function animate(timestamp) {
+                if (!startTime) startTime = timestamp;
+                let progress = (timestamp - startTime) / duration;
+                
+                if (progress > 1.0) progress = 1.0;
+                
+                // Ease out cubic
+                let eased = 1 - Math.pow(1 - progress, 3);
+                
+                drawCurve(selected, eased);
+                
+                if (progress < 1.0) {
+                    currentAnimation = requestAnimationFrame(animate);
+                }
+            }
+            
+            currentAnimation = requestAnimationFrame(animate);
+        }
+
+        // Event Listeners
+        radios.forEach(r => r.addEventListener('change', startAnimation));
+        window.addEventListener('resize', resizeCanvas);
+
+        // Initial setup
+        setTimeout(resizeCanvas, 100);
+
+    </script>
+</body>
+</html>
