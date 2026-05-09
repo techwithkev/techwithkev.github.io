@@ -4,817 +4,191 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Instructor Review — Project Progress Notes</title>
+  <title>Instructor Review — Project Progress Notes & Definitions</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
-      --bg: #0e0f11;
-      --bg2: #14161a;
-      --bg3: #1c1f24;
-      --bg4: #23272e;
-      --line: rgba(255, 255, 255, 0.07);
-      --line2: rgba(255, 255, 255, 0.13);
-      --ink: #e8e6e0;
-      --ink2: #8a8880;
-      --ink3: #50504c;
-      --gold: #c8982a;
-      --gold-lt: #e8b84a;
-      --gold-bg: rgba(200, 152, 42, 0.1);
-      --red: #c84040;
-      --green: #3a9e68;
-      --green-bg: rgba(58, 158, 104, 0.12);
-      --amber: #d4782a;
-      --amber-bg: rgba(212, 120, 42, 0.1);
-      --blue: #4a90c8;
-      --blue-bg: rgba(74, 144, 200, 0.1);
-      --r: 4px;
-      --r-lg: 8px;
-      --font-d: 'Fraunces', Georgia, serif;
-      --font-b: 'IBM Plex Sans', sans-serif;
-      --font-m: 'IBM Plex Mono', monospace;
+      --bg:        #0e0f11;
+      --bg2:       #14161a;
+      --bg3:       #1c1f24;
+      --bg4:       #23272e;
+      --line:      rgba(255,255,255,0.07);
+      --line2:     rgba(255,255,255,0.13);
+      --ink:       #e8e6e0;
+      --ink2:      #8a8880;
+      --ink3:      #50504c;
+      --gold:      #c8982a;
+      --gold-lt:   #e8b84a;
+      --gold-bg:   rgba(200,152,42,0.1);
+      --green-bg:  rgba(58,158,104,0.12);
+      --amber-bg:  rgba(212,120,42,0.1);
+      --blue:      #4a90c8;
+      --blue-bg:   rgba(74,144,200,0.1);
+      --purple:    #8a6ac8;
+      --purple-bg: rgba(138,106,200,0.1);
+      --red:       #c84040;
+      --r:         4px;
+      --r-lg:      8px;
+      --font-d:    'Fraunces', Georgia, serif;
+      --font-b:    'IBM Plex Sans', sans-serif;
+      --font-m:    'IBM Plex Mono', monospace;
     }
 
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-b); background: var(--bg); color: var(--ink); min-height: 100vh; font-size: 14px; line-height: 1.6; }
 
-    body {
-      font-family: var(--font-b);
-      background: var(--bg);
-      color: var(--ink);
-      min-height: 100vh;
-      font-size: 14px;
-      line-height: 1.6;
-    }
+    /* Topbar */
+    .topbar { background: var(--bg2); border-bottom: 1px solid var(--line); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 56px; position: sticky; top: 0; z-index: 100; }
+    .topbar-brand { display: flex; align-items: baseline; gap: 0.6rem; }
+    .topbar-logo { font-family: var(--font-d); font-size: 1.25rem; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
+    .topbar-sub { font-size: 11px; font-family: var(--font-m); color: var(--ink3); letter-spacing: 0.05em; }
+    .topbar-badges { display: flex; gap: 0.5rem; align-items: center; }
+    .topbar-badge { font-family: var(--font-m); font-size: 11px; color: var(--gold); background: var(--gold-bg); border: 1px solid rgba(200,152,42,0.25); padding: 3px 10px; border-radius: 20px; }
+    .topbar-badge.purple { color: var(--purple); background: var(--purple-bg); border-color: rgba(138,106,200,0.25); }
 
-    /* ── Topbar ── */
-    .topbar {
-      background: var(--bg2);
-      border-bottom: 1px solid var(--line);
-      padding: 0 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 56px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
+    /* Config */
+    .config-strip { background: var(--bg2); border-bottom: 1px solid var(--line); padding: 1rem 2rem; display: flex; gap: 0.75rem; align-items: flex-end; flex-wrap: wrap; }
+    .config-strip label { font-size: 10px; font-family: var(--font-m); color: var(--ink3); letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 4px; }
+    .config-strip input { font-family: var(--font-m); font-size: 12px; background: var(--bg3); border: 1px solid var(--line2); border-radius: var(--r); color: var(--ink); padding: 0.45rem 0.75rem; outline: none; width: 280px; transition: border-color 0.15s; }
+    .config-strip input:focus { border-color: var(--gold); }
+    .btn { font-family: var(--font-b); font-size: 13px; font-weight: 500; padding: 0.5rem 1.1rem; border-radius: var(--r); border: 1px solid var(--line2); background: var(--bg3); color: var(--ink2); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+    .btn:hover { border-color: var(--gold); color: var(--gold); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-primary { background: var(--gold); border-color: var(--gold); color: #0e0f11; font-weight: 600; }
+    .btn-primary:hover { background: var(--gold-lt); border-color: var(--gold-lt); color: #0e0f11; }
 
-    .topbar-brand {
-      display: flex;
-      align-items: baseline;
-      gap: 0.6rem;
-    }
+    /* Layout */
+    .layout { display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 56px); }
 
-    .topbar-logo {
-      font-family: var(--font-d);
-      font-size: 1.25rem;
-      font-weight: 500;
-      color: var(--ink);
-      letter-spacing: -0.01em;
-    }
+    /* Sidebar */
+    .sidebar { background: var(--bg2); border-right: 1px solid var(--line); padding: 1.5rem 0; position: sticky; top: 56px; height: calc(100vh - 56px); overflow-y: auto; display: flex; flex-direction: column; }
+    .sidebar-section { padding: 0 1.25rem; margin-bottom: 1.5rem; }
+    .sidebar-label { font-size: 10px; font-family: var(--font-m); color: var(--ink3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.75rem; }
+    .student-list { flex: 1; overflow-y: auto; padding: 0 0.75rem; }
+    .student-item { display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem 0.5rem; border-radius: var(--r); cursor: pointer; transition: background 0.1s; margin-bottom: 2px; }
+    .student-item:hover { background: var(--bg3); }
+    .student-item.active { background: var(--gold-bg); }
+    .student-item.active .s-name { color: var(--gold-lt); }
+    .s-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--bg4); border: 1px solid var(--line2); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--ink2); flex-shrink: 0; font-family: var(--font-m); }
+    .student-item.active .s-avatar { background: var(--gold-bg); border-color: rgba(200,152,42,0.4); color: var(--gold); }
+    .s-info { flex: 1; min-width: 0; }
+    .s-name { font-size: 13px; font-weight: 500; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .s-project { font-size: 11px; color: var(--ink3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .s-badges { display: flex; gap: 3px; flex-shrink: 0; align-items: center; }
+    .s-badge { font-family: var(--font-m); font-size: 10px; padding: 2px 5px; border-radius: 10px; }
+    .conf-1,.conf-2 { background: rgba(200,64,64,0.15); color: #e07070; }
+    .conf-3         { background: rgba(212,120,42,0.15); color: #e09060; }
+    .conf-4,.conf-5 { background: rgba(58,158,104,0.15); color: #60c090; }
+    .s-badge.has-def { background: var(--purple-bg); color: var(--purple); border: 1px solid rgba(138,106,200,0.25); font-size: 11px; padding: 1px 5px; }
+    .sidebar-footer { padding: 1rem 1.25rem 0; border-top: 1px solid var(--line); margin-top: auto; }
+    .class-stat { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink3); margin-bottom: 4px; font-family: var(--font-m); }
+    .class-stat span:last-child { color: var(--ink2); }
 
-    .topbar-sub {
-      font-size: 11px;
-      font-family: var(--font-m);
-      color: var(--ink3);
-      letter-spacing: 0.05em;
-    }
+    /* Main */
+    .main { padding: 2rem 2.5rem; overflow-y: auto; }
+    .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; gap: 1rem; color: var(--ink3); }
+    .empty-icon { width: 64px; height: 64px; border: 1px solid var(--line2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; opacity: 0.5; }
+    .empty-state p { font-family: var(--font-d); font-size: 1.1rem; font-weight: 300; font-style: italic; }
+    .empty-state small { font-size: 12px; font-family: var(--font-m); }
 
-    .topbar-badge {
-      font-family: var(--font-m);
-      font-size: 11px;
-      color: var(--gold);
-      background: var(--gold-bg);
-      border: 1px solid rgba(200, 152, 42, 0.25);
-      padding: 3px 10px;
-      border-radius: 20px;
-    }
+    /* Record header */
+    .record-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.5rem; gap: 1rem; flex-wrap: wrap; }
+    .record-title-block { flex: 1; }
+    .record-name { font-family: var(--font-d); font-size: 2rem; font-weight: 500; letter-spacing: -0.02em; line-height: 1.1; }
+    .record-project { font-size: 14px; color: var(--gold); font-style: italic; margin-top: 4px; font-family: var(--font-d); font-weight: 300; }
+    .record-meta { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: flex-start; padding-top: 4px; }
+    .meta-chip { font-family: var(--font-m); font-size: 11px; padding: 4px 10px; border-radius: 20px; background: var(--bg3); border: 1px solid var(--line2); color: var(--ink2); }
+    .meta-chip.purple { background: var(--purple-bg); border-color: rgba(138,106,200,0.25); color: var(--purple); }
+    .meta-chip.missing { background: rgba(200,64,64,0.08); border-color: rgba(200,64,64,0.2); color: #e07070; }
+    .actions-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
 
-    /* ── Config strip ── */
-    .config-strip {
-      background: var(--bg2);
-      border-bottom: 1px solid var(--line);
-      padding: 1rem 2rem;
-      display: flex;
-      gap: 0.75rem;
-      align-items: flex-end;
-      flex-wrap: wrap;
-    }
-
-    .config-strip label {
-      font-size: 10px;
-      font-family: var(--font-m);
-      color: var(--ink3);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      display: block;
-      margin-bottom: 4px;
-    }
-
-    .config-strip input {
-      font-family: var(--font-m);
-      font-size: 12px;
-      background: var(--bg3);
-      border: 1px solid var(--line2);
-      border-radius: var(--r);
-      color: var(--ink);
-      padding: 0.45rem 0.75rem;
-      outline: none;
-      width: 280px;
-      transition: border-color 0.15s;
-    }
-
-    .config-strip input:focus {
-      border-color: var(--gold);
-    }
-
-    .btn {
-      font-family: var(--font-b);
-      font-size: 13px;
-      font-weight: 500;
-      padding: 0.5rem 1.1rem;
-      border-radius: var(--r);
-      border: 1px solid var(--line2);
-      background: var(--bg3);
-      color: var(--ink2);
-      cursor: pointer;
-      transition: all 0.15s;
-      white-space: nowrap;
-    }
-
-    .btn:hover {
-      border-color: var(--gold);
-      color: var(--gold);
-    }
-
-    .btn:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-
-    .btn-primary {
-      background: var(--gold);
-      border-color: var(--gold);
-      color: #0e0f11;
-      font-weight: 600;
-    }
-
-    .btn-primary:hover {
-      background: var(--gold-lt);
-      border-color: var(--gold-lt);
-      color: #0e0f11;
-    }
-
-    /* ── Layout ── */
-    .layout {
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      min-height: calc(100vh - 56px);
-    }
-
-    /* ── Sidebar ── */
-    .sidebar {
-      background: var(--bg2);
-      border-right: 1px solid var(--line);
-      padding: 1.5rem 0;
-      position: sticky;
-      top: 56px;
-      height: calc(100vh - 56px);
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .sidebar-section {
-      padding: 0 1.25rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .sidebar-label {
-      font-size: 10px;
-      font-family: var(--font-m);
-      color: var(--ink3);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-bottom: 0.75rem;
-    }
-
-    .student-select {
-      width: 100%;
-      font-family: var(--font-b);
-      font-size: 13px;
-      background: var(--bg3);
-      border: 1px solid var(--line2);
-      border-radius: var(--r);
-      color: var(--ink);
-      padding: 0.5rem 0.75rem;
-      outline: none;
-      cursor: pointer;
-      transition: border-color 0.15s;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%238a8880' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 10px center;
-      padding-right: 28px;
-    }
-
-    .student-select:focus {
-      border-color: var(--gold);
-    }
-
-    .student-list {
-      flex: 1;
-      overflow-y: auto;
-      padding: 0 0.75rem;
-    }
-
-    .student-item {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      padding: 0.6rem 0.5rem;
-      border-radius: var(--r);
-      cursor: pointer;
-      transition: background 0.1s;
-      margin-bottom: 2px;
-    }
-
-    .student-item:hover {
-      background: var(--bg3);
-    }
-
-    .student-item.active {
-      background: var(--gold-bg);
-    }
-
-    .student-item.active .s-name {
-      color: var(--gold-lt);
-    }
-
-    .s-avatar {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background: var(--bg4);
-      border: 1px solid var(--line2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--ink2);
-      flex-shrink: 0;
-      font-family: var(--font-m);
-    }
-
-    .student-item.active .s-avatar {
-      background: var(--gold-bg);
-      border-color: rgba(200, 152, 42, 0.4);
-      color: var(--gold);
-    }
-
-    .s-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .s-name {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--ink);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .s-project {
-      font-size: 11px;
-      color: var(--ink3);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .s-badge {
-      font-family: var(--font-m);
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 10px;
-      flex-shrink: 0;
-    }
-
-    .conf-1,
-    .conf-2 {
-      background: rgba(200, 64, 64, 0.15);
-      color: #e07070;
-    }
-
-    .conf-3 {
-      background: rgba(212, 120, 42, 0.15);
-      color: #e09060;
-    }
-
-    .conf-4,
-    .conf-5 {
-      background: rgba(58, 158, 104, 0.15);
-      color: #60c090;
-    }
-
-    .sidebar-footer {
-      padding: 1rem 1.25rem 0;
-      border-top: 1px solid var(--line);
-      margin-top: auto;
-    }
-
-    .class-stat {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-      color: var(--ink3);
-      margin-bottom: 4px;
-      font-family: var(--font-m);
-    }
-
-    .class-stat span:last-child {
-      color: var(--ink2);
-    }
-
-    /* ── Main panel ── */
-    .main {
-      padding: 2rem 2.5rem;
-      overflow-y: auto;
-    }
-
-    .empty-state {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 60vh;
-      gap: 1rem;
-      color: var(--ink3);
-    }
-
-    .empty-icon {
-      width: 64px;
-      height: 64px;
-      border: 1px solid var(--line2);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 26px;
-      opacity: 0.5;
-    }
-
-    .empty-state p {
-      font-family: var(--font-d);
-      font-size: 1.1rem;
-      font-weight: 300;
-      font-style: italic;
-    }
-
-    .empty-state small {
-      font-size: 12px;
-      font-family: var(--font-m);
-    }
-
-    /* ── Record view ── */
-    .record-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      margin-bottom: 2rem;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .record-title-block {
-      flex: 1;
-    }
-
-    .record-name {
-      font-family: var(--font-d);
-      font-size: 2rem;
-      font-weight: 500;
-      letter-spacing: -0.02em;
-      line-height: 1.1;
-      color: var(--ink);
-    }
-
-    .record-project {
-      font-size: 14px;
-      color: var(--gold);
-      font-style: italic;
-      margin-top: 4px;
-      font-family: var(--font-d);
-      font-weight: 300;
-    }
-
-    .record-meta {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      align-items: flex-start;
-      padding-top: 4px;
-    }
-
-    .meta-chip {
-      font-family: var(--font-m);
-      font-size: 11px;
-      padding: 4px 10px;
-      border-radius: 20px;
-      background: var(--bg3);
-      border: 1px solid var(--line2);
-      color: var(--ink2);
-    }
-
-    .actions-row {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      margin-bottom: 1.75rem;
-    }
+    /* View tabs */
+    .view-tabs { display: flex; background: var(--bg3); border: 1px solid var(--line2); border-radius: var(--r-lg); padding: 3px; width: fit-content; margin-bottom: 1.75rem; gap: 2px; }
+    .view-tab { font-family: var(--font-m); font-size: 12px; font-weight: 500; padding: 6px 18px; border-radius: 6px; border: none; background: transparent; color: var(--ink3); cursor: pointer; transition: all 0.15s; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+    .view-tab:hover { color: var(--ink2); }
+    .view-tab.active { background: var(--bg2); color: var(--ink); border: 1px solid var(--line2); }
+    .view-tab.active.tab-def { color: var(--purple); }
+    .tab-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 
     /* Session tabs */
-    .session-tabs {
-      display: flex;
-      gap: 0.4rem;
-      margin-bottom: 1.75rem;
-      flex-wrap: wrap;
-    }
-
-    .session-tab {
-      font-family: var(--font-m);
-      font-size: 11px;
-      padding: 4px 12px;
-      border-radius: 20px;
-      border: 1px solid var(--line2);
-      background: transparent;
-      color: var(--ink3);
-      cursor: pointer;
-      transition: all 0.12s;
-    }
-
-    .session-tab:hover {
-      border-color: var(--line2);
-      color: var(--ink2);
-    }
-
-    .session-tab.active {
-      background: var(--gold-bg);
-      border-color: rgba(200, 152, 42, 0.35);
-      color: var(--gold-lt);
-    }
+    .session-tabs { display: flex; gap: 0.4rem; margin-bottom: 1.75rem; flex-wrap: wrap; }
+    .session-tab { font-family: var(--font-m); font-size: 11px; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--line2); background: transparent; color: var(--ink3); cursor: pointer; transition: all 0.12s; }
+    .session-tab:hover { color: var(--ink2); }
+    .session-tab.active { background: var(--gold-bg); border-color: rgba(200,152,42,0.35); color: var(--gold-lt); }
 
     /* Section cards */
-    .section-card {
-      background: var(--bg2);
-      border: 1px solid var(--line);
-      border-radius: var(--r-lg);
-      margin-bottom: 1.25rem;
-      overflow: hidden;
-    }
+    .section-card { background: var(--bg2); border: 1px solid var(--line); border-radius: var(--r-lg); margin-bottom: 1.25rem; overflow: hidden; }
+    .section-card-header { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1.25rem; border-bottom: 1px solid var(--line); background: var(--bg3); }
+    .section-card-num { font-family: var(--font-d); font-size: 1.4rem; font-style: italic; color: var(--ink3); line-height: 1; font-weight: 300; }
+    .section-card-title { font-size: 13px; font-weight: 600; color: var(--ink2); letter-spacing: 0.04em; text-transform: uppercase; font-family: var(--font-m); }
+    .section-card-body { padding: 1.25rem; }
+    .field-row { display: grid; grid-template-columns: 180px 1fr; gap: 0.75rem 1.5rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--line); }
+    .field-row:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+    .field-key { font-size: 11px; font-family: var(--font-m); color: var(--ink3); letter-spacing: 0.05em; padding-top: 1px; }
+    .field-val { font-size: 14px; color: var(--ink); line-height: 1.6; }
+    .field-val.empty { color: var(--ink3); font-style: italic; font-size: 13px; }
 
-    .section-card-header {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.75rem 1.25rem;
-      border-bottom: 1px solid var(--line);
-      background: var(--bg3);
-    }
+    /* Pills */
+    .phase-pill  { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; background: var(--blue-bg);   border: 1px solid rgba(74,144,200,0.25);  border-radius: 20px; font-size: 12px; color: var(--blue);   font-family: var(--font-m); }
+    .type-pill   { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; background: var(--purple-bg); border: 1px solid rgba(138,106,200,0.25); border-radius: 20px; font-size: 12px; color: var(--purple); font-family: var(--font-m); }
+    .aud-pill    { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; background: var(--amber-bg);  border: 1px solid rgba(212,120,42,0.25);  border-radius: 20px; font-size: 12px; color: #e0a060; font-family: var(--font-m); }
+    .status-pill { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-family: var(--font-m); font-weight: 500; }
+    .pill-yes        { background: var(--green-bg); color: #70d090; border: 1px solid rgba(58,158,104,0.3); }
+    .pill-partially  { background: var(--amber-bg); color: #e0a060; border: 1px solid rgba(212,120,42,0.3); }
+    .pill-no         { background: rgba(200,64,64,0.12); color: #e07070; border: 1px solid rgba(200,64,64,0.25); }
 
-    .section-card-num {
-      font-family: var(--font-d);
-      font-size: 1.4rem;
-      font-style: italic;
-      color: var(--ink3);
-      line-height: 1;
-      font-weight: 300;
-    }
+    .tools-wrap { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .tool-tag { padding: 3px 10px; background: var(--bg3); border: 1px solid var(--line2); border-radius: 20px; font-size: 12px; color: var(--ink2); font-family: var(--font-m); }
 
-    .section-card-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--ink2);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      font-family: var(--font-m);
-    }
+    .conf-bar-wrap { display: flex; align-items: center; gap: 0.75rem; }
+    .conf-bar { flex: 1; height: 6px; background: var(--bg4); border-radius: 3px; overflow: hidden; max-width: 140px; }
+    .conf-fill { height: 100%; border-radius: 3px; }
+    .conf-val { font-family: var(--font-m); font-size: 13px; font-weight: 500; }
 
-    .section-card-body {
-      padding: 1.25rem;
-    }
+    .tasks-grid { display: flex; flex-direction: column; gap: 0.5rem; }
+    .task-row { display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.6rem 0.75rem; background: var(--bg3); border-radius: var(--r); }
+    .task-num { font-family: var(--font-m); font-size: 11px; font-weight: 500; color: var(--gold); background: var(--gold-bg); border-radius: 2px; padding: 1px 6px; flex-shrink: 0; margin-top: 1px; }
+    .task-text { font-size: 13px; color: var(--ink); }
 
-    .field-row {
-      display: grid;
-      grid-template-columns: 160px 1fr;
-      gap: 0.75rem 1.5rem;
-      margin-bottom: 1rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--line);
-    }
+    .checks-wrap { display: flex; flex-direction: column; gap: 0.4rem; }
+    .check-item { display: flex; gap: 0.5rem; align-items: flex-start; font-size: 13px; color: var(--ink2); }
+    .check-item::before { content: '✓'; color: #3a9e68; font-family: var(--font-m); font-size: 12px; flex-shrink: 0; margin-top: 1px; }
 
-    .field-row:last-child {
-      margin-bottom: 0;
-      padding-bottom: 0;
-      border-bottom: none;
-    }
+    .flag-box { background: rgba(200,64,64,0.08); border: 1px solid rgba(200,64,64,0.2); border-radius: var(--r); padding: 0.6rem 0.9rem; display: flex; gap: 0.6rem; align-items: center; font-size: 13px; color: #e09090; margin-bottom: 1.25rem; font-family: var(--font-m); }
+    .no-data-box { background: var(--bg3); border: 1px solid var(--line2); border-radius: var(--r-lg); padding: 2.5rem; text-align: center; color: var(--ink3); }
+    .no-data-box p { font-family: var(--font-d); font-size: 1.1rem; font-style: italic; margin-bottom: 0.5rem; }
+    .no-data-box small { font-family: var(--font-m); font-size: 12px; }
 
-    .field-key {
-      font-size: 11px;
-      font-family: var(--font-m);
-      color: var(--ink3);
-      letter-spacing: 0.05em;
-      padding-top: 1px;
-    }
-
-    .field-val {
-      font-size: 14px;
-      color: var(--ink);
-      line-height: 1.6;
-    }
-
-    .field-val.empty {
-      color: var(--ink3);
-      font-style: italic;
-      font-size: 13px;
-    }
-
-    .phase-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 12px;
-      background: var(--blue-bg);
-      border: 1px solid rgba(74, 144, 200, 0.25);
-      border-radius: 20px;
-      font-size: 12px;
-      color: var(--blue);
-      font-family: var(--font-m);
-    }
-
-    .tools-wrap {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-    }
-
-    .tool-tag {
-      padding: 3px 10px;
-      background: var(--bg3);
-      border: 1px solid var(--line2);
-      border-radius: 20px;
-      font-size: 12px;
-      color: var(--ink2);
-      font-family: var(--font-m);
-    }
-
-    .status-pill {
-      display: inline-block;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-family: var(--font-m);
-      font-weight: 500;
-    }
-
-    .pill-yes {
-      background: var(--green-bg);
-      color: #70d090;
-      border: 1px solid rgba(58, 158, 104, 0.3);
-    }
-
-    .pill-partial {
-      background: var(--amber-bg);
-      color: #e0a060;
-      border: 1px solid rgba(212, 120, 42, 0.3);
-    }
-
-    .pill-no {
-      background: rgba(200, 64, 64, 0.12);
-      color: #e07070;
-      border: 1px solid rgba(200, 64, 64, 0.25);
-    }
-
-    .conf-bar-wrap {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .conf-bar {
-      flex: 1;
-      height: 6px;
-      background: var(--bg4);
-      border-radius: 3px;
-      overflow: hidden;
-      max-width: 140px;
-    }
-
-    .conf-fill {
-      height: 100%;
-      border-radius: 3px;
-      transition: width 0.4s ease;
-    }
-
-    .conf-val {
-      font-family: var(--font-m);
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    .tasks-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .task-row {
-      display: flex;
-      gap: 0.75rem;
-      align-items: flex-start;
-      padding: 0.6rem 0.75rem;
-      background: var(--bg3);
-      border-radius: var(--r);
-    }
-
-    .task-num {
-      font-family: var(--font-m);
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--gold);
-      background: var(--gold-bg);
-      border-radius: 2px;
-      padding: 1px 6px;
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-
-    .task-text {
-      font-size: 13px;
-      color: var(--ink);
-    }
-
-    .flag-box {
-      background: rgba(200, 64, 64, 0.08);
-      border: 1px solid rgba(200, 64, 64, 0.2);
-      border-radius: var(--r);
-      padding: 0.6rem 0.9rem;
-      display: flex;
-      gap: 0.6rem;
-      align-items: center;
-      font-size: 13px;
-      color: #e09090;
-      margin-top: 0.5rem;
-      font-family: var(--font-m);
-    }
-
-    /* ── Print / export styles ── */
+    /* Print */
     @media print {
-
-      .topbar,
-      .config-strip,
-      .sidebar,
-      .actions-row,
-      .session-tabs {
-        display: none !important;
-      }
-
-      .layout {
-        grid-template-columns: 1fr;
-      }
-
-      .main {
-        padding: 1rem;
-      }
-
-      .section-card {
-        break-inside: avoid;
-        border: 1px solid #ccc;
-        margin-bottom: 1rem;
-      }
-
-      body {
-        background: white;
-        color: black;
-        font-size: 12px;
-      }
-
-      .section-card-body,
-      .section-card-header,
-      .field-key,
-      .field-val,
-      .record-name,
-      .record-project {
-        color: black !important;
-      }
-
-      .bg2,
-      .bg3,
-      .bg4 {
-        background: white !important;
-      }
+      .topbar,.config-strip,.sidebar,.actions-row,.session-tabs,.view-tabs { display: none !important; }
+      .layout { grid-template-columns: 1fr; }
+      .main { padding: 1rem; }
+      .section-card { break-inside: avoid; border: 1px solid #ccc; margin-bottom: 1rem; }
+      body { background: white; color: black; font-size: 12px; }
+      .field-key,.field-val,.record-name,.record-project,.section-card-title { color: black !important; }
+      .section-card-header { background: #f5f5f5 !important; }
+      .section-card-body,.section-card { background: white !important; }
     }
 
-    /* ── Loading ── */
-    .spinner {
-      width: 20px;
-      height: 20px;
-      border: 2px solid var(--line2);
-      border-top-color: var(--gold);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      display: inline-block;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    .loading-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(14, 15, 17, 0.7);
-      z-index: 200;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 1rem;
-      font-family: var(--font-m);
-      font-size: 13px;
-      color: var(--ink2);
-    }
-
-    .loading-overlay.visible {
-      display: flex;
-    }
-
-    /* ── Alerts ── */
-    .alert {
-      padding: 0.6rem 1rem;
-      border-radius: var(--r);
-      font-size: 13px;
-      font-family: var(--font-m);
-      margin-bottom: 1rem;
-      display: none;
-    }
-
-    .alert.visible {
-      display: block;
-    }
-
-    .alert-error {
-      background: rgba(200, 64, 64, 0.1);
-      border: 1px solid rgba(200, 64, 64, 0.25);
-      color: #e07070;
-    }
-
-    .alert-info {
-      background: var(--blue-bg);
-      border: 1px solid rgba(74, 144, 200, 0.25);
-      color: var(--blue);
-    }
+    /* Spinner */
+    .spinner { width: 20px; height: 20px; border: 2px solid var(--line2); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-overlay { display: none; position: fixed; inset: 0; background: rgba(14,15,17,0.7); z-index: 200; align-items: center; justify-content: center; flex-direction: column; gap: 1rem; font-family: var(--font-m); font-size: 13px; color: var(--ink2); }
+    .loading-overlay.visible { display: flex; }
 
     @media (max-width: 700px) {
-      .layout {
-        grid-template-columns: 1fr;
-      }
-
-      .sidebar {
-        position: static;
-        height: auto;
-        border-right: none;
-        border-bottom: 1px solid var(--line);
-      }
-
-      .config-strip input {
-        width: 100%;
-      }
-
-      .field-row {
-        grid-template-columns: 1fr;
-        gap: 0.25rem;
-      }
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--line); }
+      .config-strip input { width: 100%; }
+      .field-row { grid-template-columns: 1fr; gap: 0.25rem; }
     }
 
-    /* ── Auth Gate ── */
+    /* Auth Gate */
     #auth-gate {
-      min-height: calc(100vh - 120px);
+      min-height: calc(100vh - 56px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -905,27 +279,27 @@
       border-radius: var(--r);
     }
 
-    /* ── Light Mode Overrides ── */
+    /* Light Mode Overrides */
     body.light-mode {
-      --bg: #f9f9fb;
-      --bg2: #ffffff;
-      --bg3: #f1f3f6;
-      --bg4: #e5e8ed;
-      --line: rgba(0, 0, 0, 0.06);
-      --line2: rgba(0, 0, 0, 0.11);
-      --ink: #1c1e21;
-      --ink2: #5b626a;
-      --ink3: #8a929b;
-      --gold: #b3821a;
-      --gold-lt: #996e11;
-      --gold-bg: rgba(179, 130, 26, 0.08);
-      --red: #b33030;
-      --green: #2a8351;
-      --green-bg: rgba(42, 131, 81, 0.08);
-      --amber: #b3611a;
-      --amber-bg: rgba(179, 97, 26, 0.08);
-      --blue: #2d73a8;
-      --blue-bg: rgba(45, 115, 168, 0.08);
+      --bg:        #f9f9fb;
+      --bg2:       #ffffff;
+      --bg3:       #f1f3f6;
+      --bg4:       #e5e8ed;
+      --line:      rgba(0, 0, 0, 0.06);
+      --line2:     rgba(0, 0, 0, 0.11);
+      --ink:       #1c1e21;
+      --ink2:      #5b626a;
+      --ink3:      #8a929b;
+      --gold:      #b3821a;
+      --gold-lt:   #996e11;
+      --gold-bg:   rgba(179, 130, 26, 0.08);
+      --green-bg:  rgba(42, 131, 81, 0.08);
+      --amber-bg:  rgba(179, 97, 26, 0.08);
+      --blue:      #2d73a8;
+      --blue-bg:   rgba(45, 115, 168, 0.08);
+      --purple:    #704da8;
+      --purple-bg: rgba(112, 77, 168, 0.08);
+      --red:       #b33030;
     }
 
     body.light-mode .btn-primary {
@@ -941,651 +315,642 @@
     }
   </style>
 </head>
-
 <body>
 
-  <div class="loading-overlay" id="loading">
-    <div class="spinner"></div>
-    <span id="loading-msg">Loading...</span>
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+  <span id="loading-msg">Loading...</span>
+</div>
+
+<header class="topbar">
+  <div class="topbar-brand">
+    <span class="topbar-logo">Instructor Review</span>
+    <span class="topbar-sub">— Dashboard</span>
   </div>
-
-  <!-- Topbar -->
-  <header class="topbar">
-    <div class="topbar-brand">
-      <span class="topbar-logo">Progress Review</span>
-      <span class="topbar-sub">— Instructor Dashboard</span>
+  <div style="display: flex; align-items: center; gap: 0.75rem;">
+    <!-- Theme Toggle Button -->
+    <button class="btn" onclick="toggleTheme()" id="theme-toggle" style="padding: 0.25rem 0.6rem; font-size: 13px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: var(--r); background: var(--bg3); border: 1px solid var(--line2); color: var(--ink2); cursor: pointer;" title="Toggle Light/Dark View">
+      🌙
+    </button>
+    <div class="topbar-badges">
+      <span class="topbar-badge" id="badge-progress">No data loaded</span>
+      <span class="topbar-badge purple" id="badge-def">No definitions</span>
     </div>
-    <div style="display: flex; align-items: center; gap: 0.75rem;">
-      <!-- Theme Toggle Button -->
-      <button class="btn" onclick="toggleTheme()" id="theme-toggle" style="padding: 0.25rem 0.6rem; font-size: 13px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: var(--r); background: var(--bg3); border: 1px solid var(--line2); color: var(--ink2); cursor: pointer;" title="Toggle Light/Dark View">
-        🌙
-      </button>
-
-      <span class="topbar-badge" id="class-badge" style="display: none;">No data loaded</span>
-      <div id="user-info" style="display: none; align-items: center; gap: 0.75rem; font-family: var(--font-b); font-size: 13px;">
-        <span id="logged-in-as" style="color: var(--ink2); font-family: var(--font-m); font-size: 12px;">👤 Loading...</span>
-        <button class="btn" onclick="logout()" style="padding: 0.25rem 0.65rem; font-size: 12px; height: 26px; display: flex; align-items: center;">Logout</button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Auth Gate -->
-  <div id="auth-gate" style="display: flex;">
-    <div class="auth-card">
-      <h2>🔑 Instructor Access</h2>
-      <p class="subtitle">Log in to review student progress notes</p>
-
-      <input type="email" id="teacher-email" placeholder="teacher@school.edu" autocomplete="email">
-      <input type="password" id="teacher-password" placeholder="Password" autocomplete="current-password">
-
-      <div id="auth-error" class="auth-error"></div>
-
-      <button onclick="loginWithEmail()" id="login-btn">Login</button>
+    <div id="user-info" style="display: none; align-items: center; gap: 0.75rem; font-family: var(--font-b); font-size: 13px;">
+      <span id="logged-in-as" style="color: var(--ink2); font-family: var(--font-m); font-size: 12px;">👤 Loading...</span>
+      <button class="btn" onclick="logout()" style="padding: 0.25rem 0.65rem; font-size: 12px; height: 26px; display: flex; align-items: center;">Logout</button>
     </div>
   </div>
+</header>
 
-  <!-- Config -->
-  <div class="config-strip" id="config-strip" style="display: none;">
-    <button class="btn btn-primary" onclick="loadAllStudents()">🔄 Refresh Student List</button>
-    <button class="btn" onclick="exportAllCSV()" id="btn-export-all" disabled>Export All CSV</button>
+<!-- Auth Gate -->
+<div id="auth-gate" style="display: flex;">
+  <div class="auth-card">
+    <h2>🔑 Instructor Access</h2>
+    <p class="subtitle">Log in to review student progress &amp; definitions</p>
+
+    <input type="email" id="teacher-email" placeholder="teacher@school.edu" autocomplete="email">
+    <input type="password" id="teacher-password" placeholder="Password" autocomplete="current-password">
+
+    <div id="auth-error" class="auth-error"></div>
+
+    <button onclick="loginWithEmail()" id="login-btn">Login</button>
   </div>
+</div>
 
-  <div class="layout" id="dashboard-layout" style="display: none;">
+<div class="config-strip" id="config-strip" style="display: none;">
+  <button class="btn btn-primary" onclick="loadAllStudents()">🔄 Refresh Student List</button>
+  <button class="btn" onclick="exportAllCSV('progress')" id="btn-export-progress" disabled>Export Progress CSV</button>
+  <button class="btn" onclick="exportAllCSV('def')" id="btn-export-def" disabled>Export Definitions CSV</button>
+</div>
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="sidebar-section">
-        <div class="sidebar-label">Filter &amp; Search</div>
-        <input type="text" id="search-input" placeholder="Search students…"
-          style="width:100%;font-family:var(--font-b);font-size:13px;background:var(--bg3);border:1px solid var(--line2);border-radius:var(--r);color:var(--ink);padding:0.45rem 0.75rem;outline:none;margin-bottom:0.75rem;"
-          oninput="filterStudents(this.value)">
-        <div class="sidebar-label" style="margin-top:0.25rem;">All Students</div>
-      </div>
+<div class="layout" id="dashboard-layout" style="display: none;">
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Search</div>
+      <input type="text" id="search-input" placeholder="Search students…"
+        style="width:100%;font-family:var(--font-b);font-size:13px;background:var(--bg3);border:1px solid var(--line2);border-radius:var(--r);color:var(--ink);padding:0.45rem 0.75rem;outline:none;margin-bottom:0.75rem;"
+        oninput="filterStudents(this.value)">
+      <div class="sidebar-label" style="margin-top:0.25rem">All Students</div>
+    </div>
+    <div class="student-list" id="student-list">
+      <div style="padding:1rem 0.5rem;color:var(--ink3);font-size:12px;font-family:var(--font-m);">Loading student records...</div>
+    </div>
+    <div class="sidebar-footer" id="sidebar-footer" style="display:none">
+      <div class="class-stat"><span>Students</span><span id="stat-total">—</span></div>
+      <div class="class-stat"><span>Avg confidence</span><span id="stat-avg">—</span></div>
+      <div class="class-stat"><span>Definitions submitted</span><span id="stat-defs">—</span></div>
+      <div class="class-stat"><span>Need attention</span><span id="stat-flag">—</span></div>
+    </div>
+  </aside>
 
-      <div class="student-list" id="student-list">
-        <div style="padding:1rem 0.5rem;color:var(--ink3);font-size:12px;font-family:var(--font-m);">
-          Loading student records...
-        </div>
-      </div>
+  <main class="main" id="main-panel">
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon">📋</div>
+      <p>No student selected</p>
+      <small>Select a student name from the list to review</small>
+    </div>
+    <div id="record-view" style="display:none"></div>
+  </main>
+</div>
 
-      <div class="sidebar-footer" id="sidebar-footer" style="display:none">
-        <div class="class-stat"><span>Total students</span><span id="stat-total">—</span></div>
-        <div class="class-stat"><span>Avg confidence</span><span id="stat-avg">—</span></div>
-        <div class="class-stat"><span>Need attention</span><span id="stat-flag">—</span></div>
-      </div>
-    </aside>
+<script>
+  // Theme toggler with persistence
+  function toggleTheme() {
+    const body = document.body;
+    const btn = document.getElementById('theme-toggle');
+    if (body.classList.contains('light-mode')) {
+      body.classList.remove('light-mode');
+      if (btn) btn.textContent = '🌙';
+      localStorage.setItem('theme', 'dark');
+    } else {
+      body.classList.add('light-mode');
+      if (btn) btn.textContent = '☀️';
+      localStorage.setItem('theme', 'light');
+    }
+  }
 
-    <!-- Main -->
-    <main class="main" id="main-panel">
-      <div class="empty-state" id="empty-state">
-        <div class="empty-icon">📋</div>
-        <p>No student selected</p>
-        <small>Select a student name from the list to review their notes</small>
-      </div>
-      <div id="record-view" style="display:none"></div>
-    </main>
-
-  </div>
-
-  <script>
-    // Theme toggler with persistence
-    function toggleTheme() {
-      const body = document.body;
-      const btn = document.getElementById('theme-toggle');
-      if (body.classList.contains('light-mode')) {
-        body.classList.remove('light-mode');
-        if (btn) btn.textContent = '🌙';
-        localStorage.setItem('theme', 'dark');
-      } else {
-        body.classList.add('light-mode');
+  // Apply saved theme immediately
+  (function() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+      document.body.classList.add('light-mode');
+      document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('theme-toggle');
         if (btn) btn.textContent = '☀️';
-        localStorage.setItem('theme', 'light');
-      }
+      });
     }
+  })();
 
-    // Apply saved theme immediately
-    (function() {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme === 'light') {
-        document.body.classList.add('light-mode');
-        document.addEventListener('DOMContentLoaded', () => {
-          const btn = document.getElementById('theme-toggle');
-          if (btn) btn.textContent = '☀️';
-        });
-      }
-    })();
+  /* ── State ── */
+  const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
 
-    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
-    const TABLE = 'project_progress_notes';
+  const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: { persistSession: false }
+  });
 
-    // Create Supabase Client for auth handling
-    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-      auth: { persistSession: false }
-    });
+  let isAuthenticated = false;
+  let authUser = null;
 
-    let isAuthenticated = false;
-    let authUser = null;
+  let allStudents    = [];
+  let progressRecs   = {};   // name -> [records] newest first
+  let defRecs        = {};   // name -> [records] newest first
+  let activeStudent  = null;
+  let activeView     = 'progress';
+  let activeSessionIdx = 0;
 
-    let allStudents = [];   // latest record per student
-    let allRecords = {};   // studentName -> all session records
-    let activeStudent = null;
-    let activeSessionIdx = 0;
+  function loading(msg) { document.getElementById('loading-msg').textContent = msg; document.getElementById('loading').classList.add('visible'); }
+  function stopLoading() { document.getElementById('loading').classList.remove('visible'); }
 
-    function loading(msg = 'Loading...') {
-      document.getElementById('loading-msg').textContent = msg;
-      document.getElementById('loading').classList.add('visible');
-    }
-    function stopLoading() { document.getElementById('loading').classList.remove('visible'); }
-
-    async function initAuth() {
-      try {
-        const { data: { session } } = await db.auth.getSession();
-        if (session?.user) {
-          setAuthenticatedState(session.user);
-        } else {
-          stopLoading();
-        }
-      } catch (err) {
-        console.error('Auth init error:', err);
+  async function initAuth() {
+    try {
+      const { data: { session } } = await db.auth.getSession();
+      if (session?.user) {
+        setAuthenticatedState(session.user);
+      } else {
         stopLoading();
       }
+    } catch (err) {
+      console.error('Auth init error:', err);
+      stopLoading();
+    }
+  }
+
+  function setAuthenticatedState(user) {
+    isAuthenticated = true;
+    authUser = user;
+    document.getElementById('auth-gate').style.display = 'none';
+    document.getElementById('config-strip').style.display = 'flex';
+    document.getElementById('dashboard-layout').style.display = 'grid';
+    document.getElementById('user-info').style.display = 'flex';
+    document.getElementById('logged-in-as').textContent = `👤 ${user.email}`;
+    
+    // Load student data upon authentication
+    loadAllStudents();
+  }
+
+  async function loginWithEmail() {
+    const email = document.getElementById('teacher-email').value.trim();
+    const password = document.getElementById('teacher-password').value;
+    const loginBtn = document.getElementById('login-btn');
+    const authErr = document.getElementById('auth-error');
+
+    authErr.style.display = 'none';
+
+    if (!email || !password) {
+      authErr.textContent = 'Email and password required.';
+      authErr.style.display = 'block';
+      return;
     }
 
-    function setAuthenticatedState(user) {
-      isAuthenticated = true;
-      authUser = user;
-      document.getElementById('auth-gate').style.display = 'none';
-      document.getElementById('config-strip').style.display = 'flex';
-      document.getElementById('dashboard-layout').style.display = 'grid';
-      document.getElementById('class-badge').style.display = 'inline-block';
-      document.getElementById('user-info').style.display = 'flex';
-      document.getElementById('logged-in-as').textContent = `👤 ${user.email}`;
-      
-      // Load the student data upon authentication
-      loadAllStudents();
-    }
+    loginBtn.disabled = true;
+    loginBtn.textContent = '⏳ Logging in…';
 
-    async function loginWithEmail() {
-      const email = document.getElementById('teacher-email').value.trim();
-      const password = document.getElementById('teacher-password').value;
-      const loginBtn = document.getElementById('login-btn');
-      const authErr = document.getElementById('auth-error');
+    try {
+      const { data, error } = await db.auth.signInWithPassword({ email, password });
 
-      authErr.style.display = 'none';
-
-      if (!email || !password) {
-        authErr.textContent = 'Email and password required.';
-        authErr.style.display = 'block';
-        return;
-      }
-
-      loginBtn.disabled = true;
-      loginBtn.textContent = '⏳ Logging in…';
-
-      try {
-        const { data, error } = await db.auth.signInWithPassword({ email, password });
-
-        if (error) {
-          authErr.textContent = `Login failed: ${error.message}`;
-          authErr.style.display = 'block';
-          loginBtn.disabled = false;
-          loginBtn.textContent = 'Login';
-          return;
-        }
-
-        setAuthenticatedState(data.user);
-        document.getElementById('teacher-email').value = '';
-        document.getElementById('teacher-password').value = '';
-
-      } catch (err) {
-        console.error('Login error:', err);
-        authErr.textContent = `Error: ${err.message}`;
+      if (error) {
+        authErr.textContent = `Login failed: ${error.message}`;
         authErr.style.display = 'block';
         loginBtn.disabled = false;
         loginBtn.textContent = 'Login';
-      }
-    }
-
-    function logout() {
-      db.auth.signOut().then(() => {
-        isAuthenticated = false;
-        authUser = null;
-        document.getElementById('auth-gate').style.display = 'flex';
-        document.getElementById('config-strip').style.display = 'none';
-        document.getElementById('dashboard-layout').style.display = 'none';
-        document.getElementById('class-badge').style.display = 'none';
-        document.getElementById('user-info').style.display = 'none';
-        document.getElementById('teacher-email').value = '';
-        document.getElementById('teacher-password').value = '';
-        
-        // Reset local states
-        allStudents = [];
-        allRecords = {};
-        renderStudentList([]);
-        document.getElementById('btn-export-all').disabled = true;
-        document.getElementById('sidebar-footer').style.display = 'none';
-        document.getElementById('empty-state').style.display = 'flex';
-        document.getElementById('record-view').style.display = 'none';
-      });
-    }
-
-    async function loadAllStudents() {
-      if (!isAuthenticated) return;
-      loading('Fetching student records…');
-      try {
-        // Fetch all records ordered newest first using authenticated Supabase Client
-        const { data: rows, error } = await db
-          .from(TABLE)
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(1000);
-
-        if (error) throw error;
-
-        if (!rows || !rows.length) {
-          stopLoading();
-          renderStudentList([]);
-          return;
-        }
-
-        // Group by student name, keep all sessions
-        const byStudent = {};
-        rows.forEach(r => {
-          if (!byStudent[r.student_name]) byStudent[r.student_name] = [];
-          byStudent[r.student_name].push(r);
-        });
-        allRecords = byStudent;
-
-        // Latest record per student for sidebar
-        allStudents = Object.values(byStudent).map(sessions => sessions[0]);
-
-        renderStudentList(allStudents);
-        updateStats(allStudents);
-
-        document.getElementById('class-badge').textContent =
-          `${allStudents.length} student${allStudents.length !== 1 ? 's' : ''}`;
-        document.getElementById('btn-export-all').disabled = false;
-        document.getElementById('sidebar-footer').style.display = 'block';
-      } catch (e) {
-        stopLoading();
-        alert('Error: ' + e.message);
-      }
-      stopLoading();
-    }
-
-    function initials(name) {
-      return name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
-    }
-
-    function confClass(r) {
-      if (!r) return '';
-      if (r <= 2) return 'conf-1';
-      if (r === 3) return 'conf-3';
-      return 'conf-5';
-    }
-
-    function renderStudentList(students) {
-      const el = document.getElementById('student-list');
-      if (!students.length) {
-        el.innerHTML = '<div style="padding:1rem 0.5rem;color:var(--ink3);font-size:12px;font-family:var(--font-m);">No students found</div>';
         return;
       }
-      const sorted = [...students].sort((a, b) => a.student_name.localeCompare(b.student_name));
-      el.innerHTML = sorted.map(s => `
-    <div class="student-item ${activeStudent === s.student_name ? 'active' : ''}"
-         onclick="selectStudent('${s.student_name.replace(/'/g, "\\'")}')">
-      <div class="s-avatar">${initials(s.student_name)}</div>
-      <div class="s-info">
-        <div class="s-name">${s.student_name}</div>
-        <div class="s-project">${s.project_title || '—'}</div>
-      </div>
-      ${s.confidence_rating
-          ? `<span class="s-badge ${confClass(s.confidence_rating)}">${s.confidence_rating}/5</span>`
-          : ''}
-    </div>
-  `).join('');
-    }
 
-    function filterStudents(q) {
-      const filtered = allStudents.filter(s =>
-        s.student_name.toLowerCase().includes(q.toLowerCase()) ||
-        (s.project_title || '').toLowerCase().includes(q.toLowerCase())
-      );
-      renderStudentList(filtered);
+      setAuthenticatedState(data.user);
+      document.getElementById('teacher-email').value = '';
+      document.getElementById('teacher-password').value = '';
+    } catch (err) {
+      console.error('Login error:', err);
+      authErr.textContent = `Error: ${err.message}`;
+      authErr.style.display = 'block';
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Login';
     }
+  }
 
-    function updateStats(students) {
-      document.getElementById('stat-total').textContent = students.length;
-      const rated = students.filter(s => s.confidence_rating);
-      const avg = rated.length
-        ? (rated.reduce((a, s) => a + s.confidence_rating, 0) / rated.length).toFixed(1)
-        : '—';
-      document.getElementById('stat-avg').textContent = avg;
-      const flagged = students.filter(s =>
-        s.confidence_rating <= 2 || s.tools_working === 'No'
-      ).length;
-      document.getElementById('stat-flag').textContent = flagged;
-    }
+  function logout() {
+    db.auth.signOut().then(() => {
+      isAuthenticated = false;
+      authUser = null;
+      document.getElementById('auth-gate').style.display = 'flex';
+      document.getElementById('config-strip').style.display = 'none';
+      document.getElementById('dashboard-layout').style.display = 'none';
+      document.getElementById('user-info').style.display = 'none';
+      document.getElementById('teacher-email').value = '';
+      document.getElementById('teacher-password').value = '';
+      
+      // Reset local states
+      allStudents = [];
+      progressRecs = {};
+      defRecs = {};
+      renderStudentList([]);
+      document.getElementById('btn-export-progress').disabled = true;
+      document.getElementById('btn-export-def').disabled = true;
+      document.getElementById('sidebar-footer').style.display = 'none';
+      document.getElementById('empty-state').style.display = 'flex';
+      document.getElementById('record-view').style.display = 'none';
+    });
+  }
 
-    function selectStudent(name) {
-      activeStudent = name;
-      activeSessionIdx = 0;
+  /* ── Load ── */
+  async function loadAllStudents() {
+    if (!isAuthenticated) return;
+    loading('Fetching records from both tables…');
+    try {
+      const [pRes, dRes] = await Promise.all([
+        db.from('project_progress_notes').select('*').order('created_at', { ascending: false }).limit(1000),
+        db.from('final_project_definitions').select('*').order('created_at', { ascending: false }).limit(1000),
+      ]);
+
+      if (pRes.error) throw pRes.error;
+      if (dRes.error) throw dRes.error;
+
+      const pRows = pRes.data || [];
+      const dRows = dRes.data || [];
+
+      progressRecs = {};
+      pRows.forEach(r => { (progressRecs[r.student_name] = progressRecs[r.student_name] || []).push(r); });
+
+      defRecs = {};
+      dRows.forEach(r => { (defRecs[r.student_name] = defRecs[r.student_name] || []).push(r); });
+
+      allStudents = Array.from(new Set([...Object.keys(progressRecs), ...Object.keys(defRecs)])).sort();
+
       renderStudentList(allStudents);
-      renderRecord();
+      updateStats();
+
+      document.getElementById('badge-progress').textContent = `${pRows.length} progress note${pRows.length !== 1 ? 's' : ''}`;
+      document.getElementById('badge-def').textContent      = `${dRows.length} definition${dRows.length !== 1 ? 's' : ''}`;
+      document.getElementById('btn-export-progress').disabled = pRows.length === 0;
+      document.getElementById('btn-export-def').disabled      = dRows.length === 0;
+      document.getElementById('sidebar-footer').style.display = 'block';
+    } catch(e) { alert('Error: ' + e.message); }
+    stopLoading();
+  }
+
+  /* ── Sidebar ── */
+  function initials(n) { return n.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase(); }
+  function confClass(r) { return r <= 2 ? 'conf-1' : r === 3 ? 'conf-3' : 'conf-5'; }
+
+  function renderStudentList(names) {
+    const el = document.getElementById('student-list');
+    if (!names.length) { el.innerHTML = '<div style="padding:1rem 0.5rem;color:var(--ink3);font-size:12px;font-family:var(--font-m);">No students found</div>'; return; }
+    el.innerHTML = names.map(name => {
+      const lp = progressRecs[name]?.[0];
+      const ld = defRecs[name]?.[0];
+      const conf = lp?.confidence_rating;
+      const project = lp?.project_title || ld?.project_title || '—';
+      return `
+        <div class="student-item ${activeStudent === name ? 'active' : ''}" onclick="selectStudent(${JSON.stringify(name)})">
+          <div class="s-avatar">${initials(name)}</div>
+          <div class="s-info">
+            <div class="s-name">${name}</div>
+            <div class="s-project">${project}</div>
+          </div>
+          <div class="s-badges">
+            ${conf ? `<span class="s-badge ${confClass(conf)}">${conf}/5</span>` : ''}
+            ${defRecs[name] ? `<span class="s-badge has-def" title="Definition submitted">✦</span>` : ''}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function filterStudents(q) {
+    const lq = q.toLowerCase();
+    renderStudentList(allStudents.filter(n =>
+      n.toLowerCase().includes(lq) ||
+      (progressRecs[n]?.[0]?.project_title || '').toLowerCase().includes(lq) ||
+      (defRecs[n]?.[0]?.project_title || '').toLowerCase().includes(lq)
+    ));
+  }
+
+  function updateStats() {
+    document.getElementById('stat-total').textContent = allStudents.length;
+    const latest = Object.values(progressRecs).map(s => s[0]);
+    const rated  = latest.filter(s => s.confidence_rating);
+    document.getElementById('stat-avg').textContent  = rated.length ? (rated.reduce((a,s) => a + s.confidence_rating, 0) / rated.length).toFixed(1) : '—';
+    document.getElementById('stat-defs').textContent = Object.keys(defRecs).length;
+    document.getElementById('stat-flag').textContent = latest.filter(s => s.confidence_rating <= 2 || s.tools_working === 'No').length;
+  }
+
+  /* ── Selection ── */
+  function selectStudent(name) {
+    activeStudent    = name;
+    activeSessionIdx = 0;
+    activeView       = progressRecs[name] ? 'progress' : 'def';
+    renderStudentList(allStudents.filter(n => {
+      const q = document.getElementById('search-input').value.toLowerCase();
+      return !q || n.toLowerCase().includes(q) ||
+        (progressRecs[n]?.[0]?.project_title||'').toLowerCase().includes(q) ||
+        (defRecs[n]?.[0]?.project_title||'').toLowerCase().includes(q);
+    }));
+    renderRecord();
+  }
+
+  function switchView(view) { activeView = view; activeSessionIdx = 0; renderRecord(); }
+  function selectSession(idx) { activeSessionIdx = idx; renderRecord(); }
+
+  /* ── Helpers ── */
+  function confColor(r) { return r <= 2 ? '#e07070' : r === 3 ? '#e0a060' : '#70d090'; }
+
+  function tagsHtml(arr) {
+    return (arr && arr.length)
+      ? `<div class="tools-wrap">${arr.map(t => `<span class="tool-tag">${t}</span>`).join('')}</div>`
+      : '<span class="empty">None listed</span>';
+  }
+
+  function pillHtml(val, type) {
+    if (!val) return '<span class="empty">Not answered</span>';
+    const cls = { 'Yes':'pill-yes', 'No':'pill-no', 'Partially':'pill-partially' }[val] || 'pill-yes';
+    return `<span class="status-pill ${type || cls}">${val}</span>`;
+  }
+
+  /* ── Render shell ── */
+  function renderRecord() {
+    if (!activeStudent) return;
+    document.getElementById('empty-state').style.display = 'none';
+    const view = document.getElementById('record-view');
+    view.style.display = 'block';
+
+    const lp = progressRecs[activeStudent]?.[0];
+    const ld = defRecs[activeStudent]?.[0];
+    const projectTitle = lp?.project_title || ld?.project_title || 'No project title';
+    const pCount = progressRecs[activeStudent]?.length || 0;
+    const hasDef = !!defRecs[activeStudent];
+
+    const flags = [];
+    if (lp?.confidence_rating <= 2) flags.push(`Low confidence (${lp.confidence_rating}/5)`);
+    if (lp?.tools_working === 'No') flags.push('Tools not working');
+
+    view.innerHTML = `
+      <div class="record-header">
+        <div class="record-title-block">
+          <h1 class="record-name">${activeStudent}</h1>
+          <p class="record-project">${projectTitle}</p>
+        </div>
+        <div class="record-meta">
+          ${pCount ? `<span class="meta-chip">${pCount} progress session${pCount !== 1 ? 's' : ''}</span>` : ''}
+          ${hasDef
+            ? `<span class="meta-chip purple">✦ Definition submitted</span>`
+            : `<span class="meta-chip missing">No definition yet</span>`}
+        </div>
+      </div>
+
+      <div class="actions-row">
+        <button class="btn btn-primary" onclick="window.print()">⎙ Print / Save PDF</button>
+        ${pCount ? `<button class="btn" onclick="exportStudentCSV('progress',${JSON.stringify(activeStudent)})">↓ Progress CSV</button>` : ''}
+        ${hasDef  ? `<button class="btn" onclick="exportStudentCSV('def',${JSON.stringify(activeStudent)})">↓ Definition CSV</button>` : ''}
+        <button class="btn" onclick="copyPlainText()">⊞ Copy as text</button>
+      </div>
+
+      ${flags.length ? `<div class="flag-box">⚑ Needs attention: ${flags.join(' · ')}</div>` : ''}
+
+      <div class="view-tabs">
+        <button class="view-tab ${activeView === 'progress' ? 'active' : ''}" onclick="switchView('progress')">
+          <span class="tab-dot" style="background:var(--gold)"></span>
+          Progress Notes${pCount ? ` (${pCount})` : ''}
+        </button>
+        <button class="view-tab tab-def ${activeView === 'def' ? 'active' : ''}" onclick="switchView('def')">
+          <span class="tab-dot" style="background:var(--purple)"></span>
+          Project Definition${hasDef ? '' : ' —'}
+        </button>
+      </div>
+
+      <div id="tab-content"></div>
+    `;
+
+    activeView === 'progress' ? renderProgressTab() : renderDefTab();
+  }
+
+  /* ── Progress Notes tab ── */
+  function renderProgressTab() {
+    const container = document.getElementById('tab-content');
+    if (!progressRecs[activeStudent]) {
+      container.innerHTML = `<div class="no-data-box"><p>No progress notes yet</p><small>Student hasn't submitted the Week 12 form</small></div>`;
+      return;
     }
+    const sessions = progressRecs[activeStudent];
+    const r = sessions[activeSessionIdx] || sessions[0];
+    const confFill = r.confidence_rating ? Math.round((r.confidence_rating / 5) * 100) : 0;
 
-    function confColor(r) {
-      if (!r) return '#8a8880';
-      if (r <= 2) return '#e07070';
-      if (r === 3) return '#e0a060';
-      return '#70d090';
-    }
+    const sessionTabs = sessions.length > 1
+      ? `<div class="session-tabs">${sessions.map((s,i) =>
+          `<button class="session-tab ${i === activeSessionIdx ? 'active' : ''}" onclick="selectSession(${i})">
+            ${s.session_date || new Date(s.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}
+           </button>`).join('')}</div>`
+      : '';
 
-    function renderRecord() {
-      const sessions = allRecords[activeStudent];
-      if (!sessions) return;
-
-      const r = sessions[activeSessionIdx];
-
-      document.getElementById('empty-state').style.display = 'none';
-      const view = document.getElementById('record-view');
-      view.style.display = 'block';
-
-      const flags = [];
-      if (r.confidence_rating <= 2) flags.push('Low deadline confidence (' + r.confidence_rating + '/5)');
-      if (r.tools_working === 'No') flags.push('Tools not working as expected');
-
-      const sessionTabs = sessions.length > 1
-        ? `<div class="session-tabs">
-        ${sessions.map((s, i) => `
-          <button class="session-tab ${i === activeSessionIdx ? 'active' : ''}"
-                  onclick="selectSession(${i})">
-            ${s.session_date || new Date(s.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-          </button>`).join('')}
-       </div>`
-        : '';
-
-      const confFill = r.confidence_rating ? Math.round((r.confidence_rating / 5) * 100) : 0;
-
-      view.innerHTML = `
-    <div class="record-header">
-      <div class="record-title-block">
-        <h1 class="record-name">${r.student_name}</h1>
-        <p class="record-project">${r.project_title || 'No project title'}</p>
-      </div>
-      <div class="record-meta">
-        ${r.session_date
-          ? `<span class="meta-chip">${new Date(r.session_date + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })}</span>`
-          : ''}
-        <span class="meta-chip">${sessions.length} session${sessions.length !== 1 ? 's' : ''}</span>
-      </div>
-    </div>
-
-    <div class="actions-row">
-      <button class="btn btn-primary" onclick="printRecord()">⎙ Print / Save PDF</button>
-      <button class="btn" onclick="exportStudentCSV('${r.student_name.replace(/'/g, "\\'")}')">↓ Export CSV</button>
-      <button class="btn" onclick="copyPlainText()">⊞ Copy as text</button>
-    </div>
-
-    ${sessionTabs}
-
-    ${flags.length ? `
-      <div class="flag-box">
-        ⚑ Needs attention: ${flags.join(' · ')}
-      </div>
-    ` : ''}
-
-    <!-- Section 1 -->
-    <div class="section-card">
-      <div class="section-card-header">
-        <span class="section-card-num">1</span>
-        <span class="section-card-title">Status Report</span>
-      </div>
-      <div class="section-card-body">
-        <div class="field-row">
-          <span class="field-key">Current phase</span>
-          <span class="field-val">
-            ${r.phase
-          ? `<span class="phase-pill">● ${r.phase}</span>`
-          : '<span class="empty">Not answered</span>'}
-          </span>
-        </div>
-        <div class="field-row">
-          <span class="field-key">Accomplishments</span>
-          <span class="field-val ${r.accomplishments ? '' : 'empty'}">
-            ${r.accomplishments || 'Not answered'}
-          </span>
-        </div>
-        <div class="field-row">
-          <span class="field-key">Confidence (Week 15)</span>
-          <span class="field-val">
-            ${r.confidence_rating ? `
-              <div class="conf-bar-wrap">
-                <div class="conf-bar">
-                  <div class="conf-fill" style="width:${confFill}%;background:${confColor(r.confidence_rating)}"></div>
-                </div>
-                <span class="conf-val" style="color:${confColor(r.confidence_rating)}">${r.confidence_rating} / 5</span>
-              </div>
-            ` : '<span class="empty">Not rated</span>'}
-          </span>
+    container.innerHTML = `
+      ${sessionTabs}
+      <div class="section-card">
+        <div class="section-card-header"><span class="section-card-num">1</span><span class="section-card-title">Status Report</span></div>
+        <div class="section-card-body">
+          <div class="field-row"><span class="field-key">Current phase</span><span class="field-val">${r.phase ? `<span class="phase-pill">● ${r.phase}</span>` : '<span class="empty">Not answered</span>'}</span></div>
+          <div class="field-row"><span class="field-key">Accomplishments</span><span class="field-val ${r.accomplishments?'':'empty'}">${r.accomplishments||'Not answered'}</span></div>
+          <div class="field-row"><span class="field-key">Confidence (Week 15)</span><span class="field-val">
+            ${r.confidence_rating
+              ? `<div class="conf-bar-wrap"><div class="conf-bar"><div class="conf-fill" style="width:${confFill}%;background:${confColor(r.confidence_rating)}"></div></div><span class="conf-val" style="color:${confColor(r.confidence_rating)}">${r.confidence_rating} / 5</span></div>`
+              : '<span class="empty">Not rated</span>'}
+          </span></div>
         </div>
       </div>
-    </div>
 
-    <!-- Section 2 -->
-    <div class="section-card">
-      <div class="section-card-header">
-        <span class="section-card-num">2</span>
-        <span class="section-card-title">Technical & Creative Check-in</span>
+      <div class="section-card">
+        <div class="section-card-header"><span class="section-card-num">2</span><span class="section-card-title">Technical & Creative Check-in</span></div>
+        <div class="section-card-body">
+          <div class="field-row"><span class="field-key">AI tools in use</span><span class="field-val">${tagsHtml(r.ai_tools)}</span></div>
+          <div class="field-row"><span class="field-key">Tools producing results</span><span class="field-val">${r.tools_working ? pillHtml(r.tools_working) : '<span class="empty">Not answered</span>'}</span></div>
+          ${r.tools_issue ? `<div class="field-row"><span class="field-key">Issue described</span><span class="field-val">${r.tools_issue}</span></div>` : ''}
+          <div class="field-row"><span class="field-key">Seed / goal changed</span><span class="field-val">${r.seed_changed ? `<span class="status-pill ${r.seed_changed==='Yes'?'pill-partially':'pill-yes'}">${r.seed_changed}</span>` : '<span class="empty">Not answered</span>'}</span></div>
+          ${r.seed_change_reason ? `<div class="field-row"><span class="field-key">Reason for change</span><span class="field-val">${r.seed_change_reason}</span></div>` : ''}
+        </div>
       </div>
-      <div class="section-card-body">
-        <div class="field-row">
-          <span class="field-key">AI tools in use</span>
-          <span class="field-val">
-            ${r.ai_tools && r.ai_tools.length
-          ? `<div class="tools-wrap">${r.ai_tools.map(t => `<span class="tool-tag">${t}</span>`).join('')}</div>`
-          : '<span class="empty">None listed</span>'}
-          </span>
-        </div>
-        <div class="field-row">
-          <span class="field-key">Tools producing results</span>
-          <span class="field-val">
-            ${r.tools_working
-          ? `<span class="status-pill pill-${r.tools_working.toLowerCase().replace(' ', '')}">${r.tools_working}</span>`
-          : '<span class="empty">Not answered</span>'}
-          </span>
-        </div>
-        ${r.tools_issue ? `
-        <div class="field-row">
-          <span class="field-key">Issue described</span>
-          <span class="field-val">${r.tools_issue}</span>
-        </div>` : ''}
-        <div class="field-row">
-          <span class="field-key">Seed / goal changed</span>
-          <span class="field-val">
-            ${r.seed_changed
-          ? `<span class="status-pill ${r.seed_changed === 'Yes' ? 'pill-partial' : 'pill-yes'}">${r.seed_changed}</span>`
-          : '<span class="empty">Not answered</span>'}
-          </span>
-        </div>
-        ${r.seed_change_reason ? `
-        <div class="field-row">
-          <span class="field-key">Reason for change</span>
-          <span class="field-val">${r.seed_change_reason}</span>
-        </div>` : ''}
-      </div>
-    </div>
 
-    <!-- Section 3 -->
-    <div class="section-card">
-      <div class="section-card-header">
-        <span class="section-card-num">3</span>
-        <span class="section-card-title">Ethical & Responsible Use</span>
-      </div>
-      <div class="section-card-body">
-        <div class="field-row">
-          <span class="field-key">Bias identified</span>
-          <span class="field-val ${r.bias_identified ? '' : 'empty'}">
-            ${r.bias_identified || 'Not answered'}
-          </span>
-        </div>
-        <div class="field-row">
-          <span class="field-key">Responsible use approach</span>
-          <span class="field-val ${r.responsible_use ? '' : 'empty'}">
-            ${r.responsible_use || 'Not answered'}
-          </span>
+      <div class="section-card">
+        <div class="section-card-header"><span class="section-card-num">3</span><span class="section-card-title">Ethical & Responsible Use</span></div>
+        <div class="section-card-body">
+          <div class="field-row"><span class="field-key">Bias identified</span><span class="field-val ${r.bias_identified?'':'empty'}">${r.bias_identified||'Not answered'}</span></div>
+          <div class="field-row"><span class="field-key">Responsible use approach</span><span class="field-val ${r.responsible_use?'':'empty'}">${r.responsible_use||'Not answered'}</span></div>
         </div>
       </div>
-    </div>
 
-    <!-- Section 4 -->
-    <div class="section-card">
-      <div class="section-card-header">
-        <span class="section-card-num">4</span>
-        <span class="section-card-title">Roadmap to the Showcase</span>
-      </div>
-      <div class="section-card-body">
-        <div class="field-row">
-          <span class="field-key">Next tasks</span>
-          <span class="field-val">
+      <div class="section-card">
+        <div class="section-card-header"><span class="section-card-num">4</span><span class="section-card-title">Roadmap to the Showcase</span></div>
+        <div class="section-card-body">
+          <div class="field-row"><span class="field-key">Next tasks</span><span class="field-val">
             <div class="tasks-grid">
-              ${[r.task_1, r.task_2, r.task_3].map((t, i) => t
-            ? `<div class="task-row"><span class="task-num">T${i + 1}</span><span class="task-text">${t}</span></div>`
-            : ''
-          ).filter(Boolean).join('') || '<span class="empty">No tasks listed</span>'}
+              ${[r.task_1,r.task_2,r.task_3].map((t,i)=>t?`<div class="task-row"><span class="task-num">T${i+1}</span><span class="task-text">${t}</span></div>`:'').filter(Boolean).join('')||'<span class="empty">No tasks listed</span>'}
             </div>
-          </span>
-        </div>
-        <div class="field-row">
-          <span class="field-key">Instructor question</span>
-          <span class="field-val ${r.instructor_question ? '' : 'empty'}">
-            ${r.instructor_question || 'No question submitted'}
-          </span>
+          </span></div>
+          <div class="field-row"><span class="field-key">Instructor question</span><span class="field-val ${r.instructor_question?'':'empty'}">${r.instructor_question||'No question submitted'}</span></div>
         </div>
       </div>
-    </div>
 
-    <div style="margin-top:2rem;font-size:11px;font-family:var(--font-m);color:var(--ink3);border-top:1px solid var(--line);padding-top:1rem;">
-      Record ID: ${r.id} · Submitted: ${new Date(r.created_at).toLocaleString()}
-    </div>
-  `;
+      <div style="margin-top:2rem;font-size:11px;font-family:var(--font-m);color:var(--ink3);border-top:1px solid var(--line);padding-top:1rem;">
+        Record ID: ${r.id} · Submitted: ${new Date(r.created_at).toLocaleString()}
+      </div>`;
+  }
+
+  /* ── Project Definition tab ── */
+  function renderDefTab() {
+    const container = document.getElementById('tab-content');
+    if (!defRecs[activeStudent]) {
+      container.innerHTML = `<div class="no-data-box" style="background:var(--purple-bg);border-color:rgba(138,106,200,0.2)"><p>No project definition submitted yet</p><small>Student hasn't completed the Final Project Definition form</small></div>`;
+      return;
+    }
+    const sessions = defRecs[activeStudent];
+    const r = sessions[activeSessionIdx] || sessions[0];
+    const extras = [r.feature_1, r.feature_2, r.feature_3].filter(Boolean);
+
+    const sessionTabs = sessions.length > 1
+      ? `<div class="session-tabs">${sessions.map((s,i) =>
+          `<button class="session-tab ${i === activeSessionIdx ? 'active' : ''}" onclick="selectSession(${i})">
+            ${s.submission_date || new Date(s.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}
+           </button>`).join('')}</div>`
+      : '';
+
+    container.innerHTML = `
+      ${sessionTabs}
+      <div class="section-card">
+        <div class="section-card-header"><span class="section-card-num">1</span><span class="section-card-title">What Is Your Project?</span></div>
+        <div class="section-card-body">
+          <div class="field-row"><span class="field-key">Project type</span><span class="field-val">${r.project_type ? `<span class="type-pill">◆ ${r.project_type}</span>` : '<span class="empty">Not answered</span>'}</span></div>
+          <div class="field-row"><span class="field-key">One-sentence description</span><span class="field-val ${r.one_sentence?'':'empty'}">${r.one_sentence||'Not answered'}</span></div>
+          <div class="field-row"><span class="field-key">AI tools at core</span><span class="field-val">${tagsHtml(r.ai_tools)}</span></div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-card-header"><span class="section-card-num">2</span><span class="section-card-title">Who Is It For?</span></div>
+        <div class="section-card-body">
+          <div class="field-row"><span class="field-key">Audience</span><span class="field-val">${r.audience ? `<span class="aud-pill">▲ ${r.audience}</span>` : '<span class="empty">Not answered</span>'}</span></div>
+          <div class="field-row"><span class="field-key">Problem / need addressed</span><span class="field-val ${r.problem_solved?'':'empty'}">${r.problem_solved||'Not answered'}</span></div>
+          <div class="field-row"><span class="field-key">How they'll use it</span><span class="field-val ${r.how_used?'':'empty'}">${r.how_used||'Not answered'}</span></div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-card-header"><span class="section-card-num">3</span><span class="section-card-title">What Should It Do?</span></div>
+        <div class="section-card-body">
+          <div class="field-row"><span class="field-key">Core feature</span><span class="field-val ${r.core_feature?'':'empty'}">${r.core_feature||'Not answered'}</span></div>
+          <div class="field-row"><span class="field-key">Additional features</span><span class="field-val">
+            ${extras.length
+              ? `<div class="tasks-grid">${extras.map((f,i)=>`<div class="task-row"><span class="task-num">F${i+1}</span><span class="task-text">${f}</span></div>`).join('')}</div>`
+              : '<span class="empty">None listed</span>'}
+          </span></div>
+          <div class="field-row"><span class="field-key">Success looks like</span><span class="field-val ${r.success_looks_like?'':'empty'}">${r.success_looks_like||'Not answered'}</span></div>
+          <div class="field-row"><span class="field-key">Known limitations</span><span class="field-val ${r.limitations?'':'empty'}">${r.limitations||'Not answered'}</span></div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-card-header"><span class="section-card-num">4</span><span class="section-card-title">Responsible Design</span></div>
+        <div class="section-card-body">
+          <div class="field-row"><span class="field-key">Considerations checked</span><span class="field-val">
+            ${(r.responsible_checks && r.responsible_checks.length)
+              ? `<div class="checks-wrap">${r.responsible_checks.map(c=>`<div class="check-item">${c}</div>`).join('')}</div>`
+              : '<span class="empty">None selected</span>'}
+          </span></div>
+          <div class="field-row"><span class="field-key">Design choice made</span><span class="field-val ${r.responsible_choice?'':'empty'}">${r.responsible_choice||'Not answered'}</span></div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-card-header"><span class="section-card-num">5</span><span class="section-card-title">Showcase Pitch</span></div>
+        <div class="section-card-body">
+          <div class="field-row"><span class="field-key">Elevator pitch</span><span class="field-val ${r.elevator_pitch?'':'empty'}">${r.elevator_pitch||'Not answered'}</span></div>
+          <div class="field-row"><span class="field-key">Most excited about</span><span class="field-val ${r.most_excited?'':'empty'}">${r.most_excited||'Not answered'}</span></div>
+        </div>
+      </div>
+
+      <div style="margin-top:2rem;font-size:11px;font-family:var(--font-m);color:var(--ink3);border-top:1px solid var(--line);padding-top:1rem;">
+        Record ID: ${r.id} · Submitted: ${new Date(r.created_at).toLocaleString()}
+      </div>`;
+  }
+
+  /* ── Export / Copy ── */
+  function toCSVRow(fields) {
+    return fields.map(f => `"${(f==null?'':String(f)).replace(/"/g,'""')}"`).join(',');
+  }
+  function downloadCSV(content, filename) {
+    const a = Object.assign(document.createElement('a'), {
+      href: URL.createObjectURL(new Blob(['\uFEFF'+content], {type:'text/csv;charset=utf-8;'})),
+      download: filename
+    });
+    a.click();
+  }
+
+  const P_HEADS = ['student_name','project_title','session_date','phase','accomplishments','confidence_rating','ai_tools','tools_working','tools_issue','seed_changed','seed_change_reason','bias_identified','responsible_use','task_1','task_2','task_3','instructor_question','created_at'];
+  const D_HEADS = ['student_name','project_title','submission_date','project_type','one_sentence','ai_tools','audience','problem_solved','how_used','core_feature','feature_1','feature_2','feature_3','success_looks_like','limitations','responsible_checks','responsible_choice','elevator_pitch','most_excited','created_at'];
+
+  const pRow = r => toCSVRow([r.student_name,r.project_title,r.session_date,r.phase,r.accomplishments,r.confidence_rating,(r.ai_tools||[]).join('; '),r.tools_working,r.tools_issue,r.seed_changed,r.seed_change_reason,r.bias_identified,r.responsible_use,r.task_1,r.task_2,r.task_3,r.instructor_question,r.created_at]);
+  const dRow = r => toCSVRow([r.student_name,r.project_title,r.submission_date,r.project_type,r.one_sentence,(r.ai_tools||[]).join('; '),r.audience,r.problem_solved,r.how_used,r.core_feature,r.feature_1,r.feature_2,r.feature_3,r.success_looks_like,r.limitations,(r.responsible_checks||[]).join('; '),r.responsible_choice,r.elevator_pitch,r.most_excited,r.created_at]);
+
+  function exportStudentCSV(type, name) {
+    if (type === 'progress') {
+      const rows = progressRecs[name] || [];
+      downloadCSV([toCSVRow(P_HEADS), ...rows.map(pRow)].join('\n'), `${name.replace(/\s+/g,'_')}_progress_notes.csv`);
+    } else {
+      const rows = defRecs[name] || [];
+      downloadCSV([toCSVRow(D_HEADS), ...rows.map(dRow)].join('\n'), `${name.replace(/\s+/g,'_')}_project_definition.csv`);
+    }
+  }
+
+  function exportAllCSV(type) {
+    const date = new Date().toISOString().split('T')[0];
+    if (type === 'progress') {
+      const rows = Object.values(progressRecs).flat().sort((a,b)=>a.student_name.localeCompare(b.student_name)||a.created_at.localeCompare(b.created_at));
+      downloadCSV([toCSVRow(P_HEADS), ...rows.map(pRow)].join('\n'), `all_progress_notes_${date}.csv`);
+    } else {
+      const rows = Object.values(defRecs).flat().sort((a,b)=>a.student_name.localeCompare(b.student_name)||a.created_at.localeCompare(b.created_at));
+      downloadCSV([toCSVRow(D_HEADS), ...rows.map(dRow)].join('\n'), `all_project_definitions_${date}.csv`);
+    }
+  }
+
+  function copyPlainText() {
+    if (!activeStudent) return;
+    const lines = [`STUDENT: ${activeStudent}`, ''];
+    const lp = progressRecs[activeStudent]?.[activeSessionIdx] || progressRecs[activeStudent]?.[0];
+    const ld = defRecs[activeStudent]?.[0];
+
+    if (lp) {
+      lines.push('PROGRESS NOTES','──────────────',
+        `Phase:          ${lp.phase||'—'}`,
+        `Accomplishments:\n  ${lp.accomplishments||'—'}`,
+        `Confidence:     ${lp.confidence_rating?lp.confidence_rating+'/5':'—'}`,
+        `AI Tools:       ${(lp.ai_tools||[]).join(', ')||'—'}`,
+        `Tools working:  ${lp.tools_working||'—'}`,
+        `Tool issue:     ${lp.tools_issue||'—'}`,
+        `Seed changed:   ${lp.seed_changed||'—'}`,
+        `Change reason:  ${lp.seed_change_reason||'—'}`,
+        `Bias:           ${lp.bias_identified||'—'}`,
+        `Responsible:    ${lp.responsible_use||'—'}`,
+        `Task 1:         ${lp.task_1||'—'}`,
+        `Task 2:         ${lp.task_2||'—'}`,
+        `Task 3:         ${lp.task_3||'—'}`,
+        `Instructor Q:   ${lp.instructor_question||'—'}`, ''
+      );
+    }
+    if (ld) {
+      lines.push('PROJECT DEFINITION','──────────────────',
+        `Type:           ${ld.project_type||'—'}`,
+        `Description:    ${ld.one_sentence||'—'}`,
+        `AI Tools:       ${(ld.ai_tools||[]).join(', ')||'—'}`,
+        `Audience:       ${ld.audience||'—'}`,
+        `Problem solved:\n  ${ld.problem_solved||'—'}`,
+        `How used:       ${ld.how_used||'—'}`,
+        `Core feature:\n  ${ld.core_feature||'—'}`,
+        `Feature 1:      ${ld.feature_1||'—'}`,
+        `Feature 2:      ${ld.feature_2||'—'}`,
+        `Feature 3:      ${ld.feature_3||'—'}`,
+        `Success:        ${ld.success_looks_like||'—'}`,
+        `Limitations:    ${ld.limitations||'—'}`,
+        `Resp. checks:   ${(ld.responsible_checks||[]).join('; ')||'—'}`,
+        `Resp. choice:\n  ${ld.responsible_choice||'—'}`,
+        `Pitch:\n  ${ld.elevator_pitch||'—'}`,
+        `Excited about:  ${ld.most_excited||'—'}`
+      );
     }
 
-    function selectSession(idx) {
-      activeSessionIdx = idx;
-      renderRecord();
-    }
+    navigator.clipboard.writeText(lines.join('\n')).then(() => {
+      const btn = event.target;
+      btn.textContent = '✓ Copied';
+      setTimeout(() => btn.textContent = '⊞ Copy as text', 1800);
+    });
+  }
 
-    function printRecord() { window.print(); }
-
-    function recordToText(r) {
-      return [
-        `PROJECT PROGRESS NOTES`,
-        `======================`,
-        `Student:        ${r.student_name}`,
-        `Project:        ${r.project_title || '—'}`,
-        `Session date:   ${r.session_date || '—'}`,
-        `Submitted:      ${new Date(r.created_at).toLocaleString()}`,
-        ``,
-        `SECTION 1 — STATUS`,
-        `Phase:          ${r.phase || '—'}`,
-        `Accomplishments:`,
-        `  ${r.accomplishments || '—'}`,
-        `Confidence:     ${r.confidence_rating ? r.confidence_rating + '/5' : '—'}`,
-        ``,
-        `SECTION 2 — TECHNICAL CHECK-IN`,
-        `AI Tools:       ${(r.ai_tools || []).join(', ') || '—'}`,
-        `Tools working:  ${r.tools_working || '—'}`,
-        `Tool issue:     ${r.tools_issue || '—'}`,
-        `Seed changed:   ${r.seed_changed || '—'}`,
-        `Change reason:  ${r.seed_change_reason || '—'}`,
-        ``,
-        `SECTION 3 — ETHICAL USE`,
-        `Bias identified:`,
-        `  ${r.bias_identified || '—'}`,
-        `Responsible use:`,
-        `  ${r.responsible_use || '—'}`,
-        ``,
-        `SECTION 4 — ROADMAP`,
-        `Task 1:         ${r.task_1 || '—'}`,
-        `Task 2:         ${r.task_2 || '—'}`,
-        `Task 3:         ${r.task_3 || '—'}`,
-        `Instructor Q:   ${r.instructor_question || '—'}`,
-      ].join('\n');
-    }
-
-    function copyPlainText() {
-      if (!activeStudent) return;
-      const r = allRecords[activeStudent][activeSessionIdx];
-      navigator.clipboard.writeText(recordToText(r)).then(() => {
-        const btn = event.target;
-        btn.textContent = '✓ Copied';
-        setTimeout(() => btn.textContent = '⊞ Copy as text', 1800);
+  // Setup login events
+  window.addEventListener('DOMContentLoaded', () => {
+    const pwInput = document.getElementById('teacher-password');
+    if (pwInput) {
+      pwInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') loginWithEmail();
       });
     }
-
-    function toCSVRow(fields) {
-      return fields.map(f => {
-        const s = f == null ? '' : String(f).replace(/"/g, '""');
-        return `"${s}"`;
-      }).join(',');
-    }
-
-    const CSV_HEADERS = [
-      'student_name', 'project_title', 'session_date', 'phase',
-      'accomplishments', 'confidence_rating', 'ai_tools',
-      'tools_working', 'tools_issue', 'seed_changed', 'seed_change_reason',
-      'bias_identified', 'responsible_use',
-      'task_1', 'task_2', 'task_3', 'instructor_question', 'created_at'
-    ];
-
-    function recordToCSVRow(r) {
-      return toCSVRow([
-        r.student_name, r.project_title, r.session_date, r.phase,
-        r.accomplishments, r.confidence_rating,
-        (r.ai_tools || []).join('; '),
-        r.tools_working, r.tools_issue, r.seed_changed, r.seed_change_reason,
-        r.bias_identified, r.responsible_use,
-        r.task_1, r.task_2, r.task_3, r.instructor_question, r.created_at
-      ]);
-    }
-
-    function downloadCSV(content, filename) {
-      const blob = new Blob(['\uFEFF' + content], { type: 'text/csv;charset=utf-8;' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = filename;
-      a.click();
-    }
-
-    function exportStudentCSV(name) {
-      const sessions = allRecords[name];
-      if (!sessions) return;
-      const header = toCSVRow(CSV_HEADERS);
-      const rows = sessions.map(recordToCSVRow);
-      downloadCSV([header, ...rows].join('\n'), `${name.replace(/\s+/g, '_')}_progress_notes.csv`);
-    }
-
-    function exportAllCSV() {
-      const header = toCSVRow(CSV_HEADERS);
-      const rows = Object.values(allRecords).flat()
-        .sort((a, b) => a.student_name.localeCompare(b.student_name) || a.created_at.localeCompare(b.created_at))
-        .map(recordToCSVRow);
-      downloadCSV([header, ...rows].join('\n'), `all_progress_notes_${new Date().toISOString().split('T')[0]}.csv`);
-    }
-
-    // Auto-load and setup on page load
-    window.addEventListener('DOMContentLoaded', () => {
-      const pwInput = document.getElementById('teacher-password');
-      if (pwInput) {
-        pwInput.addEventListener('keydown', e => {
-          if (e.key === 'Enter') loginWithEmail();
-        });
-      }
-      initAuth();
-    });
-  </script>
+    initAuth();
+  });
+</script>
 </body>
-
 </html>

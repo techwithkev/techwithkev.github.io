@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Final Project Definition — Intro to AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    /* Styling custom radio and checkbox overlays dynamically and cleanly */
+    input[type="radio"].custom-radio:checked+label,
+    input[type="checkbox"].custom-checkbox:checked+label {
+      background-color: rgba(138, 106, 200, 0.05);
+      border-color: #8a6ac8;
+      color: #4c1d95;
+      font-weight: 600;
+    }
+
+    input[type="radio"].custom-radio:checked+label>span {
+      border-color: #8a6ac8;
+      background-color: #8a6ac8;
+      box-shadow: inset 0 0 0 3px #ffffff;
+    }
+
+    input[type="checkbox"].custom-checkbox:checked+label>span {
+      border-color: #8a6ac8;
+      background-color: #8a6ac8;
+    }
+
+    input[type="checkbox"].custom-checkbox:checked+label>span::after {
+      content: '✓';
+      color: white;
+      font-size: 10px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body class="bg-[#F9FAFB] text-gray-900 min-h-screen font-sans antialiased">
+
+  <div class="max-w-5xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <!-- Header -->
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+      <div>
+        <p class="text-xs font-black uppercase tracking-widest text-purple-600 mb-1">Introduction to AI: Tools, Thinking & Responsible Use</p>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900 font-sans">FINAL PROJECT <span class="text-purple-600">DEFINITION</span></h1>
+        <p class="text-gray-500 font-medium italic mt-1">Pitch, Structure & Impact Checklist</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-white border border-gray-200 text-purple-600 shadow-sm transition-all duration-300 self-start md:self-auto">
+        Final Submission
+      </div>
+    </header>
+
+    <!-- Student Identity Card -->
+    <div class="bg-white border border-gray-200 p-6 md:p-8 rounded-2xl shadow-sm mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <label for="student-name" class="block text-xs font-black text-gray-400 uppercase tracking-wider mb-2">Student Name</label>
+          <input type="text" id="student-name" placeholder="Full name"
+            class="w-full bg-white border border-gray-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition-all duration-200 shadow-sm">
+        </div>
+        <div>
+          <label for="project-title" class="block text-xs font-black text-gray-400 uppercase tracking-wider mb-2">Project Title</label>
+          <input type="text" id="project-title" placeholder="Your final project name"
+            class="w-full bg-white border border-gray-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition-all duration-200 shadow-sm">
+        </div>
+        <div>
+          <label for="submission-date" class="block text-xs font-black text-gray-400 uppercase tracking-wider mb-2">Date</label>
+          <input type="date" id="submission-date"
+            class="w-full bg-white border border-gray-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition-all duration-200 shadow-sm">
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 1: What Is Your Project? -->
+    <section class="bg-white border border-gray-200 p-6 md:p-8 rounded-2xl shadow-sm mb-8">
+      <div class="flex items-baseline gap-3 mb-6 border-b border-gray-100 pb-3">
+        <span class="text-4xl font-black text-gray-300 font-mono italic">01</span>
+        <h2 class="text-xl font-bold text-gray-900 tracking-tight">What Is Your Project?</h2>
+      </div>
+
+      <!-- Project Type -->
+      <div class="mb-8">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-mono font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded">Q1</span>
+          <span class="text-sm font-bold text-gray-700">Project Type</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div class="relative">
+            <input type="radio" name="project-type" id="type-chatbot" value="Chatbot / Agent"
+              class="custom-radio absolute opacity-0 w-0 h-0">
+            <label for="type-chatbot"
+              class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50/10 cursor-pointer text-xs font-medium text-gray-600 transition-all duration-200 select-none">
+              <span class="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0 transition-all duration-200"></span>
+              Chatbot / Intelligent Agent
+            </label>
+          </div>
+          <div class="relative">
+            <input type="radio" name="project-type" id="type-image" value="Image / Art Generator"
+              class="custom-radio absolute opacity-0 w-0 h-0">
+            <label for="type-image"
+              class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50/10 cursor-pointer text-xs font-medium text-gray-600 transition-all duration-200 select-none">
+              <span class="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0 transition-all duration-200"></span>
+              Image / Digital Art Generator
+            </label>
+          </div>
+          <div class="relative">
+            <input type="radio" name="project-type" id="type-game" value="Interactive Game"
+              class="custom-radio absolute opacity-0 w-0 h-0">
+            <label for="type-game"
+              class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50/10 cursor-pointer text-xs font-medium text-gray-600 transition-all duration-200 select-none">
+              <span class="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0 transition-all duration-200"></span>
+              Interactive Game
+            </label>
+          </div>
+          <div class="relative">
+            <input type="radio" name="project-type" id="type-webapp" value="Web App / Tool"
+              class="custom-radio absolute opacity-0 w-0 h-0">
+            <label for="type-webapp"
+              class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50/10 cursor-pointer text-xs font-medium text-gray-600 transition-all duration-200 select-none">
+              <span class="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0 transition-all duration-200"></span>
+              Web Application / Productivity Tool
+            </label>
+          </div>
+          <div class="relative">
+            <input type="radio" name="project-type" id="type-writing" value="Creative Writing / Media"
+              class="custom-radio absolute opacity-0 w-0 h-0">
+            <label for="type-writing"
+              class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50/10 cursor-pointer text-xs font-medium text-gray-600 transition-all duration-200 select-none">
+              <span class="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0 transition-all duration-200"></span>
+              Creative Content / Story / Media
+            </label>
+          </div>
+          <div class="relative">
+            <input type="radio" name="project-type" id="type-other" value="Other"
+              class="custom-radio absolute opacity-0 w-0 h-0">
+            <label for="type-other"
+              class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50/10 cursor-pointer text-xs font-medium text-gray-600 transition-all duration-200 select-none">
+              <span class="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0 transition-all duration-200"></span>
+              Other / Multimodal Project
+            </label>
+          </div>
+        </div>
+
+        <!-- Conditional specified other type -->
+        <div class="hidden mt-4 p-4 bg-purple-50/40 border-l-4 border-purple-400 rounded-r-xl transition-all duration-200" id="project-type-other-field">
+          <label for="project-type-other-text" class="block text-xs font-black text-purple-800 uppercase tracking-wider mb-2">Specify project type</label>
+          <input type="text" id="project-type-other-text" placeholder="Explain your custom project setup..."
+            class="w-full bg-white border border-purple-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition-all duration-200 shadow-sm">
+        </div>
+      </div>
+
+      <!-- One sentence description -->
+      <div class="mb-8">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-mono font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded">Q2</span>
+          <span class="text-sm font-bold text-gray-700">One-Sentence Description</span>
+        </div>
+        <input type="text" id="one-sentence" placeholder="My project uses AI to [do what] for [whom] in order to [solve what problem]..."
+          class="w-full bg-white border border-gray-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition-all duration-200 shadow-sm">
+      </div>
+
+      <!-- AI tools at core -->
+      <div class="mb-4">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-mono font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded">Q3</span>
+          <span class="text-sm font-bold text-gray-700">Primary AI Tools At The Core (Add one or more)</span>
+        </div>
+
+        <div class="bg-gray-50/50 border border-gray-100 rounded-2xl p-5 mb-4 shadow-inner">
+          <div class="flex flex-wrap gap-2" id="tools-list">
+            <p class="text-xs font-mono text-gray-400 italic">No tools added yet. Use the input below to add tools.</p>
+          </div>
+        </div>
+
+        <div class="flex gap-2.5">
+          <input type="text" id="tool-input" placeholder="e.g. OpenAI Assistants API, Midjourney, ElevenLabs"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();addTool();}"
+            class="flex-1 bg-white border border-gray-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition-all duration-200 shadow-sm">
+          <button type="button" onclick="addTool()"
+            class="px-5 py-3 bg-purple-100 hover:bg-purple-200 text-purple-700 font-bold rounded-xl text-sm transition-all active:scale-95 shadow-sm">
+            + Add tool
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Who Is It For? -->
+    <section class="bg-white border border-gray-200 p-6 md:p-8 rounded-2xl shadow-sm mb-8">
+      <div class="flex items-baseline gap-3 mb-6 border-b border-gray-100 pb-3">
+        <span class="text-4xl font-black text-gray-300 font-mono italic">02</span>
+        <h2 class="text-xl font-bold text-gray-900 tracking-tight">Who Is It For?</h2>
+      </div>
+
+      <!-- Audience -->
+      <div class="mb-8">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-mono font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded">Q4</span>
+          <span class="text-sm font-bold text-gray-700">Target Audience</span>
+        </div>
+        <input type="text" id="audience" placeholder="e.g. High school biology students, local indie game developers, digital illustrators..."
+          class="w-full bg-white border border-gray-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition-all duration-200 shadow-sm">
+      </div>
+
+      <!-- Problem Solved -->
+      <div class="mb-8">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-mono font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded">Q5</span>
+          <span class="text-sm font-bold text-gray-700">What specific problem or human need does this address?</span>
+        </div>
+        <textarea id="problem-solved" placeholder="Explain the pain point or desire that your project fulfills..."
+          class="w-full bg-white border border-gray-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition-all duration-200 shadow-sm min-h-[100px]"></textarea>
+      </div>
+
+      <!-- How They'll Use It -->
+      <div class="mb-4">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-mono font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded">Q6</span>
+          <span class="text-sm font-bold text-gray-700">How exactly will they interact with and use your project?</span>
+        </div>
+        <textarea id="how-used" placeholder="Describe the typical user workflow or session from start to finish..."
+          class="w-full bg-white border border-gray-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition-all duration-200 shadow-sm min-h-[100px]"></textarea>
+      </div>
+    </section>
+
+    <!-- Section 3: What Should It Do? -->
+    <section class="bg-white border border-gray-200 p-6 md:p-8 rounded-2xl shadow-sm mb-8">
+      <div class="flex items-baseline gap-3 mb-6 border-b border-gray-100 pb-3">
+        <span class="text-4xl font-black text-gray-300 font-mono italic">03</span>
+        <h2 class="text-xl font-bold text-gray-900 tracking-tight">What Should It Do?</h2>
+      </div>
+
+      <!-- Core Feature -->
+      <div class="mb-8">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-mono font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded">Q7</span>
+          <span class="text-sm font-bold text-gray-700">The Absolute Core Feature (Must work to be successful)</span>
+        </div>
+        <textarea id="core-feature" placeholder="Explain the single most important capability of your project that delivers the core value..."
+          class="w-full bg-white border border-gray-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition-all duration-200 shadow-sm min-h-[100px]"></textarea>
+      </div>
+
+      <!-- Additional Features -->
+      <div class="mb-8">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-mono font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded">Q8</span>
+          <span class="text-sm font-bold text-gray-700">Additional Features (In order of priority)</span>
+        </div>
+
+        <div class="space-y-4">
+          <div class="relative flex items-center">
+            <span class="absolute left-4 text-xs font-black text-purple-500 font-mono">F1</span>
+            <input type="text" id="feature1" placeholder="High priority additional feature..."
+              class="w-full bg-white border border-gray-200 pl-12 pr-4 py-3 rounded-xl text-gray-900 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition-all duration-200 shadow-sm">
+          </div>
+          <div class="relative flex items-center">
+            <span class="absolute left-4 text-xs font-black text-purple-500 font-mono">F2</span>
+            <input type="text" id="feature2" placeholder="Secondary nice-to-have feature..."
+              class="w-full bg-white border border-gray-200 pl-12 pr-4 py-3 rounded-xl text-gray-900 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition-all duration-200 shadow-sm">
+          </div>
+          <div class="relative flex items-center">
+            <span class="absolute left-4 text-xs font-black text-purple-500 font-mono">F3</span>
+            <input type="text" id="feature3" placeholder="Optional/stretch feature..."
+              class="w-full bg-white border border-gray-200 pl-12 pr-4 py-3 rounded-xl text-gray-900 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition-all duration-200 shadow-sm">
+          </div>
+        </div>
+      </div>
+
+      <!-- Success looks like -->
+      <div class="mb-8">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-mono font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded">Q9</span>
+          <span class="text-sm font-bold text-gray-700">What does initial success look like?</span>
+        </div>
+        <textarea id="success-looks-like" placeholder="Describe a fully functioning state. How will you know it is done and works beautifully?"
+          class="w-full bg-white border border-gray-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition-all duration-200 shadow-sm min-h-[90px]"></textarea>
+      </div>
+
+      <!-- Known Limitations -->
+      <div class="mb-4">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-mono font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded">Q10</span>
+          <span class="text-sm font-bold text-gray-700">Known Limitations or Scope Constraints</span>
+        </div>
+        <textarea id="limitations" placeholder="What will your project NOT do? Set healthy boundaries to ensure completion..."
+          class="w-full bg-white border border-gray-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition-all duration-200 shadow-sm min-h-[90px]"></textarea>
+      </div>
+    </section>
+
+    <!-- Section 4: Responsible Design -->
+    <section class="bg-white border border-gray-200 p-6 md:p-8 rounded-2xl shadow-sm mb-8">
+      <div class="flex items-baseline gap-3 mb-6 border-b border-gray-100 pb-3">
+        <span class="text-4xl font-black text-gray-300 font-mono italic">04</span>
+        <h2 class="text-xl font-bold text-gray-900 tracking-tight">Responsible Design</h2>
+      </div>
+
+      <!-- Considerations checked -->
+      <div class="mb-8">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-mono font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded">Q11</span>
+          <span class="text-sm font-bold text-gray-700">Key Considerations Checked (Select all that apply)</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="relative">
+            <input type="checkbox" name="responsible-checks" id="check-bias" value="Bias & Fairness"
+              class="custom-checkbox absolute opacity-0 w-0 h-0">
+            <label for="check-bias"
+              class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50/10 cursor-pointer text-xs font-medium text-gray-600 transition-all duration-200 select-none">
+              <span class="w-4 h-4 rounded border border-gray-300 flex-shrink-0 transition-all duration-200"></span>
+              Bias &amp; Fairness
+            </label>
+          </div>
+          <div class="relative">
+            <input type="checkbox" name="responsible-checks" id="check-accuracy" value="Factual Accuracy / Hallucinations"
+              class="custom-checkbox absolute opacity-0 w-0 h-0">
+            <label for="check-accuracy"
+              class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50/10 cursor-pointer text-xs font-medium text-gray-600 transition-all duration-200 select-none">
+              <span class="w-4 h-4 rounded border border-gray-300 flex-shrink-0 transition-all duration-200"></span>
+              Factual Accuracy / Hallucinations
+            </label>
+          </div>
+          <div class="relative">
+            <input type="checkbox" name="responsible-checks" id="check-privacy" value="Privacy & Data Safety"
+              class="custom-checkbox absolute opacity-0 w-0 h-0">
+            <label for="check-privacy"
+              class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50/10 cursor-pointer text-xs font-medium text-gray-600 transition-all duration-200 select-none">
+              <span class="w-4 h-4 rounded border border-gray-300 flex-shrink-0 transition-all duration-200"></span>
+              Privacy &amp; Data Safety
+            </label>
+          </div>
+          <div class="relative">
+            <input type="checkbox" name="responsible-checks" id="check-transparency" value="User Consent & Transparency"
+              class="custom-checkbox absolute opacity-0 w-0 h-0">
+            <label for="check-transparency"
+              class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50/10 cursor-pointer text-xs font-medium text-gray-600 transition-all duration-200 select-none">
+              <span class="w-4 h-4 rounded border border-gray-300 flex-shrink-0 transition-all duration-200"></span>
+              User Consent &amp; Transparency
+            </label>
+          </div>
+          <div class="relative col-span-1 md:col-span-2">
+            <input type="checkbox" name="responsible-checks" id="check-copyright" value="IP & Copyright Ownership"
+              class="custom-checkbox absolute opacity-0 w-0 h-0">
+            <label for="check-copyright"
+              class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50/10 cursor-pointer text-xs font-medium text-gray-600 transition-all duration-200 select-none">
+              <span class="w-4 h-4 rounded border border-gray-300 flex-shrink-0 transition-all duration-200"></span>
+              Intellectual Property &amp; Copyright Ownership
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Design Choice Made -->
+      <div class="mb-4">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-mono font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded">Q12</span>
+          <span class="text-sm font-bold text-gray-700">What specific design choice did you make to address these?</span>
+        </div>
+        <textarea id="responsible-choice" placeholder="e.g. Adding a prominent disclaimer, avoiding training on private data, creating a feedback form for factual corrections..."
+          class="w-full bg-white border border-gray-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition-all duration-200 shadow-sm min-h-[100px]"></textarea>
+      </div>
+    </section>
+
+    <!-- Section 5: Showcase Pitch -->
+    <section class="bg-white border border-gray-200 p-6 md:p-8 rounded-2xl shadow-sm mb-8">
+      <div class="flex items-baseline gap-3 mb-6 border-b border-gray-100 pb-3">
+        <span class="text-4xl font-black text-gray-300 font-mono italic">05</span>
+        <h2 class="text-xl font-bold text-gray-900 tracking-tight">Showcase Pitch</h2>
+      </div>
+
+      <!-- Elevator Pitch -->
+      <div class="mb-8">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-mono font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded">Q13</span>
+          <span class="text-sm font-bold text-gray-700">Elevator Pitch (30 seconds)</span>
+        </div>
+        <textarea id="elevator-pitch" placeholder="Describe your project, your audience, and your unique value in 2-3 compelling sentences..."
+          class="w-full bg-white border border-gray-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition-all duration-200 shadow-sm min-h-[90px]"></textarea>
+      </div>
+
+      <!-- Most Excited About -->
+      <div class="mb-4">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-mono font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded">Q14</span>
+          <span class="text-sm font-bold text-gray-700">What are you most excited about demonstrating at the Showcase?</span>
+        </div>
+        <textarea id="most-excited" placeholder="What part of the user experience or AI logic will stand out the most?"
+          class="w-full bg-white border border-gray-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition-all duration-200 shadow-sm min-h-[90px]"></textarea>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Sticky Footer Submit Bar -->
+  <footer class="sticky bottom-0 bg-white border-t border-gray-200 py-4 px-6 md:px-8 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4 z-50">
+    <div class="flex items-center gap-2.5">
+      <span class="w-2.5 h-2.5 rounded-full bg-gray-300 shadow-sm transition-all duration-300" id="status-dot"></span>
+      <span class="status-msg text-xs font-mono font-bold text-gray-500" id="status-msg">Ready to submit final project definition</span>
+    </div>
+    <button type="button"
+      class="submit-btn w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white font-black px-8 py-3.5 rounded-xl shadow-md transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2"
+      id="submit-btn" onclick="submitForm()">
+      <span>Save Project Definition →</span>
+    </button>
+  </footer>
+
+  <script>
+    /* ══ SUPABASE CONFIG ══ */
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+    const TABLE = 'final_project_definitions';
+
+    let toolsList = [];
+
+    document.getElementById('submission-date').value = new Date().toISOString().split('T')[0];
+
+    function addTool() {
+      const input = document.getElementById('tool-input');
+      const val = input.value.trim();
+      if (!val) return;
+      toolsList.push(val);
+      renderTags();
+      input.value = '';
+      input.focus();
+    }
+
+    function removeTool(i) {
+      toolsList.splice(i, 1);
+      renderTags();
+    }
+
+    function renderTags() {
+      const container = document.getElementById('tools-list');
+      if (toolsList.length === 0) {
+        container.innerHTML = `<p class="text-xs font-mono text-gray-400 italic">No tools added yet. Use the input below to add tools.</p>`;
+        return;
+      }
+      container.innerHTML = toolsList.map((t, i) =>
+        `<span class="inline-flex items-center gap-1.5 pl-3 pr-2.5 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-bold font-mono text-gray-600 shadow-sm transition-all duration-200 hover:border-gray-300">${t}<button type="button" onclick="removeTool(${i})" class="text-gray-400 hover:text-red-500 font-black text-sm ml-1 line-height-1 focus:outline-none transition-colors" title="Remove">×</button></span>`
+      ).join('');
+    }
+
+    document.getElementById('type-other').addEventListener('change', () => {
+      document.getElementById('project-type-other-field').classList.remove('hidden');
+    });
+
+    document.querySelectorAll('input[name="project-type"]:not(#type-other)').forEach(r => {
+      r.addEventListener('change', () => {
+        document.getElementById('project-type-other-field').classList.add('hidden');
+      });
+    });
+
+    function getVal(id) { return document.getElementById(id).value.trim(); }
+
+    function getRadio(name) {
+      const checked = document.querySelector(`input[name="${name}"]:checked`);
+      return checked ? checked.value : null;
+    }
+
+    function getCheckboxes(name) {
+      const checked = Array.from(document.querySelectorAll(`input[name="${name}"]:checked`));
+      return checked.map(el => el.value);
+    }
+
+    function setStatus(msg, type = '') {
+      const el = document.getElementById('status-msg');
+      const dot = document.getElementById('status-dot');
+      el.textContent = msg;
+
+      el.className = 'status-msg text-xs font-mono font-bold';
+      dot.className = 'w-2.5 h-2.5 rounded-full transition-all duration-300';
+
+      if (type === 'success') {
+        el.classList.add('text-green-600');
+        dot.classList.add('bg-green-500', 'shadow-[0_0_10px_rgba(34,197,94,0.5)]');
+      } else if (type === 'error') {
+        el.classList.add('text-red-500');
+        dot.classList.add('bg-red-500', 'shadow-[0_0_10px_rgba(239,68,68,0.5)]');
+      } else if (type === 'loading') {
+        el.classList.add('text-purple-600');
+        dot.classList.add('bg-purple-500', 'animate-ping');
+      } else {
+        el.classList.add('text-gray-500');
+        dot.classList.add('bg-gray-300');
+      }
+    }
+
+    async function submitForm() {
+      const pType = getRadio('project-type');
+      const pTypeOther = getVal('project-type-other-text');
+
+      const payload = {
+        student_name: getVal('student-name'),
+        project_title: getVal('project-title'),
+        submission_date: getVal('submission-date') || null,
+        project_type: pType === 'Other' ? ('Other: ' + pTypeOther) : pType,
+        one_sentence: getVal('one-sentence'),
+        ai_tools: toolsList,
+        audience: getVal('audience'),
+        problem_solved: getVal('problem-solved'),
+        how_used: getVal('how-used'),
+        core_feature: getVal('core-feature'),
+        feature_1: getVal('feature1'),
+        feature_2: getVal('feature2'),
+        feature_3: getVal('feature3'),
+        success_looks_like: getVal('success-looks-like'),
+        limitations: getVal('limitations'),
+        responsible_checks: getCheckboxes('responsible-checks'),
+        responsible_choice: getVal('responsible-choice'),
+        elevator_pitch: getVal('elevator-pitch'),
+        most_excited: getVal('most-excited')
+      };
+
+      if (!payload.student_name) { setStatus('⚠ Student name required', 'error'); return; }
+      if (!payload.project_title) { setStatus('⚠ Project title required', 'error'); return; }
+
+      setStatus('Saving final project definition...', 'loading');
+      document.getElementById('submit-btn').disabled = true;
+
+      try {
+        const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!resp.ok) {
+          throw new Error(`HTTP ${resp.status}`);
+        }
+
+        setStatus('✓ Final project definition saved successfully!', 'success');
+      } catch (e) {
+        setStatus('✗ ' + e.message, 'error');
+      } finally {
+        document.getElementById('submit-btn').disabled = false;
+      }
+    }
+  </script>
+</body>
+
+</html>
