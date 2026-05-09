@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Access Code Generator — AI Junior Competition</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #F4F7FA;
+      color: #1B2A4A;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    main {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    header {
+      background: #1B2A4A;
+      color: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    header h1 {
+      margin: 0 0 0.5rem;
+      font-size: 1.8rem;
+    }
+
+    header p {
+      margin: 0;
+      opacity: 0.9;
+      font-size: 0.95rem;
+    }
+
+    .header-user {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .logout-btn {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.15s;
+      display: block;
+      margin-top: 0.5rem;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* ── Auth gate ─────────────────────────────────────────────────── */
+    #auth-gate {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background: #F4F7FA;
+    }
+
+    .auth-card {
+      background: #fff;
+      padding: 3rem 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 32px rgba(27, 42, 74, 0.12);
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .auth-card h2 {
+      font-size: 1.8rem;
+      color: #1B2A4A;
+      margin: 0 0 0.5rem;
+      font-weight: 700;
+    }
+
+    .auth-card .subtitle {
+      color: #5B6E85;
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+
+    .auth-card input {
+      width: 100%;
+      padding: 0.85rem;
+      margin-bottom: 1rem;
+      border: 1.5px solid #dde4ed;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s;
+      box-sizing: border-box;
+    }
+
+    .auth-card input:focus {
+      border-color: #0D6E8A;
+      background: #f9fbfc;
+    }
+
+    .auth-card button {
+      width: 100%;
+      padding: 0.9rem;
+      background: #1B2A4A;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .auth-card button:hover {
+      background: #0D6E8A;
+    }
+
+    .auth-card button:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+
+    /* ── Generator form ────────────────────────────────────────────── */
+    #generator-form {
+      display: none;
+    }
+
+    .form-group {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      border: 1px solid #dde4ed;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #0D6E8A;
+    }
+
+    select,
+    input[type="number"] {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1.5px solid #dde4ed;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-family: inherit;
+      margin-bottom: 1rem;
+      box-sizing: border-box;
+    }
+
+    select:focus,
+    input[type="number"]:focus {
+      outline: none;
+      border-color: #0D6E8A;
+      background: #f9fbfc;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    button {
+      flex: 1;
+      padding: 0.85rem;
+      background: #1B2A4A;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    button:hover {
+      background: #0D6E8A;
+    }
+
+    button:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+
+    .secondary-btn {
+      background: #0D6E8A;
+    }
+
+    .secondary-btn:hover {
+      background: #02A89E;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 1rem;
+      border: 1.5px solid #dde4ed;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.95rem;
+      resize: vertical;
+      min-height: 300px;
+      margin-bottom: 1rem;
+      box-sizing: border-box;
+    }
+
+    .output-section {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid #dde4ed;
+      margin-bottom: 1rem;
+    }
+
+    .output-section h3 {
+      margin: 0 0 1rem;
+      color: #1B2A4A;
+    }
+
+    .status {
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .status.show {
+      display: block;
+    }
+
+    .status.success {
+      background: #e8f8f0;
+      color: #1A6B3C;
+      border: 1px solid #a3d9b8;
+    }
+
+    .status.error {
+      background: #fee8e8;
+      color: #B00020;
+      border: 1px solid #f5c2c2;
+    }
+
+    .status.info {
+      background: #e8f0fe;
+      color: #1a4db5;
+      border: 1px solid #bed1f7;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+  <!-- ── Auth Gate ── -->
+  <div id="auth-gate">
+    <div class="auth-card">
+      <h2>🔑 Teacher Access</h2>
+      <p class="subtitle">Log in to generate homework access codes</p>
+
+      <input type="email" id="teacher-email" placeholder="teacher@school.edu" autocomplete="email">
+      <input type="password" id="teacher-password" placeholder="Password" autocomplete="current-password">
+
+      <div id="auth-error" style="color: #B00020; font-size: 0.9rem; margin-bottom: 1rem; display: none;"></div>
+
+      <button onclick="loginWithEmail()" id="login-btn">Login</button>
+    </div>
+  </div>
+
+  <!-- ── Generator Form ── -->
+  <div id="generator-form">
+    <header>
+      <h1>🔑 Access Code Generator</h1>
+      <p>AI Junior Competition — Create homework access codes for your students</p>
+      <div class="header-user">
+        <div id="logged-in-as"></div>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+    </header>
+
+    <main>
+      <div class="form-group">
+        <label for="class-selector">Select Class:</label>
+        <select id="class-selector">
+          <option value="10">Class 10 — AI Search</option>
+          <option value="11">Class 11 — Unsupervised Learning</option>
+          <option value="12">Class 12 — Evaluation Metrics</option>
+          <option value="13">Class 13 — Reinforcement Learning</option>
+          <option value="14">Class 14 — Recommender Systems & CSPs</option>
+          <option value="15">Class 15 — Generative AI & LLMs</option>
+        </select>
+
+        <label for="num-codes">Number of codes:</label>
+        <input type="number" id="num-codes" value="30" min="1" max="500">
+
+        <label for="max-uses">Max uses per code:</label>
+        <input type="number" id="max-uses" value="1" min="1" max="999">
+
+        <div class="button-group">
+          <button onclick="generateCodes()">Generate Codes</button>
+          <button class="secondary-btn" onclick="resetForm()">Reset</button>
+        </div>
+      </div>
+
+      <div id="status-message" class="status"></div>
+
+      <div class="output-section" id="output-section" style="display: none;">
+        <h3>Access Codes (Copy and Share with Students)</h3>
+        <textarea id="codes-output" readonly></textarea>
+        <div class="button-group">
+          <button onclick="copyCodes()">Copy All Codes</button>
+          <button class="secondary-btn" onclick="downloadCodesTxt()">Download TXT</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // ── Supabase config ────────────────────────────────────────────────────────
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+      auth: { persistSession: false }
+    });
+
+    // ── Auth state ─────────────────────────────────────────────────────────────
+    let isAuthenticated = false;
+    let authUser = null;
+
+    // ── Utility functions ──────────────────────────────────────────────────────
+    function showStatus(message, type) {
+      const statusEl = document.getElementById('status-message');
+      statusEl.textContent = message;
+      statusEl.className = `status show ${type}`;
+      statusEl.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ── Authentication ────────────────────────────────────────────────────────
+    async function initAuth() {
+      try {
+        const { data: { session } } = await db.auth.getSession();
+        if (session?.user) {
+          setAuthenticatedState(session.user);
+        }
+      } catch (err) {
+        console.error('Auth init error:', err);
+      }
+    }
+
+    function setAuthenticatedState(user) {
+      isAuthenticated = true;
+      authUser = user;
+      document.getElementById('auth-gate').style.display = 'none';
+      document.getElementById('generator-form').style.display = 'block';
+      document.getElementById('logged-in-as').textContent = `👤 ${user.email}`;
+    }
+
+    async function loginWithEmail() {
+      const email = document.getElementById('teacher-email').value.trim();
+      const password = document.getElementById('teacher-password').value;
+      const loginBtn = document.getElementById('login-btn');
+      const authErr = document.getElementById('auth-error');
+
+      authErr.style.display = 'none';
+
+      if (!email || !password) {
+        authErr.textContent = 'Email and password required.';
+        authErr.style.display = 'block';
+        return;
+      }
+
+      loginBtn.disabled = true;
+      loginBtn.textContent = '⏳ Logging in…';
+
+      try {
+        const { data, error } = await db.auth.signInWithPassword({ email, password });
+
+        if (error) {
+          authErr.textContent = `Login failed: ${error.message}`;
+          authErr.style.display = 'block';
+          loginBtn.disabled = false;
+          loginBtn.textContent = 'Login';
+          return;
+        }
+
+        setAuthenticatedState(data.user);
+        document.getElementById('teacher-email').value = '';
+        document.getElementById('teacher-password').value = '';
+
+      } catch (err) {
+        console.error('Login error:', err);
+        authErr.textContent = `Error: ${err.message}`;
+        authErr.style.display = 'block';
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Login';
+      }
+    }
+
+    function logout() {
+      db.auth.signOut().then(() => {
+        isAuthenticated = false;
+        authUser = null;
+        document.getElementById('auth-gate').style.display = 'flex';
+        document.getElementById('generator-form').style.display = 'none';
+        document.getElementById('teacher-email').value = '';
+        document.getElementById('teacher-password').value = '';
+        document.getElementById('codes-output').value = '';
+        document.getElementById('output-section').style.display = 'none';
+        document.getElementById('status-message').className = 'status';
+      });
+    }
+
+    // Allow Enter key on password input
+    document.getElementById('teacher-password').addEventListener('keydown', e => {
+      if (e.key === 'Enter') loginWithEmail();
+    });
+
+    // ── Code Generation ───────────────────────────────────────────────────────
+    async function generateCodes() {
+      if (!isAuthenticated) {
+        showStatus('Not authenticated. Please log in.', 'error');
+        return;
+      }
+
+      const classNum = parseInt(document.getElementById('class-selector').value);
+      const numCodes = parseInt(document.getElementById('num-codes').value);
+      const maxUses = parseInt(document.getElementById('max-uses').value);
+
+      if (numCodes < 1 || numCodes > 500) {
+        showStatus('Number of codes must be between 1 and 500.', 'error');
+        return;
+      }
+
+      showStatus(`⏳ Generating ${numCodes} codes for Class ${classNum}…`, 'info');
+
+      const codes = [];
+      const codeSet = new Set();
+
+      // Generate unique random alphanumeric codes
+      while (codes.length < numCodes) {
+        const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+        if (!codeSet.has(code)) {
+          codes.push(code);
+          codeSet.add(code);
+        }
+      }
+
+      // Prepare rows for database
+      const rows = codes.map(code => ({
+        code,
+        class_number: classNum,
+        max_uses: maxUses,
+        uses_count: 0,
+        is_active: true,
+        created_by: authUser.id,
+      }));
+
+      try {
+        // Insert into database
+        const { error } = await db.from('access_codes').insert(rows);
+
+        if (error) {
+          showStatus(`Error: ${error.message}`, 'error');
+          return;
+        }
+
+        // Display codes
+        document.getElementById('codes-output').value = codes.join('\n');
+        document.getElementById('output-section').style.display = 'block';
+        showStatus(`✓ Successfully generated ${numCodes} access codes for Class ${classNum}. Copy and share with your students.`, 'success');
+
+      } catch (err) {
+        console.error('Generation error:', err);
+        showStatus(`Error: ${err.message || 'Unknown error'}`, 'error');
+      }
+    }
+
+    function copyCodes() {
+      const textarea = document.getElementById('codes-output');
+      textarea.select();
+      navigator.clipboard.writeText(textarea.value).then(() => {
+        showStatus('✓ Codes copied to clipboard!', 'success');
+      }).catch(err => {
+        showStatus('Error copying to clipboard', 'error');
+      });
+    }
+
+    function downloadCodesTxt() {
+      const text = document.getElementById('codes-output').value;
+      const classNum = document.getElementById('class-selector').value;
+      const blob = new Blob([text], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `access_codes_class${classNum}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showStatus('✓ Downloaded!', 'success');
+    }
+
+    function resetForm() {
+      document.getElementById('class-selector').value = '10';
+      document.getElementById('num-codes').value = '1';
+      document.getElementById('max-uses').value = '20';
+      document.getElementById('codes-output').value = '';
+      document.getElementById('output-section').style.display = 'none';
+      document.getElementById('status-message').className = 'status';
+      document.getElementById('status-message').textContent = '';
+    }
+
+    // ── Init on page load ──────────────────────────────────────────────────────
+    initAuth();
+  </script>
+</body>
+
+</html>
