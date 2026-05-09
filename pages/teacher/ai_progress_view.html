@@ -904,6 +904,41 @@
       padding: 0.5rem 0.75rem;
       border-radius: var(--r);
     }
+
+    /* ── Light Mode Overrides ── */
+    body.light-mode {
+      --bg: #f9f9fb;
+      --bg2: #ffffff;
+      --bg3: #f1f3f6;
+      --bg4: #e5e8ed;
+      --line: rgba(0, 0, 0, 0.06);
+      --line2: rgba(0, 0, 0, 0.11);
+      --ink: #1c1e21;
+      --ink2: #5b626a;
+      --ink3: #8a929b;
+      --gold: #b3821a;
+      --gold-lt: #996e11;
+      --gold-bg: rgba(179, 130, 26, 0.08);
+      --red: #b33030;
+      --green: #2a8351;
+      --green-bg: rgba(42, 131, 81, 0.08);
+      --amber: #b3611a;
+      --amber-bg: rgba(179, 97, 26, 0.08);
+      --blue: #2d73a8;
+      --blue-bg: rgba(45, 115, 168, 0.08);
+    }
+
+    body.light-mode .btn-primary {
+      color: #ffffff;
+    }
+
+    body.light-mode .loading-overlay {
+      background: rgba(249, 249, 251, 0.85);
+    }
+
+    body.light-mode .auth-card {
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    }
   </style>
 </head>
 
@@ -920,7 +955,12 @@
       <span class="topbar-logo">Progress Review</span>
       <span class="topbar-sub">— Instructor Dashboard</span>
     </div>
-    <div style="display: flex; align-items: center; gap: 1rem;">
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <!-- Theme Toggle Button -->
+      <button class="btn" onclick="toggleTheme()" id="theme-toggle" style="padding: 0.25rem 0.6rem; font-size: 13px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: var(--r); background: var(--bg3); border: 1px solid var(--line2); color: var(--ink2); cursor: pointer;" title="Toggle Light/Dark View">
+        🌙
+      </button>
+
       <span class="topbar-badge" id="class-badge" style="display: none;">No data loaded</span>
       <div id="user-info" style="display: none; align-items: center; gap: 0.75rem; font-family: var(--font-b); font-size: 13px;">
         <span id="logged-in-as" style="color: var(--ink2); font-family: var(--font-m); font-size: 12px;">👤 Loading...</span>
@@ -988,6 +1028,33 @@
   </div>
 
   <script>
+    // Theme toggler with persistence
+    function toggleTheme() {
+      const body = document.body;
+      const btn = document.getElementById('theme-toggle');
+      if (body.classList.contains('light-mode')) {
+        body.classList.remove('light-mode');
+        if (btn) btn.textContent = '🌙';
+        localStorage.setItem('theme', 'dark');
+      } else {
+        body.classList.add('light-mode');
+        if (btn) btn.textContent = '☀️';
+        localStorage.setItem('theme', 'light');
+      }
+    }
+
+    // Apply saved theme immediately
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+        document.addEventListener('DOMContentLoaded', () => {
+          const btn = document.getElementById('theme-toggle');
+          if (btn) btn.textContent = '☀️';
+        });
+      }
+    })();
+
     const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
     const TABLE = 'project_progress_notes';
