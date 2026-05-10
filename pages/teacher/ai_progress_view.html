@@ -1079,6 +1079,10 @@
         style="display: none; align-items: center; gap: 0.75rem; font-family: var(--font-b); font-size: 13px;">
         <span id="logged-in-as" style="color: var(--ink2); font-family: var(--font-m); font-size: 12px;">👤
           Loading...</span>
+        <button class="btn btn-primary" onclick="loadAllStudents()"
+          style="padding: 0.25rem 0.65rem; font-size: 12px; height: 26px; display: flex; align-items: center; gap: 4px;">
+          🔄 Refresh
+        </button>
         <button class="btn" onclick="logout()"
           style="padding: 0.25rem 0.65rem; font-size: 12px; height: 26px; display: flex; align-items: center;">Logout</button>
       </div>
@@ -1171,7 +1175,7 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
 
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-      auth: { persistSession: false }
+      auth: { persistSession: true }
     });
 
     let isAuthenticated = false;
@@ -1186,6 +1190,16 @@
 
     function loading(msg) { document.getElementById('loading-msg').textContent = msg; document.getElementById('loading').classList.add('visible'); }
     function stopLoading() { document.getElementById('loading').classList.remove('visible'); }
+
+    function esc(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
 
     async function initAuth() {
       try {
@@ -1327,7 +1341,7 @@
         const conf = lp?.confidence_rating;
         const project = lp?.project_title || ld?.project_title || '—';
         return `
-        <div class="student-item ${activeStudent === name ? 'active' : ''}" onclick="selectStudent(${JSON.stringify(name)})">
+        <div class="student-item ${activeStudent === name ? 'active' : ''}" data-name="${esc(name)}" onclick="selectStudent(this.getAttribute('data-name'))">
           <div class="s-avatar">${initials(name)}</div>
           <div class="s-info">
             <div class="s-name">${name}</div>
@@ -1424,8 +1438,8 @@
 
       <div class="actions-row">
         <button class="btn btn-primary" onclick="window.print()">⎙ Print / Save PDF</button>
-        ${pCount ? `<button class="btn" onclick="exportStudentCSV('progress',${JSON.stringify(activeStudent)})">↓ Progress CSV</button>` : ''}
-        ${hasDef ? `<button class="btn" onclick="exportStudentCSV('def',${JSON.stringify(activeStudent)})">↓ Definition CSV</button>` : ''}
+        ${pCount ? `<button class="btn" data-student="${esc(activeStudent)}" onclick="exportStudentCSV('progress', this.getAttribute('data-student'))">↓ Progress CSV</button>` : ''}
+        ${hasDef ? `<button class="btn" data-student="${esc(activeStudent)}" onclick="exportStudentCSV('def', this.getAttribute('data-student'))">↓ Definition CSV</button>` : ''}
         <button class="btn" onclick="copyPlainText()">⊞ Copy as text</button>
       </div>
 

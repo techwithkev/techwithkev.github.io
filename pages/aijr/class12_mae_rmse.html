@@ -237,10 +237,11 @@
         // --- 4. Rendering ---
 
         function updateUIState(metrics) {
-            const e = Math.abs(metrics.outlierE);
+            const absErr = Math.abs(metrics.outlierE);
             
-            if (e < 1.0) {
-                stateIndicator.className = "rounded-xl p-5 border-l-4 transition-colors duration-300 bg-green-50 border-green-500 text-green-900";
+            // Ensure pulsed text and red classes are reset when returning from outlier state
+            stateTitle.className = "font-black text-sm uppercase tracking-wider mb-2";
+
             if (absErr < 1.0) {
                 stateTitle.innerText = "Balanced Fit";
                 stateDesc.innerHTML = "The outlier is close to the regression line. The MSE penalty is small.";
