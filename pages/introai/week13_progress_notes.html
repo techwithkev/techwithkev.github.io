@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Progress Notes — Intro to AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    /* Styling custom radio overlays dynamically and cleanly */
+    input[type="radio"].custom-radio:checked+label {
+      background-color: rgba(37, 99, 235, 0.05);
+      border-color: #2563eb;
+      color: #1e3a8a;
+      font-weight: 600;
+    }
+
+    input[type="radio"].custom-radio:checked+label>span {
+      border-color: #2563eb;
+      background-color: #2563eb;
+      box-shadow: inset 0 0 0 3px #ffffff;
+    }
+
+    input[type="radio"].yn-radio:checked+label {
+      background-color: #111827;
+      border-color: #111827;
+      color: #ffffff;
+      font-weight: 700;
+    }
+  </style>
+</head>
+
+<body class="bg-[#F9FAFB] text-gray-900 min-h-screen font-sans antialiased">
+
+  <div class="max-w-5xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <!-- Header -->
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+      <div>
+        <p class="text-xs font-black uppercase tracking-widest text-blue-600 mb-1">Introduction to AI: Tools, Thinking &
+          Responsible Use</p>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">PROJECT PROGRESS <span
+            class="text-blue-600">& PLANNING</span></h1>
+        <p class="text-gray-500 font-medium italic mt-1">Progress Notes · Session Record</p>
+      </div>
+      <div
+        class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-white border border-gray-200 text-gray-400 shadow-sm transition-all duration-300 self-start md:self-auto">
+        Week 13 Check-in
+      </div>
+    </header>
+
+    <!-- Student Identity Card -->
+    <div class="bg-white border border-gray-200 p-6 md:p-8 rounded-2xl shadow-sm mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <label for="student-name" class="block text-xs font-black text-gray-400 uppercase tracking-wider mb-2">Student
+            Name</label>
+          <input type="text" id="student-name" placeholder="Full name"
+            class="w-full bg-white border border-gray-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all duration-200 shadow-sm">
+        </div>
+        <div>
+          <label for="project-title"
+            class="block text-xs font-black text-gray-400 uppercase tracking-wider mb-2">Project Title</label>
+          <input type="text" id="project-title" placeholder="Your project name"
+            class="w-full bg-white border border-gray-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all duration-200 shadow-sm">
+        </div>
+        <div>
+          <label for="session-date"
+            class="block text-xs font-black text-gray-400 uppercase tracking-wider mb-2">Date</label>
+          <input type="date" id="session-date"
+            class="w-full bg-white border border-gray-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all duration-200 shadow-sm">
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 1: Current Status Report -->
+    <section class="bg-white border border-gray-200 p-6 md:p-8 rounded-2xl shadow-sm mb-8">
+      <div class="flex items-baseline gap-3 mb-6 border-b border-gray-100 pb-3">
+        <span class="text-4xl font-black text-gray-300 font-mono italic">01</span>
+        <h2 class="text-xl font-bold text-gray-900 tracking-tight">Current Status Report</h2>
+      </div>
+
+      <!-- Q1 -->
+      <div class="mb-8">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Q1</span>
+          <span class="text-sm font-bold text-gray-700">Current phase of the project</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div class="relative">
+            <input type="radio" name="phase" id="phase-research" value="Research and Planning"
+              class="custom-radio absolute opacity-0 w-0 h-0">
+            <label for="phase-research"
+              class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50/10 cursor-pointer text-xs font-medium text-gray-600 transition-all duration-200 select-none">
+              <span
+                class="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0 transition-all duration-200"></span>
+              Research & Planning
+            </label>
+          </div>
+          <div class="relative">
+            <input type="radio" name="phase" id="phase-data" value="Data Collection / Content Generation"
+              class="custom-radio absolute opacity-0 w-0 h-0">
+            <label for="phase-data"
+              class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50/10 cursor-pointer text-xs font-medium text-gray-600 transition-all duration-200 select-none">
+              <span
+                class="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0 transition-all duration-200"></span>
+              Data Collection / Content
+            </label>
+          </div>
+          <div class="relative">
+            <input type="radio" name="phase" id="phase-model" value="Model Training / Tool Implementation"
+              class="custom-radio absolute opacity-0 w-0 h-0">
+            <label for="phase-model"
+              class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50/10 cursor-pointer text-xs font-medium text-gray-600 transition-all duration-200 select-none">
+              <span
+                class="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0 transition-all duration-200"></span>
+              Model / Tool Implementation
+            </label>
+          </div>
+          <div class="relative">
+            <input type="radio" name="phase" id="phase-refine" value="Refining and Polishing"
+              class="custom-radio absolute opacity-0 w-0 h-0">
+            <label for="phase-refine"
+              class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50/10 cursor-pointer text-xs font-medium text-gray-600 transition-all duration-200 select-none">
+              <span
+                class="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0 transition-all duration-200"></span>
+              Refining & Polishing
+            </label>
+          </div>
+          <div class="relative">
+            <input type="radio" name="phase" id="phase-present" value="Presentation Preparation"
+              class="custom-radio absolute opacity-0 w-0 h-0">
+            <label for="phase-present"
+              class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50/10 cursor-pointer text-xs font-medium text-gray-600 transition-all duration-200 select-none">
+              <span
+                class="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0 transition-all duration-200"></span>
+              Presentation Preparation
+            </label>
+          </div>
+          <div class="relative">
+            <input type="radio" name="phase" id="phase-other" value="Other"
+              class="custom-radio absolute opacity-0 w-0 h-0">
+            <label for="phase-other"
+              class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50/10 cursor-pointer text-xs font-medium text-gray-600 transition-all duration-200 select-none">
+              <span
+                class="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0 transition-all duration-200"></span>
+              Other
+            </label>
+          </div>
+        </div>
+
+        <!-- Conditional other field -->
+        <div class="hidden mt-4 p-4 bg-amber-50/40 border-l-4 border-amber-400 rounded-r-xl transition-all duration-200"
+          id="phase-other-field">
+          <label for="phase-other-text"
+            class="block text-xs font-black text-amber-800 uppercase tracking-wider mb-2">Specify phase</label>
+          <input type="text" id="phase-other-text" placeholder="Describe your current phase..."
+            class="w-full bg-white border border-amber-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-100 outline-none transition-all duration-200 shadow-sm">
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="mb-8">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Q2</span>
+          <span class="text-sm font-bold text-gray-700">What did you accomplish this session?</span>
+        </div>
+        <textarea id="accomplishments" placeholder="Describe what you worked on and completed during this session..."
+          class="w-full bg-white border border-gray-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all duration-200 shadow-sm min-h-[120px]"></textarea>
+        <div class="text-right text-xs font-mono text-gray-400 mt-1"><span id="acc-count" class="font-bold">0</span>
+          chars</div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="mb-4">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Q3</span>
+          <span class="text-sm font-bold text-gray-700">Confidence in meeting the Week 15 deadline</span>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+          <div
+            class="flex justify-between w-full text-xs font-black uppercase tracking-widest text-gray-400 font-mono sm:flex-col sm:items-start sm:gap-1">
+            <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-red-400 rounded-full"></span>Not
+              confident</span>
+          </div>
+          <div class="flex gap-2.5" id="confidence-rating">
+            <button type="button"
+              class="rating-btn w-12 h-12 rounded-xl border border-gray-200 bg-white font-mono text-base font-bold text-gray-700 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/10 transition-all active:scale-95 flex items-center justify-center shadow-sm"
+              data-val="1" onclick="setRating(1)">1</button>
+            <button type="button"
+              class="rating-btn w-12 h-12 rounded-xl border border-gray-200 bg-white font-mono text-base font-bold text-gray-700 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/10 transition-all active:scale-95 flex items-center justify-center shadow-sm"
+              data-val="2" onclick="setRating(2)">2</button>
+            <button type="button"
+              class="rating-btn w-12 h-12 rounded-xl border border-gray-200 bg-white font-mono text-base font-bold text-gray-700 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/10 transition-all active:scale-95 flex items-center justify-center shadow-sm"
+              data-val="3" onclick="setRating(3)">3</button>
+            <button type="button"
+              class="rating-btn w-12 h-12 rounded-xl border border-gray-200 bg-white font-mono text-base font-bold text-gray-700 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/10 transition-all active:scale-95 flex items-center justify-center shadow-sm"
+              data-val="4" onclick="setRating(4)">4</button>
+            <button type="button"
+              class="rating-btn w-12 h-12 rounded-xl border border-gray-200 bg-white font-mono text-base font-bold text-gray-700 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/10 transition-all active:scale-95 flex items-center justify-center shadow-sm"
+              data-val="5" onclick="setRating(5)">5</button>
+          </div>
+          <div
+            class="flex justify-between w-full text-xs font-black uppercase tracking-widest text-gray-400 font-mono sm:flex-col sm:items-start sm:gap-1">
+            <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-green-400 rounded-full"></span>Very
+              confident</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Technical & Creative Check-in -->
+    <section class="bg-white border border-gray-200 p-6 md:p-8 rounded-2xl shadow-sm mb-8">
+      <div class="flex items-baseline gap-3 mb-6 border-b border-gray-100 pb-3">
+        <span class="text-4xl font-black text-gray-300 font-mono italic">02</span>
+        <h2 class="text-xl font-bold text-gray-900 tracking-tight">Technical & Creative Check-in</h2>
+      </div>
+
+      <!-- Q4 -->
+      <div class="mb-8">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Q4</span>
+          <span class="text-sm font-bold text-gray-700">Primary AI tools currently in use</span>
+        </div>
+
+        <div class="bg-gray-50/50 border border-gray-100 rounded-2xl p-5 mb-4 shadow-inner">
+          <div class="flex flex-wrap gap-2" id="tools-list">
+            <!-- Dynamic Tags Rendered Here -->
+            <p class="text-xs font-mono text-gray-400 italic">No tools added yet. Use the input below to add tools.</p>
+          </div>
+        </div>
+
+        <div class="flex gap-2.5">
+          <input type="text" id="tool-input" placeholder="e.g. ChatGPT, Suno, Teachable Machine"
+            onkeydown="if(event.key==='Enter'){event.preventDefault();addTool();}"
+            class="flex-1 bg-white border border-gray-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all duration-200 shadow-sm">
+          <button type="button" onclick="addTool()"
+            class="px-5 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-sm transition-all active:scale-95 shadow-sm">
+            + Add tool
+          </button>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="mb-8">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Q5</span>
+          <span class="text-sm font-bold text-gray-700">Are the tools producing the expected results?</span>
+        </div>
+
+        <div class="flex gap-3">
+          <div class="relative">
+            <input type="radio" name="tools-working" id="tw-yes" value="Yes"
+              class="yn-radio absolute opacity-0 w-0 h-0">
+            <label for="tw-yes"
+              class="inline-block px-6 py-2.5 bg-white border border-gray-200 rounded-full hover:border-gray-400 cursor-pointer text-sm text-gray-600 font-bold transition-all duration-200 select-none shadow-sm">Yes</label>
+          </div>
+          <div class="relative">
+            <input type="radio" name="tools-working" id="tw-partial" value="Partially"
+              class="yn-radio absolute opacity-0 w-0 h-0">
+            <label for="tw-partial"
+              class="inline-block px-6 py-2.5 bg-white border border-gray-200 rounded-full hover:border-gray-400 cursor-pointer text-sm text-gray-600 font-bold transition-all duration-200 select-none shadow-sm">Partially</label>
+          </div>
+          <div class="relative">
+            <input type="radio" name="tools-working" id="tw-no" value="No" class="yn-radio absolute opacity-0 w-0 h-0">
+            <label for="tw-no"
+              class="inline-block px-6 py-2.5 bg-white border border-gray-200 rounded-full hover:border-gray-400 cursor-pointer text-sm text-gray-600 font-bold transition-all duration-200 select-none shadow-sm">No</label>
+          </div>
+        </div>
+
+        <!-- Conditional Field -->
+        <div class="hidden mt-4 p-4 bg-amber-50/40 border-l-4 border-amber-400 rounded-r-xl transition-all duration-200"
+          id="tools-issue-field">
+          <label for="tools-issue" class="block text-xs font-black text-amber-800 uppercase tracking-wider mb-2">Main
+            issue (e.g. biased results, low accuracy, confusing prompts)</label>
+          <textarea id="tools-issue" placeholder="Describe the issue..."
+            class="w-full bg-white border border-amber-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-100 outline-none transition-all duration-200 shadow-sm min-h-[90px]"></textarea>
+        </div>
+      </div>
+
+      <!-- Q6 -->
+      <div class="mb-4">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Q6</span>
+          <span class="text-sm font-bold text-gray-700">Have you changed your project "Seed" or adjusted your
+            goal?</span>
+        </div>
+
+        <div class="flex gap-3">
+          <div class="relative">
+            <input type="radio" name="seed-changed" id="sc-yes" value="Yes" class="yn-radio absolute opacity-0 w-0 h-0">
+            <label for="sc-yes"
+              class="inline-block px-6 py-2.5 bg-white border border-gray-200 rounded-full hover:border-gray-400 cursor-pointer text-sm text-gray-600 font-bold transition-all duration-200 select-none shadow-sm">Yes</label>
+          </div>
+          <div class="relative">
+            <input type="radio" name="seed-changed" id="sc-no" value="No" class="yn-radio absolute opacity-0 w-0 h-0">
+            <label for="sc-no"
+              class="inline-block px-6 py-2.5 bg-white border border-gray-200 rounded-full hover:border-gray-400 cursor-pointer text-sm text-gray-600 font-bold transition-all duration-200 select-none shadow-sm">No</label>
+          </div>
+        </div>
+
+        <!-- Conditional Field -->
+        <div class="hidden mt-4 p-4 bg-amber-50/40 border-l-4 border-amber-400 rounded-r-xl transition-all duration-200"
+          id="seed-change-field">
+          <label for="seed-change-reason"
+            class="block text-xs font-black text-amber-800 uppercase tracking-wider mb-2">What caused the
+            change?</label>
+          <textarea id="seed-change-reason" placeholder="Describe what prompted the change..."
+            class="w-full bg-white border border-amber-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-100 outline-none transition-all duration-200 shadow-sm min-h-[90px]"></textarea>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- Section 4: Roadmap to the Showcase -->
+    <section class="bg-white border border-gray-200 p-6 md:p-8 rounded-2xl shadow-sm mb-8">
+      <div class="flex items-baseline gap-3 mb-6 border-b border-gray-100 pb-3">
+        <span class="text-4xl font-black text-gray-300 font-mono italic">04</span>
+        <h2 class="text-xl font-bold text-gray-900 tracking-tight">Roadmap to the Showcase</h2>
+      </div>
+
+      <!-- Q9 -->
+      <div class="mb-8">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Q9</span>
+          <span class="text-sm font-bold text-gray-700">Three most important tasks before the next session</span>
+        </div>
+
+        <div class="space-y-4">
+          <div class="relative flex items-center">
+            <span class="absolute left-4 text-xs font-black text-blue-500 font-mono">1</span>
+            <input type="text" id="task1" placeholder="Most important task..."
+              class="w-full bg-white border border-gray-200 pl-10 pr-4 py-3 rounded-xl text-gray-900 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all duration-200 shadow-sm">
+          </div>
+          <div class="relative flex items-center">
+            <span class="absolute left-4 text-xs font-black text-blue-500 font-mono">2</span>
+            <input type="text" id="task2" placeholder="Second task..."
+              class="w-full bg-white border border-gray-200 pl-10 pr-4 py-3 rounded-xl text-gray-900 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all duration-200 shadow-sm">
+          </div>
+          <div class="relative flex items-center">
+            <span class="absolute left-4 text-xs font-black text-blue-500 font-mono">3</span>
+            <input type="text" id="task3" placeholder="Third task..."
+              class="w-full bg-white border border-gray-200 pl-10 pr-4 py-3 rounded-xl text-gray-900 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all duration-200 shadow-sm">
+          </div>
+        </div>
+      </div>
+
+      <!-- Q10 -->
+      <div class="mb-4">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Q10</span>
+          <span class="text-sm font-bold text-gray-700">One specific question to ask the instructor today</span>
+        </div>
+        <textarea id="instructor-question" placeholder="What do you need to ask to move forward?"
+          class="w-full bg-white border border-gray-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all duration-200 shadow-sm min-h-[90px]"></textarea>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Sticky Footer Submit Bar -->
+  <footer
+    class="sticky bottom-0 bg-white border-t border-gray-200 py-4 px-6 md:px-8 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4 z-50">
+    <div class="flex items-center gap-2.5">
+      <span class="w-2.5 h-2.5 rounded-full bg-gray-300 shadow-sm transition-all duration-300" id="status-dot"></span>
+      <span class="status-msg text-xs font-mono font-bold text-gray-500" id="status-msg">Ready to submit</span>
+    </div>
+    <button type="button"
+      class="submit-btn w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-black px-8 py-3.5 rounded-xl shadow-md transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2"
+      id="submit-btn" onclick="submitForm()">
+      <span>Save Progress Notes →</span>
+    </button>
+  </footer>
+
+  <script>
+    /* ══ SUPABASE CONFIG ══ */
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+    const TABLE = 'project_progress_notes';
+
+    let confidenceRating = null;
+    let toolsList = [];
+
+    document.getElementById('session-date').value = new Date().toISOString().split('T')[0];
+
+    const accTextarea = document.getElementById('accomplishments');
+    accTextarea.addEventListener('input', () => {
+      document.getElementById('acc-count').textContent = accTextarea.value.length;
+    });
+
+    function setRating(val) {
+      confidenceRating = val;
+      document.querySelectorAll('.rating-btn').forEach(btn => {
+        const isSelected = parseInt(btn.dataset.val) === val;
+        if (isSelected) {
+          btn.className = 'rating-btn w-12 h-12 rounded-xl border border-blue-600 bg-blue-600 font-mono text-base font-black text-white shadow-md shadow-blue-100 scale-105 transition-all active:scale-95 flex items-center justify-center';
+        } else {
+          btn.className = 'rating-btn w-12 h-12 rounded-xl border border-gray-200 bg-white font-mono text-base font-bold text-gray-700 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/10 transition-all active:scale-95 flex items-center justify-center shadow-sm';
+        }
+      });
+    }
+
+    function addTool() {
+      const input = document.getElementById('tool-input');
+      const val = input.value.trim();
+      if (!val) return;
+      toolsList.push(val);
+      renderTags();
+      input.value = '';
+      input.focus();
+    }
+
+    function removeTool(i) {
+      toolsList.splice(i, 1);
+      renderTags();
+    }
+
+    function renderTags() {
+      const container = document.getElementById('tools-list');
+      if (toolsList.length === 0) {
+        container.innerHTML = `<p class="text-xs font-mono text-gray-400 italic">No tools added yet. Use the input below to add tools.</p>`;
+        return;
+      }
+      container.innerHTML = toolsList.map((t, i) =>
+        `<span class="inline-flex items-center gap-1.5 pl-3 pr-2.5 py-1.5 bg-white border border-gray-200 rounded-full text-xs font-bold font-mono text-gray-600 shadow-sm transition-all duration-200 hover:border-gray-300">${t}<button type="button" onclick="removeTool(${i})" class="text-gray-400 hover:text-red-500 font-black text-sm ml-1 line-height-1 focus:outline-none transition-colors" title="Remove">×</button></span>`
+      ).join('');
+    }
+
+    document.querySelectorAll('input[name="tools-working"]').forEach(r => {
+      r.addEventListener('change', () => {
+        const field = document.getElementById('tools-issue-field');
+        if (r.value !== 'Yes') {
+          field.classList.remove('hidden');
+        } else {
+          field.classList.add('hidden');
+        }
+      });
+    });
+
+    document.querySelectorAll('input[name="seed-changed"]').forEach(r => {
+      r.addEventListener('change', () => {
+        const field = document.getElementById('seed-change-field');
+        if (r.value === 'Yes') {
+          field.classList.remove('hidden');
+        } else {
+          field.classList.add('hidden');
+        }
+      });
+    });
+
+    document.getElementById('phase-other').addEventListener('change', () => {
+      document.getElementById('phase-other-field').classList.remove('hidden');
+    });
+
+    document.querySelectorAll('input[name="phase"]:not(#phase-other)').forEach(r => {
+      r.addEventListener('change', () => {
+        document.getElementById('phase-other-field').classList.add('hidden');
+      });
+    });
+
+    function getVal(id) { return document.getElementById(id).value.trim(); }
+
+    // Overriding check to work with newly designed radios
+    function getRadio(name) {
+      const checked = document.querySelector(`input[name="${name}"]:checked`);
+      return checked ? checked.value : null;
+    }
+
+    function setStatus(msg, type = '') {
+      const el = document.getElementById('status-msg');
+      const dot = document.getElementById('status-dot');
+      el.textContent = msg;
+
+      el.className = 'status-msg text-xs font-mono font-bold';
+      dot.className = 'w-2.5 h-2.5 rounded-full transition-all duration-300';
+
+      if (type === 'success') {
+        el.classList.add('text-green-600');
+        dot.classList.add('bg-green-500', 'shadow-[0_0_10px_rgba(34,197,94,0.5)]');
+      } else if (type === 'error') {
+        el.classList.add('text-red-500');
+        dot.classList.add('bg-red-500', 'shadow-[0_0_10px_rgba(239,68,68,0.5)]');
+      } else if (type === 'loading') {
+        el.classList.add('text-blue-600');
+        dot.classList.add('bg-blue-500', 'animate-ping');
+      } else {
+        el.classList.add('text-gray-500');
+        dot.classList.add('bg-gray-300');
+      }
+    }
+
+    async function submitForm() {
+      const phase = getRadio('phase');
+      const phaseOther = getVal('phase-other-text');
+
+      const payload = {
+        student_name: getVal('student-name'),
+        project_title: getVal('project-title'),
+        session_date: getVal('session-date') || null,
+        phase: phase === 'Other' ? ('Other: ' + phaseOther) : phase,
+        accomplishments: getVal('accomplishments'),
+        confidence_rating: confidenceRating,
+        ai_tools: toolsList,
+        tools_working: getRadio('tools-working'),
+        tools_issue: getVal('tools-issue'),
+        seed_changed: getRadio('seed-changed'),
+        seed_change_reason: getVal('seed-change-reason'),
+        bias_identified: getVal('bias-identified'),
+        responsible_use: getVal('responsible-use'),
+        task_1: getVal('task1'),
+        task_2: getVal('task2'),
+        task_3: getVal('task3'),
+        instructor_question: getVal('instructor-question'),
+      };
+
+      if (!payload.student_name) { setStatus('⚠ Student name required', 'error'); return; }
+      if (!payload.project_title) { setStatus('⚠ Project title required', 'error'); return; }
+
+      setStatus('Saving...', 'loading');
+      document.getElementById('submit-btn').disabled = true;
+
+      try {
+        const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!resp.ok) {
+          throw new Error(`HTTP ${resp.status}`);
+        }
+
+        setStatus('✓ Saved successfully', 'success');
+      } catch (e) {
+        setStatus('✗ ' + e.message, 'error');
+      } finally {
+        document.getElementById('submit-btn').disabled = false;
+      }
+    }
+  </script>
+</body>
+
+</html>
