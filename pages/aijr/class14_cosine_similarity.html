@@ -7,12 +7,15 @@
     <title>Cosine Similarity: Vector Spaces</title>
     <!-- Tailwind CSS for UI -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Three.js Core -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- Three.js OrbitControls -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <!-- CSS2DRenderer for Text Labels -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
+    <!-- Three.js via ES Modules (importmap) -->
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/"
+      }
+    }
+    </script>
     <style>
         .axis-label {
             color: #9ca3af; /* text-gray-400 */
@@ -138,8 +141,11 @@
         </div>
     </div>
 
-    <script>
-        window.onload = function () {
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+        window.addEventListener('DOMContentLoaded', function () {
             // --- UI Elements ---
             const slideAction = document.getElementById('slideAction');
             const slideComedy = document.getElementById('slideComedy');
@@ -173,7 +179,7 @@
             container.appendChild(renderer.domElement);
 
             // CSS2DRenderer for text labels
-            const labelRenderer = new THREE.CSS2DRenderer();
+            const labelRenderer = new CSS2DRenderer();
             labelRenderer.setSize(container.clientWidth, container.clientHeight);
             labelRenderer.domElement.style.position = 'absolute';
             labelRenderer.domElement.style.top = '0px';
@@ -182,7 +188,7 @@
 
             // Controls setup
             // Attach OrbitControls to the CSS2D domElement so we can still drag the canvas
-            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            const controls = new OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
             controls.dampingFactor = 0.05;
             controls.target.set(2.5, 2.5, 2.5); // Look at the center of the 5x5x5 box
@@ -215,7 +221,7 @@
                 const div = document.createElement('div');
                 div.className = 'axis-label';
                 div.textContent = text;
-                const label = new THREE.CSS2DObject(div);
+                const label = new CSS2DObject(div);
                 label.position.copy(position);
                 scene.add(label);
             }
@@ -349,7 +355,7 @@
             }, 50);
 
             animate();
-        };
+        });
     </script>
 </body>
 
