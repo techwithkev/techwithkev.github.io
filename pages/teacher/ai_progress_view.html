@@ -1340,11 +1340,24 @@
         const ld = defRecs[name]?.[0];
         const conf = lp?.confidence_rating;
         const project = lp?.project_title || ld?.project_title || '—';
+
+        // Calculate latest update date
+        let latestDateStr = '';
+        const lpTime = lp ? new Date(lp.created_at).getTime() : 0;
+        const ldTime = ld ? new Date(ld.created_at).getTime() : 0;
+        if (lpTime || ldTime) {
+          const latestTime = Math.max(lpTime, ldTime);
+          latestDateStr = new Date(latestTime).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
         return `
         <div class="student-item ${activeStudent === name ? 'active' : ''}" data-name="${esc(name)}" onclick="selectStudent(this.getAttribute('data-name'))">
           <div class="s-avatar">${initials(name)}</div>
           <div class="s-info">
-            <div class="s-name">${name}</div>
+            <div class="s-name" style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px;">
+              <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${name}</span>
+              ${latestDateStr ? `<span style="font-size: 10px; font-family: var(--font-m); color: var(--ink3); font-weight: normal; flex-shrink: 0;">${latestDateStr}</span>` : ''}
+            </div>
             <div class="s-project">${project}</div>
           </div>
           <div class="s-badges">
