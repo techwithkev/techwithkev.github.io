@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latent Space Interpolation — AI/ML Visualization</title>
+    <meta name="description" content="An interactive visualization of latent space interpolation in generative models. Drag a point through the latent space to smoothly morph between generated face expressions.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* ─── Custom Styles ────────────────────────────────────────── */
+        .step-block {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .step-block:last-child { border-bottom: none; }
+        .step-num {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #7c3aed;
+            color: white;
+            font-size: 10px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1px;
+        }
+        .math-chip {
+            display: inline-block;
+            background: #f5f3ff;
+            border: 1px solid #c4b5fd;
+            color: #5b21b6;
+            border-radius: 4px;
+            padding: 1px 6px;
+            font-family: monospace;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .math-chip.gold {
+            background: #fffbeb;
+            border-color: #fcd34d;
+            color: #92400e;
+        }
+        details summary {
+            cursor: pointer;
+            list-style: none;
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            padding: 6px 0;
+        }
+        details summary::-webkit-details-marker { display: none; }
+        details[open] summary { color: #7c3aed; }
+
+        /* ─── Latent Grid ──────────────────────────────────────────── */
+        #latent-grid {
+            cursor: crosshair;
+            touch-action: none;
+            border-radius: 12px;
+        }
+
+        /* ─── Endpoint Thumbnails ──────────────────────────────────── */
+        .endpoint-canvas {
+            border-radius: 10px;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        /* ─── Morph Preview ────────────────────────────────────────── */
+        #morph-canvas {
+            border-radius: 16px;
+            box-shadow: 0 0 40px rgba(124, 58, 237, 0.3);
+        }
+
+        /* ─── Interpolation Axis Badges ───────────────────────────── */
+        .axis-badge {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            white-space: nowrap;
+        }
+
+        /* ─── Dimension Readout Bars ──────────────────────────────── */
+        .dim-bar-track {
+            flex: 1;
+            height: 6px;
+            background: #1e293b;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .dim-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.12s ease;
+        }
+
+        /* ─── Slider Styling ──────────────────────────────────────── */
+        #interpolation-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: linear-gradient(to right, #7c3aed, #ec4899);
+            outline: none;
+            cursor: pointer;
+        }
+        #interpolation-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #7c3aed;
+            box-shadow: 0 2px 8px rgba(124,58,237,0.4);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        #interpolation-slider::-webkit-slider-thumb:active {
+            transform: scale(1.2);
+        }
+        #interpolation-slider::-moz-range-thumb {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #7c3aed;
+            box-shadow: 0 2px 8px rgba(124,58,237,0.4);
+            cursor: pointer;
+        }
+
+        /* ─── Pulse hint ───────────────────────────────────────────── */
+        .pulse-hint {
+            animation: pulseHint 2s ease-in-out infinite;
+        }
+        @keyframes pulseHint {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* ─── 2D grid crosshair glow ───────────────────────────────── */
+        .grid-point-glow {
+            filter: drop-shadow(0 0 8px rgba(167, 139, 250, 0.9));
+        }
+
+        /* ─── Latent dim readout tag ───────────────────────────────── */
+        .dim-tag {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            background: rgba(124,58,237,0.08);
+            border: 1px solid rgba(124,58,237,0.15);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+
+        <!-- Navigation -->
+        <nav class="mb-6 pt-4 no-print">
+            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-violet-600 transition-colors" style="text-decoration: none;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Course Hub
+            </a>
+        </nav>
+
+        <!-- Header -->
+        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <h1 class="text-4xl font-black tracking-tight text-gray-900">LATENT SPACE <span class="text-violet-600">INTERPOLATION</span></h1>
+                <p class="text-gray-500 font-medium italic">How generative models navigate the geometry of learned representations</p>
+            </div>
+            <div id="status-badge" class="px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-white border border-gray-200 text-gray-400 shadow-sm transition-all duration-300">
+                Drag the point
+            </div>
+        </header>
+
+        <!-- Main Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+
+            <!-- Left Panel: Controls & Explanation -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-5 h-fit">
+
+                <!-- The Concept -->
+                <div>
+                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-tighter mb-3 border-b border-gray-100 pb-2">The Concept</h2>
+                    <p class="text-sm text-gray-600 leading-relaxed mb-3">
+                        A <strong>Generative Model</strong> (like a VAE or GAN) learns to compress images into a compact <em>latent vector</em> — a point in a high-dimensional space.
+                    </p>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        Because this space is <strong>continuous and structured</strong>, you can move a point between two latent codes and decode each position to get a smooth visual morph.
+                    </p>
+                </div>
+
+                <!-- Endpoint Selector -->
+                <div>
+                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-tighter mb-3 border-b border-gray-100 pb-2">Endpoint Faces</h2>
+                    <div class="grid grid-cols-2 gap-3">
+                        <!-- Face A -->
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="text-[10px] font-black uppercase text-violet-600 tracking-wider">z_A (Origin)</div>
+                            <canvas id="canvas-a" width="96" height="96" class="endpoint-canvas" style="border-color: #7c3aed;"></canvas>
+                            <select id="face-a-select" class="text-xs font-bold border border-gray-200 rounded-lg px-2 py-1.5 bg-white text-gray-700 w-full" onchange="onEndpointChange()">
+                                <option value="happy">😊 Happy</option>
+                                <option value="surprised">😮 Surprised</option>
+                                <option value="wink">😉 Winking</option>
+                            </select>
+                        </div>
+                        <!-- Face B -->
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="text-[10px] font-black uppercase text-pink-500 tracking-wider">z_B (Target)</div>
+                            <canvas id="canvas-b" width="96" height="96" class="endpoint-canvas" style="border-color: #ec4899;"></canvas>
+                            <select id="face-b-select" class="text-xs font-bold border border-gray-200 rounded-lg px-2 py-1.5 bg-white text-gray-700 w-full" onchange="onEndpointChange()">
+                                <option value="sad">😢 Sad</option>
+                                <option value="angry">😠 Angry</option>
+                                <option value="sleepy">😴 Sleepy</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Latent Dimension Readout -->
+                <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xs font-black uppercase text-violet-600 tracking-widest">Latent Vector z:</span>
+                        <span id="t-label" class="text-sm font-mono font-black text-gray-800">t = 0.00</span>
+                    </div>
+                    <div class="space-y-2.5" id="dim-readout">
+                        <!-- rendered by JS -->
+                    </div>
+                </div>
+
+                <!-- Interpolation Slider -->
+                <div>
+                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-tighter mb-3 border-b border-gray-100 pb-2">Linear Interpolation (1D)</h2>
+                    <p class="text-xs text-gray-400 mb-3">Drag the slider or the point on the 2D map to move through latent space.</p>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-[10px] font-black text-violet-600 uppercase">z_A</span>
+                        <input type="range" id="interpolation-slider" min="0" max="1" step="0.005" value="0" oninput="onSliderChange()">
+                        <span class="text-[10px] font-black text-pink-500 uppercase">z_B</span>
+                    </div>
+                </div>
+
+                <!-- Narrative -->
+                <div id="narrativeBox" class="text-sm font-medium text-gray-700 bg-gray-100 p-3 rounded-lg border border-gray-200 transition-all duration-300 leading-relaxed">
+                    Drag the slider or the <strong class="text-violet-600">purple point</strong> on the latent map to interpolate between the two faces.
+                </div>
+
+                <!-- How it Works -->
+                <details open>
+                    <summary>▶ How the math works</summary>
+                    <div class="mt-2 text-xs text-gray-600 leading-relaxed">
+                        <div class="step-block">
+                            <div class="step-num">1</div>
+                            <div>The model encodes Image A → <span class="math-chip gold">z_A</span> and Image B → <span class="math-chip gold">z_B</span>, two vectors in latent space.</div>
+                        </div>
+                        <div class="step-block">
+                            <div class="step-num">2</div>
+                            <div>Pick a parameter <span class="math-chip">t ∈ [0,1]</span> along the path.</div>
+                        </div>
+                        <div class="step-block">
+                            <div class="step-num">3</div>
+                            <div>Compute: <span class="math-chip">z(t) = (1−t)·z_A + t·z_B</span></div>
+                        </div>
+                        <div class="step-block">
+                            <div class="step-num">4</div>
+                            <div>Decode <span class="math-chip gold">z(t)</span> through the generator/decoder to get the interpolated image.</div>
+                        </div>
+                        <div class="step-block">
+                            <div class="step-num">5</div>
+                            <div>Sweeping t from 0→1 gives a <strong>smooth visual morph</strong> because the latent space is continuous.</div>
+                        </div>
+                    </div>
+                </details>
+
+            </div>
+
+            <!-- Right Panel: Visualization -->
+            <div class="lg:col-span-2 bg-slate-900 border-2 border-slate-800 p-6 rounded-2xl shadow-inner flex flex-col gap-6">
+
+                <!-- Top: Morph Preview + 2D Grid -->
+                <div class="flex flex-col md:flex-row gap-6 items-center">
+
+                    <!-- Morphed Image -->
+                    <div class="flex flex-col items-center gap-3 flex-shrink-0">
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest font-mono">Decoded Output</p>
+                        <div class="relative">
+                            <canvas id="morph-canvas" width="200" height="200"></canvas>
+                            <div id="morph-label" class="absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-violet-600 text-white shadow-lg">
+                                z_A
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2D Latent Grid -->
+                    <div class="flex-1 flex flex-col items-center gap-3 w-full">
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest font-mono">2D Latent Space Map</p>
+                        <!-- Axis labels -->
+                        <div class="relative w-full" style="max-width: 320px;">
+                            <!-- Top axis label -->
+                            <div class="flex justify-between text-[9px] font-black uppercase tracking-wider text-slate-500 mb-1 px-1">
+                                <span class="axis-badge bg-slate-800 text-slate-400">← more z₂</span>
+                                <span class="axis-badge bg-slate-800 text-slate-400">z₂ more →</span>
+                            </div>
+                            <!-- Grid Canvas -->
+                            <canvas id="latent-grid" width="320" height="260" class="w-full"></canvas>
+                            <!-- Bottom axis label -->
+                            <div class="flex justify-between text-[9px] font-black uppercase tracking-wider text-slate-500 mt-1 px-1">
+                                <span class="axis-badge bg-violet-900/40 text-violet-400">z_A origin</span>
+                                <span class="axis-badge bg-pink-900/40 text-pink-400">z_B target</span>
+                            </div>
+                        </div>
+
+                        <!-- Latent dims panel -->
+                        <div class="w-full max-w-xs bg-slate-800/60 rounded-xl p-4 border border-slate-700/50 mt-1">
+                            <div class="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-3">Latent Dimensions (z₁–z₄)</div>
+                            <div class="space-y-2" id="dim-bars">
+                                <!-- rendered by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom: Interpolation Path Detail -->
+                <div class="pt-5 border-t border-slate-800">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h3 class="text-sm font-black uppercase tracking-wider text-violet-400">Interpolation Path</h3>
+                            <p class="text-xs text-slate-400">Each column shows the decoded image at that t value along the path</p>
+                        </div>
+                        <span id="path-t-badge" class="px-3 py-1 rounded-full text-[10px] font-black bg-violet-900/40 border border-violet-700/40 text-violet-300 font-mono">t = 0.000</span>
+                    </div>
+
+                    <!-- Path strip of mini-frames -->
+                    <div class="flex items-center gap-2 overflow-x-auto pb-2" id="path-strip">
+                        <!-- rendered by JS -->
+                    </div>
+                </div>
+
+                <!-- Legend -->
+                <div class="pt-4 border-t border-slate-800 flex flex-wrap gap-x-6 gap-y-2 text-[10px] uppercase font-bold text-slate-500 justify-center">
+                    <div class="flex items-center gap-2">
+                        <span class="inline-block w-3 h-3 rounded-full" style="background:#7c3aed;"></span>
+                        z_A — Origin face
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="inline-block w-3 h-3 rounded-full" style="background:#ec4899;"></span>
+                        z_B — Target face
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="inline-block w-4 h-1 rounded" style="background: linear-gradient(to right, #7c3aed, #ec4899);"></span>
+                        Interpolation path z(t)
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="inline-block w-3 h-3 rounded-full border-2 border-white" style="background:#a78bfa;"></span>
+                        Current position
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+    /* ─── FACE DEFINITIONS ────────────────────────────────────────────────── */
+    // Each face is defined by a set of interpolatable parameters
+    // These are the "latent codes" that the model has learned
+
+    const FACE_PARAMS = {
+        // FACE A OPTIONS
+        happy: {
+            label: 'Happy',
+            emoji: '😊',
+            // Latent vector (4D for display)
+            z: [0.9, 0.8, 0.1, 0.2],
+            // Visual parameters for canvas rendering
+            skinTone: [255, 218, 168],
+            eyeOpenness: 0.7,       // 0=closed, 1=fully open
+            eyebrowRaise: 0.7,      // 0=low/angry, 1=high/raised
+            mouthCurve: 1.0,        // -1=frown, 0=neutral, 1=smile
+            mouthOpen: 0.3,         // 0=closed, 1=open
+            cheekBlush: 0.6,        // 0=none, 1=strong
+            eyeSquint: 0.3,         // 0=normal, 1=squinted from smile
+            pupilSize: 0.5,
+            eyeShineX: -0.2,
+            eyeShineY: -0.2,
+        },
+        surprised: {
+            label: 'Surprised',
+            emoji: '😮',
+            z: [0.2, 0.9, 0.7, 0.1],
+            skinTone: [255, 218, 168],
+            eyeOpenness: 1.0,
+            eyebrowRaise: 1.0,
+            mouthCurve: 0.0,
+            mouthOpen: 0.8,
+            cheekBlush: 0.0,
+            eyeSquint: 0.0,
+            pupilSize: 0.7,
+            eyeShineX: -0.25,
+            eyeShineY: -0.25,
+        },
+        wink: {
+            label: 'Winking',
+            emoji: '😉',
+            z: [0.6, 0.5, 0.2, 0.8],
+            skinTone: [255, 218, 168],
+            eyeOpenness: 0.65,
+            eyebrowRaise: 0.6,
+            mouthCurve: 0.75,
+            mouthOpen: 0.15,
+            cheekBlush: 0.4,
+            eyeSquint: 0.2,
+            pupilSize: 0.45,
+            eyeShineX: -0.2,
+            eyeShineY: -0.2,
+            leftEyeClosed: true,  // special: left eye is closed
+        },
+        // FACE B OPTIONS
+        sad: {
+            label: 'Sad',
+            emoji: '😢',
+            z: [0.1, 0.2, 0.9, 0.8],
+            skinTone: [240, 210, 185],
+            eyeOpenness: 0.55,
+            eyebrowRaise: 0.2,
+            mouthCurve: -1.0,
+            mouthOpen: 0.15,
+            cheekBlush: 0.0,
+            eyeSquint: 0.0,
+            pupilSize: 0.4,
+            eyeShineX: -0.2,
+            eyeShineY: -0.2,
+            teardrop: true,
+        },
+        angry: {
+            label: 'Angry',
+            emoji: '😠',
+            z: [0.05, 0.05, 0.8, 0.9],
+            skinTone: [240, 190, 170],
+            eyeOpenness: 0.6,
+            eyebrowRaise: -0.1,
+            mouthCurve: -0.7,
+            mouthOpen: 0.05,
+            cheekBlush: 0.0,
+            eyeSquint: 0.5,
+            pupilSize: 0.35,
+            eyeShineX: -0.2,
+            eyeShineY: -0.2,
+            angryBrow: true,
+        },
+        sleepy: {
+            label: 'Sleepy',
+            emoji: '😴',
+            z: [0.4, 0.1, 0.3, 0.9],
+            skinTone: [240, 215, 185],
+            eyeOpenness: 0.15,
+            eyebrowRaise: 0.3,
+            mouthCurve: 0.2,
+            mouthOpen: 0.25,
+            cheekBlush: 0.2,
+            eyeSquint: 0.0,
+            pupilSize: 0.3,
+            eyeShineX: -0.2,
+            eyeShineY: -0.2,
+            zzz: true,
+        },
+    };
+
+    const DIM_COLORS = ['#a78bfa', '#34d399', '#f472b6', '#fbbf24'];
+    const DIM_NAMES = ['Expression', 'Emotion', 'Arousal', 'Valence'];
+
+    /* ─── STATE ─────────────────────────────────────────────────────────── */
+    let t = 0;            // interpolation parameter [0,1]
+    let gridX = 0;        // 2D grid position [0,1]
+    let gridY = 0.5;      // 2D grid position [0,1]
+    let isDraggingGrid = false;
+    let isDraggingSlider = false;
+    let faceA = FACE_PARAMS['happy'];
+    let faceB = FACE_PARAMS['sad'];
+
+    /* ─── INTERPOLATION ──────────────────────────────────────────────────── */
+    function lerp(a, b, t) { return a + (b - a) * t; }
+    function lerpColor(c1, c2, t) {
+        return [
+            Math.round(lerp(c1[0], c2[0], t)),
+            Math.round(lerp(c1[1], c2[1], t)),
+            Math.round(lerp(c1[2], c2[2], t)),
+        ];
+    }
+
+    function getInterpolatedParams(t) {
+        const a = faceA;
+        const b = faceB;
+        // Smoothstep for slightly more organic feel
+        const s = t * t * (3 - 2 * t);
+        return {
+            skinTone: lerpColor(a.skinTone, b.skinTone, s),
+            eyeOpenness: lerp(a.eyeOpenness, b.eyeOpenness, s),
+            eyebrowRaise: lerp(a.eyebrowRaise, b.eyebrowRaise, s),
+            mouthCurve: lerp(a.mouthCurve, b.mouthCurve, s),
+            mouthOpen: lerp(a.mouthOpen, b.mouthOpen, s),
+            cheekBlush: lerp(a.cheekBlush, b.cheekBlush, s),
+            eyeSquint: lerp(a.eyeSquint, b.eyeSquint, s),
+            pupilSize: lerp(a.pupilSize, b.pupilSize, s),
+            eyeShineX: lerp(a.eyeShineX || -0.2, b.eyeShineX || -0.2, s),
+            eyeShineY: lerp(a.eyeShineY || -0.2, b.eyeShineY || -0.2, s),
+            teardrop: t > 0.5 && b.teardrop,
+            zzz: t > 0.6 && b.zzz,
+            angryBrow: t > 0.5 && b.angryBrow,
+            leftEyeClosed: a.leftEyeClosed ? (t < 0.3) : false,
+        };
+    }
+
+    /* ─── FACE DRAWING ENGINE ────────────────────────────────────────────── */
+    function drawFace(ctx, params, size) {
+        const cx = size / 2;
+        const cy = size / 2;
+        const r = size * 0.38;
+        const [sr, sg, sb] = params.skinTone;
+
+        ctx.clearRect(0, 0, size, size);
+
+        // ── Shadow ──
+        ctx.save();
+        ctx.shadowColor = 'rgba(0,0,0,0.18)';
+        ctx.shadowBlur = size * 0.08;
+        ctx.shadowOffsetY = size * 0.03;
+
+        // ── Face circle ──
+        const faceGrad = ctx.createRadialGradient(cx - r*0.2, cy - r*0.2, r*0.1, cx, cy, r*1.1);
+        faceGrad.addColorStop(0, `rgb(${Math.min(sr+25,255)},${Math.min(sg+20,255)},${Math.min(sb+15,255)})`);
+        faceGrad.addColorStop(1, `rgb(${Math.max(sr-30,0)},${Math.max(sg-25,0)},${Math.max(sb-20,0)})`);
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, r, r * 1.05, 0, 0, Math.PI * 2);
+        ctx.fillStyle = faceGrad;
+        ctx.fill();
+        ctx.restore();
+
+        // ── Cheek blush ──
+        if (params.cheekBlush > 0.05) {
+            const blushAlpha = params.cheekBlush * 0.35;
+            ctx.save();
+            ctx.globalAlpha = blushAlpha;
+            ctx.beginPath();
+            ctx.ellipse(cx - r * 0.5, cy + r * 0.15, r * 0.28, r * 0.18, 0, 0, Math.PI * 2);
+            ctx.fillStyle = '#f87171';
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(cx + r * 0.5, cy + r * 0.15, r * 0.28, r * 0.18, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // ── Eyes ──
+        const eyeY = cy - r * 0.15;
+        const eyeOffX = r * 0.32;
+        const eyeH = r * 0.22 * Math.max(0.08, params.eyeOpenness - params.eyeSquint * 0.5);
+        const eyeW = r * 0.22;
+
+        function drawEye(ex, closed = false) {
+            const actualH = closed ? eyeH * 0.08 : eyeH;
+
+            // White of eye
+            ctx.save();
+            ctx.beginPath();
+            ctx.ellipse(ex, eyeY, eyeW, Math.max(actualH, eyeH * 0.08), 0, 0, Math.PI * 2);
+            ctx.fillStyle = closed ? `rgb(${sr},${sg},${sb})` : 'white';
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+            ctx.lineWidth = size * 0.008;
+            ctx.stroke();
+            ctx.restore();
+
+            if (!closed) {
+                // Iris
+                const irisR = eyeW * 0.62 * params.pupilSize * 2;
+                const irisGrad = ctx.createRadialGradient(ex, eyeY, 0, ex, eyeY, irisR);
+                irisGrad.addColorStop(0, '#1a1a2e');
+                irisGrad.addColorStop(0.5, '#3b4f8a');
+                irisGrad.addColorStop(1, '#1a1a2e');
+                ctx.save();
+                ctx.beginPath();
+                ctx.ellipse(ex, eyeY, eyeW, Math.max(actualH, 1), 0, 0, Math.PI * 2);
+                ctx.clip();
+                ctx.beginPath();
+                ctx.arc(ex, eyeY, irisR, 0, Math.PI * 2);
+                ctx.fillStyle = irisGrad;
+                ctx.fill();
+                // Pupil
+                ctx.beginPath();
+                ctx.arc(ex, eyeY, irisR * 0.45, 0, Math.PI * 2);
+                ctx.fillStyle = '#050510';
+                ctx.fill();
+                // Shine
+                ctx.beginPath();
+                ctx.arc(ex + irisR * params.eyeShineX, eyeY + irisR * params.eyeShineY, irisR * 0.22, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255,255,255,0.85)';
+                ctx.fill();
+                ctx.restore();
+            }
+
+            // Eyelid / squint line
+            if (params.eyeSquint > 0.1 && !closed) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(ex - eyeW, eyeY);
+                ctx.lineTo(ex + eyeW, eyeY);
+                ctx.strokeStyle = `rgba(${Math.max(sr-60,0)},${Math.max(sg-55,0)},${Math.max(sb-50,0)},${params.eyeSquint * 0.6})`;
+                ctx.lineWidth = actualH * 1.2;
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        drawEye(cx - eyeOffX, params.leftEyeClosed);
+        drawEye(cx + eyeOffX, false);
+
+        // ── Eyebrows ──
+        const browY = eyeY - r * 0.22 - params.eyebrowRaise * r * 0.12;
+        const browCurve = params.angryBrow ? -r * 0.05 : r * 0.03;
+
+        function drawBrow(bx, flip = 1) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(bx - eyeW * 0.9, browY + browCurve * flip);
+            ctx.quadraticCurveTo(bx, browY - browCurve, bx + eyeW * 0.9, browY + browCurve * flip);
+            ctx.strokeStyle = `rgba(${Math.max(sr-80,0)},${Math.max(sg-75,0)},${Math.max(sb-65,0)},0.85)`;
+            ctx.lineWidth = size * 0.025;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        drawBrow(cx - eyeOffX, 1);
+        drawBrow(cx + eyeOffX, -1);
+
+        // ── Nose ──
+        const noseY = cy + r * 0.1;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx - r * 0.08, noseY, r * 0.04, 0, Math.PI * 2);
+        ctx.arc(cx + r * 0.08, noseY, r * 0.04, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${Math.max(sr-40,0)},${Math.max(sg-35,0)},${Math.max(sb-30,0)},0.55)`;
+        ctx.fill();
+        ctx.restore();
+
+        // ── Mouth ──
+        const mouthY = cy + r * 0.42;
+        const mouthW = r * 0.45;
+        const curveMag = params.mouthCurve * r * 0.22;
+        const openMag = params.mouthOpen * r * 0.15;
+
+        ctx.save();
+        if (openMag > r * 0.02) {
+            // Open mouth
+            ctx.beginPath();
+            ctx.moveTo(cx - mouthW, mouthY);
+            ctx.quadraticCurveTo(cx, mouthY + curveMag + openMag, cx + mouthW, mouthY);
+            ctx.quadraticCurveTo(cx, mouthY + curveMag - openMag * 1.5, cx - mouthW, mouthY);
+            ctx.closePath();
+            ctx.fillStyle = '#2d1a1a';
+            ctx.fill();
+            // Teeth (only if smiling)
+            if (params.mouthCurve > 0.2) {
+                ctx.save();
+                ctx.clip();
+                ctx.fillStyle = 'white';
+                ctx.fillRect(cx - mouthW * 0.8, mouthY - openMag * 0.5, mouthW * 1.6, openMag * 0.8);
+                ctx.restore();
+            }
+        }
+
+        // Mouth outline / lip curve
+        ctx.beginPath();
+        ctx.moveTo(cx - mouthW, mouthY);
+        ctx.quadraticCurveTo(cx, mouthY + curveMag, cx + mouthW, mouthY);
+        ctx.strokeStyle = `rgba(${Math.max(sr-70,0)},${Math.max(sg-65,0)},${Math.max(sb-60,0)},0.8)`;
+        ctx.lineWidth = size * 0.022;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+        ctx.restore();
+
+        // ── Teardrop ──
+        if (params.teardrop) {
+            const tearAlpha = t > 0.5 ? Math.min(1, (t - 0.5) * 3) : 0;
+            ctx.save();
+            ctx.globalAlpha = tearAlpha;
+            ctx.beginPath();
+            const tearX = cx + eyeOffX + eyeW * 0.3;
+            const tearStartY = eyeY + eyeH;
+            ctx.moveTo(tearX, tearStartY);
+            ctx.bezierCurveTo(tearX + r * 0.1, tearStartY + r * 0.1, tearX + r * 0.1, tearStartY + r * 0.2, tearX, tearStartY + r * 0.22);
+            ctx.bezierCurveTo(tearX - r * 0.1, tearStartY + r * 0.2, tearX - r * 0.06, tearStartY + r * 0.05, tearX, tearStartY);
+            const tearGrad = ctx.createLinearGradient(tearX, tearStartY, tearX, tearStartY + r * 0.22);
+            tearGrad.addColorStop(0, 'rgba(100,180,255,0.5)');
+            tearGrad.addColorStop(1, 'rgba(60,150,255,0.85)');
+            ctx.fillStyle = tearGrad;
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // ── ZZZ (sleepy) ──
+        if (params.zzz) {
+            const zzzAlpha = t > 0.6 ? Math.min(1, (t - 0.6) * 4) : 0;
+            ctx.save();
+            ctx.globalAlpha = zzzAlpha;
+            ctx.font = `bold ${r * 0.28}px sans-serif`;
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillText('z', cx + r * 0.55, cy - r * 0.3);
+            ctx.font = `bold ${r * 0.22}px sans-serif`;
+            ctx.fillText('z', cx + r * 0.70, cy - r * 0.5);
+            ctx.font = `bold ${r * 0.16}px sans-serif`;
+            ctx.fillText('z', cx + r * 0.82, cy - r * 0.65);
+            ctx.restore();
+        }
+    }
+
+    /* ─── RENDER FUNCTIONS ───────────────────────────────────────────────── */
+    function renderEndpoints() {
+        // Face A
+        const ctxA = document.getElementById('canvas-a').getContext('2d');
+        drawFace(ctxA, faceA, 96);
+        // Face B
+        const ctxB = document.getElementById('canvas-b').getContext('2d');
+        drawFace(ctxB, faceB, 96);
+    }
+
+    function renderMorphedFace() {
+        const params = getInterpolatedParams(t);
+        const ctx = document.getElementById('morph-canvas').getContext('2d');
+        drawFace(ctx, params, 200);
+    }
+
+    function renderDimReadout() {
+        // Interpolate latent vectors
+        const zA = faceA.z;
+        const zB = faceB.z;
+        const s = t * t * (3 - 2 * t);
+        const zCurrent = zA.map((v, i) => lerp(v, zB[i], s));
+
+        // Left panel
+        const leftHTML = zCurrent.map((val, i) => `
+            <div class="flex items-center gap-2">
+                <span class="text-[9px] font-black uppercase tracking-wider w-16" style="color: ${DIM_COLORS[i]}">z${i+1}</span>
+                <div class="attn-bar-track flex-1 h-1.5 bg-gray-200 rounded overflow-hidden">
+                    <div class="dim-bar-fill h-full rounded" style="width:${Math.round(val * 100)}%; background:${DIM_COLORS[i]};"></div>
+                </div>
+                <span class="text-xs font-mono font-black text-gray-600 w-8 text-right">${val.toFixed(2)}</span>
+            </div>
+        `).join('');
+        document.getElementById('dim-readout').innerHTML = leftHTML;
+
+        // Right panel bars
+        const rightHTML = zCurrent.map((val, i) => `
+            <div class="flex items-center gap-2">
+                <span class="text-[9px] font-black uppercase tracking-wider" style="color: ${DIM_COLORS[i]}; min-width: 3rem;">${DIM_NAMES[i]}</span>
+                <div class="dim-bar-track flex-1">
+                    <div class="dim-bar-fill" style="width:${Math.round(val * 100)}%; background:${DIM_COLORS[i]};"></div>
+                </div>
+                <span class="text-[10px] font-mono font-black text-slate-300 w-8 text-right">${val.toFixed(2)}</span>
+            </div>
+        `).join('');
+        document.getElementById('dim-bars').innerHTML = rightHTML;
+
+        document.getElementById('t-label').textContent = `t = ${t.toFixed(2)}`;
+        document.getElementById('path-t-badge').textContent = `t = ${t.toFixed(3)}`;
+    }
+
+    function updateMorphLabel() {
+        const label = document.getElementById('morph-label');
+        if (t < 0.05) {
+            label.textContent = 'z_A';
+            label.style.background = '#7c3aed';
+        } else if (t > 0.95) {
+            label.textContent = 'z_B';
+            label.style.background = '#ec4899';
+        } else {
+            const pct = Math.round(t * 100);
+            label.textContent = `z(t=${t.toFixed(2)})`;
+            label.style.background = `linear-gradient(to right, #7c3aed, #ec4899)`;
+        }
+    }
+
+    function updateNarrative() {
+        const box = document.getElementById('narrativeBox');
+        if (t < 0.05) {
+            box.innerHTML = `You're at <strong class="text-violet-600">z_A</strong> — the origin face (<strong>${faceA.label}</strong>). The latent vector is fully set to its encoding.`;
+            box.className = 'text-sm font-medium text-violet-800 bg-violet-50 p-3 rounded-lg border border-violet-200 transition-all duration-300 leading-relaxed';
+        } else if (t > 0.95) {
+            box.innerHTML = `You've reached <strong class="text-pink-600">z_B</strong> — the target face (<strong>${faceB.label}</strong>). The decoder is fully reconstructing this encoding.`;
+            box.className = 'text-sm font-medium text-pink-800 bg-pink-50 p-3 rounded-lg border border-pink-200 transition-all duration-300 leading-relaxed';
+        } else if (t < 0.3) {
+            box.innerHTML = `Close to <strong class="text-violet-600">z_A</strong>. The interpolated vector <span class="font-mono text-xs bg-white px-1 rounded border">z(t)</span> still strongly resembles the <strong>${faceA.label}</strong> face — features from ${faceB.label} are just beginning to emerge.`;
+            box.className = 'text-sm font-medium text-gray-700 bg-gray-100 p-3 rounded-lg border border-gray-200 transition-all duration-300 leading-relaxed';
+        } else if (t > 0.7) {
+            box.innerHTML = `Close to <strong class="text-pink-600">z_B</strong>. The <strong>${faceB.label}</strong> expression is dominant — you can see the smoothly blended facial features from the target encoding.`;
+            box.className = 'text-sm font-medium text-gray-700 bg-gray-100 p-3 rounded-lg border border-gray-200 transition-all duration-300 leading-relaxed';
+        } else {
+            box.innerHTML = `Midway through the interpolation path. The decoded face blends features from <strong class="text-violet-600">${faceA.label}</strong> and <strong class="text-pink-600">${faceB.label}</strong> proportionally — this only works because the latent space is <em>smooth and continuous</em>.`;
+            box.className = 'text-sm font-medium text-gray-700 bg-gray-100 p-3 rounded-lg border border-gray-200 transition-all duration-300 leading-relaxed';
+        }
+    }
+
+    function updateStatusBadge() {
+        const badge = document.getElementById('status-badge');
+        if (t < 0.05) {
+            badge.textContent = `Origin: ${faceA.emoji} ${faceA.label}`;
+            badge.className = 'px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-violet-50 border border-violet-300 text-violet-700 shadow-sm transition-all duration-300';
+        } else if (t > 0.95) {
+            badge.textContent = `Target: ${faceB.emoji} ${faceB.label}`;
+            badge.className = 'px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-pink-50 border border-pink-300 text-pink-700 shadow-sm transition-all duration-300';
+        } else {
+            badge.textContent = `Interpolating — t = ${t.toFixed(2)}`;
+            badge.className = 'px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-blue-50 border border-blue-200 text-blue-700 shadow-sm transition-all duration-300';
+        }
+    }
+
+    /* ─── PATH STRIP ─────────────────────────────────────────────────────── */
+    const PATH_STEPS = 9;
+    let pathCanvases = [];
+
+    function buildPathStrip() {
+        const strip = document.getElementById('path-strip');
+        strip.innerHTML = '';
+        pathCanvases = [];
+
+        for (let i = 0; i <= PATH_STEPS; i++) {
+            const tv = i / PATH_STEPS;
+            const wrapper = document.createElement('div');
+            wrapper.className = 'flex flex-col items-center gap-1 flex-shrink-0';
+            wrapper.id = `path-wrapper-${i}`;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            canvas.style.borderRadius = '10px';
+            canvas.style.border = '2px solid transparent';
+            canvas.style.cursor = 'pointer';
+            canvas.style.transition = 'border-color 0.2s, transform 0.15s';
+            canvas.title = `t = ${tv.toFixed(2)}`;
+            canvas.onclick = () => setT(tv);
+
+            const label = document.createElement('div');
+            label.className = 'text-[9px] font-mono font-bold text-slate-500';
+            label.textContent = `t=${tv.toFixed(1)}`;
+
+            wrapper.appendChild(canvas);
+            wrapper.appendChild(label);
+            strip.appendChild(wrapper);
+            pathCanvases.push({ canvas, tv, label });
+        }
+
+        renderPathStrip();
+    }
+
+    function renderPathStrip() {
+        pathCanvases.forEach(({ canvas, tv }) => {
+            const params = getInterpolatedParams(tv);
+            const ctx = canvas.getContext('2d');
+            drawFace(ctx, params, 64);
+
+            // Highlight the closest step to current t
+            const isActive = Math.abs(tv - t) < 0.06;
+            canvas.style.borderColor = isActive ? '#a78bfa' : 'transparent';
+            canvas.style.transform = isActive ? 'scale(1.12)' : 'scale(1)';
+            canvas.style.boxShadow = isActive ? '0 0 12px rgba(167,139,250,0.5)' : 'none';
+        });
+    }
+
+    /* ─── 2D LATENT GRID ─────────────────────────────────────────────────── */
+    function renderLatentGrid() {
+        const canvas = document.getElementById('latent-grid');
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width;
+        const H = canvas.height;
+
+        ctx.clearRect(0, 0, W, H);
+
+        // Background
+        const bgGrad = ctx.createLinearGradient(0, 0, W, H);
+        bgGrad.addColorStop(0, '#0f0f1a');
+        bgGrad.addColorStop(1, '#1a1025');
+        ctx.fillStyle = bgGrad;
+        ctx.roundRect(0, 0, W, H, 12);
+        ctx.fill();
+
+        // Grid lines
+        ctx.save();
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.07)';
+        ctx.lineWidth = 1;
+        const gridStep = 40;
+        for (let x = gridStep; x < W; x += gridStep) {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+        }
+        for (let y = gridStep; y < H; y += gridStep) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+        }
+        ctx.restore();
+
+        // ── Draw some other "latent points" as context dots ──
+        const contextPoints = [
+            { x: 0.15, y: 0.72, label: 'Neutral', color: '#94a3b8' },
+            { x: 0.55, y: 0.85, label: 'Laugh', color: '#94a3b8' },
+            { x: 0.82, y: 0.35, label: 'Cry', color: '#94a3b8' },
+            { x: 0.30, y: 0.18, label: 'Fear', color: '#94a3b8' },
+            { x: 0.70, y: 0.60, label: 'Disgust', color: '#94a3b8' },
+        ];
+        contextPoints.forEach(pt => {
+            const px = pt.x * W;
+            const py = pt.y * H;
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(px, py, 5, 0, Math.PI * 2);
+            ctx.fillStyle = pt.color + '55';
+            ctx.fill();
+            ctx.strokeStyle = pt.color + '88';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            ctx.restore();
+            ctx.save();
+            ctx.font = 'bold 9px sans-serif';
+            ctx.fillStyle = '#94a3b8';
+            ctx.globalAlpha = 0.55;
+            ctx.fillText(pt.label, px + 8, py + 3);
+            ctx.restore();
+        });
+
+        // ── Origin point (z_A) ──
+        const aX = 28;
+        const aY = H - 28;
+        // ── Target point (z_B) ──
+        const bX = W - 28;
+        const bY = 28;
+
+        // Interpolation path line
+        const pathGrad = ctx.createLinearGradient(aX, aY, bX, bY);
+        pathGrad.addColorStop(0, '#7c3aed');
+        pathGrad.addColorStop(1, '#ec4899');
+        ctx.save();
+        ctx.setLineDash([5, 4]);
+        ctx.strokeStyle = pathGrad;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(aX, aY);
+        ctx.lineTo(bX, bY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.restore();
+
+        // Draw z_A endpoint
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(aX, aY, 11, 0, Math.PI * 2);
+        ctx.fillStyle = '#7c3aed';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.font = 'bold 9px monospace';
+        ctx.fillStyle = '#a78bfa';
+        ctx.fillText('z_A', aX - 8, aY + 22);
+        ctx.restore();
+
+        // Draw z_B endpoint
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(bX, bY, 11, 0, Math.PI * 2);
+        ctx.fillStyle = '#ec4899';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.font = 'bold 9px monospace';
+        ctx.fillStyle = '#f9a8d4';
+        ctx.fillText('z_B', bX - 8, bY - 14);
+        ctx.restore();
+
+        // Current position on path (linear interp between A and B)
+        const curX = lerp(aX, bX, t);
+        const curY = lerp(aY, bY, t);
+
+        // Glow ring
+        ctx.save();
+        const glowGrad = ctx.createRadialGradient(curX, curY, 0, curX, curY, 22);
+        glowGrad.addColorStop(0, 'rgba(167,139,250,0.35)');
+        glowGrad.addColorStop(1, 'rgba(167,139,250,0)');
+        ctx.beginPath();
+        ctx.arc(curX, curY, 22, 0, Math.PI * 2);
+        ctx.fillStyle = glowGrad;
+        ctx.fill();
+        ctx.restore();
+
+        // Current position dot
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(curX, curY, 9, 0, Math.PI * 2);
+        const dotColor = interpolateHex('#7c3aed', '#ec4899', t);
+        ctx.fillStyle = dotColor;
+        ctx.fill();
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+        ctx.restore();
+
+        // Draggable area indicator
+        ctx.save();
+        ctx.font = 'bold 9px sans-serif';
+        ctx.fillStyle = 'rgba(148,163,184,0.4)';
+        ctx.fillText('Click or drag to move', W/2 - 50, H - 8);
+        ctx.restore();
+
+        // Axis labels
+        ctx.save();
+        ctx.font = 'bold 9px monospace';
+        ctx.fillStyle = 'rgba(148,163,184,0.5)';
+        ctx.fillText('z₁', 6, H - 6);
+        ctx.fillText('z₂', W - 16, 12);
+        ctx.restore();
+    }
+
+    function interpolateHex(hex1, hex2, t) {
+        const r1 = parseInt(hex1.slice(1,3),16), g1 = parseInt(hex1.slice(3,5),16), b1 = parseInt(hex1.slice(5,7),16);
+        const r2 = parseInt(hex2.slice(1,3),16), g2 = parseInt(hex2.slice(3,5),16), b2 = parseInt(hex2.slice(5,7),16);
+        const r = Math.round(lerp(r1,r2,t)).toString(16).padStart(2,'0');
+        const g = Math.round(lerp(g1,g2,t)).toString(16).padStart(2,'0');
+        const b = Math.round(lerp(b1,b2,t)).toString(16).padStart(2,'0');
+        return `#${r}${g}${b}`;
+    }
+
+    /* ─── FULL RENDER ────────────────────────────────────────────────────── */
+    function renderAll() {
+        renderMorphedFace();
+        renderDimReadout();
+        renderLatentGrid();
+        renderPathStrip();
+        updateMorphLabel();
+        updateNarrative();
+        updateStatusBadge();
+        // Sync slider
+        document.getElementById('interpolation-slider').value = t;
+    }
+
+    /* ─── GRID INTERACTION ───────────────────────────────────────────────── */
+    function getGridT(canvas, clientX, clientY) {
+        const rect = canvas.getBoundingClientRect();
+        const W = canvas.width;
+        const H = canvas.height;
+        const scaleX = W / rect.width;
+        const scaleY = H / rect.height;
+
+        const px = (clientX - rect.left) * scaleX;
+        const py = (clientY - rect.top) * scaleY;
+
+        // Map to [0,1] based on the A→B diagonal direction
+        const aX = 28, aY = H - 28;
+        const bX = W - 28, bY = 28;
+        const dx = bX - aX, dy = bY - aY;
+        const len = Math.sqrt(dx*dx + dy*dy);
+        // Project click onto the line
+        const proj = ((px - aX) * dx + (py - aY) * dy) / (len * len);
+        return Math.max(0, Math.min(1, proj));
+    }
+
+    function setT(newT) {
+        t = Math.max(0, Math.min(1, newT));
+        renderAll();
+    }
+
+    function initGridInteraction() {
+        const canvas = document.getElementById('latent-grid');
+
+        canvas.addEventListener('mousedown', (e) => {
+            isDraggingGrid = true;
+            setT(getGridT(canvas, e.clientX, e.clientY));
+        });
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDraggingGrid) return;
+            setT(getGridT(canvas, e.clientX, e.clientY));
+        });
+        canvas.addEventListener('mouseup', () => { isDraggingGrid = false; });
+        canvas.addEventListener('mouseleave', () => { isDraggingGrid = false; });
+
+        // Touch support
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            isDraggingGrid = true;
+            const touch = e.touches[0];
+            setT(getGridT(canvas, touch.clientX, touch.clientY));
+        }, { passive: false });
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (!isDraggingGrid) return;
+            const touch = e.touches[0];
+            setT(getGridT(canvas, touch.clientX, touch.clientY));
+        }, { passive: false });
+        canvas.addEventListener('touchend', () => { isDraggingGrid = false; });
+    }
+
+    /* ─── SLIDER INTERACTION ─────────────────────────────────────────────── */
+    function onSliderChange() {
+        t = parseFloat(document.getElementById('interpolation-slider').value);
+        renderAll();
+    }
+
+    /* ─── ENDPOINT CHANGE ────────────────────────────────────────────────── */
+    function onEndpointChange() {
+        const aKey = document.getElementById('face-a-select').value;
+        const bKey = document.getElementById('face-b-select').value;
+        faceA = FACE_PARAMS[aKey];
+        faceB = FACE_PARAMS[bKey];
+        renderEndpoints();
+        buildPathStrip();
+        renderAll();
+    }
+
+    /* ─── INIT ──────────────────────────────────────────────────────────── */
+    window.addEventListener('DOMContentLoaded', () => {
+        renderEndpoints();
+        buildPathStrip();
+        initGridInteraction();
+        renderAll();
+
+        // Redraw grid on window resize
+        window.addEventListener('resize', () => {
+            renderLatentGrid();
+        });
+    });
+    </script>
+
+</body>
+</html>

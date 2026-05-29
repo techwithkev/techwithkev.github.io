@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transformer Self-Attention Web</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .token-word {
+            display: inline-block;
+            padding: 8px 13px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1.05rem;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            position: relative;
+            white-space: nowrap;
+            user-select: none;
+        }
+        .token-word:hover {
+            transform: translateY(-2px);
+        }
+        .token-word.ambiguous {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+        .token-word.ambiguous:hover {
+            background: #fde68a;
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
+        }
+        .token-word.regular {
+            background: #f1f5f9;
+            border-color: #e2e8f0;
+            color: #475569;
+        }
+        .token-word.regular:hover {
+            background: #e2e8f0;
+        }
+        .token-word.active {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #1d4ed8;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.25);
+            transform: translateY(-2px);
+        }
+        .token-word.highlighted {
+            border-color: currentColor;
+        }
+        .attn-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+            border-radius: 6px;
+            transition: background 0.15s;
+        }
+        .attn-bar-track {
+            flex: 1;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .attn-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+        }
+        .sentence-btn {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+        .sentence-btn:hover {
+            border-color: #3b82f6;
+            color: #1d4ed8;
+        }
+        .sentence-btn.active {
+            background: #1d4ed8;
+            border-color: #1d4ed8;
+            color: white;
+        }
+        .head-btn {
+            padding: 5px 12px;
+            border-radius: 20px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            cursor: pointer;
+            font-family: monospace;
+            transition: all 0.15s;
+        }
+        .head-btn.active {
+            border-color: #8b5cf6;
+            background: #f5f3ff;
+            color: #6d28d9;
+        }
+        #svg-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            overflow: visible;
+        }
+        .token-container {
+            position: relative;
+        }
+        .pulse-hint {
+            animation: pulseHint 2s ease-in-out infinite;
+        }
+        @keyframes pulseHint {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .step-block {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .step-block:last-child { border-bottom: none; }
+        .step-num {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #1d4ed8;
+            color: white;
+            font-size: 10px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1px;
+        }
+        .math-chip {
+            display: inline-block;
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            color: #0369a1;
+            border-radius: 4px;
+            padding: 1px 6px;
+            font-family: monospace;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .math-chip.gold {
+            background: #fffbeb;
+            border-color: #fcd34d;
+            color: #92400e;
+        }
+        details summary {
+            cursor: pointer;
+            list-style: none;
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            padding: 6px 0;
+        }
+        details summary::-webkit-details-marker { display: none; }
+        details[open] summary { color: #1d4ed8; }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+
+        <!-- Navigation -->
+        <nav class="mb-6 pt-4 no-print">
+            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 transition-colors" style="text-decoration: none;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Course Hub
+            </a>
+        </nav>
+
+        <!-- Header -->
+        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <h1 class="text-4xl font-black tracking-tight text-gray-900">SELF-ATTENTION <span class="text-blue-600">WEB</span></h1>
+                <p class="text-gray-500 font-medium italic">How Transformers resolve ambiguity using context</p>
+            </div>
+            <div id="status-badge" class="px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-white border border-gray-200 text-gray-400 shadow-sm transition-all duration-300">
+                Hover a word
+            </div>
+        </header>
+
+        <!-- Main Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+
+            <!-- Left Panel: Controls & Explanation -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-5 h-fit">
+
+                <!-- The Concept -->
+                <div>
+                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-tighter mb-3 border-b border-gray-100 pb-2">The Concept</h2>
+                    <p class="text-sm text-gray-600 leading-relaxed mb-3">
+                        In a Transformer, every word asks: <em>"Which other words should I pay attention to?"</em>
+                    </p>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        The model computes <strong>attention weights</strong> — numbers between 0 and 1 that say how much each word focuses on every other word. Thicker lines = higher attention.
+                    </p>
+                </div>
+
+                <!-- Sentence Selector -->
+                <div>
+                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-tighter mb-3 border-b border-gray-100 pb-2">Example Sentence</h2>
+                    <div class="flex flex-wrap gap-2" id="sentence-buttons">
+                        <!-- rendered by JS -->
+                    </div>
+                </div>
+
+                <!-- Attention Head -->
+                <div>
+                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-tighter mb-3 border-b border-gray-100 pb-2">Attention Head</h2>
+                    <p class="text-xs text-gray-400 mb-2">Transformers run multiple heads in parallel — each one learns different patterns.</p>
+                    <div class="flex flex-wrap gap-2" id="head-buttons">
+                        <!-- rendered by JS -->
+                    </div>
+                </div>
+
+                <!-- Attention Weights Readout -->
+                <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xs font-black uppercase text-blue-600 tracking-widest">Attention from:</span>
+                        <span id="active-token-label" class="text-sm font-mono font-black text-gray-800">—</span>
+                    </div>
+                    <div id="attn-readout" class="space-y-1.5">
+                        <p class="text-xs text-gray-400 italic">Hover over a <span class="text-amber-600 font-bold">highlighted</span> word to see its attention weights.</p>
+                    </div>
+                </div>
+
+                <!-- Narrative -->
+                <div id="narrativeBox" class="text-sm font-medium text-gray-700 bg-gray-100 p-3 rounded-lg border border-gray-200 transition-all duration-300 leading-relaxed">
+                    Hover over a <strong class="text-amber-600">golden</strong> ambiguous word to see how the model uses context to resolve its meaning.
+                </div>
+
+                <!-- Q·K Step Explainer -->
+                <details id="mechanic-panel" open>
+                    <summary>▶ How it computes this</summary>
+                    <div id="mechanic-body" class="mt-2 text-xs text-gray-600 leading-relaxed">
+                        <div class="step-block">
+                            <div class="step-num">1</div>
+                            <div><span class="math-chip gold">Q</span> Each token projects a <strong>Query</strong>: <em>"What context am I looking for?"</em></div>
+                        </div>
+                        <div class="step-block">
+                            <div class="step-num">2</div>
+                            <div><span class="math-chip gold">K</span> Every other token has a <strong>Key</strong>: <em>"Here's what I represent."</em></div>
+                        </div>
+                        <div class="step-block">
+                            <div class="step-num">3</div>
+                            <div>Compute <span class="math-chip">Q · K</span> dot products — a high score means strong alignment.</div>
+                        </div>
+                        <div class="step-block">
+                            <div class="step-num">4</div>
+                            <div>Scale by <span class="math-chip">÷ √d</span> to prevent values from exploding in high dimensions.</div>
+                        </div>
+                        <div class="step-block">
+                            <div class="step-num">5</div>
+                            <div><span class="math-chip">softmax(·)</span> converts scores → probabilities that sum to 1. <strong>These are the line widths you see.</strong></div>
+                        </div>
+                        <div class="step-block">
+                            <div class="step-num">6</div>
+                            <div>Output = weighted sum of <span class="math-chip gold">V</span> (Value) vectors. The token's new meaning is a blend of its context.</div>
+                        </div>
+                    </div>
+                </details>
+
+            </div>
+
+            <!-- Right Panel: Sentence Visualization -->
+            <div class="lg:col-span-2 bg-slate-900 border-2 border-slate-800 p-6 rounded-2xl shadow-inner flex flex-col">
+
+                <!-- Sentence Display Area -->
+                <div class="flex flex-col">
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 text-center font-mono">Click or hover a word</p>
+                    <div id="token-area" class="token-container relative">
+                        <!-- SVG overlay for lines -->
+                        <svg id="svg-canvas" xmlns="http://www.w3.org/2000/svg"></svg>
+                        <!-- Tokens rendered here -->
+                        <div id="tokens-wrap" class="flex flex-wrap gap-3 justify-center items-center relative z-10 pb-2 pt-2 min-h-[80px]">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Query-Key Vector Math Section -->
+                <div class="mt-4 pt-4 border-t border-slate-800 text-slate-300">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+                        <div>
+                            <h3 class="text-sm font-black uppercase tracking-wider text-blue-400">Query-Key Mathematical Alignment</h3>
+                            <p class="text-xs text-slate-400">See how dot products calculate the attention weights</p>
+                        </div>
+                        
+                        <!-- Manual Query Vector Sandbox Toggle -->
+                        <div id="sandbox-toggle-wrap" class="hidden flex items-center gap-2 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/60 shadow-inner">
+                            <input type="checkbox" id="sandbox-toggle" class="cursor-pointer rounded text-blue-600 focus:ring-blue-500 bg-slate-900 border-slate-700" onchange="toggleSandboxMode()">
+                            <label for="sandbox-toggle" class="text-[10px] font-black uppercase tracking-wider text-slate-300 cursor-pointer select-none">Query Sandbox (Manual)</label>
+                        </div>
+                    </div>
+
+                    <!-- Sandbox Sliders (Hidden by default, shown when sandbox is enabled) -->
+                    <div id="sandbox-sliders" class="hidden bg-slate-850 border border-slate-800 p-4 rounded-xl mb-4 space-y-3 shadow-inner">
+                        <div class="text-[10px] font-black text-amber-400 uppercase tracking-widest mb-1">Interactive Query Vector Editor</div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <!-- Slider 1 -->
+                            <div>
+                                <div class="flex justify-between items-center mb-1 text-[9px] uppercase font-bold text-slate-400 tracking-wider">
+                                    <span id="slider-dim0-label">Dimension 1</span>
+                                    <span id="slider-dim0-val" class="font-mono text-amber-300 font-bold">0.0</span>
+                                </div>
+                                <input type="range" id="slider-dim0" min="-2.0" max="5.0" step="0.1" value="0.0" class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500" oninput="onSandboxSliderChange()">
+                            </div>
+                            <!-- Slider 2 -->
+                            <div>
+                                <div class="flex justify-between items-center mb-1 text-[9px] uppercase font-bold text-slate-400 tracking-wider">
+                                    <span id="slider-dim1-label">Dimension 2</span>
+                                    <span id="slider-dim1-val" class="font-mono text-amber-300 font-bold">0.0</span>
+                                </div>
+                                <input type="range" id="slider-dim1" min="-2.0" max="5.0" step="0.1" value="0.0" class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500" oninput="onSandboxSliderChange()">
+                            </div>
+                            <!-- Slider 3 -->
+                            <div>
+                                <div class="flex justify-between items-center mb-1 text-[9px] uppercase font-bold text-slate-400 tracking-wider">
+                                    <span id="slider-dim2-label">Dimension 3</span>
+                                    <span id="slider-dim2-val" class="font-mono text-amber-300 font-bold">0.0</span>
+                                </div>
+                                <input type="range" id="slider-dim2" min="-2.0" max="5.0" step="0.1" value="0.0" class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-rose-500" oninput="onSandboxSliderChange()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Breakdown Table / Placeholder -->
+                    <div id="vector-math-breakdown" class="bg-slate-950/40 rounded-xl border border-slate-800/80 p-4 min-h-[120px] flex flex-col justify-center items-center text-center">
+                        <svg class="w-8 h-8 text-slate-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                        <p class="text-xs text-slate-500 font-bold uppercase tracking-wider">No word selected</p>
+                        <p class="text-xs text-slate-600 mt-1 max-w-sm">Hover over any word in the sentence above to inspect its Query vector and see the mathematical dot products with all Key vectors!</p>
+                    </div>
+                </div>
+
+                <!-- Legend -->
+                <div class="mt-8 pt-4 border-t border-slate-800 flex flex-wrap gap-x-6 gap-y-2 text-[10px] uppercase font-bold text-slate-500 justify-center">
+                    <div class="flex items-center gap-2">
+                        <span class="inline-block w-8 h-1 rounded" style="background:#3b82f6; opacity:1;"></span>
+                        <span class="inline-block w-8 h-0.5 rounded" style="background:#3b82f6; opacity:0.3;"></span>
+                        Line weight = Attention strength
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="inline-block w-3 h-3 rounded" style="background:#fde68a; border:2px solid #f59e0b;"></span>
+                        Ambiguous token
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="inline-block w-3 h-3 rounded" style="background:#dbeafe; border:2px solid #3b82f6;"></span>
+                        Active / selected
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+    /* ─── DATA ─────────────────────────────────────────────────────────── */
+    const SENTENCES = [
+      {
+        id: 0,
+        label: '"bank" example',
+        tokens: ['I', 'sat', 'by', 'the', 'bank', 'watching', 'the', 'river', 'flow'],
+        ambiguous: [4],
+        narratives: {
+          4: [
+            `<strong>"bank"</strong> — Head 0 (Syntactic)<br>
+             <span class="math-chip gold">Q<sub>bank</sub> · K<sub>sat</sub></span> scores high — "bank" queries for its verb, finding <em>sat</em>.<br>
+             <span class="math-chip gold">Q<sub>bank</sub> · K<sub>river</sub></span> also scores high — noun-context link to <em>river</em>.<br>
+             The weighted <span class="math-chip">V</span> blend pulls "bank" toward a riverside meaning.`,
+            `<strong>"bank"</strong> — Head 1 (Semantic)<br>
+             <span class="math-chip gold">Q<sub>bank</sub> · K<sub>river</sub></span> gives the highest raw score — learned co-occurrence of "bank" + "river" in a riverbank context.<br>
+             After <span class="math-chip">softmax</span>: <em>river</em> gets the highest attention weight — the thickest line you see.<br>
+             The output <span class="math-chip">V</span> vector for "bank" is now dominated by river-context meaning, not financial.`,
+            `<strong>"bank"</strong> — Head 2 (Positional)<br>
+             <span class="math-chip gold">Q<sub>bank</sub> · K</span> scores are highest for immediate neighbours — this head learned to weight by proximity, not meaning.<br>
+             Useful for grammar structure, not disambiguation.`,
+          ],
+        },
+      },
+      {
+        id: 1,
+        label: '"fly" example',
+        tokens: ['Time', 'flies', 'like', 'an', 'arrow', ';', 'fruit', 'flies', 'like', 'a', 'banana'],
+        ambiguous: [1, 7],
+        narratives: {
+          1: [
+            `<strong>First "flies"</strong> — Head 0 (Syntactic)<br>
+             <span class="math-chip gold">Q<sub>flies</sub> · K<sub>Time</sub></span> scores high — subject-verb link detected.<br>
+             The <span class="math-chip">V</span> blend gives "flies" a <strong>verb</strong> meaning: <em>to move quickly.</em>`,
+            `<strong>First "flies"</strong> — Head 1 (Semantic)<br>
+             <span class="math-chip gold">Q<sub>flies</sub> · K<sub>Time</sub></span> is the largest score here. After softmax <em>Time</em> gets high attention — confirming the subject.<br>
+             The <span class="math-chip">V</span> output locks in the verb reading: <em>Time</em> is doing the flying.`,
+            `<strong>First "flies"</strong> — Head 2 (Positional)<br>
+             Scores computed as <span class="math-chip gold">Q · K</span> decay with distance. Local neighbours dominate, regardless of meaning.`,
+          ],
+          7: [
+            `<strong>Second "flies"</strong> — Head 0 (Syntactic)<br>
+             <span class="math-chip gold">Q<sub>flies</sub> · K<sub>fruit</sub></span> and <span class="math-chip gold">Q<sub>flies</sub> · K<sub>banana</sub></span> both score high — "flies" sees a noun subject <em>fruit</em> and object <em>banana</em>.<br>
+             The <span class="math-chip">V</span> blend makes this a <strong>noun</strong> (insect species).`,
+            `<strong>Second "flies"</strong> — Head 1 (Semantic)<br>
+             <span class="math-chip gold">Q<sub>flies</sub> · K<sub>fruit</sub></span> is highest — "fruit flies" is a known noun phrase.<br>
+             The weighted <span class="math-chip">V</span> pulls meaning toward the insect, not the action of flying.`,
+            `<strong>Second "flies"</strong> — Head 2 (Positional)<br>
+             <span class="math-chip gold">Q · K</span> scores drop with distance. Local words <em>fruit</em> and <em>like</em> dominate — structural context only.`,
+          ],
+        },
+      },
+      {
+        id: 2,
+        label: '"saw" example',
+        tokens: ['She', 'saw', 'the', 'man', 'with', 'the', 'telescope'],
+        ambiguous: [1, 4],
+        narratives: {
+          1: [
+            `<strong>"saw"</strong> — Head 0 (Syntactic)<br>
+             <span class="math-chip gold">Q<sub>saw</sub> · K<sub>She</sub></span> and <span class="math-chip gold">Q<sub>saw</sub> · K<sub>man</sub></span> score highest — subject + object of the verb.<br>
+             The <span class="math-chip">V</span> blend grounds "saw" as a transitive verb between these two participants.`,
+            `<strong>"saw"</strong> — Head 1 (Semantic)<br>
+             <span class="math-chip gold">Q<sub>saw</sub> · K<sub>She</sub></span> dominates. The semantic head focuses on the agent (who is doing the seeing).<br>
+             The <span class="math-chip">V</span> output encodes <em>She</em> as the perceiver — not the tool used.`,
+            `<strong>"saw"</strong> — Head 2 (Positional)<br>
+             <span class="math-chip gold">Q · K</span> is distance-weighted. Immediate neighbours dominate, capturing syntactic proximity.`,
+          ],
+          4: [
+            `<strong>"with"</strong> — Head 0 (Syntactic)<br>
+             <span class="math-chip gold">Q<sub>with</sub> · K<sub>saw</sub></span> and <span class="math-chip gold">Q<sub>with</sub> · K<sub>man</sub></span> both score similarly — the model can't decide if "with the telescope" modifies <em>saw</em> or <em>man</em>.<br>
+             Distributed weights = genuine ambiguity (PP-attachment problem).`,
+            `<strong>"with"</strong> — Head 1 (Semantic)<br>
+             <span class="math-chip gold">Q<sub>with</sub> · K<sub>man</sub></span> edges out <span class="math-chip gold">Q<sub>with</sub> · K<sub>telescope</sub></span> slightly.<br>
+             Weight is spread, showing the model is genuinely uncertain which interpretation is correct.`,
+            `<strong>"with"</strong> — Head 2 (Positional)<br>
+             <span class="math-chip gold">Q · K</span> scores by distance. Neighbouring tokens get most of the weight.`,
+          ],
+        },
+      },
+    ];
+
+    // Dimensional information and Query/Key raw representations
+    const VECTORS = {
+      0: [ // Sentence 0 ("bank")
+        // Head 0: Syntactic
+        {
+          dimensions: ['Syntax Focus', 'Semantic: Nature/Water', 'Semantic: Finance/Money'],
+          q: [
+            [1.5, 0.0, 0.0], // I
+            [1.8, 0.2, 0.0], // sat
+            [1.0, 0.0, 0.0], // by
+            [0.8, 0.0, 0.0], // the
+            [2.2, 1.2, 0.0], // bank
+            [1.5, 0.5, 0.0], // watching
+            [0.8, 0.0, 0.0], // the
+            [1.2, 1.8, 0.0], // river
+            [1.0, 1.5, 0.0], // flow
+          ],
+          k: [
+            [1.5, 0.1, 0.0], // I
+            [2.0, 0.2, 0.0], // sat
+            [1.2, 0.3, 0.0], // by
+            [0.8, 0.0, 0.0], // the
+            [1.2, 0.8, 0.2], // bank
+            [1.4, 0.5, 0.0], // watching
+            [0.8, 0.0, 0.0], // the
+            [1.5, 2.2, 0.0], // river
+            [0.6, 1.2, 0.0], // flow
+          ]
+        },
+        // Head 1: Semantic
+        {
+          dimensions: ['Syntax Focus', 'Semantic: Nature/Water', 'Semantic: Finance/Money'],
+          q: [
+            [1.0, 0.0, 0.0], // I
+            [1.2, 0.0, 0.0], // sat
+            [0.8, 0.0, 0.0], // by
+            [0.5, 0.0, 0.0], // the
+            [0.1, 2.8, 0.0], // bank
+            [1.0, 0.5, 0.0], // watching
+            [0.5, 0.0, 0.0], // the
+            [0.2, 1.5, 0.0], // river
+            [0.2, 1.0, 0.0], // flow
+          ],
+          k: [
+            [0.5, 0.0, 0.0], // I
+            [0.6, 0.1, 0.0], // sat
+            [0.4, 0.2, 0.0], // by
+            [0.2, 0.0, 0.0], // the
+            [0.5, 1.0, 3.5], // bank (has nature AND strong finance keys!)
+            [0.8, 0.4, 0.0], // watching
+            [0.2, 0.0, 0.0], // the
+            [0.2, 2.5, 0.0], // river
+            [0.2, 1.8, 0.0], // flow
+          ]
+        },
+        // Head 2: Positional
+        {
+          dimensions: ['Relative Proximity', 'Left-leaning', 'Right-leaning'],
+          q: [
+            [2.5, 0.0, 1.0], [2.5, 0.5, 0.5], [2.5, 0.8, 0.2], [2.5, 1.0, 0.0], [2.8, 0.0, 0.0],
+            [2.5, 0.0, 1.0], [2.5, 0.0, 1.2], [2.5, 0.0, 1.5], [2.5, 0.0, 1.8]
+          ],
+          k: [
+            [1.5, 2.0, 0.0], [2.0, 1.5, 0.0], [2.2, 1.0, 0.0], [2.5, 0.5, 0.0], [2.8, 0.0, 0.0],
+            [2.5, 0.0, 0.5], [2.2, 0.0, 1.0], [2.0, 0.0, 1.5], [1.5, 0.0, 2.0]
+          ]
+        }
+      ],
+      1: [ // Sentence 1 ("fly")
+        // Head 0: Syntactic
+        {
+          dimensions: ['Syntax Focus', 'Semantic: Time/Speed', 'Semantic: Food/Fruit'],
+          q: [
+            [1.8, 0.2, 0.0], [2.2, 0.5, 0.0], [1.2, 0.2, 0.0], [0.8, 0.0, 0.0], [1.5, 0.5, 0.0], [0.5, 0.0, 0.0],
+            [1.8, 0.0, 0.2], [2.2, 0.0, 0.5], [1.2, 0.0, 0.2], [0.8, 0.0, 0.0], [1.5, 0.0, 0.5]
+          ],
+          k: [
+            [1.5, 0.1, 0.0], [1.8, 0.4, 0.0], [1.2, 0.1, 0.0], [0.8, 0.0, 0.0], [1.6, 0.6, 0.0], [0.4, 0.0, 0.0],
+            [1.5, 0.0, 0.4], [1.8, 0.0, 0.6], [1.2, 0.0, 0.2], [0.8, 0.0, 0.0], [1.6, 0.0, 0.8]
+          ]
+        },
+        // Head 1: Semantic
+        {
+          dimensions: ['Syntax Focus', 'Semantic: Time/Speed', 'Semantic: Food/Fruit'],
+          q: [
+            [1.0, 0.5, 0.0], // Time
+            [0.2, 2.5, 0.0], // flies(1) (seeks Time/Speed context)
+            [0.8, 0.2, 0.0], // like
+            [0.5, 0.0, 0.0], // an
+            [0.8, 0.4, 0.0], // arrow
+            [0.2, 0.0, 0.0], // ;
+            [1.0, 0.0, 0.5], // fruit
+            [0.2, 0.0, 2.5], // flies(2) (seeks Food/Fruit context)
+            [0.8, 0.0, 0.2], // like
+            [0.5, 0.0, 0.0], // a
+            [0.8, 0.0, 0.4], // banana
+          ],
+          k: [
+            [0.4, 2.2, 0.0], // Time
+            [0.5, 1.0, 0.0], // flies(1)
+            [0.6, 0.2, 0.0], // like
+            [0.2, 0.0, 0.0], // an
+            [0.4, 0.8, 0.0], // arrow
+            [0.1, 0.0, 0.0], // ;
+            [0.4, 0.0, 2.2], // fruit
+            [0.5, 0.0, 1.0], // flies(2)
+            [0.6, 0.0, 0.2], // like
+            [0.2, 0.0, 0.0], // a
+            [0.3, 0.0, 1.8], // banana
+          ]
+        },
+        // Head 2: Positional
+        {
+          dimensions: ['Relative Proximity', 'Left-leaning', 'Right-leaning'],
+          q: [
+            [2.5, 0.0, 1.0], [2.5, 0.2, 0.8], [2.5, 0.4, 0.6], [2.5, 0.6, 0.4], [2.5, 0.8, 0.2], [2.5, 1.0, 0.0],
+            [2.5, 0.0, 1.0], [2.5, 0.0, 1.2], [2.5, 0.0, 1.4], [2.5, 0.0, 1.6], [2.5, 0.0, 1.8]
+          ],
+          k: [
+            [1.5, 2.0, 0.0], [1.8, 1.8, 0.0], [2.0, 1.5, 0.0], [2.2, 1.0, 0.0], [2.4, 0.5, 0.0], [2.5, 0.0, 0.0],
+            [2.4, 0.0, 0.5], [2.2, 0.0, 1.0], [2.0, 0.0, 1.5], [1.8, 0.0, 1.8], [1.5, 0.0, 2.0]
+          ]
+        }
+      ],
+      2: [ // Sentence 2 ("saw")
+        // Head 0: Syntactic
+        {
+          dimensions: ['Syntax Focus', 'Semantic: Sight/Perception', 'Semantic: Tool/Instrument'],
+          q: [
+            [1.8, 0.2, 0.0], [2.2, 0.8, 0.0], [0.8, 0.0, 0.0], [1.5, 0.2, 0.0], [1.2, 0.5, 0.5], [0.8, 0.0, 0.0], [1.5, 0.2, 0.8]
+          ],
+          k: [
+            [1.5, 0.2, 0.0], [2.0, 0.6, 0.0], [0.8, 0.0, 0.0], [1.6, 0.4, 0.0], [1.2, 0.4, 0.4], [0.8, 0.0, 0.0], [1.4, 0.2, 1.0]
+          ]
+        },
+        // Head 1: Semantic
+        {
+          dimensions: ['Syntax Focus', 'Semantic: Sight/Perception', 'Semantic: Tool/Instrument'],
+          q: [
+            [1.0, 0.2, 0.0], // She
+            [1.5, 2.0, 0.0], // saw (seeks Sight/Perception)
+            [0.5, 0.0, 0.0], // the
+            [1.0, 0.2, 0.0], // man
+            [1.2, 0.8, 1.2], // with (seeks both man & telescope)
+            [0.5, 0.0, 0.0], // the
+            [0.8, 0.5, 2.2], // telescope (seeks Tool/Instrument)
+          ],
+          k: [
+            [0.8, 0.2, 0.0], // She
+            [0.5, 1.8, 0.0], // saw
+            [0.2, 0.0, 0.0], // the
+            [1.0, 0.4, 0.0], // man
+            [0.6, 0.4, 0.6], // with
+            [0.2, 0.0, 0.0], // the
+            [0.4, 0.2, 2.0], // telescope
+          ]
+        },
+        // Head 2: Positional
+        {
+          dimensions: ['Relative Proximity', 'Left-leaning', 'Right-leaning'],
+          q: [
+            [2.5, 0.0, 1.0], [2.5, 0.2, 0.8], [2.5, 0.4, 0.6], [2.5, 0.6, 0.4], [2.5, 0.8, 0.2], [2.5, 1.0, 0.0], [2.5, 0.0, 1.2]
+          ],
+          k: [
+            [1.5, 2.0, 0.0], [1.8, 1.8, 0.0], [2.0, 1.5, 0.0], [2.2, 1.0, 0.0], [2.4, 0.5, 0.0], [2.5, 0.0, 0.0], [2.2, 0.0, 1.0]
+          ]
+        }
+      ]
+    };
+
+    const HEAD_LABELS = ['Head 0 — Syntactic', 'Head 1 — Semantic', 'Head 2 — Positional'];
+    const LINE_COLORS = ['#3b82f6', '#8b5cf6', '#10b981']; // per head
+
+    /* ─── STATE ─────────────────────────────────────────────────────────── */
+    let activeSentenceIdx = 0;
+    let activeHeadIdx = 0;
+    let activeTokenIdx = null;
+    let sandboxMode = false;
+    let sandboxQ = [0.0, 0.0, 0.0];
+
+    /* ─── HELPERS ───────────────────────────────────────────────────────── */
+    function getSentence() { return SENTENCES[activeSentenceIdx]; }
+    
+    function getActiveVectors() {
+        return VECTORS[activeSentenceIdx][activeHeadIdx];
+    }
+
+    function computeAttention(tokenIdx, manualQ = null) {
+        const vecData = getActiveVectors();
+        const q = manualQ || vecData.q[tokenIdx];
+        const keys = vecData.k;
+        
+        // Calculate raw scores: Q . K / sqrt(3)
+        const rawScores = keys.map(k => {
+            const dot = q[0]*k[0] + q[1]*k[1] + q[2]*k[2];
+            return dot / Math.sqrt(3);
+        });
+        
+        // Softmax
+        const maxScore = Math.max(...rawScores);
+        const exps = rawScores.map(s => Math.exp(s - maxScore));
+        const sumExps = exps.reduce((a, b) => a + b, 0);
+        const weights = exps.map(e => e / sumExps);
+        
+        return {
+            q,
+            keys,
+            rawScores,
+            weights
+        };
+    }
+
+    function tokenColor(tokenIdx) {
+        const s = getSentence();
+        return s.ambiguous.includes(tokenIdx) ? 'ambiguous' : 'regular';
+    }
+
+    /* ─── RENDER SENTENCE BUTTONS ────────────────────────────────────────── */
+    function renderSentenceButtons() {
+        const container = document.getElementById('sentence-buttons');
+        container.innerHTML = SENTENCES.map((s, i) => `
+            <button class="sentence-btn ${i === activeSentenceIdx ? 'active' : ''}"
+                    onclick="selectSentence(${i})">${s.label}</button>
+        `).join('');
+    }
+
+    /* ─── RENDER HEAD BUTTONS ─────────────────────────────────────────────── */
+    function renderHeadButtons() {
+        const container = document.getElementById('head-buttons');
+        container.innerHTML = HEAD_LABELS.map((l, i) => `
+            <button class="head-btn ${i === activeHeadIdx ? 'active' : ''}"
+                    onclick="selectHead(${i})">${l}</button>
+        `).join('');
+    }
+
+    /* ─── RENDER TOKENS ──────────────────────────────────────────────────── */
+    function renderTokens() {
+        const s = getSentence();
+        const wrap = document.getElementById('tokens-wrap');
+        wrap.innerHTML = s.tokens.map((tok, i) => {
+            const cls = tokenColor(i);
+            const isActive = i === activeTokenIdx;
+            const hint = cls === 'ambiguous' && !activeTokenIdx ? 'pulse-hint' : '';
+            return `<span
+                class="token-word ${cls} ${isActive ? 'active' : ''} ${hint}"
+                id="token-${i}"
+                data-idx="${i}"
+                onmouseenter="hoverToken(${i})"
+                onmouseleave="unhoverToken()"
+                onclick="hoverToken(${i})"
+            >${tok}</span>`;
+        }).join('');
+    }
+
+    /* ─── RENDER ATTENTION LINES (SVG) ───────────────────────────────────── */
+    function clearLines() {
+        const svg = document.getElementById('svg-canvas');
+        svg.innerHTML = '';
+    }
+
+    function drawLines(fromIdx) {
+        clearLines();
+        const s = getSentence();
+        
+        // Compute dynamically!
+        const attnData = computeAttention(fromIdx, sandboxMode ? sandboxQ : null);
+        const weights = attnData.weights;
+        
+        const svg = document.getElementById('svg-canvas');
+        const svgRect = svg.getBoundingClientRect();
+
+        const fromEl = document.getElementById(`token-${fromIdx}`);
+        if (!fromEl) return;
+        const fromRect = fromEl.getBoundingClientRect();
+        const x1 = fromRect.left + fromRect.width / 2 - svgRect.left;
+        const y1 = fromRect.top + fromRect.height / 2 - svgRect.top;
+
+        const color = LINE_COLORS[activeHeadIdx];
+
+        weights.forEach((w, toIdx) => {
+            if (toIdx === fromIdx) return; // skip self
+            if (w < 0.01) return; // skip very tiny weights
+
+            const toEl = document.getElementById(`token-${toIdx}`);
+            if (!toEl) return;
+            const toRect = toEl.getBoundingClientRect();
+            const x2 = toRect.left + toRect.width / 2 - svgRect.left;
+            const y2 = toRect.top + toRect.height / 2 - svgRect.top;
+
+            const lineW = Math.max(1, w * 18);
+            const opacity = Math.max(0.1, Math.min(1, w * 4));
+
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', x1);
+            line.setAttribute('y1', y1);
+            line.setAttribute('x2', x2);
+            line.setAttribute('y2', y2);
+            line.setAttribute('stroke', color);
+            line.setAttribute('stroke-width', lineW);
+            line.setAttribute('stroke-opacity', opacity);
+            line.setAttribute('stroke-linecap', 'round');
+            svg.appendChild(line);
+        });
+    }
+
+    /* ─── RENDER ATTENTION READOUT ───────────────────────────────────────── */
+    function renderReadout(tokenIdx) {
+        const s = getSentence();
+        
+        // Compute dynamically!
+        const attnData = computeAttention(tokenIdx, sandboxMode ? sandboxQ : null);
+        const weights = attnData.weights;
+        const color = LINE_COLORS[activeHeadIdx];
+
+        // Sort by weight descending for display
+        const pairs = weights.map((w, i) => ({ w, i })).sort((a, b) => b.w - a.w);
+
+        document.getElementById('active-token-label').textContent = `"${s.tokens[tokenIdx]}"`;
+        document.getElementById('attn-readout').innerHTML = pairs.map(({ w, i }) => {
+            const pct = Math.round(w * 100);
+            const isSelf = i === tokenIdx;
+            return `<div class="attn-row">
+                <span class="text-xs font-mono font-bold text-gray-500 w-16 truncate" title="${s.tokens[i]}">${isSelf ? '→ self' : s.tokens[i]}</span>
+                <div class="attn-bar-track">
+                    <div class="attn-bar-fill" style="width:${pct}%; background:${color};"></div>
+                </div>
+                <span class="text-xs font-mono font-black text-gray-700 w-8 text-right">${pct}%</span>
+            </div>`;
+        }).join('');
+    }
+
+    /* ─── NARRATIVE ───────────────────────────────────────────────────────── */
+    function updateNarrative(tokenIdx) {
+        const s = getSentence();
+        const narr = s.narratives[tokenIdx];
+        const box = document.getElementById('narrativeBox');
+        if (narr && narr[activeHeadIdx]) {
+            box.innerHTML = narr[activeHeadIdx];
+            box.className = 'text-sm text-blue-800 bg-blue-50 p-3 rounded-lg border border-blue-200 transition-all duration-300 leading-relaxed';
+        } else {
+            box.innerHTML = `Hover over a <strong class="text-amber-600">golden</strong> ambiguous word to see how the model uses context to resolve its meaning.`;
+            box.className = 'text-sm font-medium text-gray-700 bg-gray-100 p-3 rounded-lg border border-gray-200 transition-all duration-300 leading-relaxed';
+        }
+    }
+
+    /* ─── STATUS BADGE ──────────────────────────────────────────────────── */
+    function updateBadge(tokenIdx) {
+        const s = getSentence();
+        const badge = document.getElementById('status-badge');
+        if (tokenIdx === null) {
+            badge.textContent = 'Hover a word';
+            badge.className = 'px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-white border border-gray-200 text-gray-400 shadow-sm transition-all duration-300';
+        } else if (s.ambiguous.includes(tokenIdx)) {
+            badge.textContent = `Ambiguous: "${s.tokens[tokenIdx]}"`;
+            badge.className = 'px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-amber-50 border border-amber-300 text-amber-700 shadow-sm transition-all duration-300';
+        } else {
+            badge.textContent = `Token: "${s.tokens[tokenIdx]}"`;
+            badge.className = 'px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-blue-50 border border-blue-200 text-blue-700 shadow-sm transition-all duration-300';
+        }
+    }
+
+    /* ─── RENDER VECTOR MATHEMATICAL BREAKDOWN ────────────────────────────── */
+    function renderVectorMath(tokenIdx) {
+        if (tokenIdx === null) {
+            document.getElementById('sandbox-toggle-wrap').classList.add('hidden');
+            document.getElementById('vector-math-breakdown').innerHTML = `
+                <svg class="w-8 h-8 text-slate-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                <p class="text-xs text-slate-500 font-bold uppercase tracking-wider">No word selected</p>
+                <p class="text-xs text-slate-600 mt-1 max-w-sm">Hover over any word in the sentence above to inspect its Query vector and see the mathematical dot products with all Key vectors!</p>
+            `;
+            return;
+        }
+
+        // Show sandbox checkbox
+        document.getElementById('sandbox-toggle-wrap').classList.remove('hidden');
+
+        const s = getSentence();
+        const vecData = getActiveVectors();
+        const dims = vecData.dimensions;
+        
+        // Update Sandbox Slider labels to reflect active dimension names!
+        document.getElementById('slider-dim0-label').textContent = dims[0];
+        document.getElementById('slider-dim1-label').textContent = dims[1];
+        document.getElementById('slider-dim2-label').textContent = dims[2];
+
+        const attnData = computeAttention(tokenIdx, sandboxMode ? sandboxQ : null);
+        const qVal = attnData.q;
+        const keys = attnData.keys;
+        const rawScores = attnData.rawScores;
+        const weights = attnData.weights;
+
+        // Render Q Vector Header
+        let html = `
+        <div class="flex flex-col md:flex-row justify-between gap-4 mb-4 pb-4 border-b border-slate-800/80 text-left w-full">
+            <div>
+                <span class="text-[9px] font-black uppercase text-indigo-400 tracking-wider">Active Query Word:</span>
+                <div class="flex items-center gap-2 mt-1">
+                    <span class="text-base font-black text-white">"${s.tokens[tokenIdx]}"</span>
+                    <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[9px] font-mono border border-indigo-500/40">${sandboxMode ? 'Custom Query Vector 🎛️' : 'Query Vector Q'}</span>
+                </div>
+            </div>
+            <div class="flex gap-2 self-start md:self-center overflow-x-auto w-full md:w-auto">
+                <div class="flex flex-col items-center bg-indigo-950/40 border border-indigo-900/60 rounded-lg p-2 min-w-[95px]">
+                    <span class="text-[8px] uppercase font-bold text-indigo-400 text-center truncate w-full" title="${dims[0]}">${dims[0]}</span>
+                    <span class="text-xs font-mono font-black text-indigo-300 mt-0.5">${qVal[0] >= 0 ? '+' : ''}${qVal[0].toFixed(1)}</span>
+                </div>
+                <div class="flex flex-col items-center bg-emerald-950/40 border border-emerald-900/60 rounded-lg p-2 min-w-[95px]">
+                    <span class="text-[8px] uppercase font-bold text-emerald-400 text-center truncate w-full" title="${dims[1]}">${dims[1]}</span>
+                    <span class="text-xs font-mono font-black text-emerald-300 mt-0.5">${qVal[1] >= 0 ? '+' : ''}${qVal[1].toFixed(1)}</span>
+                </div>
+                <div class="flex flex-col items-center bg-rose-950/40 border border-rose-900/60 rounded-lg p-2 min-w-[95px]">
+                    <span class="text-[8px] uppercase font-bold text-rose-400 text-center truncate w-full" title="${dims[2]}">${dims[2]}</span>
+                    <span class="text-xs font-mono font-black text-rose-300 mt-0.5">${qVal[2] >= 0 ? '+' : ''}${qVal[2].toFixed(1)}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto w-full">
+            <table class="w-full text-left text-xs min-w-[600px]">
+                <thead>
+                    <tr class="border-b border-slate-800/85 text-slate-500 font-bold text-[9px] uppercase tracking-wider">
+                        <th class="py-2 pr-4">Target Word (Key)</th>
+                        <th class="py-2 px-2">Key Vector (K)</th>
+                        <th class="py-2 px-2 text-right">Dot Product (Q · K)</th>
+                        <th class="py-2 px-2 text-right">Scaled (÷√3)</th>
+                        <th class="py-2 pl-4 text-right">Weight (Softmax)</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-900/60 font-medium">
+        `;
+
+        s.tokens.forEach((tok, j) => {
+            const kVal = keys[j];
+            const dot = qVal[0]*kVal[0] + qVal[1]*kVal[1] + qVal[2]*kVal[2];
+            const scaled = rawScores[j];
+            const w = weights[j];
+            const pct = Math.round(w * 100);
+            const isSelf = j === tokenIdx;
+            
+            // Build calculations string
+            const calcStr = `(${qVal[0].toFixed(1)}×${kVal[0].toFixed(1)}) + (${qVal[1].toFixed(1)}×${kVal[1].toFixed(1)}) + (${qVal[2].toFixed(1)}×${kVal[2].toFixed(1)}) = ${dot.toFixed(2)}`;
+
+            const rowClass = isSelf ? 'bg-indigo-950/20 text-white' : 'text-slate-300 hover:bg-slate-800/20';
+
+            html += `
+            <tr class="${rowClass} transition-colors">
+                <td class="py-2.5 pr-4 font-mono font-bold">
+                    <span class="inline-block w-2 h-2 rounded-full mr-2" style="background: ${isSelf ? '#8b5cf6' : '#475569'}"></span>
+                    ${tok} ${isSelf ? '<span class="text-[9px] text-slate-500 font-sans font-bold">(query)</span>' : ''}
+                </td>
+                <td class="py-2.5 px-2 font-mono text-[10px]">
+                    [<span class="text-indigo-400">${kVal[0].toFixed(1)}</span>, <span class="text-emerald-400">${kVal[1].toFixed(1)}</span>, <span class="text-rose-400">${kVal[2].toFixed(1)}</span>]
+                </td>
+                <td class="py-2.5 px-2 text-right font-mono text-[10px] text-slate-400">
+                    ${calcStr}
+                </td>
+                <td class="py-2.5 px-2 text-right font-mono font-bold text-slate-300">
+                    ${scaled.toFixed(2)}
+                </td>
+                <td class="py-2.5 pl-4 text-right">
+                    <div class="inline-flex items-center gap-2 justify-end w-full">
+                        <span class="font-mono font-black text-blue-400 text-xs w-8">${pct}%</span>
+                        <div class="w-16 h-1.5 bg-slate-800 rounded overflow-hidden">
+                            <div class="h-full bg-blue-500" style="width: ${pct}%;"></div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            `;
+        });
+
+        html += `
+                </tbody>
+            </table>
+        </div>
+        `;
+
+        document.getElementById('vector-math-breakdown').innerHTML = html;
+    }
+
+    /* ─── SANDBOX INTERACTION HANDLERS ──────────────────────────────────── */
+    function toggleSandboxMode() {
+        const checkbox = document.getElementById('sandbox-toggle');
+        sandboxMode = checkbox.checked;
+        const slidersWrap = document.getElementById('sandbox-sliders');
+        
+        if (sandboxMode) {
+            slidersWrap.classList.remove('hidden');
+            // Initialize sliders with the current active token's default Q vector
+            const vecData = getActiveVectors();
+            const defaultQ = vecData.q[activeTokenIdx] || [0.0, 0.0, 0.0];
+            sandboxQ = [...defaultQ];
+            
+            document.getElementById('slider-dim0').value = sandboxQ[0];
+            document.getElementById('slider-dim1').value = sandboxQ[1];
+            document.getElementById('slider-dim2').value = sandboxQ[2];
+            
+            document.getElementById('slider-dim0-val').textContent = sandboxQ[0].toFixed(1);
+            document.getElementById('slider-dim1-val').textContent = sandboxQ[1].toFixed(1);
+            document.getElementById('slider-dim2-val').textContent = sandboxQ[2].toFixed(1);
+        } else {
+            slidersWrap.classList.add('hidden');
+        }
+        
+        // Re-render components with the current mode
+        if (activeTokenIdx !== null) {
+            hoverToken(activeTokenIdx);
+        }
+    }
+
+    function onSandboxSliderChange() {
+        sandboxQ[0] = parseFloat(document.getElementById('slider-dim0').value);
+        sandboxQ[1] = parseFloat(document.getElementById('slider-dim1').value);
+        sandboxQ[2] = parseFloat(document.getElementById('slider-dim2').value);
+        
+        document.getElementById('slider-dim0-val').textContent = sandboxQ[0].toFixed(1);
+        document.getElementById('slider-dim1-val').textContent = sandboxQ[1].toFixed(1);
+        document.getElementById('slider-dim2-val').textContent = sandboxQ[2].toFixed(1);
+        
+        if (activeTokenIdx !== null) {
+            drawLines(activeTokenIdx);
+            renderReadout(activeTokenIdx);
+            renderVectorMath(activeTokenIdx);
+        }
+    }
+
+    /* ─── EVENTS ────────────────────────────────────────────────────────── */
+    function hoverToken(idx) {
+        activeTokenIdx = idx;
+        
+        // If sandbox is enabled and we hovered a new token, sync the sliders
+        if (sandboxMode) {
+            const vecData = getActiveVectors();
+            const defaultQ = vecData.q[idx] || [0.0, 0.0, 0.0];
+            sandboxQ = [...defaultQ];
+            
+            document.getElementById('slider-dim0').value = sandboxQ[0];
+            document.getElementById('slider-dim1').value = sandboxQ[1];
+            document.getElementById('slider-dim2').value = sandboxQ[2];
+            
+            document.getElementById('slider-dim0-val').textContent = sandboxQ[0].toFixed(1);
+            document.getElementById('slider-dim1-val').textContent = sandboxQ[1].toFixed(1);
+            document.getElementById('slider-dim2-val').textContent = sandboxQ[2].toFixed(1);
+        }
+        
+        renderTokens();
+        drawLines(idx);
+        renderReadout(idx);
+        updateNarrative(idx);
+        updateBadge(idx);
+        renderVectorMath(idx);
+    }
+
+    function unhoverToken() {
+        // Keep lines visible if a token was clicked (activeTokenIdx stays)
+    }
+
+    function selectSentence(idx) {
+        activeSentenceIdx = idx;
+        activeTokenIdx = null;
+        
+        // Reset sandbox
+        sandboxMode = false;
+        const checkbox = document.getElementById('sandbox-toggle');
+        if (checkbox) checkbox.checked = false;
+        const slidersWrap = document.getElementById('sandbox-sliders');
+        if (slidersWrap) slidersWrap.classList.add('hidden');
+        
+        renderSentenceButtons();
+        renderTokens();
+        clearLines();
+        document.getElementById('active-token-label').textContent = '—';
+        document.getElementById('attn-readout').innerHTML = '<p class="text-xs text-gray-400 italic">Hover over a <span class="text-amber-600 font-bold">highlighted</span> word to see its attention weights.</p>';
+        updateNarrative(null);
+        updateBadge(null);
+        renderVectorMath(null);
+    }
+
+    function selectHead(idx) {
+        activeHeadIdx = idx;
+        renderHeadButtons();
+        if (activeTokenIdx !== null) {
+            // Reset sandboxQ for the new head so we don't carry over the old head's edited values
+            if (sandboxMode) {
+                const vecData = getActiveVectors();
+                const defaultQ = vecData.q[activeTokenIdx] || [0.0, 0.0, 0.0];
+                sandboxQ = [...defaultQ];
+                
+                document.getElementById('slider-dim0').value = sandboxQ[0];
+                document.getElementById('slider-dim1').value = sandboxQ[1];
+                document.getElementById('slider-dim2').value = sandboxQ[2];
+                
+                document.getElementById('slider-dim0-val').textContent = sandboxQ[0].toFixed(1);
+                document.getElementById('slider-dim1-val').textContent = sandboxQ[1].toFixed(1);
+                document.getElementById('slider-dim2-val').textContent = sandboxQ[2].toFixed(1);
+            }
+            
+            drawLines(activeTokenIdx);
+            renderReadout(activeTokenIdx);
+            updateNarrative(activeTokenIdx);
+            renderVectorMath(activeTokenIdx);
+        }
+    }
+
+    /* ─── INIT ──────────────────────────────────────────────────────────── */
+    window.addEventListener('DOMContentLoaded', () => {
+        renderSentenceButtons();
+        renderHeadButtons();
+        renderTokens();
+        updateBadge(null);
+        renderVectorMath(null);
+
+        // Redraw lines on window resize (token positions shift)
+        window.addEventListener('resize', () => {
+            if (activeTokenIdx !== null) drawLines(activeTokenIdx);
+        });
+    });
+    </script>
+
+</body>
+</html>
