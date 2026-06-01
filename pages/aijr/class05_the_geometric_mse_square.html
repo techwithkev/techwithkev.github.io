@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Geometric MSE Square - AI Competition Jr</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .interactive-canvas {
+            cursor: crosshair;
+        }
+        .mode-btn.active {
+            background-color: #f59e0b;
+            color: #ffffff;
+            border-color: #d97706;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+
+        <!-- Navigation -->
+        <nav class="mb-6 pt-4 no-print">
+            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-amber-600 transition-colors font-mono" style="text-decoration: none;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Course Hub
+            </a>
+        </nav>
+
+        <!-- Header -->
+        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+            <div>
+                <h1 class="text-4xl font-black tracking-tight text-gray-900 uppercase font-mono">The Geometric <span class="text-amber-500 text-glow-amber">MSE Square</span></h1>
+                <p class="text-gray-500 font-medium italic">Adjust the regression line to see how vertical residuals form physical squares. Watch Mean Squared Error (MSE) represent the total area of these squares!</p>
+            </div>
+            <div id="status-badge" class="px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-amber-50 border border-amber-200 text-amber-800 shadow-sm transition-all duration-300">
+                Class 05 Visualizer
+            </div>
+        </header>
+
+        <!-- Main Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
+
+            <!-- Left Controls Panel (Lg: 5 cols) -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+
+                <!-- Parameters Editor -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-5">
+                    <div>
+                        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-100 pb-2">1. Regression Line Parameters</h2>
+                        
+                        <div class="space-y-6">
+                            <!-- Slope Slider -->
+                            <div>
+                                <div class="flex justify-between items-end mb-2">
+                                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Slope (m) - Angle</label>
+                                    <span id="slope-display" class="text-xs font-mono font-black bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1 rounded-full">0.50</span>
+                                </div>
+                                <input type="range" id="slope-slider" min="-2.0" max="2.0" step="0.05" value="0.50" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                                <div class="flex justify-between text-[9px] font-bold text-gray-400 mt-2 uppercase tracking-tighter">
+                                    <span>Negative Slope</span>
+                                    <span>Zero (Flat)</span>
+                                    <span>Positive Slope</span>
+                                </div>
+                            </div>
+
+                            <!-- Intercept Slider -->
+                            <div>
+                                <div class="flex justify-between items-end mb-2">
+                                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Intercept (b) - Height</label>
+                                    <span id="intercept-display" class="text-xs font-mono font-black bg-gray-100 text-gray-700 border border-gray-200 px-3 py-1 rounded-full">1.00</span>
+                                </div>
+                                <input type="range" id="intercept-slider" min="-4.0" max="4.0" step="0.1" value="1.00" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                                <div class="flex justify-between text-[9px] font-bold text-gray-400 mt-2 uppercase tracking-tighter">
+                                    <span>Shift Down</span>
+                                    <span>Origin (0.0)</span>
+                                    <span>Shift Up</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Canvas Mode Toggles -->
+                    <div>
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">2. Point Interaction Tools</h3>
+                        <div class="grid grid-cols-2 gap-2 mb-3">
+                            <button id="btn-drag-mode" class="mode-btn px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-black uppercase rounded-lg border border-amber-600 transition-colors active">
+                                🖐️ Drag Points
+                            </button>
+                            <button id="btn-add-mode" class="mode-btn px-3 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-bold uppercase rounded-lg border border-gray-200 transition-colors">
+                                ➕ Add Points
+                            </button>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="clearPoints()" class="flex-1 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-[10px] font-bold uppercase rounded-md border border-rose-200 transition-colors">
+                                Clear Canvas
+                            </button>
+                            <button onclick="resetToDefaults()" class="flex-1 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-[10px] font-bold uppercase rounded-md border border-gray-300 transition-colors">
+                                Reset defaults
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Display Options -->
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 flex flex-col gap-2">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" id="toggle-squares" checked class="w-4 h-4 cursor-pointer text-amber-600 rounded border-gray-300 focus:ring-amber-500">
+                            <label for="toggle-squares" class="text-xs font-bold text-gray-600 uppercase tracking-wider cursor-pointer select-none">Show MSE Squares (Error^2)</label>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" id="toggle-best-fit" class="w-4 h-4 cursor-pointer text-amber-600 rounded border-gray-300 focus:ring-amber-500">
+                            <label for="toggle-best-fit" class="text-xs font-bold text-gray-600 uppercase tracking-wider cursor-pointer select-none">Show OLS Best Fit Line (Dashed)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Match Benchmark Challenge -->
+                <div id="challenge-panel" class="rounded-2xl p-5 border-l-4 border-amber-500 bg-amber-50 text-amber-900 transition-all duration-300 flex flex-col gap-1.5 shadow-sm">
+                    <div class="flex justify-between items-center">
+                        <h3 id="challenge-title" class="font-black text-xs uppercase tracking-wider">Match the Best Fit Line!</h3>
+                        <span id="challenge-score" class="px-2.5 py-0.5 rounded-full font-mono text-[9px] font-bold uppercase bg-amber-200 text-amber-900">High Error ❌</span>
+                    </div>
+                    <p id="challenge-desc" class="text-xs font-medium leading-relaxed">
+                        Adjust the Slope ($m$) and Intercept ($b$) sliders to try to minimize the Amber squares. See if you can get your Manual MSE close to the OLS minimum fit!
+                    </p>
+                </div>
+
+                <!-- Loss metrics Summary cards -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-900 border border-slate-800 text-white rounded-2xl p-4 flex flex-col justify-center items-center text-center shadow-sm">
+                        <span class="text-[9px] uppercase tracking-wider text-amber-400 font-black mb-1">Your Total Area (SSE)</span>
+                        <span id="metric-sse" class="text-2xl font-mono font-black text-amber-300">0.00</span>
+                        <span class="text-[8px] font-mono text-slate-400 font-bold uppercase mt-0.5">Sum of all square sizes</span>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 text-white rounded-2xl p-4 flex flex-col justify-center items-center text-center shadow-sm">
+                        <span class="text-[9px] uppercase tracking-wider text-amber-400 font-black mb-1">Your Average Area (MSE)</span>
+                        <span id="metric-mse" class="text-2xl font-mono font-black text-amber-300">0.00</span>
+                        <span class="text-[8px] font-mono text-slate-400 font-bold uppercase mt-0.5">Total Area / N</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Visual Stage & Code Panel (Lg: 7 cols) -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
+
+                <!-- 2D Regression Plot Canvas -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest">3. The Geometric Regression Grid</h2>
+                            <p class="text-[11px] text-gray-400">Drag blue coordinates to change points. Slide parameters or drag line handles to alter linear predictions.</p>
+                        </div>
+                        <div id="point-count-chip" class="px-2.5 py-0.5 text-[9px] font-mono font-black uppercase rounded bg-slate-100 text-slate-500 tracking-wider">
+                            Points: N=6
+                        </div>
+                    </div>
+
+                    <!-- Canvas container -->
+                    <div class="relative w-full h-[360px] bg-slate-950 border border-slate-900 shadow-inner rounded-xl overflow-hidden">
+                        <canvas id="concept-canvas" class="w-full h-full absolute inset-0 interactive-canvas"></canvas>
+                        <!-- Floating hover overlay -->
+                        <div id="hover-overlay" class="absolute pointer-events-none text-[9px] font-mono font-black bg-black/80 text-slate-200 rounded px-2 py-1 border border-slate-800 hidden"></div>
+                        <!-- Canvas instructions -->
+                        <div class="absolute top-3 left-3 bg-slate-900/80 px-2.5 py-1 rounded text-[9px] uppercase font-bold text-slate-400 border border-slate-800 tracking-wide select-none pointer-events-none">
+                            💡 Drag blue points to warp dataset
+                        </div>
+                    </div>
+                </div>
+
+                <!-- scikit-learn Code view -->
+                <div class="bg-slate-900 border-2 border-slate-800 p-6 rounded-2xl shadow-inner flex flex-col gap-4 text-white">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <div>
+                            <h2 class="text-xs font-black uppercase tracking-wider text-amber-400">Mean Squared Error calculation</h2>
+                            <p class="text-[10px] text-slate-400">Live generated NumPy python algorithm</p>
+                        </div>
+                        <div class="flex bg-slate-950 p-0.5 rounded-lg border border-slate-800 shadow-inner font-mono text-[9px] text-slate-300 uppercase tracking-widest px-2.5 py-1">
+                            numpy.mean
+                        </div>
+                    </div>
+
+                    <!-- Code block -->
+                    <div class="bg-slate-950/80 rounded-xl border border-slate-800/80 p-4 font-mono text-[10px] text-slate-300 overflow-x-auto shadow-inner leading-relaxed">
+                        <pre id="numpy-code" class="whitespace-pre"></pre>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- 3-Column Educational Context Footer -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <!-- Explain Underfitting -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-amber-50 text-amber-600 border border-amber-100 rounded-xl flex items-center justify-center font-bold mb-4 font-mono text-xs">01</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">Why Square the Errors?</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    By squaring the residual distance ($y_i - \hat{y}_i$), we create actual <strong>physical squares</strong>. This has two critical effects:
+                </p>
+                <p class="text-xs text-gray-500 leading-relaxed mt-2">
+                    1. <strong>Outliers are highly penalized</strong>: A residual of 3 yields a square area of 9, while a residual of 1 yields an area of 1. Squaring amplifies massive misses.
+                </p>
+                <p class="text-xs text-gray-500 leading-relaxed mt-1">
+                    2. <strong>Cancels negative signs</strong>: Errors above the line ($+e$) and below the line ($-e$) both form positive squared areas, preventing them from canceling each other out.
+                </p>
+            </div>
+
+            <!-- Explain Overfitting -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-amber-50 text-amber-600 border border-amber-100 rounded-xl flex items-center justify-center font-bold mb-4 font-mono text-xs">02</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">Mean Squared Error</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    The mathematical formula for MSE is:
+                </p>
+                <div class="bg-slate-50 border border-gray-200 rounded-lg p-2.5 font-mono text-[10px] text-center my-3 text-gray-700">
+                    MSE = 1/N * Σ (y_i - ŷ_i)²
+                </div>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    Geometrically, the Sum of Squared Errors (SSE) is the **sum of the areas of all the translucent amber squares**. The Mean Squared Error (MSE) is simply the **average area of these squares**.
+                </p>
+            </div>
+
+            <!-- Explain AI connection -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center font-bold mb-4 border border-amber-200 font-mono text-xs">03</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">How AI Uses This</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    Mean Squared Error is the absolute gold-standard loss function for continuous prediction (regression) tasks in Artificial Intelligence.
+                </p>
+                <p class="text-xs text-gray-500 leading-relaxed mt-2">
+                    During training, neural networks or linear models use optimization strategies like **Gradient Descent**. The algorithm computes the derivative (slope) of this total area. It then step-by-step pivots and shifts weights to **shrink the squares** until their combined area is as tiny as mathematically possible.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MAIN JAVASCRIPT LOGIC -->
+    <script>
+        // Default coordinates
+        const DEFAULT_POINTS = [
+            { x: -3.0, y: -2.0 },
+            { x: -1.5, y: -0.5 },
+            { x: 0.0, y: 1.5 },
+            { x: 1.0, y: 0.5 },
+            { x: 2.5, y: 3.0 },
+            { x: 3.5, y: 2.0 }
+        ];
+
+        // Active dataset
+        let points = JSON.parse(JSON.stringify(DEFAULT_POINTS));
+
+        // Line parameters: y = m * x + b
+        let m_slope = 0.50;
+        let b_intercept = 1.00;
+
+        // Interaction state
+        let interactionMode = 'drag'; // 'drag' or 'add'
+        let draggedPoint = null;
+        let activeLineDrag = null; // for dragging the line directly
+        const clickRadius = 15; // pixels for hit detection
+
+        // DOM elements
+        const canvas = document.getElementById('concept-canvas');
+        const ctx = canvas.getContext('2d');
+        const slopeSlider = document.getElementById('slope-slider');
+        const interceptSlider = document.getElementById('intercept-slider');
+        const slopeDisplay = document.getElementById('slope-display');
+        const interceptDisplay = document.getElementById('intercept-display');
+        const toggleSquares = document.getElementById('toggle-squares');
+        const toggleBestFit = document.getElementById('toggle-best-fit');
+        
+        const btnDragMode = document.getElementById('btn-drag-mode');
+        const btnAddMode = document.getElementById('btn-add-mode');
+        const pointCountChip = document.getElementById('point-count-chip');
+        const metricSse = document.getElementById('metric-sse');
+        const metricMse = document.getElementById('metric-mse');
+        
+        const challengePanel = document.getElementById('challenge-panel');
+        const challengeTitle = document.getElementById('challenge-title');
+        const challengeScore = document.getElementById('challenge-score');
+        const challengeDesc = document.getElementById('challenge-desc');
+        const numpyCode = document.getElementById('numpy-code');
+        const hoverOverlay = document.getElementById('hover-overlay');
+
+        /* ─── INITIALIZATION ──────────────────────────────────────────────── */
+        function init() {
+            setupListeners();
+            resizeCanvas();
+        }
+
+        function setupListeners() {
+            // Sliders
+            slopeSlider.addEventListener('input', () => {
+                m_slope = parseFloat(slopeSlider.value);
+                drawPlot();
+            });
+
+            interceptSlider.addEventListener('input', () => {
+                b_intercept = parseFloat(interceptSlider.value);
+                drawPlot();
+            });
+
+            // Toggles
+            toggleSquares.addEventListener('change', drawPlot);
+            toggleBestFit.addEventListener('change', drawPlot);
+
+            // Interaction buttons
+            btnDragMode.addEventListener('click', () => {
+                interactionMode = 'drag';
+                btnDragMode.className = 'mode-btn px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-black uppercase rounded-lg border border-amber-600 transition-colors active';
+                btnAddMode.className = 'mode-btn px-3 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-bold uppercase rounded-lg border border-gray-200 transition-colors';
+                canvas.style.cursor = 'default';
+            });
+
+            btnAddMode.addEventListener('click', () => {
+                interactionMode = 'add';
+                btnAddMode.className = 'mode-btn px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-xs font-black uppercase rounded-lg border border-amber-600 transition-colors active';
+                btnDragMode.className = 'mode-btn px-3 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-bold uppercase rounded-lg border border-gray-200 transition-colors';
+                canvas.style.cursor = 'crosshair';
+            });
+
+            // Canvas drag events
+            canvas.addEventListener('mousedown', handleMouseDown);
+            canvas.addEventListener('mousemove', handleMouseMove);
+            canvas.addEventListener('mouseup', handleMouseUp);
+            canvas.addEventListener('mouseleave', handleMouseLeave);
+
+            // Touch support for tablets/mobile
+            canvas.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                    const rect = canvas.getBoundingClientRect();
+                    const clientX = e.touches[0].clientX;
+                    const clientY = e.touches[0].clientY;
+                    handleDown(clientX - rect.left, clientY - rect.top);
+                }
+            });
+
+            canvas.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 1) {
+                    const rect = canvas.getBoundingClientRect();
+                    const clientX = e.touches[0].clientX;
+                    const clientY = e.touches[0].clientY;
+                    handleMove(clientX - rect.left, clientY - rect.top);
+                    e.preventDefault();
+                }
+            });
+
+            canvas.addEventListener('touchend', () => {
+                draggedPoint = null;
+                activeLineDrag = null;
+            });
+
+            window.addEventListener('resize', resizeCanvas);
+        }
+
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            drawPlot();
+        }
+
+        /* ─── POINT ACTIONS ───────────────────────────────────────────────── */
+        function clearPoints() {
+            points = [];
+            drawPlot();
+        }
+
+        function resetToDefaults() {
+            points = JSON.parse(JSON.stringify(DEFAULT_POINTS));
+            m_slope = 0.50;
+            b_intercept = 1.00;
+            slopeSlider.value = 0.50;
+            interceptSlider.value = 1.00;
+            drawPlot();
+        }
+
+        /* ─── CANVAS COORDINATE MATHEMATICAL MAPPING ───────────────────────── */
+        // Mathematically center origin, dynamic scaling based on sizing
+        function getScale() {
+            const w = canvas.width;
+            const h = canvas.height;
+            return Math.min(w, h) / 10; // ~40-50 pixels per unit
+        }
+
+        const getX = (x) => canvas.width / 2 + x * getScale();
+        const getY = (y) => canvas.height / 2 - y * getScale();
+        const getMathX = (px) => (px - canvas.width / 2) / getScale();
+        const getMathY = (py) => (canvas.height / 2 - py) / getScale();
+
+        /* ─── MOUSE/TOUCH EVENT HANDLERS ──────────────────────────────────── */
+        function handleMouseDown(e) {
+            const rect = canvas.getBoundingClientRect();
+            const px = e.clientX - rect.left;
+            const py = e.clientY - rect.top;
+            handleDown(px, py, e.button === 2 || e.ctrlKey || e.shiftKey);
+        }
+
+        function handleDown(px, py, isSecondaryAction = false) {
+            const mx = getMathX(px);
+            const my = getMathY(py);
+
+            // Double click or right click delete point
+            if (isSecondaryAction) {
+                const clickIdx = findClosestPointIndex(px, py);
+                if (clickIdx !== -1) {
+                    points.splice(clickIdx, 1);
+                    drawPlot();
+                    return;
+                }
+            }
+
+            if (interactionMode === 'add') {
+                // Add a new point
+                // Constrain limits
+                if (Math.abs(mx) <= 5.5 && Math.abs(my) <= 5.5) {
+                    points.push({ x: parseFloat(mx.toFixed(2)), y: parseFloat(my.toFixed(2)) });
+                    drawPlot();
+                }
+            } else {
+                // Check if clicking close to an existing point to drag
+                const clickIdx = findClosestPointIndex(px, py);
+                if (clickIdx !== -1) {
+                    draggedPoint = points[clickIdx];
+                    canvas.style.cursor = 'grabbing';
+                } else {
+                    // Check if clicking near the line to drag/adjust parameters directly
+                    const distToLine = Math.abs(my - (m_slope * mx + b_intercept)) / Math.sqrt(m_slope * m_slope + 1);
+                    if (distToLine * getScale() < 18) {
+                        // Clicked near line! 
+                        // If near middle (close to x=0), drag intercept
+                        // If far from middle (x near edges), drag slope
+                        if (Math.abs(mx) < 1.2) {
+                            activeLineDrag = { type: 'intercept', initialY: my, initialB: b_intercept };
+                        } else {
+                            activeLineDrag = { type: 'slope', x: mx, initialY: my, initialM: m_slope };
+                        }
+                        canvas.style.cursor = 'grabbing';
+                    }
+                }
+            }
+        }
+
+        function handleMouseMove(e) {
+            const rect = canvas.getBoundingClientRect();
+            const px = e.clientX - rect.left;
+            const py = e.clientY - rect.top;
+            handleMove(px, py);
+        }
+
+        function handleMove(px, py) {
+            const mx = getMathX(px);
+            const my = getMathY(py);
+
+            // 1. If dragging a point
+            if (draggedPoint) {
+                draggedPoint.x = Math.max(-5.0, Math.min(5.0, parseFloat(mx.toFixed(2))));
+                draggedPoint.y = Math.max(-5.0, Math.min(5.0, parseFloat(my.toFixed(2))));
+                drawPlot();
+                return;
+            }
+
+            // 2. If dragging the line
+            if (activeLineDrag) {
+                if (activeLineDrag.type === 'intercept') {
+                    const deltaY = my - activeLineDrag.initialY;
+                    b_intercept = parseFloat((activeLineDrag.initialB + deltaY).toFixed(2));
+                    b_intercept = Math.max(-4.0, Math.min(4.0, b_intercept));
+                    interceptSlider.value = b_intercept;
+                } else if (activeLineDrag.type === 'slope') {
+                    // Determine rotation change
+                    // y = m*x + b -> m = (y - b) / x
+                    let newM = (my - b_intercept) / activeLineDrag.x;
+                    m_slope = parseFloat(newM.toFixed(2));
+                    m_slope = Math.max(-2.0, Math.min(2.0, m_slope));
+                    slopeSlider.value = m_slope;
+                }
+                drawPlot();
+                return;
+            }
+
+            // 3. Hovering feedback
+            const hoverIdx = findClosestPointIndex(px, py);
+            if (hoverIdx !== -1) {
+                canvas.style.cursor = 'grab';
+                const pt = points[hoverIdx];
+                hoverOverlay.style.left = `${px + 15}px`;
+                hoverOverlay.style.top = `${py - 25}px`;
+                hoverOverlay.style.display = 'block';
+                hoverOverlay.textContent = `Point: (${pt.x.toFixed(2)}, ${pt.y.toFixed(2)})`;
+            } else {
+                // Hovering near the predictive line?
+                const distToLine = Math.abs(my - (m_slope * mx + b_intercept)) / Math.sqrt(m_slope * m_slope + 1);
+                if (interactionMode === 'drag' && distToLine * getScale() < 18) {
+                    canvas.style.cursor = Math.abs(mx) < 1.2 ? 'ns-resize' : 'n-resize';
+                    hoverOverlay.style.left = `${px + 15}px`;
+                    hoverOverlay.style.top = `${py - 25}px`;
+                    hoverOverlay.style.display = 'block';
+                    hoverOverlay.textContent = "Drag center to shift intercept (b), drag ends to rotate (m)";
+                } else {
+                    canvas.style.cursor = interactionMode === 'add' ? 'crosshair' : 'default';
+                    hoverOverlay.style.display = 'none';
+                }
+            }
+        }
+
+        function handleMouseUp() {
+            draggedPoint = null;
+            activeLineDrag = null;
+            if (interactionMode === 'drag') {
+                canvas.style.cursor = 'default';
+            }
+        }
+
+        function handleMouseLeave() {
+            draggedPoint = null;
+            activeLineDrag = null;
+            hoverOverlay.style.display = 'none';
+        }
+
+        function findClosestPointIndex(px, py) {
+            let minDistance = clickRadius;
+            let closestIndex = -1;
+
+            for (let i = 0; i < points.length; i++) {
+                const ptX = getX(points[i].x);
+                const ptY = getY(points[i].y);
+                const dist = Math.hypot(px - ptX, py - ptY);
+
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    closestIndex = i;
+                }
+            }
+            return closestIndex;
+        }
+
+        /* ─── MATHEMATICAL LEAST SQUARES FORMULAS ──────────────────────────── */
+        function calculateOLSBestFit() {
+            const n = points.length;
+            if (n < 2) {
+                return { m: 0.0, b: 0.0, isPossible: false };
+            }
+
+            let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+            points.forEach(p => {
+                sumX += p.x;
+                sumY += p.y;
+                sumXY += p.x * p.y;
+                sumXX += p.x * p.x;
+            });
+
+            const meanX = sumX / n;
+            const meanY = sumY / n;
+
+            // Slope denominator check to avoid vertical singularities
+            let numerator = 0;
+            let denominator = 0;
+            points.forEach(p => {
+                numerator += (p.x - meanX) * (p.y - meanY);
+                denominator += (p.x - meanX) * (p.x - meanX);
+            });
+
+            if (Math.abs(denominator) < 1e-9) {
+                return { m: 0.0, b: meanY, isPossible: true };
+            }
+
+            const m_opt = numerator / denominator;
+            const b_opt = meanY - m_opt * meanX;
+
+            return { m: m_opt, b: b_opt, isPossible: true };
+        }
+
+        function getMSE(m, b) {
+            if (points.length === 0) return 0.0;
+            let errSqSum = 0;
+            points.forEach(p => {
+                const pred = m * p.x + b;
+                errSqSum += Math.pow(p.y - pred, 2);
+            });
+            return errSqSum / points.length;
+        }
+
+        /* ─── PLOT RENDERING ──────────────────────────────────────────────── */
+        function drawPlot() {
+            const w = canvas.width;
+            const h = canvas.height;
+            const scale = getScale();
+
+            ctx.clearRect(0, 0, w, h);
+
+            // 1. Draw Gridlines
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+            
+            // X units vertical gridlines
+            for (let x = -5; x <= 5; x += 1) {
+                ctx.beginPath();
+                ctx.moveTo(getX(x), 0);
+                ctx.lineTo(getX(x), h);
+                ctx.stroke();
+            }
+            // Y units horizontal gridlines
+            for (let y = -5; y <= 5; y += 1) {
+                ctx.beginPath();
+                ctx.moveTo(0, getY(y));
+                ctx.lineTo(w, getY(y));
+                ctx.stroke();
+            }
+
+            // 2. Draw Main Origin Axes
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(w / 2, 0); ctx.lineTo(w / 2, h); // Y Axis
+            ctx.moveTo(0, h / 2); ctx.lineTo(w, h / 2); // X Axis
+            ctx.stroke();
+
+            // Label axes units
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = 'bold 9px monospace';
+            ctx.textAlign = 'center';
+            for (let x = -5; x <= 5; x++) {
+                if (x !== 0) ctx.fillText(x, getX(x), h / 2 + 15);
+            }
+            ctx.textAlign = 'right';
+            for (let y = -5; y <= 5; y++) {
+                if (y !== 0) ctx.fillText(y, w / 2 - 8, getY(y) + 3);
+            }
+
+            // 3. Perform OLS math & calculations
+            const ols = calculateOLSBestFit();
+            const manualSse = points.reduce((acc, p) => acc + Math.pow(p.y - (m_slope * p.x + b_intercept), 2), 0);
+            const manualMse = points.length > 0 ? manualSse / points.length : 0;
+            const optimalMse = ols.isPossible ? getMSE(ols.m, ols.b) : 0;
+
+            // Update DOM metrics
+            pointCountChip.textContent = `Points: N=${points.length}`;
+            slopeDisplay.textContent = m_slope.toFixed(2);
+            interceptDisplay.textContent = b_intercept.toFixed(2);
+            metricSse.textContent = manualSse.toFixed(3);
+            metricMse.textContent = manualMse.toFixed(3);
+
+            // 4. Draw OLS benchmark dashed line
+            if (toggleBestFit.checked && ols.isPossible) {
+                ctx.strokeStyle = '#38bdf8'; // Sky-400
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([4, 4]);
+                ctx.beginPath();
+                ctx.moveTo(getX(-5), getY(ols.m * -5 + ols.b));
+                ctx.lineTo(getX(5), getY(ols.m * 5 + ols.b));
+                ctx.stroke();
+                ctx.setLineDash([]); // Reset
+            }
+
+            // 5. Draw Predictive Line
+            ctx.strokeStyle = '#f59e0b'; // Amber-500
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(getX(-5.5), getY(m_slope * -5.5 + b_intercept));
+            ctx.lineTo(getX(5.5), getY(m_slope * 5.5 + b_intercept));
+            ctx.stroke();
+
+            // Draw line handles helpers in drag mode
+            if (interactionMode === 'drag') {
+                ctx.fillStyle = '#ffffff';
+                ctx.strokeStyle = '#d97706';
+                ctx.lineWidth = 2.5;
+
+                // Pivot nodes at x = -3 and x = 3
+                const hx1 = -3.5, hy1 = m_slope * hx1 + b_intercept;
+                const hx2 = 3.5, hy2 = m_slope * hx2 + b_intercept;
+                const hx3 = 0, hy3 = b_intercept;
+
+                // End handles (rotators)
+                [ {x: hx1, y: hy1}, {x: hx2, y: hy2} ].forEach(node => {
+                    ctx.beginPath();
+                    ctx.arc(getX(node.x), getY(node.y), 4.5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                });
+
+                // Center handle (translator)
+                ctx.strokeStyle = '#b45309';
+                ctx.beginPath();
+                ctx.rect(getX(hx3) - 4.5, getY(hy3) - 4.5, 9, 9);
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            // 6. Draw MSE Squares (the core concept!)
+            if (toggleSquares.checked) {
+                points.forEach(p => {
+                    const predY = m_slope * p.x + b_intercept;
+                    const dy = p.y - predY; // height of vertical residual
+                    
+                    const px1 = getX(p.x);
+                    const py1 = getY(predY);
+                    const px2 = getX(p.x);
+                    const py2 = getY(p.y);
+                    
+                    // Draw square extending horizontally (to the right if dy > 0, to left if dy < 0)
+                    const px3 = getX(p.x + dy);
+                    const py3 = getY(p.y);
+                    const px4 = getX(p.x + dy);
+                    const py4 = getY(predY);
+
+                    // Render translucent fill and amber borders
+                    ctx.fillStyle = 'rgba(245, 158, 11, 0.15)';
+                    ctx.strokeStyle = 'rgba(245, 158, 11, 0.55)';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.moveTo(px1, py1);
+                    ctx.lineTo(px2, py2);
+                    ctx.lineTo(px3, py3);
+                    ctx.lineTo(px4, py4);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Connect point to prediction with a bold dashed residual line
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([2, 2]);
+                    ctx.beginPath();
+                    ctx.moveTo(px1, py1);
+                    ctx.lineTo(px2, py2);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    // Area Badge inside the square (only if square is large enough to read easily)
+                    if (Math.abs(dy) >= 0.35) {
+                        const sqArea = dy * dy;
+                        // Center coordinates of square
+                        const cx = getX(p.x + dy / 2);
+                        const cy = getY((p.y + predY) / 2);
+
+                        // Pill badge background
+                        ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+                        const txt = sqArea.toFixed(2);
+                        ctx.font = 'bold 7.5px monospace';
+                        const txtW = ctx.measureText(txt).width;
+
+                        ctx.beginPath();
+                        ctx.roundRect(cx - txtW/2 - 3, cy - 6, txtW + 6, 12, 3);
+                        ctx.fill();
+
+                        ctx.fillStyle = '#fbbf24'; // Amber text
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(txt, cx, cy);
+                        ctx.textBaseline = 'alphabetic'; // Reset
+                    }
+                });
+            }
+
+            // 7. Draw Dataset Coordinates
+            points.forEach(p => {
+                ctx.fillStyle = '#06b6d4'; // Cyan core
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(getX(p.x), getY(p.y), 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            });
+
+            // 8. Update Gamified Challenge scoring badge
+            updateChallengeStatus(manualMse, optimalMse, ols.isPossible);
+
+            // 9. Sync Live code output
+            updateCodeRepresentation();
+        }
+
+        /* ─── GAMIFIED CHALLENGE STATUS GAUGE ──────────────────────────────── */
+        function updateChallengeStatus(manualMse, optimalMse, isPossible) {
+            if (points.length === 0) {
+                challengePanel.className = 'rounded-2xl p-5 border-l-4 border-gray-400 bg-gray-50 text-gray-800 transition-colors shadow-sm';
+                challengeTitle.textContent = 'Empty Dataset';
+                challengeScore.className = 'px-2.5 py-0.5 rounded-full font-mono text-[9px] font-bold uppercase bg-gray-200 text-gray-700';
+                challengeScore.textContent = 'No Data ❌';
+                challengeDesc.textContent = 'Add data points by switching to "Add Points" mode and clicking on the canvas grid!';
+                return;
+            }
+
+            if (!isPossible) {
+                challengePanel.className = 'rounded-2xl p-5 border-l-4 border-gray-400 bg-gray-50 text-gray-800 transition-colors shadow-sm';
+                challengeTitle.textContent = 'Calculating optimal fit...';
+                challengeScore.textContent = 'Waiting';
+                return;
+            }
+
+            const errorDelta = manualMse - optimalMse;
+
+            if (errorDelta < 0.03) {
+                challengePanel.className = 'rounded-2xl p-5 border-l-4 border-emerald-500 bg-emerald-50 text-emerald-900 transition-colors shadow-sm';
+                challengeTitle.textContent = 'Legendary OLS Fit! 🏆';
+                challengeScore.className = 'px-2.5 py-0.5 rounded-full font-mono text-[9px] font-bold bg-emerald-200 text-emerald-900';
+                challengeScore.textContent = 'Perfect Fit! 🌟';
+                challengeDesc.textContent = `Excellent job! Your manual parameters yield MSE of ${manualMse.toFixed(3)}, which completely aligns with the mathematical absolute minimum fit!`;
+            } else if (errorDelta < 0.25) {
+                challengePanel.className = 'rounded-2xl p-5 border-l-4 border-blue-500 bg-blue-50 text-blue-900 transition-colors shadow-sm';
+                challengeTitle.textContent = 'Great Fit! 👍';
+                challengeScore.className = 'px-2.5 py-0.5 rounded-full font-mono text-[9px] font-bold bg-blue-200 text-blue-900';
+                challengeScore.textContent = 'Close Match';
+                challengeDesc.textContent = `You are very close! Your MSE is ${manualMse.toFixed(3)}, just ${(errorDelta).toFixed(3)} units away from the optimal OLS MSE (${optimalMse.toFixed(3)}). Minor adjustments can seal it!`;
+            } else if (errorDelta < 1.0) {
+                challengePanel.className = 'rounded-2xl p-5 border-l-4 border-amber-500 bg-amber-50 text-amber-900 transition-colors shadow-sm';
+                challengeTitle.textContent = 'Getting Closer... 🔍';
+                challengeScore.className = 'px-2.5 py-0.5 rounded-full font-mono text-[9px] font-bold bg-amber-200 text-amber-900';
+                challengeScore.textContent = 'Moderate Error';
+                challengeDesc.textContent = `Squares are shrinking, but more optimization is needed. Your MSE is ${manualMse.toFixed(3)} vs. optimal of ${optimalMse.toFixed(3)}. Keep rotating and shifting!`;
+            } else {
+                challengePanel.className = 'rounded-2xl p-5 border-l-4 border-rose-500 bg-rose-50 text-rose-900 transition-colors shadow-sm';
+                challengeTitle.textContent = 'High MSE Loss! ❌';
+                challengeScore.className = 'px-2.5 py-0.5 rounded-full font-mono text-[9px] font-bold bg-rose-200 text-rose-900';
+                challengeScore.textContent = 'High Error';
+                challengeDesc.textContent = `The translucent amber squares have huge combined volume! Your MSE is ${manualMse.toFixed(3)}. Shift and pivot the line to shrink the sizes of the squares.`;
+            }
+        }
+
+        /* ─── CODE VIEW SYNCHRONIZATION ───────────────────────────────────── */
+        function updateCodeRepresentation() {
+            if (points.length === 0) {
+                numpyCode.innerHTML = `# Add points to the canvas to generate standard linear regression Python code...`;
+                return;
+            }
+
+            const xVals = points.map(p => p.x.toFixed(2));
+            const yVals = points.map(p => p.y.toFixed(2));
+
+            let output = `<span class="text-rose-400">import</span> numpy <span class="text-rose-400">as</span> np\n\n`;
+            output += `# 1. Active data coordinates from grid\n`;
+            output += `X = np.array([${xVals.join(', ')}])\n`;
+            output += `y = np.array([${yVals.join(', ')}])\n\n`;
+
+            output += `# 2. Your manual model weights (Slope and Intercept)\n`;
+            output += `m = <span class="text-yellow-300 font-bold">${m_slope.toFixed(2)}</span>\n`;
+            output += `b = <span class="text-yellow-300 font-bold">${b_intercept.toFixed(2)}</span>\n\n`;
+
+            output += `# 3. Predict linear model outputs: ŷ = m * X + b\n`;
+            output += `y_pred = m * X + b\n`;
+            output += `print(f"Predictions: {y_pred.round(2)}")\n\n`;
+
+            output += `# 4. Compute Squared Errors (Amber Square Areas) and Mean Squared Error\n`;
+            output += `squared_errors = (y - y_pred) ** 2\n`;
+            output += `mse = np.mean(squared_errors)\n`;
+            
+            const liveMse = getMSE(m_slope, b_intercept);
+            output += `print(f"Mean Squared Error: {mse:.4f}")  # Live output: <span class="text-emerald-400 font-black">${liveMse.toFixed(4)}</span>`;
+
+            numpyCode.innerHTML = output;
+        }
+
+        // Initialize visual elements on screen load
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>
