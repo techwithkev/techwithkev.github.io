@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Min-Max vs. Z-Score Normalizer - AI Competition Jr</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .interactive-canvas {
+            cursor: crosshair;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+
+        <!-- Navigation -->
+        <nav class="mb-6 pt-4 no-print">
+            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-emerald-600 transition-colors font-mono" style="text-decoration: none;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Course Hub
+            </a>
+        </nav>
+
+        <!-- Header -->
+        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+            <div>
+                <h1 class="text-4xl font-black tracking-tight text-gray-900 uppercase">Min-Max vs. <span class="text-emerald-600">Z-Score</span></h1>
+                <p class="text-gray-500 font-medium italic">Animate how datasets scale and witness the critical impact of outliers on AI feature scaling</p>
+            </div>
+            <div id="status-badge" class="px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-emerald-50 border border-emerald-200 text-emerald-800 shadow-sm transition-all duration-300">
+                Feature Scaling
+            </div>
+        </header>
+
+        <!-- Main Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
+
+            <!-- Left Controls Panel (Lg: 5 cols) -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+
+                <!-- Scaling Selector & Options -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-5">
+                    <div>
+                        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-100 pb-2">1. Select Scaling Preprocessor</h2>
+                        
+                        <!-- Scaling mode tab selectors -->
+                        <div class="grid grid-cols-3 gap-2" id="scaling-modes">
+                            <button onclick="setScalingMode('unscaled')" id="btn-unscaled" class="py-2.5 px-2 bg-emerald-600 text-white text-[11px] font-black uppercase tracking-wider rounded-xl shadow-sm border border-emerald-500 transition-all text-center">
+                                Unscaled
+                            </button>
+                            <button onclick="setScalingMode('minmax')" id="btn-minmax" class="py-2.5 px-2 bg-gray-50 hover:bg-emerald-50 text-gray-700 hover:text-emerald-900 text-[11px] font-black uppercase tracking-wider rounded-xl border border-gray-200 transition-all text-center">
+                                Min-Max [0, 1]
+                            </button>
+                            <button onclick="setScalingMode('zscore')" id="btn-zscore" class="py-2.5 px-2 bg-gray-50 hover:bg-emerald-50 text-gray-700 hover:text-emerald-900 text-[11px] font-black uppercase tracking-wider rounded-xl border border-gray-200 transition-all text-center">
+                                Z-Score Standard
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Outlier Controller -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2 border-b border-gray-100 pb-1.5">
+                            <h3 class="text-[10px] font-black uppercase text-gray-400 tracking-wider">Outlier Demonstration</h3>
+                            <span id="outlier-status" class="text-[9px] font-mono font-black uppercase tracking-wider text-rose-500 bg-rose-50 border border-rose-100 px-2 py-0.5 rounded">Active Outlier</span>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <!-- Toggle Outlier -->
+                            <div class="flex items-center justify-between bg-gray-50 p-3.5 rounded-xl border border-gray-200/60">
+                                <span class="text-xs font-bold text-gray-600 uppercase tracking-wide">Include Extreme Outlier</span>
+                                <input type="checkbox" id="outlier-toggle" checked onchange="toggleOutlier()" class="w-4 h-4 cursor-pointer text-emerald-600 rounded border-gray-300">
+                            </div>
+
+                            <!-- Outlier Coordinates Sliders -->
+                            <div id="outlier-sliders" class="space-y-4 pt-2">
+                                <div>
+                                    <div class="flex justify-between items-end mb-1 text-[10px] uppercase font-bold text-gray-400">
+                                        <span>Outlier Age (X Axis)</span>
+                                        <span id="outlier-age-display" class="font-mono text-rose-600 font-bold">95 yrs</span>
+                                    </div>
+                                    <input type="range" id="outlier-age" min="5" max="98" step="1" value="95" class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-rose-500" oninput="updateOutlierValues()">
+                                </div>
+                                <div>
+                                    <div class="flex justify-between items-end mb-1 text-[10px] uppercase font-bold text-gray-400">
+                                        <span>Outlier Income (Y Axis)</span>
+                                        <span id="outlier-income-display" class="font-mono text-rose-600 font-bold">$125,000</span>
+                                    </div>
+                                    <input type="range" id="outlier-income" min="5000" max="150000" step="2500" value="125000" class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-rose-500" oninput="updateOutlierValues()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hovered Diagnostic Inspector -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-100 pb-2">Active Node Diagnostic</h2>
+                    <div id="pixel-inspector" class="flex flex-col gap-3 text-xs text-gray-600 leading-relaxed">
+                        <!-- Populated by JS on hover -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Visual Stage & Code Panel (Lg: 7 cols) -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
+
+                <!-- 2D Scatter Plot Canvas -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-4">
+                    <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                        <div>
+                            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest">2. Dynamic 2D Scaling Stage</h2>
+                            <p class="text-[11px] text-gray-400">Watch the points smoothly glide as they rescale. Drag the <span class="text-rose-500 font-bold">red outlier</span> directly on the canvas!</p>
+                        </div>
+                    </div>
+
+                    <!-- Canvas stage -->
+                    <div class="relative w-full h-[320px] bg-slate-950 rounded-2xl border border-slate-900 shadow-inner flex items-center justify-center overflow-hidden">
+                        <canvas id="scatter-canvas" class="w-full h-full absolute inset-0 interactive-canvas"></canvas>
+                        <!-- Floating legend -->
+                        <div class="absolute bottom-4 right-4 flex flex-col gap-1.5 bg-slate-900/85 p-3 rounded-lg border border-slate-800 text-[9px] uppercase font-bold text-slate-400 tracking-wider pointer-events-none">
+                            <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 bg-emerald-500 rounded-full border border-emerald-300"></span>Main Population</div>
+                            <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 bg-rose-500 rounded-full border border-rose-300"></span>Outlier Coordinate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- scikit-learn Code view -->
+                <div class="bg-slate-900 border-2 border-slate-800 p-6 rounded-2xl shadow-inner flex flex-col gap-4 text-white">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <div>
+                            <h2 class="text-xs font-black uppercase tracking-wider text-emerald-400">Scikit-Learn Scaling Preprocessing</h2>
+                            <p class="text-[10px] text-slate-400">How to write this scaling transform in Python</p>
+                        </div>
+                        <div class="flex bg-slate-950 p-0.5 rounded-lg border border-slate-800 shadow-inner font-mono text-[9px] text-slate-300 uppercase tracking-widest px-2.5 py-1">
+                            sklearn.preprocessing
+                        </div>
+                    </div>
+
+                    <!-- Code block -->
+                    <div class="bg-slate-950/80 rounded-xl border border-slate-800/80 p-4 font-mono text-[10px] text-slate-300 overflow-x-auto shadow-inner leading-relaxed">
+                        <pre id="sklearn-code" class="whitespace-pre"></pre>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- 3-Column Educational Context Footer -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <!-- Explain Min-Max -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center font-bold mb-4 border border-emerald-100 font-mono text-xs">01</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">Min-Max Normalization</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    Min-Max scales features strictly into a fixed boundary, typically **[0, 1]**. 
+                    It is excellent when you have bounded ranges and no outliers (e.g. image pixel intensities 0–255).
+                </p>
+                <p class="text-xs text-rose-500 leading-relaxed mt-2 font-medium">
+                    ⚠️ Outlier Warning: Notice how dragging the red outlier to extreme coordinates forces all the other green dots to bunch together into a tiny, unreadable corner!
+                </p>
+            </div>
+
+            <!-- Explain Z-Score -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center font-bold mb-4 border border-emerald-100 font-mono text-xs">02</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">Z-Score Standardization</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    Z-Score centers data around a mean of **0** with a standard deviation of **1** ($\sigma$). 
+                    It makes variables dimensionless and robust.
+                </p>
+                <p class="text-xs text-emerald-600 leading-relaxed mt-2 font-medium">
+                    💪 Outlier Robustness: As you slide or drag the outlier, watch the standard deviation adjust. 
+                    The rest of the cluster remains spread out and readable because scaling depends on variance, not absolute min/max!
+                </p>
+            </div>
+
+            <!-- Explain AI connection -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center font-bold mb-4 border border-emerald-100 font-mono text-xs">03</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">Why Scale Features?</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    Most AI models calculate distances (like KNN or SVM) or run gradient descent optimization (like neural networks).
+                </p>
+                <p class="text-xs text-gray-500 leading-relaxed mt-2">
+                    Without scaling, features with massive raw ranges (Income: $0–150k) completely swamp smaller ranges (Age: 0–100), making the AI ignore the smaller dimension entirely!
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MAIN JAVASCRIPT LOGIC -->
+    <script>
+        // State variables
+        let scalingMode = 'unscaled'; // 'unscaled', 'minmax', 'zscore'
+        let includeOutlier = true;
+        let hoveredIndex = null;
+        let isDragging = false;
+
+        // Static representative main population points (Age: 18-75, Income: 20k-90k)
+        const RAW_DATA = [
+            { age: 24, income: 34000 }, { age: 31, income: 42000 },
+            { age: 45, income: 68000 }, { age: 22, income: 28000 },
+            { age: 54, income: 82000 }, { age: 38, income: 51000 },
+            { age: 62, income: 64000 }, { age: 29, income: 45000 },
+            { age: 48, income: 75000 }, { age: 19, income: 22000 },
+            { age: 67, income: 58000 }, { age: 35, income: 48000 },
+            { age: 52, income: 79000 }, { age: 41, income: 60000 },
+            { age: 58, income: 88000 }, { age: 27, income: 38000 }
+        ];
+
+        // The dynamic Outlier Point coordinates
+        let outlierPoint = { age: 95, income: 125000 };
+
+        // Point rendering positions for smooth transitions
+        // Each point will be: { ageCurrent, incomeCurrent, ageTarget, incomeTarget }
+        let animatedPoints = [];
+
+        // Canvas element references
+        const canvas = document.getElementById('scatter-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        const outlierToggle = document.getElementById('outlier-toggle');
+        const outlierAgeSlider = document.getElementById('outlier-age');
+        const outlierIncomeSlider = document.getElementById('outlier-income');
+        const outlierAgeDisplay = document.getElementById('outlier-age-display');
+        const outlierIncomeDisplay = document.getElementById('outlier-income-display');
+        const outlierSlidersWrap = document.getElementById('outlier-sliders');
+        const outlierStatus = document.getElementById('outlier-status');
+
+        const pixelInspector = document.getElementById('pixel-inspector');
+        const sklearnCode = document.getElementById('sklearn-code');
+
+        /* ─── INITIALIZATION ──────────────────────────────────────────────── */
+        function init() {
+            setupListeners();
+            initializeAnimatedPoints();
+            animateLoop();
+        }
+
+        function setupListeners() {
+            outlierToggle.checked = true;
+            outlierAgeSlider.value = 95;
+            outlierIncomeSlider.value = 125000;
+
+            outlierAgeSlider.addEventListener('input', updateOutlierValues);
+            outlierIncomeSlider.addEventListener('input', updateOutlierValues);
+
+            // Dragging interactions directly on canvas
+            canvas.addEventListener('mousedown', (e) => {
+                if (!includeOutlier) return;
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+
+                // Find the outlier's current coordinates in canvas pixels
+                const outlierAnim = animatedPoints[animatedPoints.length - 1];
+                if (!outlierAnim) return;
+
+                const dist = Math.sqrt(Math.pow(mouseX - outlierAnim.xPx, 2) + Math.pow(mouseY - outlierAnim.yPx, 2));
+
+                // If within 15px radius of outlier node
+                if (dist < 15) {
+                    isDragging = true;
+                }
+            });
+
+            canvas.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+
+                if (isDragging) {
+                    // Reverse map mouse coordinates back to data values depending on scalingMode
+                    const padding = 50;
+                    const plotW = canvas.width - padding * 2;
+                    const plotH = canvas.height - padding * 2;
+                    
+                    let targetAge = 0;
+                    let targetIncome = 0;
+
+                    const stats = calculateStatistics();
+
+                    if (scalingMode === 'unscaled') {
+                        targetAge = ((mouseX - padding) / plotW) * 100;
+                        targetIncome = (1 - (mouseY - padding) / plotH) * 150000;
+                    } 
+                    else if (scalingMode === 'minmax') {
+                        const scaledX = (mouseX - padding) / plotW;
+                        const scaledY = 1 - (mouseY - padding) / plotH;
+                        
+                        // Reverse Min-Max: x = scaled * (max - min) + min
+                        // Note: min/max here represents bounds BEFORE including the outlier in calculations if we want smooth drag,
+                        // but to maintain consistency we use absolute bounds.
+                        const ageMin = Math.min(...RAW_DATA.map(p => p.age));
+                        const incomeMin = Math.min(...RAW_DATA.map(p => p.income));
+                        
+                        // Rough boundaries estimation to prevent locking
+                        targetAge = scaledX * (100 - ageMin) + ageMin;
+                        targetIncome = scaledY * (150000 - incomeMin) + incomeMin;
+                    } 
+                    else if (scalingMode === 'zscore') {
+                        const scaledX = ((mouseX - padding) / (plotW / 2)) - 1; // z-score X
+                        const scaledY = 1 - ((mouseY - padding) / (plotH / 2)) * 2; // z-score Y (shifted)
+
+                        // Reverse Z-score: x = z * std + mean
+                        // To make the dragging feel natural, calculate mean and standard deviation of static population
+                        const meanAge = stats.meanAge;
+                        const stdAge = stats.stdAge;
+                        const meanInc = stats.meanIncome;
+                        const stdInc = stats.stdIncome;
+
+                        targetAge = scaledX * 2.5 * stdAge + meanAge;
+                        targetIncome = scaledY * 2.5 * stdInc + meanInc;
+                    }
+
+                    // Constrain boundaries
+                    outlierPoint.age = Math.min(100, Math.max(5, Math.round(targetAge)));
+                    outlierPoint.income = Math.min(150000, Math.max(5000, Math.round(targetIncome / 1000) * 1000));
+
+                    // Sync sliders
+                    outlierAgeSlider.value = outlierPoint.age;
+                    outlierIncomeSlider.value = outlierPoint.income;
+                    outlierAgeDisplay.textContent = `${outlierPoint.age} yrs`;
+                    outlierIncomeDisplay.textContent = `$${outlierPoint.income.toLocaleString()}`;
+
+                    updateTargets();
+                } else {
+                    // Check for hover coordinates
+                    hoveredIndex = null;
+                    animatedPoints.forEach((p, idx) => {
+                        if (idx === animatedPoints.length - 1 && !includeOutlier) return; // skip outlier if disabled
+                        const dist = Math.sqrt(Math.pow(mouseX - p.xPx, 2) + Math.pow(mouseY - p.yPx, 2));
+                        if (dist < 8) {
+                            hoveredIndex = idx;
+                        }
+                    });
+                    updateInspector();
+                }
+            });
+
+            window.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+        }
+
+        function updateOutlierValues() {
+            outlierPoint.age = parseInt(outlierAgeSlider.value);
+            outlierPoint.income = parseInt(outlierIncomeSlider.value);
+
+            outlierAgeDisplay.textContent = `${outlierPoint.age} yrs`;
+            outlierIncomeDisplay.textContent = `$${outlierPoint.income.toLocaleString()}`;
+
+            updateTargets();
+        }
+
+        function toggleOutlier() {
+            includeOutlier = outlierToggle.checked;
+            
+            if (includeOutlier) {
+                outlierSlidersWrap.classList.remove('opacity-50', 'pointer-events-none');
+                outlierStatus.className = "text-[9px] font-mono font-black uppercase tracking-wider text-rose-500 bg-rose-50 border border-rose-100 px-2 py-0.5 rounded";
+                outlierStatus.textContent = "Active Outlier";
+            } else {
+                outlierSlidersWrap.classList.add('opacity-50', 'pointer-events-none');
+                outlierStatus.className = "text-[9px] font-mono font-black uppercase tracking-wider text-slate-400 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded";
+                outlierStatus.textContent = "Disabled";
+            }
+
+            updateTargets();
+            if (hoveredIndex === animatedPoints.length - 1) {
+                hoveredIndex = null;
+                updateInspector();
+            }
+        }
+
+        function setScalingMode(mode) {
+            scalingMode = mode;
+
+            // Highlight tab button active state
+            ['unscaled', 'minmax', 'zscore'].forEach(m => {
+                const el = document.getElementById(`btn-${m}`);
+                if (m === mode) {
+                    el.className = "py-2.5 px-2 bg-emerald-600 text-white text-[11px] font-black uppercase tracking-wider rounded-xl shadow-sm border border-emerald-500 transition-all text-center";
+                } else {
+                    el.className = "py-2.5 px-2 bg-gray-50 hover:bg-emerald-50 text-gray-700 hover:text-emerald-900 text-[11px] font-black uppercase tracking-wider rounded-xl border border-gray-200 transition-all text-center";
+                }
+            });
+
+            updateTargets();
+            updateCodeRepresentation();
+            updateInspector();
+        }
+
+        /* ─── DATA PREPROCESSING MATH & STATS ──────────────────────────────── */
+        function calculateStatistics() {
+            const currentSet = [...RAW_DATA];
+            if (includeOutlier) {
+                currentSet.push(outlierPoint);
+            }
+
+            const count = currentSet.length;
+            
+            // Age Stats
+            const ages = currentSet.map(p => p.age);
+            const ageMin = Math.min(...ages);
+            const ageMax = Math.max(...ages);
+            const sumAge = ages.reduce((a, b) => a + b, 0);
+            const meanAge = sumAge / count;
+            const varianceAge = ages.reduce((a, b) => a + Math.pow(b - meanAge, 2), 0) / count;
+            const stdAge = Math.sqrt(varianceAge);
+
+            // Income Stats
+            const incomes = currentSet.map(p => p.income);
+            const incomeMin = Math.min(...incomes);
+            const incomeMax = Math.max(...incomes);
+            const sumInc = incomes.reduce((a, b) => a + b, 0);
+            const meanIncome = sumInc / count;
+            const varianceInc = incomes.reduce((a, b) => a + Math.pow(b - meanIncome, 2), 0) / count;
+            const stdIncome = Math.sqrt(varianceInc);
+
+            return {
+                ageMin, ageMax, meanAge, stdAge,
+                incomeMin, incomeMax, meanIncome, stdIncome,
+                currentSet
+            };
+        }
+
+        function initializeAnimatedPoints() {
+            animatedPoints = [];
+            
+            // Push static dataset
+            RAW_DATA.forEach(p => {
+                animatedPoints.push({
+                    age: p.age,
+                    income: p.income,
+                    // starts unscaled
+                    xCurrent: p.age,
+                    yCurrent: p.income,
+                    xTarget: p.age,
+                    yTarget: p.income,
+                    xPx: 0,
+                    yPx: 0
+                });
+            });
+
+            // Push outlier node at index RAW_DATA.length
+            animatedPoints.push({
+                age: outlierPoint.age,
+                income: outlierPoint.income,
+                xCurrent: outlierPoint.age,
+                yCurrent: outlierPoint.income,
+                xTarget: outlierPoint.age,
+                yTarget: outlierPoint.income,
+                xPx: 0,
+                yPx: 0
+            });
+
+            updateTargets();
+        }
+
+        function updateTargets() {
+            const stats = calculateStatistics();
+
+            animatedPoints.forEach((p, idx) => {
+                // Determine raw target values
+                let age = p.age;
+                let income = p.income;
+
+                if (idx === animatedPoints.length - 1) {
+                    // Update outlier base values
+                    p.age = outlierPoint.age;
+                    p.income = outlierPoint.income;
+                    age = outlierPoint.age;
+                    income = outlierPoint.income;
+                }
+
+                if (scalingMode === 'unscaled') {
+                    p.xTarget = age;
+                    p.yTarget = income;
+                } 
+                else if (scalingMode === 'minmax') {
+                    // x_scaled = (x - min) / (max - min)
+                    // Scale using the globally recalculated bounds!
+                    const xRange = stats.ageMax - stats.ageMin;
+                    const yRange = stats.incomeMax - stats.incomeMin;
+
+                    p.xTarget = xRange > 0 ? (age - stats.ageMin) / xRange : 0.5;
+                    p.yTarget = yRange > 0 ? (income - stats.incomeMin) / yRange : 0.5;
+                } 
+                else if (scalingMode === 'zscore') {
+                    // x_scaled = (x - mean) / std
+                    // Scale using globally recalculated mean and standard deviation
+                    p.xTarget = stats.stdAge > 0 ? (age - stats.meanAge) / stats.stdAge : 0;
+                    p.yTarget = stats.stdIncome > 0 ? (income - stats.meanIncome) / stats.stdIncome : 0;
+                }
+            });
+        }
+
+        /* ─── RENDERING CANVAS STAGE ───────────────────────────────────────── */
+        function drawStage() {
+            const w = canvas.width;
+            const h = canvas.height;
+            const padding = 50;
+            const plotW = w - padding * 2;
+            const plotH = h - padding * 2;
+
+            ctx.clearRect(0, 0, w, h);
+
+            const stats = calculateStatistics();
+
+            // Calculate current coordinates in canvas pixels for each point
+            animatedPoints.forEach((p, idx) => {
+                // Simple organic Easing transitions for smooth gliding
+                p.xCurrent += (p.xTarget - p.xCurrent) * 0.08;
+                p.yCurrent += (p.yTarget - p.yCurrent) * 0.08;
+
+                let px = 0;
+                let py = 0;
+
+                if (scalingMode === 'unscaled') {
+                    // X-axis: Age 0 - 100
+                    // Y-axis: Income 0 - 150,000
+                    px = padding + (p.xCurrent / 100) * plotW;
+                    py = padding + plotH - (p.yCurrent / 150000) * plotH;
+                } 
+                else if (scalingMode === 'minmax') {
+                    // Both X and Y strictly lie in [0, 1]
+                    // Map [0, 1] to canvas coordinates
+                    px = padding + p.xCurrent * plotW;
+                    py = padding + plotH - p.yCurrent * plotH;
+                } 
+                else if (scalingMode === 'zscore') {
+                    // Centered around 0. Standard range is roughly -2.5 to +2.5 standard deviations.
+                    // Map Z-score -2.5 to +2.5 to canvas coordinates
+                    const range = 2.5; // SD range plotted
+                    px = padding + plotW / 2 + (p.xCurrent / range) * (plotW / 2);
+                    py = padding + plotH / 2 - (p.yCurrent / range) * (plotH / 2);
+                }
+
+                p.xPx = px;
+                p.yPx = py;
+            });
+
+            // --- DRAW GRAPH AXES & GRID ACCENTS ---
+            ctx.strokeStyle = '#273549';
+            ctx.lineWidth = 1;
+
+            if (scalingMode === 'unscaled') {
+                // Clean bottom axis line
+                ctx.beginPath();
+                ctx.moveTo(padding, h - padding); ctx.lineTo(w - padding, h - padding);
+                ctx.moveTo(padding, padding); ctx.lineTo(padding, h - padding);
+                ctx.stroke();
+
+                // Axis ticks
+                ctx.fillStyle = '#64748b';
+                ctx.font = 'bold 9px monospace';
+                ctx.textAlign = 'center';
+                for (let age = 0; age <= 100; age += 20) {
+                    const px = padding + (age / 100) * plotW;
+                    ctx.fillText(age, px, h - padding + 15);
+                }
+                ctx.textAlign = 'right';
+                for (let inc = 0; inc <= 150000; inc += 30000) {
+                    const py = padding + plotH - (inc / 150000) * plotH;
+                    ctx.fillText('$' + (inc / 1000) + 'k', padding - 10, py + 3);
+                }
+
+                // Grid Titles
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = 'bold 9px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('RAW AGE (0 - 100)', w / 2, h - 12);
+            } 
+            else if (scalingMode === 'minmax') {
+                // Draw a beautiful bounded square outline representing the [0, 1] × [0, 1] box
+                ctx.fillStyle = 'rgba(16, 185, 129, 0.04)'; // Light green tint inside box
+                ctx.fillRect(padding, padding, plotW, plotH);
+
+                ctx.strokeStyle = 'rgba(16, 185, 129, 0.4)'; // Emerald border
+                ctx.lineWidth = 1.5;
+                ctx.strokeRect(padding, padding, plotW, plotH);
+
+                // Axis labels strictly 0.0 to 1.0
+                ctx.fillStyle = '#10b981'; // Emerald text
+                ctx.font = 'bold 9px monospace';
+                ctx.textAlign = 'center';
+                ctx.fillText('0.0 (Min)', padding, h - padding + 15);
+                ctx.fillText('0.5', padding + plotW / 2, h - padding + 15);
+                ctx.fillText('1.0 (Max)', w - padding, h - padding + 15);
+
+                ctx.textAlign = 'right';
+                ctx.fillText('0.0 (Min)', padding - 10, h - padding + 3);
+                ctx.fillText('0.5', padding - 10, padding + plotH / 2 + 3);
+                ctx.fillText('1.0 (Max)', padding - 10, padding + 3);
+
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = 'bold 9px sans-serif';
+                ctx.fillText('MIN-MAX SCALED AGE [0.0 - 1.0]', w / 2, h - 12);
+            } 
+            else if (scalingMode === 'zscore') {
+                // Centered axis lines directly through 0 (the center)
+                ctx.strokeStyle = '#475569';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(padding, padding + plotH / 2); ctx.lineTo(w - padding, padding + plotH / 2); // X axis
+                ctx.moveTo(padding + plotW / 2, padding); ctx.lineTo(padding + plotW / 2, h - padding); // Y axis
+                ctx.stroke();
+
+                // Draw concentric standard deviation dashed circle boundaries
+                ctx.strokeStyle = 'rgba(16, 185, 129, 0.15)';
+                ctx.setLineDash([3, 4]);
+                for (let sd = 1; sd <= 2; sd++) {
+                    const rX = (sd / 2.5) * (plotW / 2);
+                    const rY = (sd / 2.5) * (plotH / 2);
+                    ctx.beginPath();
+                    ctx.ellipse(padding + plotW / 2, padding + plotH / 2, rX, rY, 0, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    // Text labels for standard deviation caps
+                    ctx.fillStyle = '#10b981';
+                    ctx.font = 'bold 7px monospace';
+                    ctx.fillText(`+${sd}σ`, padding + plotW / 2 + rX + 4, padding + plotH / 2 + 10);
+                }
+                ctx.setLineDash([]);
+
+                // Axis ticks for standard deviations
+                ctx.fillStyle = '#10b981';
+                ctx.font = 'bold 9px monospace';
+                ctx.textAlign = 'center';
+                ctx.fillText('-2.0σ', padding + (0.5 / 2.5) * (plotW / 2), h - padding + 15);
+                ctx.fillText('0.0 (μ)', padding + plotW / 2, h - padding + 15);
+                ctx.fillText('+2.0σ', padding + plotW / 2 + (2.0 / 2.5) * (plotW / 2), h - padding + 15);
+
+                ctx.textAlign = 'right';
+                ctx.fillText('-2.0σ', padding - 10, padding + plotH / 2 + (2.0 / 2.5) * (plotH / 2) + 3);
+                ctx.fillText('0.0 (μ)', padding - 10, padding + plotH / 2 + 3);
+                ctx.fillText('+2.0σ', padding - 10, padding + (0.5 / 2.5) * (plotH / 2) + 3);
+
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = 'bold 9px sans-serif';
+                ctx.fillText('Z-SCORE STANDARDIZED AGE (MEAN μ = 0, STD σ = 1)', w / 2, h - 12);
+            }
+
+            // --- DRAW DATA POINTS ---
+            animatedPoints.forEach((p, idx) => {
+                if (idx === animatedPoints.length - 1) {
+                    // Outlier Point (Red Node)
+                    if (!includeOutlier) return;
+
+                    ctx.fillStyle = 'rgba(239, 68, 68, 0.8)'; // Red-500
+                    ctx.strokeStyle = '#fca5a5';
+                    ctx.lineWidth = 1.5;
+
+                    ctx.beginPath();
+                    ctx.arc(p.xPx, p.yPx, 8, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Drag handle rings overlay
+                    ctx.fillStyle = 'rgba(239, 68, 68, 0.15)';
+                    ctx.beginPath();
+                    ctx.arc(p.xPx, p.yPx, 18, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    // Main Population Points (Emerald Green)
+                    const isHovered = idx === hoveredIndex;
+
+                    ctx.fillStyle = isHovered ? '#10b981' : 'rgba(16, 185, 129, 0.7)'; // Emerald
+                    ctx.strokeStyle = isHovered ? '#ffffff' : '#a7f3d0';
+                    ctx.lineWidth = isHovered ? 2.5 : 1;
+
+                    ctx.beginPath();
+                    ctx.arc(p.xPx, p.yPx, isHovered ? 8 : 6, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                }
+            });
+        }
+
+        /* ─── DYNAMIC DIAGNOSTIC INSPECTOR ─────────────────────────────────── */
+        function updateInspector() {
+            if (hoveredIndex === null) {
+                // Display statistics summary by default
+                const stats = calculateStatistics();
+                pixelInspector.innerHTML = `
+                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-3.5 shadow-inner">
+                        <div class="text-[10px] font-black uppercase text-gray-400 tracking-wider">Population Baseline Metrics</div>
+                        <div class="grid grid-cols-2 gap-4 mt-2 font-mono text-[10px] leading-relaxed">
+                            <div>
+                                <span class="font-bold text-gray-700">AGE STATS:</span>
+                                <div>• Min: ${stats.ageMin} yrs</div>
+                                <div>• Max: ${stats.ageMax} yrs</div>
+                                <div>• Mean (μ): ${stats.meanAge.toFixed(1)}</div>
+                                <div>• Std (σ): ${stats.stdAge.toFixed(1)}</div>
+                            </div>
+                            <div>
+                                <span class="font-bold text-gray-700">INCOME STATS:</span>
+                                <div>• Min: $${stats.incomeMin.toLocaleString()}</div>
+                                <div>• Max: $${stats.incomeMax.toLocaleString()}</div>
+                                <div>• Mean (μ): $${Math.round(stats.meanIncome).toLocaleString()}</div>
+                                <div>• Std (σ): $${Math.round(stats.stdIncome).toLocaleString()}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const p = animatedPoints[hoveredIndex];
+            const isOutlier = hoveredIndex === animatedPoints.length - 1;
+            const stats = calculateStatistics();
+
+            // Calculate active scaled coordinate details
+            let scaledXStr = '—';
+            let scaledYStr = '—';
+
+            if (scalingMode === 'unscaled') {
+                scaledXStr = `${p.age} yrs`;
+                scaledYStr = `$${p.income.toLocaleString()}`;
+            } 
+            else if (scalingMode === 'minmax') {
+                const ageScaled = (p.age - stats.ageMin) / (stats.ageMax - stats.ageMin);
+                const incScaled = (p.income - stats.incomeMin) / (stats.incomeMax - stats.incomeMin);
+                scaledXStr = ageScaled.toFixed(3);
+                scaledYStr = incScaled.toFixed(3);
+            } 
+            else if (scalingMode === 'zscore') {
+                const ageScaled = (p.age - stats.meanAge) / stats.stdAge;
+                const incScaled = (p.income - stats.meanIncome) / stats.stdIncome;
+                scaledXStr = `${ageScaled > 0 ? '+' : ''}${ageScaled.toFixed(2)}σ`;
+                scaledYStr = `${incScaled > 0 ? '+' : ''}${incScaled.toFixed(2)}σ`;
+            }
+
+            pixelInspector.innerHTML = `
+                <div class="${isOutlier ? 'bg-rose-50 border-rose-200 text-rose-950' : 'bg-emerald-50 border-emerald-200 text-emerald-950'} border rounded-xl p-3.5 shadow-inner">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-[10px] font-black uppercase tracking-wider ${isOutlier ? 'text-rose-700' : 'text-emerald-700'}">${isOutlier ? 'Outlier Node Details' : 'Representative Node Details'}</span>
+                        <span class="text-[8px] font-mono font-bold bg-white/70 px-1.5 py-0.5 rounded border border-gray-200">Index: ${hoveredIndex}</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mt-2 font-mono text-[10px] leading-relaxed">
+                        <div>
+                            <span class="font-bold">RAW VALUES:</span>
+                            <div>• Age: ${p.age} yrs</div>
+                            <div>• Income: $${p.income.toLocaleString()}</div>
+                        </div>
+                        <div>
+                            <span class="font-bold">SCALED VALUES:</span>
+                            <div>• Age scaled: <strong class="font-bold">${scaledXStr}</strong></div>
+                            <div>• Income scaled: <strong class="font-bold">${scaledYStr}</strong></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /* ─── SCIKIT-LEARN PYTHON CODE BLOCK GENERATION ──────────────────────── */
+        function updateCodeRepresentation() {
+            let output = '';
+
+            if (scalingMode === 'unscaled') {
+                output += `# Disparate scale raw dataset\n`;
+                output += `raw_data = np.array([\n`;
+                output += `    [ 24.0,  34000.0], # [Age, Income]\n`;
+                output += `    [ 31.0,  42000.0],\n`;
+                if (includeOutlier) {
+                    output += `    [ <span class="text-rose-300 font-bold">${outlierPoint.age.toFixed(1)}, ${outlierPoint.income.toFixed(1)}</span>]  # Extreme Outlier!\n`;
+                }
+                output += `])\n\n`;
+                output += `# In raw format, Income values fully swamp Age during AI training!\n`;
+                output += `print(raw_data)`;
+            } 
+            else if (scalingMode === 'minmax') {
+                output += `<span class="text-emerald-400">from</span> sklearn.preprocessing <span class="text-emerald-400">import</span> MinMaxScaler\n\n`;
+                output += `# 1. Min-Max normalization bounds everything strictly between 0 and 1\n`;
+                output += `scaler = MinMaxScaler(feature_range=(0, 1))\n`;
+                output += `scaled_data = scaler.fit_transform(raw_data)\n\n`;
+                
+                output += `# Scaled outputs shape: [0.0 - 1.0]\n`;
+                output += `print(scaled_data)\n`;
+                
+                if (includeOutlier) {
+                    output += `# Note: Outliers warp bounds, squashing typical population entries!`;
+                } else {
+                    output += `# Healthy uniform spread inside the [0, 1] boundary box.`;
+                }
+            } 
+            else if (scalingMode === 'zscore') {
+                output += `<span class="text-emerald-400">from</span> sklearn.preprocessing <span class="text-emerald-400">import</span> StandardScaler\n\n`;
+                output += `# 1. Z-Score standardization centers data (Mean = 0, Std = 1)\n`;
+                output += `scaler = StandardScaler()\n`;
+                output += `standardized_data = scaler.fit_transform(raw_data)\n\n`;
+                
+                output += `# Standardized output offsets (dimensionless σ standard deviations)\n`;
+                output += `print(standardized_data)\n`;
+                output += `# Robust scaling: main population remains spread out around origin (0).`;
+            }
+
+            sklearnCode.innerHTML = output;
+        }
+
+        /* ─── ANIMATION LOOP ───────────────────────────────────────────────── */
+        function animateLoop() {
+            drawStage();
+            requestAnimationFrame(animateLoop);
+        }
+
+        // Initialize script execution on DOM load
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Matrix Explorer - AI Competition Jr</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Smooth styling additions */
+        .pixel-cell {
+            transition: background-color 0.15s ease, transform 0.1s ease;
+        }
+
+        .pixel-cell:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+
+        /* Custom scrollbar for data tabs */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 3px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        /* Focus outline glow */
+        .pixel-input:focus {
+            box-shadow: inset 0 0 0 2px #8b5cf6;
+        }
+
+        /* Pixelated canvas container */
+        .pixel-canvas-box {
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -webkit-crisp-edges;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+
+        /* Pulse animations for active nodes */
+        .active-cell-pulse {
+            animation: borderGlow 1.5s infinite alternate;
+        }
+
+        @keyframes borderGlow {
+            from {
+                box-shadow: 0 0 4px #8b5cf6, inset 0 0 4px #8b5cf6;
+            }
+            to {
+                box-shadow: 0 0 12px #c084fc, inset 0 0 8px #c084fc;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+
+        <!-- Navigation -->
+        <nav class="mb-6 pt-4 no-print">
+            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-violet-600 transition-colors font-mono" style="text-decoration: none;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Course Hub
+            </a>
+        </nav>
+
+        <!-- Header -->
+        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+            <div>
+                <h1 class="text-4xl font-black tracking-tight text-gray-900 uppercase">PIXEL MATRIX <span class="text-violet-600">EXPLORER</span></h1>
+                <p class="text-gray-500 font-medium italic">Proving digital images are just multi-dimensional arrays of numbers</p>
+            </div>
+            <div id="status-badge" class="px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-violet-50 border border-violet-200 text-violet-800 shadow-sm transition-all duration-300">
+                Interactive Grid
+            </div>
+        </header>
+
+        <!-- Main Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
+
+            <!-- Left Grid Panel (Lg: 7 cols) -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
+
+                <!-- Configuration & Toolbar -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-5">
+                    <div>
+                        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-100 pb-2">1. Display & Edit Mode</h2>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <!-- Dimension Select -->
+                            <div>
+                                <label class="block text-[10px] font-black uppercase text-gray-400 tracking-wider mb-1">Grid Dimension</label>
+                                <select id="grid-size" onchange="changeGridSize(this.value)" class="w-full text-xs font-bold bg-gray-50 border border-gray-200 rounded-lg p-2.5 focus:outline-none focus:border-violet-500 cursor-pointer">
+                                    <option value="5">5 × 5 Grid</option>
+                                    <option value="10" selected>10 × 10 Grid</option>
+                                </select>
+                            </div>
+                            <!-- Color Mode Select -->
+                            <div>
+                                <label class="block text-[10px] font-black uppercase text-gray-400 tracking-wider mb-1">Color System</label>
+                                <select id="color-mode" onchange="changeColorMode(this.value)" class="w-full text-xs font-bold bg-gray-50 border border-gray-200 rounded-lg p-2.5 focus:outline-none focus:border-violet-500 cursor-pointer">
+                                    <option value="grayscale">Grayscale (1-Ch)</option>
+                                    <option value="rgb">RGB Color (3-Ch)</option>
+                                </select>
+                            </div>
+                            <!-- Tool Select -->
+                            <div>
+                                <label class="block text-[10px] font-black uppercase text-gray-400 tracking-wider mb-1">Interaction Tool</label>
+                                <select id="interaction-tool" onchange="changeInteractionTool(this.value)" class="w-full text-xs font-bold bg-gray-50 border border-gray-200 rounded-lg p-2.5 focus:outline-none focus:border-violet-500 cursor-pointer">
+                                    <option value="edit">Type Numbers</option>
+                                    <option value="brush">Paintbrush</option>
+                                </select>
+                            </div>
+                            <!-- Brush Value/Color -->
+                            <div id="brush-settings-container" class="opacity-50 pointer-events-none transition-all duration-300">
+                                <label id="brush-label" class="block text-[10px] font-black uppercase text-gray-400 tracking-wider mb-1">Brush Value</label>
+                                <!-- Grayscale Brush Options -->
+                                <select id="brush-val-gray" onchange="updateBrush()" class="w-full text-xs font-bold bg-gray-50 border border-gray-200 rounded-lg p-2.5 focus:outline-none focus:border-violet-500 cursor-pointer">
+                                    <option value="255">255 (White)</option>
+                                    <option value="192">192 (Light Gray)</option>
+                                    <option value="128" selected>128 (Medium Gray)</option>
+                                    <option value="64">64 (Dark Gray)</option>
+                                    <option value="0">0 (Black)</option>
+                                </select>
+                                <!-- RGB Brush Options (Hidden by default) -->
+                                <select id="brush-val-rgb" onchange="updateBrush()" class="hidden w-full text-xs font-bold bg-gray-50 border border-gray-200 rounded-lg p-2.5 focus:outline-none focus:border-violet-500 cursor-pointer">
+                                    <option value="#ef4444" selected>Red (255,0,0)</option>
+                                    <option value="#22c55e">Green (0,255,0)</option>
+                                    <option value="#3b82f6">Blue (0,0,255)</option>
+                                    <option value="#eab308">Yellow (255,255,0)</option>
+                                    <option value="#a855f7">Purple (255,0,255)</option>
+                                    <option value="#06b6d4">Cyan (0,255,255)</option>
+                                    <option value="#ffffff">White (255,255,255)</option>
+                                    <option value="#000000">Black (0,0,0)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shape Presets Panel -->
+                    <div>
+                        <h3 class="text-[10px] font-black uppercase text-gray-400 tracking-wider mb-2">Shape Presets</h3>
+                        <div class="flex flex-wrap gap-2" id="presets-container">
+                            <!-- Populated dynamically by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Matrix Grid Editor -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-4">
+                    <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+                        <div>
+                            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest">2. Numerical Array Grid</h2>
+                            <p class="text-[11px] text-gray-400 font-medium">Double-click or type to edit a value. Click & drag when Paintbrush is active.</p>
+                        </div>
+                        <!-- Channels Tabs for RGB editing -->
+                        <div id="rgb-tabs-container" class="hidden flex bg-gray-100 p-0.5 rounded-lg border border-gray-200/80">
+                            <button onclick="changeRgbTab('combined')" id="tab-combined" class="px-2.5 py-1 text-[10px] font-black uppercase tracking-wider rounded-md bg-white text-gray-800 shadow-sm transition-all">Combined</button>
+                            <button onclick="changeRgbTab('red')" id="tab-red" class="px-2.5 py-1 text-[10px] font-black uppercase tracking-wider rounded-md text-gray-500 hover:text-red-600 transition-all">Red (R)</button>
+                            <button onclick="changeRgbTab('green')" id="tab-green" class="px-2.5 py-1 text-[10px] font-black uppercase tracking-wider rounded-md text-gray-500 hover:text-green-600 transition-all">Green (G)</button>
+                            <button onclick="changeRgbTab('blue')" id="tab-blue" class="px-2.5 py-1 text-[10px] font-black uppercase tracking-wider rounded-md text-gray-500 hover:text-blue-600 transition-all">Blue (B)</button>
+                        </div>
+                    </div>
+
+                    <!-- The Dynamic Matrix Container -->
+                    <div class="flex items-center justify-center p-2 bg-gray-50 rounded-2xl border border-gray-200 shadow-inner relative overflow-hidden select-none min-h-[350px]">
+                        <div id="grid-container" class="grid gap-1 w-full max-w-[450px] aspect-square">
+                            <!-- Populated dynamically by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Single Pixel Detail Inspector (RGB mode specific) -->
+                    <div id="pixel-inspector" class="hidden bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-white shadow-md">
+                        <div>
+                            <h4 class="text-[10px] font-black uppercase text-violet-400 tracking-widest">Pixel Inspector</h4>
+                            <p class="text-xs text-slate-400">Position: <strong class="font-mono text-slate-200">Row <span id="inspect-row">-</span>, Col <span id="inspect-col">-</span></strong></p>
+                        </div>
+                        <div class="flex flex-wrap gap-4 items-center flex-grow justify-end w-full md:w-auto">
+                            <!-- R Slider -->
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-black text-red-500 uppercase tracking-widest w-4">R</span>
+                                <input type="range" id="inspect-r" min="0" max="255" class="w-20 md:w-24 accent-red-500 cursor-pointer h-1.5 bg-slate-700 rounded-lg appearance-none" oninput="updateInspectPixel()">
+                                <span id="inspect-r-val" class="font-mono text-xs font-black text-slate-300 w-8 text-right">0</span>
+                            </div>
+                            <!-- G Slider -->
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-black text-green-500 uppercase tracking-widest w-4">G</span>
+                                <input type="range" id="inspect-g" min="0" max="255" class="w-20 md:w-24 accent-green-500 cursor-pointer h-1.5 bg-slate-700 rounded-lg appearance-none" oninput="updateInspectPixel()">
+                                <span id="inspect-g-val" class="font-mono text-xs font-black text-slate-300 w-8 text-right">0</span>
+                            </div>
+                            <!-- B Slider -->
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-black text-blue-500 uppercase tracking-widest w-4">B</span>
+                                <input type="range" id="inspect-b" min="0" max="255" class="w-20 md:w-24 accent-blue-500 cursor-pointer h-1.5 bg-slate-700 rounded-lg appearance-none" oninput="updateInspectPixel()">
+                                <span id="inspect-b-val" class="font-mono text-xs font-black text-slate-300 w-8 text-right">0</span>
+                            </div>
+                            <!-- Color Preview Box -->
+                            <div id="inspect-color-preview" class="w-8 h-8 rounded-lg border border-slate-700 shadow-inner"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Visual & Code Panel (Lg: 5 cols) -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+
+                <!-- Live Canvas Preview Box -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-5">
+                    <div>
+                        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-100 pb-2">3. Rendered Output Canvas</h2>
+                        <div class="flex flex-col items-center gap-4 bg-gray-50 border border-gray-200 rounded-2xl p-6 shadow-inner relative">
+                            <!-- Scaled Visual Canvas -->
+                            <div class="relative w-full max-w-[260px] aspect-square bg-slate-200 rounded-lg shadow border border-gray-300 overflow-hidden">
+                                <canvas id="render-canvas" class="w-full h-full absolute inset-0 pixel-canvas-box"></canvas>
+                                <!-- Highlight overlay pointer -->
+                                <div id="canvas-highlight" class="absolute pointer-events-none border border-yellow-400 bg-yellow-400/20 hidden"></div>
+                            </div>
+
+                            <!-- Controls overlay -->
+                            <div class="flex items-center justify-between w-full border-t border-gray-200/60 pt-4">
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" id="toggle-gridlines" checked onchange="drawCanvas()" class="cursor-pointer rounded text-violet-600 focus:ring-violet-500 border-gray-300 w-4 h-4">
+                                    <label for="toggle-gridlines" class="text-[10px] font-black uppercase tracking-wider text-gray-500 cursor-pointer select-none">Show Gridlines</label>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-[10px] font-black uppercase tracking-wider text-gray-400">Actual Size:</span>
+                                    <div class="relative border border-slate-400/60 bg-white p-0.5 rounded shadow-sm w-7 h-7 flex items-center justify-center" title="Physical screen pixels">
+                                        <canvas id="actual-canvas" class="pixel-canvas-box border border-slate-300 bg-slate-50" style="width: 16px; height: 16px;"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- live Array representation code box -->
+                <div class="bg-slate-900 border-2 border-slate-800 p-6 rounded-2xl shadow-inner flex flex-col gap-4 text-white">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-slate-800 pb-3">
+                        <div>
+                            <h2 class="text-xs font-black uppercase tracking-wider text-violet-400">4. Live Data Representation</h2>
+                            <p class="text-[10px] text-slate-400">How the computer stores this state in memory</p>
+                        </div>
+                        <!-- Code format tabs -->
+                        <div class="flex bg-slate-950 p-0.5 rounded-lg border border-slate-800 shadow-inner">
+                            <button onclick="changeCodeTab('numpy')" id="code-tab-numpy" class="px-2.5 py-1 text-[9px] font-black uppercase tracking-wider rounded bg-slate-800 text-slate-200">NumPy</button>
+                            <button onclick="changeCodeTab('pytorch')" id="code-tab-pytorch" class="px-2.5 py-1 text-[9px] font-black uppercase tracking-wider rounded text-slate-400 hover:text-slate-200">PyTorch</button>
+                            <button onclick="changeCodeTab('flat')" id="code-tab-flat" class="px-2.5 py-1 text-[9px] font-black uppercase tracking-wider rounded text-slate-400 hover:text-slate-200">Flat 1D</button>
+                        </div>
+                    </div>
+
+                    <!-- Code Block Display -->
+                    <div class="bg-slate-950/80 rounded-xl border border-slate-800/80 p-4 font-mono text-[10px] text-slate-300 overflow-x-auto max-h-[350px] custom-scrollbar shadow-inner leading-normal">
+                        <pre id="code-block" class="whitespace-pre"></pre>
+                    </div>
+
+                    <!-- Dynamic Legend explaining shapes -->
+                    <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-800/50 flex flex-col gap-1 text-[10px] font-medium text-slate-400 leading-normal">
+                        <div class="flex items-center gap-1.5 text-violet-300 uppercase tracking-widest font-black mb-1">Interactive Sync</div>
+                        <p>Hovering over cells in the grid highlights their index coordinates in the code block and corresponding coordinates in the canvas!</p>
+                        <p class="mt-1">Notice how the shapes, structures, and gradients you see are stored in code as plain sequences of integers.</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Educational Explanation Panels -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <!-- Explain Grayscale -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-gray-700 font-bold mb-4">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path></svg>
+                </div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">Grayscale & Bit Depth</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    In a grayscale image, each pixel is just a single number representing light intensity. 
+                    A value of <strong class="text-gray-900">0</strong> is completely black (no light), and <strong class="text-gray-900">255</strong> is completely white (full intensity).
+                </p>
+                <p class="text-xs text-gray-500 leading-relaxed mt-2">
+                    Why 255? Because digital images are typically <strong>8-bit</strong>. An 8-bit integer can hold exactly $2^8 = 256$ values (0 to 255).
+                </p>
+            </div>
+
+            <!-- Explain RGB Channels -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center text-red-600 font-bold mb-4 border border-red-100">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                </div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">Color in Three Dimensions</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    To make full color, we layer three separate channels: <strong>Red</strong>, <strong>Green</strong>, and <strong>Blue</strong> (RGB). 
+                    Each channel is itself a full 2D array of intensity values.
+                </p>
+                <p class="text-xs text-gray-500 leading-relaxed mt-2">
+                    When stacked together in memory, a color image becomes a <strong>3D Array (Tensor)</strong> with a shape of <strong class="text-gray-900">(Height, Width, Channels)</strong>. 
+                    Additive light mixing combines them on your screen.
+                </p>
+            </div>
+
+            <!-- AI Connection -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-violet-50 rounded-xl flex items-center justify-center text-violet-600 font-bold mb-4 border border-violet-100">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 .364l-.707.707M21 12h-1M4 12H3m3.343-5.657l.707-.707m2.828 9.9a5 5 0 113.536 0V21h-2v-4.9a5.002 5.002 0 01-1.536-1.1z"></path></svg>
+                </div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">How Computer Vision Sees</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    To an AI model (like a CNN or Vision Transformer), an image is not a "picture" — it is just these matrices of numbers. 
+                </p>
+                <p class="text-xs text-gray-500 leading-relaxed mt-2">
+                    A model learns mathematical operations (like 2D convolution filters or attention dot products) that slide over these arrays to find edges, textures, shapes, and eventually classify objects.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MAIN JAVASCRIPT LOGIC -->
+    <script>
+        /* ─── PRESET DEFINITIONS ───────────────────────────────────────────── */
+        const PRESETS = {
+            grayscale: {
+                5: [
+                    {
+                        name: "X Shape",
+                        data: [
+                            255,   0,   0,   0, 255,
+                              0, 255,   0, 255,   0,
+                              0,   0, 255,   0,   0,
+                              0, 255,   0, 255,   0,
+                            255,   0,   0,   0, 255
+                        ]
+                    },
+                    {
+                        name: "Chessboard",
+                        data: [
+                            255,   0, 255,   0, 255,
+                              0, 255,   0, 255,   0,
+                            255,   0, 255,   0, 255,
+                              0, 255,   0, 255,   0,
+                            255,   0, 255,   0, 255
+                        ]
+                    },
+                    {
+                        name: "Gradient Wave",
+                        data: [
+                              0,  64, 128, 192, 255,
+                              0,  64, 128, 192, 255,
+                              0,  64, 128, 192, 255,
+                              0,  64, 128, 192, 255,
+                              0,  64, 128, 192, 255
+                        ]
+                    },
+                    {
+                        name: "Smile 5x5",
+                        data: [
+                              0,   0,   0,   0,   0,
+                              0, 255,   0, 255,   0,
+                              0,   0,   0,   0,   0,
+                            255,   0,   0,   0, 255,
+                              0, 255, 255, 255,   0
+                        ]
+                    }
+                ],
+                10: [
+                    {
+                        name: "Smiley Face",
+                        data: [
+                              0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+                              0,   0, 255, 255,   0,   0, 255, 255,   0,   0,
+                              0,   0, 255, 255,   0,   0, 255, 255,   0,   0,
+                              0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+                              0,   0,   0,   0, 255, 255,   0,   0,   0,   0,
+                              0,   0,   0,   0, 255, 255,   0,   0,   0,   0,
+                              0, 255,   0,   0,   0,   0,   0,   0, 255,   0,
+                              0,   0, 255,   0,   0,   0,   0, 255,   0,   0,
+                              0,   0,   0, 255, 255, 255, 255,   0,   0,   0,
+                              0,   0,   0,   0,   0,   0,   0,   0,   0,   0
+                        ]
+                    },
+                    {
+                        name: "Heart",
+                        data: [
+                              0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+                              0,   0, 255, 255,   0,   0, 255, 255,   0,   0,
+                              0, 255, 255, 255, 255, 255, 255, 255, 255,   0,
+                            255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+                            255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+                              0, 255, 255, 255, 255, 255, 255, 255, 255,   0,
+                              0,   0, 255, 255, 255, 255, 255, 255,   0,   0,
+                              0,   0,   0, 255, 255, 255, 255,   0,   0,   0,
+                              0,   0,   0,   0, 255, 255,   0,   0,   0,   0,
+                              0,   0,   0,   0,   0,   0,   0,   0,   0,   0
+                        ]
+                    },
+                    {
+                        name: "Letter A",
+                        data: [
+                              0,   0,   0,   0, 255, 255,   0,   0,   0,   0,
+                              0,   0,   0, 255, 255, 255, 255,   0,   0,   0,
+                              0,   0, 255, 255,   0,   0, 255, 255,   0,   0,
+                              0,   0, 255, 255,   0,   0, 255, 255,   0,   0,
+                              0, 255, 255, 255, 255, 255, 255, 255, 255,   0,
+                            255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+                            255, 255,   0,   0,   0,   0,   0,   0, 255, 255,
+                            255, 255,   0,   0,   0,   0,   0,   0, 255, 255,
+                            255, 255,   0,   0,   0,   0,   0,   0, 255, 255,
+                              0,   0,   0,   0,   0,   0,   0,   0,   0,   0
+                        ]
+                    },
+                    {
+                        name: "Radial Gradient",
+                        data: [
+                              0,  30,  60,  80,  90,  90,  80,  60,  30,   0,
+                             30,  70, 110, 130, 140, 140, 130, 110,  70,  30,
+                             60, 110, 160, 190, 200, 200, 190, 160, 110,  60,
+                             80, 130, 190, 230, 240, 240, 190, 130, 130,  80,
+                             90, 140, 200, 240, 255, 255, 240, 200, 140,  90,
+                             90, 140, 200, 240, 255, 255, 240, 200, 140,  90,
+                             80, 130, 190, 230, 240, 240, 190, 130, 130,  80,
+                             60, 110, 160, 190, 200, 200, 190, 160, 110,  60,
+                             30,  70, 110, 130, 140, 140, 130, 110,  70,  30,
+                              0,  30,  60,  80,  90,  90,  80,  60,  30,   0
+                        ]
+                    }
+                ]
+            },
+            rgb: {
+                5: [
+                    {
+                        name: "RGB Corners",
+                        data: [
+                            [255,0,0], [255,0,0], [255,255,255], [0,255,0], [0,255,0],
+                            [255,0,0], [255,0,0], [255,255,255], [0,255,0], [0,255,0],
+                            [255,255,255], [255,255,255], [0,0,0], [255,255,255], [255,255,255],
+                            [0,0,255], [0,0,255], [255,255,255], [255,255,0], [255,255,0],
+                            [0,0,255], [0,0,255], [255,255,255], [255,255,0], [255,255,0]
+                        ]
+                    },
+                    {
+                        name: "Diagonal Rainbow",
+                        data: [
+                            [255,0,0], [255,127,0], [255,255,0], [0,255,0], [0,0,255],
+                            [255,127,0], [255,255,0], [0,255,0], [0,0,255], [75,0,130],
+                            [255,255,0], [0,255,0], [0,0,255], [75,0,130], [148,0,211],
+                            [0,255,0], [0,0,255], [75,0,130], [148,0,211], [255,255,255],
+                            [0,0,255], [75,0,130], [148,0,211], [255,255,255], [0,0,0]
+                        ]
+                    }
+                ],
+                10: [
+                    {
+                        name: "Sunset Glow",
+                        data: [
+                            [255, 0, 128], [255, 0, 128], [255, 0, 128], [255, 0, 128], [255, 0, 128], [255, 0, 128], [255, 0, 128], [255, 0, 128], [255, 0, 128], [255, 0, 128],
+                            [255, 40, 100], [255, 40, 100], [255, 40, 100], [255, 40, 100], [255, 40, 100], [255, 40, 100], [255, 40, 100], [255, 40, 100], [255, 40, 100], [255, 40, 100],
+                            [255, 80, 70], [255, 80, 70], [255, 80, 70], [255, 80, 70], [255, 80, 70], [255, 80, 70], [255, 80, 70], [255, 80, 70], [255, 80, 70], [255, 80, 70],
+                            [255, 120, 40], [255, 120, 40], [255, 120, 40], [255, 120, 40], [255, 120, 40], [255, 120, 40], [255, 120, 40], [255, 120, 40], [255, 120, 40], [255, 120, 40],
+                            [255, 160, 20], [255, 160, 20], [255, 160, 20], [255, 160, 20], [255, 160, 20], [255, 160, 20], [255, 160, 20], [255, 160, 20], [255, 160, 20], [255, 160, 20],
+                            [255, 200, 0], [255, 200, 0], [255, 200, 0], [255, 200, 0], [255, 200, 0], [255, 200, 0], [255, 200, 0], [255, 200, 0], [255, 200, 0], [255, 200, 0],
+                            [180, 160, 60], [180, 160, 60], [180, 160, 60], [180, 160, 60], [180, 160, 60], [180, 160, 60], [180, 160, 60], [180, 160, 60], [180, 160, 60], [180, 160, 60],
+                            [100, 100, 140], [100, 100, 140], [100, 100, 140], [100, 100, 140], [100, 100, 140], [100, 100, 140], [100, 100, 140], [100, 100, 140], [100, 100, 140], [100, 100, 140],
+                            [40, 40, 200], [40, 40, 200], [40, 40, 200], [40, 40, 200], [40, 40, 200], [40, 40, 200], [40, 40, 200], [40, 40, 200], [40, 40, 200], [40, 40, 200],
+                            [10, 10, 120], [10, 10, 120], [10, 10, 120], [10, 10, 120], [10, 10, 120], [10, 10, 120], [10, 10, 120], [10, 10, 120], [10, 10, 120], [10, 10, 120]
+                        ]
+                    },
+                    {
+                        name: "Color Target",
+                        data: [
+                            [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0],
+                            [255,0,0], [255,255,255], [255,255,255], [255,255,255], [255,255,255], [255,255,255], [255,255,255], [255,255,255], [255,255,255], [255,0,0],
+                            [255,0,0], [255,255,255], [0,0,255], [0,0,255], [0,0,255], [0,0,255], [0,0,255], [0,0,255], [255,255,255], [255,0,0],
+                            [255,0,0], [255,255,255], [0,0,255], [0,255,0], [0,255,0], [0,255,0], [0,255,0], [0,0,255], [255,255,255], [255,0,0],
+                            [255,0,0], [255,255,255], [0,0,255], [0,255,0], [255,255,0], [255,255,0], [0,255,0], [0,0,255], [255,255,255], [255,0,0],
+                            [255,0,0], [255,255,255], [0,0,255], [0,255,0], [255,255,0], [255,255,0], [0,255,0], [0,0,255], [255,255,255], [255,0,0],
+                            [255,0,0], [255,255,255], [0,0,255], [0,255,0], [0,255,0], [0,255,0], [0,255,0], [0,0,255], [255,255,255], [255,0,0],
+                            [255,0,0], [255,255,255], [0,0,255], [0,0,255], [0,0,255], [0,0,255], [0,0,255], [0,0,255], [255,255,255], [255,0,0],
+                            [255,0,0], [255,255,255], [255,255,255], [255,255,255], [255,255,255], [255,255,255], [255,255,255], [255,255,255], [255,255,255], [255,0,0],
+                            [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0], [255,0,0]
+                        ]
+                    }
+                ]
+            }
+        };
+
+        /* ─── STATE MANAGEMENT ────────────────────────────────────────────── */
+        let gridSize = 10; // 5 or 10
+        let colorMode = 'grayscale'; // 'grayscale' or 'rgb'
+        let interactionTool = 'edit'; // 'edit' or 'brush'
+        let rgbTab = 'combined'; // 'combined', 'red', 'green', 'blue'
+        let codeTab = 'numpy'; // 'numpy', 'pytorch', 'flat'
+
+        // Core data arrays
+        // Grayscale holds linear integers: [val, val, ...] of length size * size
+        // RGB holds linear [R,G,B] arrays: [[r,g,b], [r,g,b], ...] of length size * size
+        let grayscaleData = [];
+        let rgbData = [];
+
+        // Drag to paint state
+        let isDrawing = false;
+        let selectedCellIdx = 0; // index of pixel inspected currently
+
+        // DOM elements
+        const gridContainer = document.getElementById('grid-container');
+        const renderCanvas = document.getElementById('render-canvas');
+        const actualCanvas = document.getElementById('actual-canvas');
+        const codeBlock = document.getElementById('code-block');
+        const pixelInspector = document.getElementById('pixel-inspector');
+        const rgbTabsContainer = document.getElementById('rgb-tabs-container');
+        const brushSettingsContainer = document.getElementById('interaction-tool').parentElement.nextElementSibling;
+        
+        const inspectRow = document.getElementById('inspect-row');
+        const inspectCol = document.getElementById('inspect-col');
+        const inspectR = document.getElementById('inspect-r');
+        const inspectG = document.getElementById('inspect-g');
+        const inspectB = document.getElementById('inspect-b');
+        const inspectRVal = document.getElementById('inspect-r-val');
+        const inspectGVal = document.getElementById('inspect-g-val');
+        const inspectBVal = document.getElementById('inspect-b-val');
+        const inspectColorPreview = document.getElementById('inspect-color-preview');
+
+        /* ─── INITIALIZATION ──────────────────────────────────────────────── */
+        function init() {
+            resetData();
+            loadPreset(0); // Load default preset
+            setupGlobalListeners();
+            updateUI();
+        }
+
+        function resetData() {
+            const count = gridSize * gridSize;
+            grayscaleData = new Array(count).fill(0);
+            rgbData = Array.from({ length: count }, () => [0, 0, 0]);
+        }
+
+        function setupGlobalListeners() {
+            window.addEventListener('mouseup', () => {
+                isDrawing = false;
+            });
+        }
+
+        /* ─── STATE MUTATORS ──────────────────────────────────────────────── */
+        function changeGridSize(size) {
+            gridSize = parseInt(size);
+            resetData();
+            // Load the first available preset of new size
+            loadPreset(0);
+            updateUI();
+        }
+
+        function changeColorMode(mode) {
+            colorMode = mode;
+            rgbTab = 'combined';
+            // Auto convert or load presets
+            loadPreset(0);
+            updateUI();
+        }
+
+        function changeInteractionTool(tool) {
+            interactionTool = tool;
+            const container = document.getElementById('brush-settings-container');
+            const brushGray = document.getElementById('brush-val-gray');
+            const brushRgb = document.getElementById('brush-val-rgb');
+            
+            if (tool === 'brush') {
+                container.classList.remove('opacity-50', 'pointer-events-none');
+                if (colorMode === 'grayscale') {
+                    brushGray.classList.remove('hidden');
+                    brushRgb.classList.add('hidden');
+                } else {
+                    brushGray.classList.add('hidden');
+                    brushRgb.classList.remove('hidden');
+                }
+            } else {
+                container.classList.add('opacity-50', 'pointer-events-none');
+            }
+        }
+
+        function updateBrush() {
+            // No-op - brush state is read directly on click/drag
+        }
+
+        function changeRgbTab(tab) {
+            rgbTab = tab;
+            renderGrid();
+        }
+
+        function changeCodeTab(tab) {
+            codeTab = tab;
+            // Update active styling
+            ['numpy', 'pytorch', 'flat'].forEach(t => {
+                const el = document.getElementById(`code-tab-${t}`);
+                if (t === tab) {
+                    el.className = "px-2.5 py-1 text-[9px] font-black uppercase tracking-wider rounded bg-slate-800 text-slate-200";
+                } else {
+                    el.className = "px-2.5 py-1 text-[9px] font-black uppercase tracking-wider rounded text-slate-400 hover:text-slate-200";
+                }
+            });
+            renderCodeRepresentation();
+        }
+
+        /* ─── PRESET LOADING ──────────────────────────────────────────────── */
+        function loadPreset(idx) {
+            const list = PRESETS[colorMode][gridSize];
+            if (!list || !list[idx]) return;
+            const preset = list[idx];
+            if (colorMode === 'grayscale') {
+                grayscaleData = [...preset.data];
+            } else {
+                // deep copy of array entries
+                rgbData = preset.data.map(rgb => [...rgb]);
+            }
+            selectedCellIdx = 0;
+            updateUI();
+        }
+
+        function renderPresetButtons() {
+            const container = document.getElementById('presets-container');
+            const list = PRESETS[colorMode][gridSize] || [];
+            container.innerHTML = list.map((p, i) => `
+                <button onclick="loadPreset(${i})" class="px-3 py-1.5 bg-gray-100 hover:bg-violet-100 hover:text-violet-800 text-gray-700 text-xs font-bold rounded-lg border border-gray-200/80 transition-colors">
+                    ${p.name}
+                </button>
+            `).join('');
+        }
+
+        /* ─── GRID RENDERING ──────────────────────────────────────────────── */
+        function renderGrid() {
+            gridContainer.innerHTML = '';
+            // set dynamic CSS columns
+            gridContainer.style.gridTemplateColumns = `repeat(${gridSize}, minmax(0, 1fr))`;
+            gridContainer.style.gridTemplateRows = `repeat(${gridSize}, minmax(0, 1fr))`;
+
+            const total = gridSize * gridSize;
+
+            for (let i = 0; i < total; i++) {
+                const cell = document.createElement('div');
+                cell.className = "pixel-cell border border-gray-300/40 relative flex items-center justify-center font-mono cursor-crosshair rounded-sm group";
+                cell.id = `cell-${i}`;
+                cell.dataset.idx = i;
+
+                // Color calculation depending on mode and selected tab
+                let bgColor = '#fff';
+                let textColor = 'text-black';
+                let cellText = '';
+
+                if (colorMode === 'grayscale') {
+                    const val = grayscaleData[i];
+                    bgColor = `rgb(${val}, ${val}, ${val})`;
+                    textColor = val > 128 ? 'text-black font-semibold' : 'text-white';
+                    cellText = val;
+
+                    // Grid input wrapper for double-click/typing mode
+                    cell.innerHTML = `
+                        <input type="text" pattern="[0-9]*" inputmode="numeric" 
+                            class="pixel-input w-full h-full text-center bg-transparent border-none outline-none font-mono font-bold text-xs select-all cursor-pointer ${textColor}" 
+                            value="${cellText}" 
+                            data-idx="${i}"
+                            onfocus="selectCell(${i})"
+                            oninput="onCellInput(this, ${i})"
+                            onkeydown="onCellKeydown(event, ${i})"
+                        />
+                    `;
+                } else {
+                    // RGB Mode
+                    const rgb = rgbData[i];
+                    if (rgbTab === 'combined') {
+                        bgColor = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+                        cellText = ''; // empty, show color block
+                        cell.innerHTML = `<span class="text-[9px] opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 text-white rounded px-1 absolute text-center font-mono select-none pointer-events-none">${rgb[0]},${rgb[1]},${rgb[2]}</span>`;
+                    } else {
+                        // Monochromatic red, green, or blue representation
+                        const val = rgbTab === 'red' ? rgb[0] : (rgbTab === 'green' ? rgb[1] : rgb[2]);
+                        if (rgbTab === 'red') {
+                            bgColor = `rgb(${val}, 0, 0)`;
+                            textColor = val > 120 ? 'text-white' : 'text-red-400';
+                        } else if (rgbTab === 'green') {
+                            bgColor = `rgb(0, ${val}, 0)`;
+                            textColor = val > 120 ? 'text-white' : 'text-green-400';
+                        } else {
+                            bgColor = `rgb(0, 0, ${val})`;
+                            textColor = val > 120 ? 'text-white' : 'text-blue-400';
+                        }
+                        cellText = val;
+
+                        cell.innerHTML = `
+                            <input type="text" pattern="[0-9]*" inputmode="numeric" 
+                                class="pixel-input w-full h-full text-center bg-transparent border-none outline-none font-mono font-bold text-[10px] select-all cursor-pointer ${textColor}" 
+                                value="${cellText}" 
+                                data-idx="${i}"
+                                onfocus="selectCell(${i})"
+                                oninput="onCellInput(this, ${i})"
+                                onkeydown="onCellKeydown(event, ${i})"
+                            />
+                        `;
+                    }
+                }
+
+                cell.style.backgroundColor = bgColor;
+
+                // Click-and-drag drawing event hooks
+                cell.addEventListener('mousedown', (e) => {
+                    isDrawing = true;
+                    selectCell(i);
+                    if (interactionTool === 'brush') {
+                        applyBrush(i);
+                        e.preventDefault();
+                    }
+                });
+
+                cell.addEventListener('mouseenter', () => {
+                    hoverCellSync(i);
+                    if (isDrawing && interactionTool === 'brush') {
+                        applyBrush(i);
+                    }
+                });
+
+                cell.addEventListener('mouseleave', () => {
+                    unhoverCellSync(i);
+                });
+
+                gridContainer.appendChild(cell);
+            }
+
+            // Sync visual highlights for the selected cell
+            highlightActiveCellGrid();
+        }
+
+        /* ─── DATA INPUT & KEYBOARD HANDLING ───────────────────────────────── */
+        function onCellInput(inputEl, idx) {
+            let val = inputEl.value.replace(/[^0-9]/g, '');
+            if (val === '') val = '0';
+            let num = Math.min(255, Math.max(0, parseInt(val)));
+            
+            inputEl.value = num;
+
+            if (colorMode === 'grayscale') {
+                grayscaleData[idx] = num;
+            } else {
+                if (rgbTab === 'red') rgbData[idx][0] = num;
+                else if (rgbTab === 'green') rgbData[idx][1] = num;
+                else if (rgbTab === 'blue') rgbData[idx][2] = num;
+            }
+
+            // Update live outputs
+            drawCanvas();
+            renderCodeRepresentation();
+            updatePixelInspector();
+            
+            // Recalculate dynamic text/background colors of the input cell without full rerender
+            let cell = document.getElementById(`cell-${idx}`);
+            if (colorMode === 'grayscale') {
+                cell.style.backgroundColor = `rgb(${num}, ${num}, ${num})`;
+                inputEl.className = `pixel-input w-full h-full text-center bg-transparent border-none outline-none font-mono font-bold text-xs select-all cursor-pointer ${num > 128 ? 'text-black font-semibold' : 'text-white'}`;
+            } else {
+                if (rgbTab === 'red') {
+                    cell.style.backgroundColor = `rgb(${num}, 0, 0)`;
+                    inputEl.className = `pixel-input w-full h-full text-center bg-transparent border-none outline-none font-mono font-bold text-[10px] select-all cursor-pointer ${num > 120 ? 'text-white' : 'text-red-400'}`;
+                } else if (rgbTab === 'green') {
+                    cell.style.backgroundColor = `rgb(0, ${num}, 0)`;
+                    inputEl.className = `pixel-input w-full h-full text-center bg-transparent border-none outline-none font-mono font-bold text-[10px] select-all cursor-pointer ${num > 120 ? 'text-white' : 'text-green-400'}`;
+                } else if (rgbTab === 'blue') {
+                    cell.style.backgroundColor = `rgb(0, 0, ${num})`;
+                    inputEl.className = `pixel-input w-full h-full text-center bg-transparent border-none outline-none font-mono font-bold text-[10px] select-all cursor-pointer ${num > 120 ? 'text-white' : 'text-blue-400'}`;
+                }
+            }
+        }
+
+        function onCellKeydown(e, idx) {
+            // Basic arrow key grid navigation
+            let targetIdx = idx;
+            if (e.key === 'ArrowRight') {
+                targetIdx = (idx + 1) % (gridSize * gridSize);
+            } else if (e.key === 'ArrowLeft') {
+                targetIdx = (idx - 1 + (gridSize * gridSize)) % (gridSize * gridSize);
+            } else if (e.key === 'ArrowDown') {
+                targetIdx = (idx + gridSize) % (gridSize * gridSize);
+            } else if (e.key === 'ArrowUp') {
+                targetIdx = (idx - gridSize + (gridSize * gridSize)) % (gridSize * gridSize);
+            }
+
+            if (targetIdx !== idx) {
+                const nextInput = document.querySelector(`#cell-${targetIdx} input`);
+                if (nextInput) {
+                    nextInput.focus();
+                    nextInput.select();
+                }
+                e.preventDefault();
+            }
+        }
+
+        /* ─── PAINTBRUSH LOGIC ─────────────────────────────────────────────── */
+        function applyBrush(idx) {
+            if (colorMode === 'grayscale') {
+                const brushVal = parseInt(document.getElementById('brush-val-gray').value);
+                grayscaleData[idx] = brushVal;
+            } else {
+                const hexColor = document.getElementById('brush-val-rgb').value;
+                const rgb = hexToRgb(hexColor);
+                if (rgbTab === 'combined') {
+                    rgbData[idx] = [...rgb];
+                } else if (rgbTab === 'red') {
+                    rgbData[idx][0] = rgb[0];
+                } else if (rgbTab === 'green') {
+                    rgbData[idx][1] = rgb[1];
+                } else if (rgbTab === 'blue') {
+                    rgbData[idx][2] = rgb[2];
+                }
+            }
+            
+            // Fast visual update of cell
+            let cell = document.getElementById(`cell-${idx}`);
+            if (colorMode === 'grayscale') {
+                const num = grayscaleData[idx];
+                cell.style.backgroundColor = `rgb(${num}, ${num}, ${num})`;
+                const input = cell.querySelector('input');
+                if (input) {
+                    input.value = num;
+                    input.className = `pixel-input w-full h-full text-center bg-transparent border-none outline-none font-mono font-bold text-xs select-all cursor-pointer ${num > 128 ? 'text-black font-semibold' : 'text-white'}`;
+                }
+            } else {
+                const rgb = rgbData[idx];
+                if (rgbTab === 'combined') {
+                    cell.style.backgroundColor = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+                } else {
+                    const val = rgbTab === 'red' ? rgb[0] : (rgbTab === 'green' ? rgb[1] : rgb[2]);
+                    const input = cell.querySelector('input');
+                    if (input) {
+                        input.value = val;
+                        if (rgbTab === 'red') {
+                            cell.style.backgroundColor = `rgb(${val}, 0, 0)`;
+                            input.className = `pixel-input w-full h-full text-center bg-transparent border-none outline-none font-mono font-bold text-[10px] select-all cursor-pointer ${val > 120 ? 'text-white' : 'text-red-400'}`;
+                        } else if (rgbTab === 'green') {
+                            cell.style.backgroundColor = `rgb(0, ${val}, 0)`;
+                            input.className = `pixel-input w-full h-full text-center bg-transparent border-none outline-none font-mono font-bold text-[10px] select-all cursor-pointer ${val > 120 ? 'text-white' : 'text-green-400'}`;
+                        } else if (rgbTab === 'blue') {
+                            cell.style.backgroundColor = `rgb(0, 0, ${val})`;
+                            input.className = `pixel-input w-full h-full text-center bg-transparent border-none outline-none font-mono font-bold text-[10px] select-all cursor-pointer ${val > 120 ? 'text-white' : 'text-blue-400'}`;
+                        }
+                    }
+                }
+            }
+
+            drawCanvas();
+            renderCodeRepresentation();
+            updatePixelInspector();
+        }
+
+        function hexToRgb(hex) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return [r, g, b];
+        }
+
+        /* ─── CANVAS RENDERING ─────────────────────────────────────────────── */
+        function drawCanvas() {
+            const ctx = renderCanvas.getContext('2d');
+            const actCtx = actualCanvas.getContext('2d');
+            const showLines = document.getElementById('toggle-gridlines').checked;
+
+            // Resize internal sizes to match the logical grid
+            renderCanvas.width = gridSize * 10;
+            renderCanvas.height = gridSize * 10;
+            actualCanvas.width = gridSize;
+            actualCanvas.height = gridSize;
+
+            ctx.clearRect(0, 0, renderCanvas.width, renderCanvas.height);
+            actCtx.clearRect(0, 0, actualCanvas.width, actualCanvas.height);
+
+            // Draw cells
+            for (let r = 0; r < gridSize; r++) {
+                for (let c = 0; c < gridSize; c++) {
+                    const idx = r * gridSize + c;
+                    let color = 'rgb(0,0,0)';
+
+                    if (colorMode === 'grayscale') {
+                        const val = grayscaleData[idx];
+                        color = `rgb(${val}, ${val}, ${val})`;
+                    } else {
+                        const rgb = rgbData[idx];
+                        color = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+                    }
+
+                    // Scaled canvas draw
+                    ctx.fillStyle = color;
+                    ctx.fillRect(c * 10, r * 10, 10, 10);
+
+                    // Actual size canvas draw
+                    actCtx.fillStyle = color;
+                    actCtx.fillRect(c, r, 1, 1);
+                }
+            }
+
+            // Draw gridlines overlay if enabled
+            if (showLines) {
+                ctx.strokeStyle = 'rgba(200, 200, 200, 0.4)';
+                ctx.lineWidth = 0.5;
+                ctx.beginPath();
+                for (let i = 0; i <= gridSize; i++) {
+                    // Vertical
+                    ctx.moveTo(i * 10, 0);
+                    ctx.lineTo(i * 10, renderCanvas.height);
+                    // Horizontal
+                    ctx.moveTo(0, i * 10);
+                    ctx.lineTo(renderCanvas.width, i * 10);
+                }
+                ctx.stroke();
+            }
+        }
+
+        /* ─── CODE DATA GENERATION ─────────────────────────────────────────── */
+        function renderCodeRepresentation() {
+            let codeHtml = '';
+            
+            if (codeTab === 'numpy') {
+                if (colorMode === 'grayscale') {
+                    codeHtml += `<span class="text-violet-400">import</span> numpy <span class="text-violet-400">as</span> np\n\n`;
+                    codeHtml += `# Grayscale Image Array - shape: (${gridSize}, ${gridSize})\n`;
+                    codeHtml += `image = np.array([\n`;
+                    for (let r = 0; r < gridSize; r++) {
+                        codeHtml += `    [`;
+                        for (let c = 0; c < gridSize; c++) {
+                            const idx = r * gridSize + c;
+                            const val = grayscaleData[idx];
+                            const isSelected = idx === selectedCellIdx;
+                            const valStr = val.toString().padStart(3);
+                            codeHtml += `<span id="code-val-${idx}" data-idx="${idx}" onmouseenter="hoverCellSync(${idx})" onmouseleave="unhoverCellSync(${idx})" class="px-0.5 rounded cursor-pointer transition-colors duration-100 ${isSelected ? 'bg-violet-700/80 text-white font-bold' : 'hover:bg-slate-800'}" onclick="selectCell(${idx})">${valStr}</span>`;
+                            if (c < gridSize - 1) codeHtml += `, `;
+                        }
+                        codeHtml += `]${r < gridSize - 1 ? ',' : ''}\n`;
+                    }
+                    codeHtml += `])`;
+                } else {
+                    codeHtml += `<span class="text-violet-400">import</span> numpy <span class="text-violet-400">as</span> np\n\n`;
+                    codeHtml += `# RGB Image Array - shape: (${gridSize}, ${gridSize}, 3)\n`;
+                    codeHtml += `image = np.array([\n`;
+                    for (let r = 0; r < gridSize; r++) {
+                        codeHtml += `    [`;
+                        for (let c = 0; c < gridSize; c++) {
+                            const idx = r * gridSize + c;
+                            const rgb = rgbData[idx];
+                            const isSelected = idx === selectedCellIdx;
+                            const rgbStr = `[${rgb[0].toString().padStart(3)},${rgb[1].toString().padStart(3)},${rgb[2].toString().padStart(3)}]`;
+                            codeHtml += `<span id="code-val-${idx}" data-idx="${idx}" onmouseenter="hoverCellSync(${idx})" onmouseleave="unhoverCellSync(${idx})" class="px-0.5 rounded cursor-pointer transition-colors duration-100 text-[9px] ${isSelected ? 'bg-violet-700/80 text-white font-bold' : 'hover:bg-slate-800 text-slate-300'}" onclick="selectCell(${idx})">${rgbStr}</span>`;
+                            if (c < gridSize - 1) codeHtml += `, `;
+                        }
+                        codeHtml += `]${r < gridSize - 1 ? ',' : ''}\n`;
+                    }
+                    codeHtml += `])`;
+                }
+            } else if (codeTab === 'pytorch') {
+                if (colorMode === 'grayscale') {
+                    codeHtml += `<span class="text-violet-400">import</span> torch\n\n`;
+                    codeHtml += `# PyTorch Grayscale Tensor - shape: (1, ${gridSize}, ${gridSize})\n`;
+                    codeHtml += `image_tensor = torch.tensor([\n    [\n`;
+                    for (let r = 0; r < gridSize; r++) {
+                        codeHtml += `        [`;
+                        for (let c = 0; c < gridSize; c++) {
+                            const idx = r * gridSize + c;
+                            const val = grayscaleData[idx];
+                            const isSelected = idx === selectedCellIdx;
+                            const valStr = val.toString().padStart(3);
+                            codeHtml += `<span id="code-val-${idx}" data-idx="${idx}" onmouseenter="hoverCellSync(${idx})" onmouseleave="unhoverCellSync(${idx})" class="px-0.5 rounded cursor-pointer transition-colors duration-100 ${isSelected ? 'bg-violet-700/80 text-white font-bold' : 'hover:bg-slate-800'}" onclick="selectCell(${idx})">${valStr}</span>`;
+                            if (c < gridSize - 1) codeHtml += `, `;
+                        }
+                        codeHtml += `]${r < gridSize - 1 ? ',' : ''}\n`;
+                    }
+                    codeHtml += `    ]\n])`;
+                } else {
+                    codeHtml += `<span class="text-violet-400">import</span> torch\n\n`;
+                    codeHtml += `# PyTorch Color Tensor - shape: (3, ${gridSize}, ${gridSize}) - Channels-first\n`;
+                    codeHtml += `image_tensor = torch.tensor([\n`;
+                    
+                    // Channel Names
+                    const channels = ["Red Channel", "Green Channel", "Blue Channel"];
+                    for (let ch = 0; ch < 3; ch++) {
+                        codeHtml += `    # ${channels[ch]}\n    [\n`;
+                        for (let r = 0; r < gridSize; r++) {
+                            codeHtml += `        [`;
+                            for (let c = 0; c < gridSize; c++) {
+                                const idx = r * gridSize + c;
+                                const val = rgbData[idx][ch];
+                                const isSelected = idx === selectedCellIdx;
+                                const valStr = val.toString().padStart(3);
+                                // Hovering links back correctly
+                                codeHtml += `<span id="code-val-${idx}-ch-${ch}" data-idx="${idx}" onmouseenter="hoverCellSync(${idx})" onmouseleave="unhoverCellSync(${idx})" class="px-0.5 rounded cursor-pointer transition-colors duration-100 ${isSelected ? 'bg-violet-700/80 text-white font-bold' : 'hover:bg-slate-800 text-slate-300'}" onclick="selectCell(${idx})">${valStr}</span>`;
+                                if (c < gridSize - 1) codeHtml += `, `;
+                            }
+                            codeHtml += `        ]${r < gridSize - 1 ? ',' : ''}\n`;
+                        }
+                        codeHtml += `    ]${ch < 2 ? ',' : ''}\n`;
+                    }
+                    codeHtml += `])`;
+                }
+            } else {
+                // Flat Array Mode
+                const count = gridSize * gridSize;
+                if (colorMode === 'grayscale') {
+                    codeHtml += `# Flat 1D Array representation - size: ${count}\n`;
+                    codeHtml += `flat_image = [\n    `;
+                    for (let i = 0; i < count; i++) {
+                        const val = grayscaleData[i];
+                        const isSelected = i === selectedCellIdx;
+                        const valStr = val.toString().padStart(3);
+                        codeHtml += `<span id="code-val-${i}" data-idx="${i}" onmouseenter="hoverCellSync(${i})" onmouseleave="unhoverCellSync(${i})" class="px-0.5 rounded cursor-pointer transition-colors duration-100 ${isSelected ? 'bg-violet-700/80 text-white font-bold' : 'hover:bg-slate-800'}" onclick="selectCell(${i})">${valStr}</span>`;
+                        if (i < count - 1) {
+                            codeHtml += `,`;
+                            if ((i + 1) % gridSize === 0) codeHtml += `\n    `;
+                            else codeHtml += ` `;
+                        }
+                    }
+                    codeHtml += `\n]`;
+                } else {
+                    codeHtml += `# Flat 1D RGB Array representation - size: ${count} pixels\n`;
+                    codeHtml += `flat_image = [\n    `;
+                    for (let i = 0; i < count; i++) {
+                        const rgb = rgbData[i];
+                        const isSelected = i === selectedCellIdx;
+                        const rgbStr = `[${rgb[0]},${rgb[1]},${rgb[2]}]`;
+                        codeHtml += `<span id="code-val-${i}" data-idx="${i}" onmouseenter="hoverCellSync(${i})" onmouseleave="unhoverCellSync(${i})" class="px-0.5 rounded cursor-pointer transition-colors duration-100 text-[9px] ${isSelected ? 'bg-violet-700/80 text-white font-bold' : 'hover:bg-slate-800 text-slate-300'}" onclick="selectCell(${i})">${rgbStr}</span>`;
+                        if (i < count - 1) {
+                            codeHtml += `,`;
+                            if ((i + 1) % 5 === 0) codeHtml += `\n    `;
+                            else codeHtml += ` `;
+                        }
+                    }
+                    codeHtml += `\n]`;
+                }
+            }
+
+            codeBlock.innerHTML = codeHtml;
+        }
+
+        /* ─── HOVER SYNCHRONIZATION ────────────────────────────────────────── */
+        function hoverCellSync(idx) {
+            // 1. Highlight cell in interactive grid
+            const gridCell = document.getElementById(`cell-${idx}`);
+            if (gridCell) {
+                gridCell.classList.add('ring-2', 'ring-violet-400', 'scale-105', 'z-10');
+            }
+
+            // 2. Highlight position in rendered canvas
+            const r = Math.floor(idx / gridSize);
+            const c = idx % gridSize;
+            const highlight = document.getElementById('canvas-highlight');
+            if (highlight) {
+                highlight.style.display = 'block';
+                highlight.style.width = '10px';
+                highlight.style.height = '10px';
+                highlight.style.left = `${c * 10}px`;
+                highlight.style.top = `${r * 10}px`;
+            }
+
+            // 3. Highlight numbers in dynamic code block representation
+            const codeSpans = document.querySelectorAll(`[id^="code-val-${idx}"]`);
+            codeSpans.forEach(span => {
+                span.classList.add('bg-slate-800', 'text-yellow-300', 'font-black');
+            });
+        }
+
+        function unhoverCellSync(idx) {
+            // 1. Remove highlight cell in grid
+            const gridCell = document.getElementById(`cell-${idx}`);
+            if (gridCell) {
+                gridCell.classList.remove('ring-2', 'ring-violet-400', 'scale-105', 'z-10');
+            }
+
+            // 2. Hide highlight in canvas
+            const highlight = document.getElementById('canvas-highlight');
+            if (highlight) {
+                highlight.style.display = 'none';
+            }
+
+            // 3. Remove highlight from code block
+            const codeSpans = document.querySelectorAll(`[id^="code-val-${idx}"]`);
+            codeSpans.forEach(span => {
+                span.classList.remove('bg-slate-800', 'text-yellow-300', 'font-black');
+            });
+        }
+
+        /* ─── PIXEL SELECTION & INSPECTION ─────────────────────────────────── */
+        function selectCell(idx) {
+            selectedCellIdx = idx;
+            
+            // Remove selection pulse class from all grid cells
+            const count = gridSize * gridSize;
+            for (let i = 0; i < count; i++) {
+                const cell = document.getElementById(`cell-${i}`);
+                if (cell) cell.classList.remove('active-cell-pulse', 'ring-2', 'ring-violet-500');
+            }
+
+            // Add selection styling to active cell
+            highlightActiveCellGrid();
+
+            // Open or update pixel inspector sidebar/bar
+            updatePixelInspector();
+            renderCodeRepresentation();
+        }
+
+        function highlightActiveCellGrid() {
+            const activeCell = document.getElementById(`cell-${selectedCellIdx}`);
+            if (activeCell) {
+                activeCell.classList.add('active-cell-pulse', 'ring-2', 'ring-violet-500');
+            }
+        }
+
+        function updatePixelInspector() {
+            if (colorMode === 'rgb') {
+                pixelInspector.classList.remove('hidden');
+                const rgb = rgbData[selectedCellIdx];
+                const row = Math.floor(selectedCellIdx / gridSize);
+                const col = selectedCellIdx % gridSize;
+
+                inspectRow.textContent = row;
+                inspectCol.textContent = col;
+                
+                inspectR.value = rgb[0];
+                inspectG.value = rgb[1];
+                inspectB.value = rgb[2];
+
+                inspectRVal.textContent = rgb[0];
+                inspectGVal.textContent = rgb[1];
+                inspectBVal.textContent = rgb[2];
+
+                inspectColorPreview.style.backgroundColor = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+            } else {
+                pixelInspector.classList.add('hidden');
+            }
+        }
+
+        function updateInspectPixel() {
+            const r = parseInt(inspectR.value);
+            const g = parseInt(inspectG.value);
+            const b = parseInt(inspectB.value);
+
+            rgbData[selectedCellIdx] = [r, g, b];
+
+            inspectRVal.textContent = r;
+            inspectGVal.textContent = g;
+            inspectBVal.textContent = b;
+            inspectColorPreview.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+
+            // Fast visual update of cell in combined grid
+            const cell = document.getElementById(`cell-${selectedCellIdx}`);
+            if (cell) {
+                if (rgbTab === 'combined') {
+                    cell.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+                } else {
+                    const val = rgbTab === 'red' ? r : (rgbTab === 'green' ? g : b);
+                    cell.style.backgroundColor = rgbTab === 'red' ? `rgb(${val}, 0, 0)` : (rgbTab === 'green' ? `rgb(0, ${val}, 0)` : `rgb(0, 0, ${val})`);
+                    const input = cell.querySelector('input');
+                    if (input) input.value = val;
+                }
+            }
+
+            drawCanvas();
+            renderCodeRepresentation();
+        }
+
+        /* ─── UI UPDATE MASTER ────────────────────────────────────────────── */
+        function updateUI() {
+            // Render shapes presets list
+            renderPresetButtons();
+
+            // Toggle headers and tab visibility
+            if (colorMode === 'rgb') {
+                rgbTabsContainer.classList.remove('hidden');
+                // Auto switch interaction tool display option
+                changeInteractionTool(interactionTool);
+            } else {
+                rgbTabsContainer.classList.add('hidden');
+                changeInteractionTool(interactionTool);
+            }
+
+            // Build grid cells DOM elements
+            renderGrid();
+
+            // Render output Canvas
+            drawCanvas();
+
+            // Update live array data representation
+            renderCodeRepresentation();
+
+            // Update inspector bar
+            updatePixelInspector();
+        }
+
+        // Initialize script execution on DOM load
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>

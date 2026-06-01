@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Overfitting Polynomial - AI Competition Jr</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .interactive-canvas {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+
+        <!-- Navigation -->
+        <nav class="mb-6 pt-4 no-print">
+            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-rose-600 transition-colors font-mono" style="text-decoration: none;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Course Hub
+            </a>
+        </nav>
+
+        <!-- Header -->
+        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+            <div>
+                <h1 class="text-4xl font-black tracking-tight text-gray-900 uppercase">Overfitting <span class="text-rose-600">Polynomial</span></h1>
+                <p class="text-gray-500 font-medium italic">Adjust the polynomial degree capacity to watch regression models memorize training data while failing validation splits</p>
+            </div>
+            <div id="status-badge" class="px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-rose-50 border border-rose-200 text-rose-800 shadow-sm transition-all duration-300">
+                Model Capacity
+            </div>
+        </header>
+
+        <!-- Main Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
+
+            <!-- Left Controls Panel (Lg: 5 cols) -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+
+                <!-- Parameters Editor -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-5">
+                    <div>
+                        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-100 pb-2">1. Regression Settings</h2>
+                        
+                        <div class="space-y-6">
+                            <!-- Polynomial Degree Slider -->
+                            <div>
+                                <div class="flex justify-between items-end mb-2">
+                                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Polynomial Degree (Complexity)</label>
+                                    <span id="degree-display" class="text-xs font-mono font-black bg-rose-50 text-rose-700 border border-rose-200 px-3 py-1 rounded-full">Degree 1 (Linear)</span>
+                                </div>
+                                <input type="range" id="degree-slider" min="1" max="6" step="1" value="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-rose-500">
+                                <div class="flex justify-between text-[9px] font-bold text-gray-400 mt-2 uppercase tracking-tighter">
+                                    <span>Linear Fit (High Bias)</span>
+                                    <span>Perfect Interpolation (High Variance)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Presets Panel -->
+                    <div>
+                        <h3 class="text-[10px] font-black uppercase text-gray-400 tracking-wider mb-2">Capacity Presets</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="loadScenario(1)" class="px-3 py-1.5 bg-gray-100 hover:bg-rose-100 hover:text-rose-800 text-gray-700 text-xs font-bold rounded-lg border border-gray-200 transition-colors">
+                                Degree 1 (Underfit)
+                            </button>
+                            <button onclick="loadScenario(3)" class="px-3 py-1.5 bg-gray-100 hover:bg-rose-100 hover:text-rose-800 text-gray-700 text-xs font-bold rounded-lg border border-gray-200 transition-colors">
+                                Degree 3 (Optimal Fit)
+                            </button>
+                            <button onclick="loadScenario(6)" class="px-3 py-1.5 bg-gray-100 hover:bg-rose-100 hover:text-rose-800 text-gray-700 text-xs font-bold rounded-lg border border-gray-200 transition-colors">
+                                Degree 6 (Overfit)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Warning Report -->
+                <div id="warning-panel" class="rounded-2xl p-5 border-l-4 transition-colors duration-300">
+                    <h3 id="warning-title" class="font-black text-xs uppercase tracking-wider mb-1">State Checked</h3>
+                    <p id="warning-desc" class="text-xs font-medium leading-relaxed"></p>
+                </div>
+
+                <!-- Live Metrics Summary -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex flex-col justify-center items-center text-center">
+                        <span class="text-[9px] uppercase tracking-wider text-blue-600 font-black mb-1">Training Loss (MSE)</span>
+                        <span id="metric-train" class="text-2xl font-mono font-black text-blue-700">0.00</span>
+                        <span class="text-[8px] font-mono text-blue-500 font-bold uppercase mt-0.5">Fits blue points</span>
+                    </div>
+                    <div class="bg-rose-50 border border-rose-100 rounded-2xl p-4 flex flex-col justify-center items-center text-center">
+                        <span class="text-[9px] uppercase tracking-wider text-rose-600 font-black mb-1">Test Loss (MSE)</span>
+                        <span id="metric-test" class="text-2xl font-mono font-black text-rose-700">0.00</span>
+                        <span class="text-[8px] font-mono text-rose-500 font-bold uppercase mt-0.5">Fits pink points</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Visual Stage & Code Panel (Lg: 7 cols) -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
+
+                <!-- 2D Regression Plot Canvas -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-4">
+                    <div>
+                        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest">2. 2D Regression Visualizer</h2>
+                        <p class="text-[11px] text-gray-400">Notice how a Degree 6 polynomial passes <strong>perfectly</strong> through all 7 <span class="text-blue-500 font-bold">blue training points</span> while completely missing the <span class="text-rose-500 font-bold">pink test points</span>!</p>
+                    </div>
+
+                    <!-- Canvas container -->
+                    <div class="relative w-full h-[280px] bg-slate-950 border border-slate-900 shadow-inner rounded-xl overflow-hidden">
+                        <canvas id="regression-canvas" class="w-full h-full absolute inset-0 interactive-canvas"></canvas>
+                        <!-- Floating legend -->
+                        <div class="absolute bottom-4 right-4 flex flex-col gap-1.5 bg-slate-900/90 p-3 rounded-lg border border-slate-800 text-[9px] uppercase font-bold text-slate-400 tracking-wider pointer-events-none">
+                            <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 bg-blue-500 rounded-full border border-blue-300"></span>Train Data (N=7)</div>
+                            <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 bg-rose-500 rounded-full border border-rose-300"></span>Test Data (N=4)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- scikit-learn Pipeline Code view -->
+                <div class="bg-slate-900 border-2 border-slate-800 p-6 rounded-2xl shadow-inner flex flex-col gap-4 text-white">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <div>
+                            <h2 class="text-xs font-black uppercase tracking-wider text-rose-400">sklearn polynomial pipeline</h2>
+                            <p class="text-[10px] text-slate-400">How to write this regression model in Python</p>
+                        </div>
+                        <div class="flex bg-slate-950 p-0.5 rounded-lg border border-slate-800 shadow-inner font-mono text-[9px] text-slate-300 uppercase tracking-widest px-2.5 py-1">
+                            sklearn.linear_model
+                        </div>
+                    </div>
+
+                    <!-- Code block -->
+                    <div class="bg-slate-950/80 rounded-xl border border-slate-800/80 p-4 font-mono text-[10px] text-slate-300 overflow-x-auto shadow-inner leading-relaxed">
+                        <pre id="numpy-code" class="whitespace-pre"></pre>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- 3-Column Educational Context Footer -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <!-- Explain Underfitting -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-rose-50 text-rose-600 border border-rose-100 rounded-xl flex items-center justify-center font-bold mb-4 font-mono text-xs">01</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">Underfitting (Bias)</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    At Degree 1, the model is a straight line. It fails to capture the underlying wave curve.
+                </p>
+                <p class="text-xs text-gray-500 leading-relaxed mt-2">
+                    This is called **High Bias**. The model makes oversimplified assumptions about the relationship, resulting in high training error and poor predictive performance overall.
+                </p>
+            </div>
+
+            <!-- Explain Overfitting -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-rose-50 text-rose-600 border border-rose-100 rounded-xl flex items-center justify-center font-bold mb-4 border border-rose-100 font-mono text-xs">02</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">Overfitting (Variance)</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    At Degree 6, the model wiggles wildly to touch every single training point. Its training loss drops to exactly $0.0$.
+                </p>
+                <p class="text-xs text-gray-500 leading-relaxed mt-2">
+                    This is **High Variance**. The model has memorized the noise of the training data. 
+                    However, it completely misses the unseen test coordinates because it has failed to generalize.
+                </p>
+            </div>
+
+            <!-- Explain AI connection -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center font-bold mb-4 border border-rose-200 font-mono text-xs">03</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">How AI Uses This</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    Overfitting is the primary challenge in artificial intelligence development. 
+                    Deep neural networks have millions of parameters (analogous to extremely high-degree polynomials).
+                </p>
+                <p class="text-xs text-gray-500 leading-relaxed mt-2">
+                    AI developers prevent overfitting using techniques like **Regularization** (L1/L2 penalty which dampens coefficients) or **Dropout**, forcing models to maintain simple, robust decision logic.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MAIN JAVASCRIPT LOGIC -->
+    <script>
+        // State variables
+        let degree = 1;
+
+        // Static 7 Training coordinates (Blue points)
+        const TRAIN_POINTS = [
+            { x: 1.0, y: 2.1 },
+            { x: 2.0, y: 3.6 },
+            { x: 3.0, y: 3.1 },
+            { x: 4.0, y: 1.8 },
+            { x: 5.0, y: 0.9 },
+            { x: 6.0, y: 1.2 },
+            { x: 7.0, y: 3.4 }
+        ];
+
+        // Static 4 Unseen Validation/Test coordinates (Pink points)
+        const TEST_POINTS = [
+            { x: 1.5, y: 3.0 },
+            { x: 3.5, y: 2.3 },
+            { x: 5.5, y: 0.9 },
+            { x: 6.5, y: 2.1 }
+        ];
+
+        // Canvas references
+        const canvas = document.getElementById('regression-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        const degreeSlider = document.getElementById('degree-slider');
+        const degreeDisplay = document.getElementById('degree-display');
+        
+        const metricTrain = document.getElementById('metric-train');
+        const metricTest = document.getElementById('metric-test');
+        const warningPanel = document.getElementById('warning-panel');
+        const warningTitle = document.getElementById('warning-title');
+        const warningDesc = document.getElementById('warning-desc');
+        const numpyCode = document.getElementById('numpy-code');
+
+        /* ─── INITIALIZATION ──────────────────────────────────────────────── */
+        function init() {
+            setupListeners();
+            resizeCanvas();
+        }
+
+        function setupListeners() {
+            degreeSlider.addEventListener('input', () => {
+                degree = parseInt(degreeSlider.value);
+                drawPlot();
+            });
+
+            window.addEventListener('resize', resizeCanvas);
+        }
+
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            drawPlot();
+        }
+
+        function loadScenario(deg) {
+            degree = deg;
+            degreeSlider.value = deg;
+            drawPlot();
+        }
+
+        /* ─── POLYNOMIAL LEAST SQUARES MATHEMATICAL SOLVER ─────────────────── */
+        // Solving ATA * w = ATY using Gaussian Elimination
+        function solveLinearSystem(A, B) {
+            const n = B.length;
+            for (let i = 0; i < n; i++) {
+                // Search for maximum in this column
+                let maxEl = Math.abs(A[i][i]);
+                let maxRow = i;
+                for (let k = i + 1; k < n; k++) {
+                    if (Math.abs(A[k][i]) > maxEl) {
+                        maxEl = Math.abs(A[k][i]);
+                        maxRow = k;
+                    }
+                }
+
+                // Swap maximum row with current row
+                for (let k = i; k < n; k++) {
+                    const tmp = A[maxRow][k];
+                    A[maxRow][k] = A[i][k];
+                    A[i][k] = tmp;
+                }
+                const tmp = B[maxRow];
+                B[maxRow] = B[i];
+                B[i] = tmp;
+
+                // Pivot validation to prevent division by 0
+                if (Math.abs(A[i][i]) < 1e-12) {
+                    continue; // Skip singular column
+                }
+
+                // Make all rows below this one 0 in current column
+                for (let k = i + 1; k < n; k++) {
+                    const c = -A[k][i] / A[i][i];
+                    for (let j = i; j < n; j++) {
+                        if (i === j) {
+                            A[k][j] = 0;
+                        } else {
+                            A[k][j] += c * A[i][j];
+                        }
+                    }
+                    B[k] += c * B[i];
+                }
+            }
+
+            // Solve equation Ax=B for an upper triangular matrix A
+            const x = new Array(n).fill(0);
+            for (let i = n - 1; i >= 0; i--) {
+                if (Math.abs(A[i][i]) < 1e-12) {
+                    x[i] = 0;
+                    continue;
+                }
+                x[i] = B[i] / A[i][i];
+                for (let k = i - 1; k >= 0; k--) {
+                    B[k] -= A[k][i] * x[i];
+                }
+            }
+            return x;
+        }
+
+        function fitPolynomialRegression(points, deg) {
+            const n = points.length;
+            
+            // Construct Vandermonde matrix A (n x deg+1)
+            // and vector Y (n x 1)
+            const A = [];
+            const Y = [];
+            for (let i = 0; i < n; i++) {
+                const row = [];
+                for (let j = 0; j <= deg; j++) {
+                    row.push(Math.pow(points[i].x, j));
+                }
+                A.push(row);
+                Y.push(points[i].y);
+            }
+
+            // Compute A^T * A (size: deg+1 x deg+1)
+            // and A^T * Y (size: deg+1 x 1)
+            const ATA = [];
+            const ATY = [];
+            for (let r = 0; r <= deg; r++) {
+                ATY.push(0);
+                const row = [];
+                for (let c = 0; c <= deg; c++) {
+                    row.push(0);
+                }
+                ATA.push(row);
+            }
+
+            for (let i = 0; i < n; i++) {
+                for (let r = 0; r <= deg; r++) {
+                    ATY[r] += A[i][r] * Y[i];
+                    for (let c = 0; c <= deg; c++) {
+                        ATA[r][c] += A[i][r] * A[i][c];
+                    }
+                }
+            }
+
+            // Solve ATA * w = ATY
+            return solveLinearSystem(ATA, ATY);
+        }
+
+        function evaluatePolynomial(coefficients, x) {
+            let y = 0;
+            coefficients.forEach((coef, idx) => {
+                y += coef * Math.pow(x, idx);
+            });
+            return y;
+        }
+
+        /* ─── LOSS METRICS CALCULATIONS ────────────────────────────────────── */
+        function calculateMSE(points, coefficients) {
+            const sqDiffSum = points.reduce((acc, p) => {
+                const predY = evaluatePolynomial(coefficients, p.x);
+                return acc + Math.pow(p.y - predY, 2);
+            }, 0);
+            return sqDiffSum / points.length;
+        }
+
+        /* ─── RENDERING PLOT GRAPH ─────────────────────────────────────────── */
+        function drawPlot() {
+            const w = canvas.width;
+            const h = canvas.height;
+            const padding = 45;
+            const plotW = w - padding * 2;
+            const plotH = h - padding * 2;
+
+            // Map data coords to canvas pixels
+            // Data Domain: X in [0.5, 7.5], Y in [0, 4.5] (or similar)
+            const getX = (x) => padding + ((x - 0.5) / 7.0) * plotW;
+            const getY = (y) => padding + plotH - (y / 4.2) * plotH;
+
+            // Fit model on training points strictly!
+            const coefficients = fitPolynomialRegression(TRAIN_POINTS, degree);
+
+            // Calculate Losses
+            const trainLoss = calculateMSE(TRAIN_POINTS, coefficients);
+            const testLoss = calculateMSE(TEST_POINTS, coefficients);
+
+            // Update UI elements
+            degreeDisplay.textContent = degree === 1 ? "Degree 1 (Linear)" : `Degree ${degree} Polynomial`;
+            metricTrain.textContent = trainLoss < 0.0001 ? "0.000" : trainLoss.toFixed(3);
+            metricTest.textContent = testLoss > 999 ? "999+" : testLoss.toFixed(3);
+
+            ctx.clearRect(0, 0, w, h);
+
+            // Draw axis lines
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(padding, h - padding); ctx.lineTo(w - padding, h - padding); // X
+            ctx.moveTo(padding, padding); ctx.lineTo(padding, h - padding); // Y
+            ctx.stroke();
+
+            // Grid markers
+            ctx.fillStyle = '#64748b';
+            ctx.font = 'bold 8px monospace';
+            ctx.textAlign = 'center';
+            for (let x = 1; x <= 7; x++) {
+                const px = getX(x);
+                ctx.fillText(x, px, h - padding + 15);
+            }
+            ctx.textAlign = 'right';
+            for (let y = 0; y <= 4; y += 1) {
+                const py = getY(y);
+                ctx.fillText(y, padding - 8, py + 3);
+            }
+
+            // Draw curve line
+            ctx.strokeStyle = '#f43f5e'; // Rose-500
+            ctx.lineWidth = 3.5;
+            ctx.beginPath();
+            
+            // Plot fine-grained polynomial curve across domain range
+            let first = true;
+            for (let x = 0.5; x <= 7.5; x += 0.05) {
+                const px = getX(x);
+                const rawY = evaluatePolynomial(coefficients, x);
+                
+                // Truncate wild vertical scaling peaks to stay inside canvas view
+                const py = getY(Math.min(6.5, Math.max(-2.5, rawY)));
+
+                if (first) {
+                    ctx.moveTo(px, py);
+                    first = false;
+                } else {
+                    ctx.lineTo(px, py);
+                }
+            }
+            ctx.stroke();
+
+            // Draw Points
+            // 1. Training Set (Blue dots)
+            TRAIN_POINTS.forEach(p => {
+                ctx.fillStyle = '#3b82f6';
+                ctx.strokeStyle = '#93c5fd';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(getX(p.x), getY(p.y), 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            });
+
+            // 2. Testing Set (Pink dots)
+            TEST_POINTS.forEach(p => {
+                ctx.fillStyle = '#ec4899';
+                ctx.strokeStyle = '#fbcfe8';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(getX(p.x), getY(p.y), 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            });
+
+            updateStatus(trainLoss, testLoss);
+            updateCodeRepresentation(coefficients);
+        }
+
+        /* ─── STATUS DIAGNOSTIC REPORTING ──────────────────────────────────── */
+        function updateStatus(trainLoss, testLoss) {
+            if (degree === 1) {
+                warningPanel.className = 'rounded-2xl p-5 border-l-4 border-amber-500 bg-amber-50 text-amber-900 transition-colors duration-300';
+                warningTitle.textContent = 'High Bias (Underfitting)';
+                warningDesc.textContent = 'A simple straight line lacks the capacity to capture the wave curve. Both training and testing losses are highly elevated because the model is too simple.';
+            } else if (degree <= 3) {
+                warningPanel.className = 'rounded-2xl p-5 border-l-4 border-emerald-500 bg-emerald-50 text-emerald-900 transition-colors duration-300';
+                warningTitle.textContent = 'Balanced Generalization';
+                warningDesc.textContent = 'Perfect! The polynomial degree is optimal. The curve is smooth and captures the true underlying pattern, keeping both training and test errors minimized.';
+            } else {
+                warningPanel.className = 'rounded-2xl p-5 border-l-4 border-rose-500 bg-rose-50 text-rose-900 transition-colors duration-300';
+                warningTitle.textContent = 'High Variance (Overfitting)';
+                warningDesc.textContent = `Pristine overfitting! The model wiggles wildly to fit every training point. Notice how training loss is near 0.00, but the curve completely misses test coordinates, causing test loss to balloon to ${testLoss.toFixed(2)}!`;
+            }
+        }
+
+        /* ─── NUMPY / SKLEARN PYTHON CODE GENERATION ────────────────────────── */
+        function updateCodeRepresentation(coefs) {
+            let output = `<span class="text-rose-400">from</span> sklearn.preprocessing <span class="text-rose-400">import</span> PolynomialFeatures\n`;
+            output += `<span class="text-rose-400">from</span> sklearn.linear_model <span class="text-rose-400">import</span> LinearRegression\n`;
+            output += `<span class="text-rose-400">import</span> numpy <span class="text-rose-400">as</span> np\n\n`;
+
+            output += `# 1. Fit Polynomial Regression - Degree: ${degree}\n`;
+            output += `poly = PolynomialFeatures(degree=<span class="text-yellow-300 font-bold">${degree}</span>)\n`;
+            output += `X_poly_train = poly.fit_transform(X_train)\n\n`;
+
+            output += `model = LinearRegression()\n`;
+            output += `model.fit(X_poly_train, y_train)\n\n`;
+
+            // Display polynomial coefficients rounded
+            const roundedCoefs = coefs.map(c => c.toFixed(3));
+            output += `# Polynomial weights calculated live:\n`;
+            output += `print(model.intercept_) # Intercept: <span class="text-yellow-300 font-bold">${roundedCoefs[0]}</span>\n`;
+            output += `print(model.coef_)      # Coefficients: [${roundedCoefs.slice(1).join(', ')}]`;
+
+            numpyCode.innerHTML = output;
+        }
+
+        // Initialize script execution on DOM load
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>

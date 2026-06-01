@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Array Shape Transformer - AI Competition Jr</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Isometric grid base transformations */
+        .stage-container {
+            perspective: 1000px;
+            overflow: hidden;
+        }
+
+        .block-element {
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .block-element:hover {
+            transform: scale(1.1) translateZ(20px) !important;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.5);
+            z-index: 100 !important;
+        }
+
+        /* 3D face accents */
+        .block-element::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.15) 100%);
+            border-radius: inherit;
+            pointer-events: none;
+        }
+
+        /* Custom scrollbars */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #312e81;
+            border-radius: 2px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #4338ca;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+
+        <!-- Navigation -->
+        <nav class="mb-6 pt-4 no-print">
+            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-indigo-600 transition-colors font-mono" style="text-decoration: none;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Course Hub
+            </a>
+        </nav>
+
+        <!-- Header -->
+        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+            <div>
+                <h1 class="text-4xl font-black tracking-tight text-gray-900 uppercase">Array Shape <span class="text-indigo-600">Transformer</span></h1>
+                <p class="text-gray-500 font-medium italic">A visual block builder that animates how arrays fold into multi-dimensional matrices and tensors</p>
+            </div>
+            <div id="status-badge" class="px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-indigo-50 border border-indigo-200 text-indigo-800 shadow-sm transition-all duration-300">
+                1D ➔ 2D ➔ 3D
+            </div>
+        </header>
+
+        <!-- Main Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
+
+            <!-- Left Controls Panel (Lg: 5 cols) -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+
+                <!-- Configuration & Shape Selection -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-5">
+                    <div>
+                        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-100 pb-2">1. Select Target Shape</h2>
+                        
+                        <!-- Shape selector buttons -->
+                        <div class="grid grid-cols-2 gap-2" id="shape-buttons">
+                            <button onclick="changeShape('1d-12')" id="btn-1d-12" class="py-2.5 px-3 bg-indigo-600 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-sm border border-indigo-500 transition-all flex flex-col items-center">
+                                <span>1D Array</span>
+                                <span class="text-[10px] font-mono font-medium opacity-85 mt-0.5">shape: (12,)</span>
+                            </button>
+                            <button onclick="changeShape('2d-3x4')" id="btn-2d-3x4" class="py-2.5 px-3 bg-gray-50 hover:bg-indigo-50 text-gray-700 hover:text-indigo-900 text-xs font-black uppercase tracking-wider rounded-xl border border-gray-200 transition-all flex flex-col items-center">
+                                <span>2D Matrix (3×4)</span>
+                                <span class="text-[10px] font-mono font-medium opacity-85 mt-0.5">shape: (3, 4)</span>
+                            </button>
+                            <button onclick="changeShape('2d-4x3')" id="btn-2d-4x3" class="py-2.5 px-3 bg-gray-50 hover:bg-indigo-50 text-gray-700 hover:text-indigo-900 text-xs font-black uppercase tracking-wider rounded-xl border border-gray-200 transition-all flex flex-col items-center">
+                                <span>2D Matrix (4×3)</span>
+                                <span class="text-[10px] font-mono font-medium opacity-85 mt-0.5">shape: (4, 3)</span>
+                            </button>
+                            <button onclick="changeShape('3d-2x2x3')" id="btn-3d-2x2x3" class="py-2.5 px-3 bg-gray-50 hover:bg-indigo-50 text-gray-700 hover:text-indigo-900 text-xs font-black uppercase tracking-wider rounded-xl border border-gray-200 transition-all flex flex-col items-center">
+                                <span>3D Tensor (2×2×3)</span>
+                                <span class="text-[10px] font-mono font-medium opacity-85 mt-0.5">shape: (2, 2, 3)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Custom Element Values -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2 border-b border-gray-100 pb-1.5">
+                            <h3 class="text-[10px] font-black uppercase text-gray-400 tracking-wider">Array Element Data</h3>
+                            <!-- Data presets -->
+                            <select id="data-preset" onchange="applyPresetData(this.value)" class="text-[10px] font-bold text-indigo-600 bg-indigo-50/50 hover:bg-indigo-50 border border-indigo-100 rounded px-1.5 py-0.5 cursor-pointer outline-none">
+                                <option value="numbers">Numbers (0-11)</option>
+                                <option value="letters">Letters (A-L)</option>
+                                <option value="repeats">Binary [0,1,0...]</option>
+                                <option value="words">Custom Words</option>
+                            </select>
+                        </div>
+
+                        <!-- Editable element list -->
+                        <div class="grid grid-cols-6 gap-2" id="elements-inputs">
+                            <!-- Injected dynamically by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Math Formula Explainer -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-100 pb-2">Index Folding Math</h2>
+                    
+                    <div id="math-explainer" class="space-y-3.5 text-xs text-gray-600 leading-relaxed">
+                        <!-- Populated by JS on hover/shape change -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Visual Stage & Code Panel (Lg: 7 cols) -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
+
+                <!-- Graphic 3D Folding Stage -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-4">
+                    <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                        <div>
+                            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest">2. Visual Shape folding Stage</h2>
+                            <p class="text-[11px] text-gray-400">Hover over blocks to track their mathematical coordinates.</p>
+                        </div>
+                        <!-- Perspective toggle -->
+                        <div id="view-perspective-wrap" class="hidden flex items-center gap-1.5 bg-gray-100 px-2 py-1 rounded-lg border border-gray-200">
+                            <input type="checkbox" id="isometric-toggle" checked onchange="updateBlocksLayout()" class="cursor-pointer rounded text-indigo-600 focus:ring-indigo-500 border-gray-300">
+                            <label for="isometric-toggle" class="text-[9px] font-black uppercase tracking-wider text-gray-500 cursor-pointer select-none">3D Iso Tilt</label>
+                        </div>
+                    </div>
+
+                    <!-- Visual Stage Area -->
+                    <div class="stage-container relative w-full h-[320px] bg-slate-950 rounded-2xl border border-slate-900 shadow-inner flex items-center justify-center">
+                        <!-- Subtle background grid aesthetic -->
+                        <div class="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:24px_24px] opacity-30"></div>
+                        
+                        <!-- Parent transform node for blocks -->
+                        <div id="blocks-stage" class="relative w-full h-full transition-transform duration-700 ease-in-out">
+                            <!-- 12 Absoluted div blocks will slide inside here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Code Representation Panel -->
+                <div class="bg-slate-900 border-2 border-slate-800 p-6 rounded-2xl shadow-inner flex flex-col gap-4 text-white">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <div>
+                            <h2 class="text-xs font-black uppercase tracking-wider text-indigo-400">NumPy Reshape Code</h2>
+                            <p class="text-[10px] text-slate-400">How to write this transformation in Python</p>
+                        </div>
+                        <div class="flex bg-slate-950 p-0.5 rounded-lg border border-slate-800 shadow-inner">
+                            <span class="px-2.5 py-1 text-[9px] font-black uppercase tracking-wider rounded bg-slate-800 text-slate-200 font-mono">.reshape()</span>
+                        </div>
+                    </div>
+
+                    <!-- Code display -->
+                    <div class="bg-slate-950/80 rounded-xl border border-slate-800/80 p-4 font-mono text-[10px] text-slate-300 overflow-x-auto shadow-inner leading-relaxed">
+                        <pre id="numpy-code" class="whitespace-pre"></pre>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- 3-Column Educational Context Footer -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <!-- Core Concept -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center font-bold mb-4 border border-indigo-100 font-mono text-xs">01</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">Contiguous Memory</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    Under the hood, computer memory is strictly <strong>one-dimensional</strong>. 
+                    Whether an image is a 2D matrix or a 3D tensor, all elements are stored next to each other in a flat contiguous block of memory.
+                </p>
+                <p class="text-xs text-gray-500 leading-relaxed mt-2">
+                    Reshaping an array does <strong>not</strong> change the data in memory. It only changes the metadata (the <em>strides</em> and <em>shape</em>) that dictates how code navigates through it.
+                </p>
+            </div>
+
+            <!-- Folding Coordinates -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center font-bold mb-4 border border-indigo-100 font-mono text-xs">02</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">The Reshaping Index Math</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    To transition a flat index $i$ into a matrix of columns $W$, the new coordinates are computed as:
+                    <br>
+                    <span class="font-mono bg-gray-50 px-1 py-0.5 rounded">Row = Math.floor(i / W)</span>
+                    <br>
+                    <span class="font-mono bg-gray-50 px-1 py-0.5 rounded">Col = i % W</span>
+                </p>
+                <p class="text-xs text-gray-500 leading-relaxed mt-2">
+                    Tensors in 3D introduce a depth/layer layer size $H \times W$. The index floats through layers, then rows, then columns. Try tracking individual block indices as they fold!
+                </p>
+            </div>
+
+            <!-- AI Connection -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center font-bold mb-4 border border-indigo-100 font-mono text-xs">03</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">From Shapes to AI</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    Machine learning is entirely built on reshaping arrays. 
+                    For example, to feed an image into a Dense Layer, we must **flatten** a $(28, 28)$ matrix into a $(784,)$ flat vector.
+                </p>
+                <p class="text-xs text-gray-500 leading-relaxed mt-2">
+                    In Transformers, inputs are continually restructured between shapes like `(Batch, Sequence, Head, Dimension)` to let different attention channels read data parallelly.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MAIN JAVASCRIPT LOGIC -->
+    <script>
+        /* ─── STATE MANAGEMENT ────────────────────────────────────────────── */
+        let activeShape = '1d-12'; // '1d-12', '2d-3x4', '2d-4x3', '3d-2x2x3'
+        let hoveredBlockIdx = null;
+
+        // Custom element strings
+        let elementValues = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"];
+
+        // Colors for blocks - A beautiful spectrum to track coordinate flow
+        // Uniform dark slate-indigo styling for all blocks - less colorful & highly readable
+        const BLOCK_COLORS = Array(12).fill("from-slate-800 to-indigo-950 border-slate-700 text-slate-100 shadow-indigo-950/20");
+
+        const PRESETS = {
+            numbers: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"],
+            letters: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"],
+            repeats: ["1", "0", "1", "0", "1", "0", "1", "0", "1", "0", "1", "0"],
+            words: ["I", "LOVE", "DATA", "MATH", "FOR", "DEEP", "LEARN", "AI", "JR", "CODE", "FLOW", "TENS"]
+        };
+
+        // DOM elements
+        const blocksStage = document.getElementById('blocks-stage');
+        const elementsInputs = document.getElementById('elements-inputs');
+        const numpyCode = document.getElementById('numpy-code');
+        const mathExplainer = document.getElementById('math-explainer');
+        const isoToggle = document.getElementById('isometric-toggle');
+        const isoWrap = document.getElementById('view-perspective-wrap');
+
+        /* ─── INITIALIZATION ──────────────────────────────────────────────── */
+        function init() {
+            renderInputs();
+            renderBlocksDom();
+            updateBlocksLayout();
+            updateCodeRepresentation();
+            updateMathExplainer();
+        }
+
+        function renderInputs() {
+            elementsInputs.innerHTML = '';
+            for (let i = 0; i < 12; i++) {
+                elementsInputs.innerHTML += `
+                    <div>
+                        <input type="text" maxlength="5" value="${elementValues[i]}" data-idx="${i}" oninput="onElementValueChange(this, ${i})" 
+                            class="w-full text-center text-xs font-mono font-bold bg-gray-50 border border-gray-200 rounded-lg p-1.5 focus:outline-none focus:border-indigo-500" />
+                        <div class="text-[8px] font-bold text-gray-400 text-center mt-0.5">i: ${i}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderBlocksDom() {
+            blocksStage.innerHTML = '';
+            for (let i = 0; i < 12; i++) {
+                const block = document.createElement('div');
+                block.className = `block-element absolute bg-gradient-to-br ${BLOCK_COLORS[i]} border border-slate-700 flex flex-col items-center justify-center shadow-lg select-none rounded-xl cursor-pointer`;
+                block.id = `block-${i}`;
+                
+                // Add inner content
+                block.innerHTML = `
+                    <span class="text-[9px] opacity-75 font-mono absolute top-1 left-1.5 font-bold">i:${i}</span>
+                    <span class="font-bold font-mono text-base block-val-txt truncate max-w-full px-1 transition-all duration-300">${elementValues[i]}</span>
+                    <span class="text-[8px] font-mono opacity-80 absolute bottom-1 right-1.5 block-coord-txt font-bold"></span>
+                `;
+
+                // Hover tracking
+                block.addEventListener('mouseenter', () => {
+                    hoverBlock(i);
+                });
+                block.addEventListener('mouseleave', () => {
+                    unhoverBlock();
+                });
+
+                blocksStage.appendChild(block);
+            }
+        }
+
+        /* ─── STATE MUTATORS ──────────────────────────────────────────────── */
+        function changeShape(shape) {
+            activeShape = shape;
+            
+            // Highlight active button
+            const buttons = ['1d-12', '2d-3x4', '2d-4x3', '3d-2x2x3'];
+            buttons.forEach(b => {
+                const el = document.getElementById(`btn-${b}`);
+                if (b === shape) {
+                    el.className = "py-2.5 px-3 bg-indigo-600 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-sm border border-indigo-500 transition-all flex flex-col items-center";
+                } else {
+                    el.className = "py-2.5 px-3 bg-gray-50 hover:bg-indigo-50 text-gray-700 hover:text-indigo-900 text-xs font-black uppercase tracking-wider rounded-xl border border-gray-200 transition-all flex flex-col items-center";
+                }
+            });
+
+            // Toggle isometric tilted checkbox visibility (only relevant in 3D)
+            if (shape === '3d-2x2x3') {
+                isoWrap.classList.remove('hidden');
+            } else {
+                isoWrap.classList.add('hidden');
+            }
+
+            updateBlocksLayout();
+            updateCodeRepresentation();
+            updateMathExplainer();
+        }
+
+        function onElementValueChange(inputEl, idx) {
+            const val = inputEl.value;
+            elementValues[idx] = val;
+            
+            // Fast visual update of text without full structural re-render
+            const block = document.getElementById(`block-${idx}`);
+            if (block) {
+                const textEl = block.querySelector('.block-val-txt');
+                if (textEl) textEl.textContent = val;
+            }
+
+            updateCodeRepresentation();
+        }
+
+        function applyPresetData(presetName) {
+            const preset = PRESETS[presetName];
+            if (!preset) return;
+            elementValues = [...preset];
+            
+            // Sync values to inputs
+            const inputs = elementsInputs.querySelectorAll('input');
+            inputs.forEach((input, i) => {
+                input.value = elementValues[i];
+            });
+
+            // Sync values to blocks
+            for (let i = 0; i < 12; i++) {
+                const block = document.getElementById(`block-${i}`);
+                if (block) {
+                    const textEl = block.querySelector('.block-val-txt');
+                    if (textEl) textEl.textContent = elementValues[i];
+                }
+            }
+
+            updateCodeRepresentation();
+        }
+
+        /* ─── DYNAMIC LAYOUT & COORDINATES MATH ────────────────────────────── */
+        function updateBlocksLayout() {
+            const containerW = blocksStage.clientWidth;
+            const containerH = blocksStage.clientHeight;
+
+            const centerX = containerW / 2;
+            const centerY = containerH / 2;
+
+            for (let i = 0; i < 12; i++) {
+                const block = document.getElementById(`block-${i}`);
+                const coordTxt = block.querySelector('.block-coord-txt');
+                const valTxt = block.querySelector('.block-val-txt');
+                
+                let w = 48, h = 48; // default dimensions
+                let left = 0, top = 0;
+                let transformStr = '';
+                let zIndex = i;
+
+                if (activeShape === '1d-12') {
+                    // --- 1D Array Layout (One long row) ---
+                    // Scale sizes to fit within normal margins
+                    w = 38;
+                    h = 56;
+                    const spacing = 41;
+                    const totalW = 12 * spacing;
+                    left = centerX - totalW / 2 + (i * spacing) + 2;
+                    top = centerY - h / 2;
+                    coordTxt.textContent = `[${i}]`;
+                    
+                    // Adjust font sizes for smaller blocks
+                    valTxt.className = 'font-bold font-mono text-xs block-val-txt truncate max-w-full px-1 transition-all duration-300';
+                }
+                else if (activeShape === '2d-3x4') {
+                    // --- 2D Matrix (3 rows, 4 columns) ---
+                    w = 66;
+                    h = 66;
+                    const cols = 4;
+                    const spacingX = 76;
+                    const spacingY = 76;
+                    const totalW = cols * spacingX;
+                    const totalH = 3 * spacingY;
+
+                    const r = Math.floor(i / cols);
+                    const c = i % cols;
+
+                    left = centerX - totalW / 2 + (c * spacingX) + 5;
+                    top = centerY - totalH / 2 + (r * spacingY) + 5;
+                    
+                    coordTxt.textContent = `[${r},${c}]`;
+                    valTxt.className = 'font-bold font-mono text-xl block-val-txt truncate max-w-full px-1 transition-all duration-300';
+                }
+                else if (activeShape === '2d-4x3') {
+                    // --- 2D Matrix (4 rows, 3 columns) ---
+                    w = 66;
+                    h = 66;
+                    const cols = 3;
+                    const spacingX = 76;
+                    const spacingY = 76;
+                    const totalW = cols * spacingX;
+                    const totalH = 4 * spacingY;
+
+                    const r = Math.floor(i / cols);
+                    const c = i % cols;
+
+                    left = centerX - totalW / 2 + (c * spacingX) + 5;
+                    top = centerY - totalH / 2 + (r * spacingY) + 5;
+                    
+                    coordTxt.textContent = `[${r},${c}]`;
+                    valTxt.className = 'font-bold font-mono text-xl block-val-txt truncate max-w-full px-1 transition-all duration-300';
+                }
+                else if (activeShape === '3d-2x2x3') {
+                    // --- 3D Tensor (2 layers, each 2x3 grid) ---
+                    w = 56;
+                    h = 56;
+                    const layers = 2;
+                    const rows = 2;
+                    const cols = 3;
+
+                    const d = Math.floor(i / (rows * cols)); // layer index (0 or 1)
+                    const r = Math.floor((i % (rows * cols)) / cols); // row index (0 or 1)
+                    const c = i % cols; // col index (0, 1, 2)
+
+                    if (isoToggle.checked) {
+                        // Isometric tilted projection
+                        const isoSpacingX = 46;
+                        const isoSpacingY = 23;
+                        const layerOffsetVal = 70; // vertical float height
+
+                        // Calculate relative isometric offset
+                        const xOffset = (c - r) * isoSpacingX;
+                        const yOffset = (c + r) * isoSpacingY;
+
+                        left = centerX + xOffset - w / 2;
+                        top = centerY + yOffset - h / 2 - 25; // center adjusted
+
+                        // Shift layer 1 straight UP in projection space
+                        if (d === 1) {
+                            top -= layerOffsetVal;
+                        }
+
+                        // Layer depth determines 3D render stack order
+                        zIndex = (d * 50) + (r * 5) + c;
+                        
+                        // Mild isometric tilt scale
+                        transformStr = 'rotateX(55deg) rotateZ(-40deg)';
+                    } else {
+                        // Side-by-side standard 2D view for layers
+                        const spacingX = 64;
+                        const spacingY = 64;
+                        const layerGap = 50; // gap between boxes
+
+                        // Total width for the two 2x3 tables side by side
+                        const tableW = cols * spacingX;
+                        const totalW = (2 * tableW) + layerGap;
+                        const totalH = rows * spacingY;
+
+                        // Left coordinate depends on layer d
+                        const tableStartX = centerX - totalW / 2 + (d * (tableW + layerGap));
+
+                        left = tableStartX + (c * spacingX);
+                        top = centerY - totalH / 2 + (r * spacingY);
+                    }
+
+                    coordTxt.textContent = `[${d},${r},${c}]`;
+                    valTxt.className = 'font-bold font-mono text-lg block-val-txt truncate max-w-full px-1 transition-all duration-300';
+                }
+
+                // Apply calculations to absolute CSS properties
+                block.style.left = `${left}px`;
+                block.style.top = `${top}px`;
+                block.style.width = `${w}px`;
+                block.style.height = `${h}px`;
+                block.style.zIndex = zIndex;
+                block.style.transform = transformStr;
+            }
+        }
+
+        /* ─── HOVER EFFECTS & COORDINATES TRACKER ──────────────────────────── */
+        function hoverBlock(idx) {
+            hoveredBlockIdx = idx;
+            
+            // Add custom scale / border highlights to grid input and block
+            const inputs = elementsInputs.querySelectorAll('input');
+            if (inputs[idx]) {
+                inputs[idx].classList.add('border-indigo-500', 'bg-indigo-50', 'ring-2', 'ring-indigo-200');
+            }
+
+            // Apply hover tracking elements in code view
+            const codeEl = document.getElementById(`code-item-${idx}`);
+            if (codeEl) {
+                codeEl.classList.add('bg-indigo-900', 'text-yellow-300', 'font-black', 'rounded', 'px-0.5');
+            }
+
+            // Dynamic hover highlights for block element
+            const blockEl = document.getElementById(`block-${idx}`);
+            if (blockEl) {
+                blockEl.classList.remove('from-slate-800', 'to-indigo-950', 'border-slate-700', 'text-slate-100');
+                blockEl.classList.add('from-indigo-500', 'to-indigo-700', 'border-indigo-400', 'text-white', 'scale-110');
+            }
+
+            updateMathExplainer();
+        }
+
+        function unhoverBlock() {
+            if (hoveredBlockIdx !== null) {
+                const idx = hoveredBlockIdx;
+                const inputs = elementsInputs.querySelectorAll('input');
+                if (inputs[idx]) {
+                    inputs[idx].classList.remove('border-indigo-500', 'bg-indigo-50', 'ring-2', 'ring-indigo-200');
+                }
+
+                const codeEl = document.getElementById(`code-item-${idx}`);
+                if (codeEl) {
+                    codeEl.classList.remove('bg-indigo-900', 'text-yellow-300', 'font-black', 'rounded', 'px-0.5');
+                }
+
+                const blockEl = document.getElementById(`block-${idx}`);
+                if (blockEl) {
+                    blockEl.classList.remove('from-indigo-500', 'to-indigo-700', 'border-indigo-400', 'text-white', 'scale-110');
+                    blockEl.classList.add('from-slate-800', 'to-indigo-950', 'border-slate-700', 'text-slate-100');
+                }
+            }
+            hoveredBlockIdx = null;
+            updateMathExplainer();
+        }
+
+        /* ─── NUMPY CODE REPRESENTATION ────────────────────────────────────── */
+        function updateCodeRepresentation() {
+            // Safe formatted data string representation
+            const listItems = elementValues.map((v, i) => {
+                const isSelected = i === hoveredBlockIdx;
+                const quoteVal = isNaN(v) ? `"${v}"` : v;
+                return `<span id="code-item-${i}" class="transition-colors duration-100 cursor-pointer ${isSelected ? 'bg-indigo-900 text-yellow-300 font-bold px-0.5 rounded' : 'hover:bg-slate-800'}" onmouseenter="hoverBlock(${i})" onmouseleave="unhoverBlock()">${quoteVal}</span>`;
+            }).join(', ');
+
+            let outputCode = `<span class="text-indigo-400">import</span> numpy <span class="text-indigo-400">as</span> np\n\n`;
+            outputCode += `# 1D flat input array - shape: (12,)\n`;
+            outputCode += `arr = np.array([${listItems}])\n\n`;
+
+            if (activeShape === '1d-12') {
+                outputCode += `# No change required\n`;
+                outputCode += `reshaped = arr\n`;
+                outputCode += `print(reshaped)\n`;
+                outputCode += `# Output: [${elementValues.map(v => isNaN(v) ? `'${v}'` : v).join(' ')}]`;
+            }
+            else if (activeShape === '2d-3x4') {
+                outputCode += `# Fold array into 3 rows and 4 columns\n`;
+                outputCode += `matrix = arr.reshape(<span class="text-yellow-400 font-bold">3, 4</span>)\n`;
+                outputCode += `print(matrix)\n`;
+                outputCode += `# Output:\n# [`;
+                for (let r = 0; r < 3; r++) {
+                    outputCode += `${r > 0 ? '#  [' : '['}`;
+                    for (let c = 0; c < 4; c++) {
+                        const idx = r * 4 + c;
+                        outputCode += ` '${elementValues[idx]}'`;
+                    }
+                    outputCode += ` ]${r < 2 ? ',\n' : ']'}`;
+                }
+            }
+            else if (activeShape === '2d-4x3') {
+                outputCode += `# Fold array into 4 rows and 3 columns\n`;
+                outputCode += `matrix = arr.reshape(<span class="text-yellow-400 font-bold">4, 3</span>)\n`;
+                outputCode += `print(matrix)\n`;
+                outputCode += `# Output:\n# [`;
+                for (let r = 0; r < 4; r++) {
+                    outputCode += `${r > 0 ? '#  [' : '['}`;
+                    for (let c = 0; c < 3; c++) {
+                        const idx = r * 3 + c;
+                        outputCode += ` '${elementValues[idx]}'`;
+                    }
+                    outputCode += ` ]${r < 3 ? ',\n' : ']'}`;
+                }
+            }
+            else if (activeShape === '3d-2x2x3') {
+                outputCode += `# Fold array into 3D Tensor: 2 layers, each 2 rows by 3 columns\n`;
+                outputCode += `tensor = arr.reshape(<span class="text-yellow-400 font-bold">2, 2, 3</span>)\n`;
+                outputCode += `print(tensor)\n`;
+                outputCode += `# Output:\n# [[\n`;
+                for (let d = 0; d < 2; d++) {
+                    outputCode += `#   # Layer ${d}\n#   [\n`;
+                    for (let r = 0; r < 2; r++) {
+                        outputCode += `#     [`;
+                        for (let c = 0; c < 3; c++) {
+                            const idx = (d * 6) + (r * 3) + c;
+                            outputCode += ` '${elementValues[idx]}'`;
+                        }
+                        outputCode += ` ]${r < 1 ? ',\n' : ''}`;
+                    }
+                    outputCode += `\n#   ]${d < 1 ? ',\n' : ''}`;
+                }
+                outputCode += `\n# ]]`;
+            }
+
+            numpyCode.innerHTML = outputCode;
+        }
+
+        /* ─── MATHEMATICAL EXPLANATIONS BUILDER ────────────────────────────── */
+        function updateMathExplainer() {
+            let explainerHtml = '';
+
+            const idx = hoveredBlockIdx !== null ? hoveredBlockIdx : 0;
+            const isHovered = hoveredBlockIdx !== null;
+            const val = elementValues[idx];
+
+            explainerHtml += `
+                <div class="bg-indigo-50/50 p-3.5 rounded-xl border border-indigo-100 shadow-inner">
+                    <span class="text-[10px] font-black uppercase text-indigo-700 tracking-wider">Active Element Diagnostic</span>
+                    <div class="mt-1 flex items-center justify-between">
+                        <span class="font-bold text-gray-800 text-sm">Index <span class="font-mono text-indigo-600 font-black">i: ${idx}</span> (Value: "${val}")</span>
+                        <span class="text-[10px] bg-white border border-gray-200 px-2 py-0.5 rounded text-gray-500 font-semibold uppercase">${isHovered ? 'Hovered Node' : 'Default Node 0'}</span>
+                    </div>
+                </div>
+            `;
+
+            if (activeShape === '1d-12') {
+                explainerHtml += `
+                    <div>
+                        <p class="font-semibold text-gray-700">1D Array Mapping:</p>
+                        <p class="text-xs text-gray-500 mt-1">
+                            In a 1D array, elements are arranged sequentially. The mathematical index $i$ corresponds directly to the offset:
+                        </p>
+                        <div class="bg-gray-100 rounded p-2.5 mt-2 font-mono text-[10px] text-gray-700 text-center">
+                            Coordinate = [${idx}]
+                        </div>
+                    </div>
+                `;
+            }
+            else if (activeShape === '2d-3x4') {
+                const r = Math.floor(idx / 4);
+                const c = idx % 4;
+                explainerHtml += `
+                    <div>
+                        <p class="font-semibold text-gray-700">2D Matrix (3 rows × 4 columns):</p>
+                        <p class="text-xs text-gray-500 mt-1">
+                            To find the 2D matrix coordinate $(Row, Col)$ for index $i$, we divide and modulo by the column width ($W = 4$):
+                        </p>
+                        <div class="space-y-1.5 mt-2 bg-gray-100 rounded p-2.5 font-mono text-[10px] text-gray-700">
+                            <div>Row = floor(${idx} / 4) = <strong class="text-indigo-600 font-black">${r}</strong></div>
+                            <div>Col = ${idx} % 4 = <strong class="text-indigo-600 font-black">${c}</strong></div>
+                            <div class="border-t border-gray-200 pt-1.5 mt-1.5 font-sans font-bold text-center">➔ Grid Position: [${r}, ${c}]</div>
+                        </div>
+                    </div>
+                `;
+            }
+            else if (activeShape === '2d-4x3') {
+                const r = Math.floor(idx / 3);
+                const c = idx % 3;
+                explainerHtml += `
+                    <div>
+                        <p class="font-semibold text-gray-700">2D Matrix (4 rows × 3 columns):</p>
+                        <p class="text-xs text-gray-500 mt-1">
+                            To find the 2D matrix coordinate $(Row, Col)$ for index $i$, we divide and modulo by the column width ($W = 3$):
+                        </p>
+                        <div class="space-y-1.5 mt-2 bg-gray-100 rounded p-2.5 font-mono text-[10px] text-gray-700">
+                            <div>Row = floor(${idx} / 3) = <strong class="text-indigo-600 font-black">${r}</strong></div>
+                            <div>Col = ${idx} % 3 = <strong class="text-indigo-600 font-black">${c}</strong></div>
+                            <div class="border-t border-gray-200 pt-1.5 mt-1.5 font-sans font-bold text-center">➔ Grid Position: [${r}, ${c}]</div>
+                        </div>
+                    </div>
+                `;
+            }
+            else if (activeShape === '3d-2x2x3') {
+                const layers = 2, rows = 2, cols = 3;
+                const layer_sz = rows * cols; // 6 elements per layer
+
+                const d = Math.floor(idx / layer_sz);
+                const r = Math.floor((idx % layer_sz) / cols);
+                const c = idx % cols;
+
+                explainerHtml += `
+                    <div>
+                        <p class="font-semibold text-gray-700">3D Tensor (2 × 2 × 3):</p>
+                        <p class="text-xs text-gray-500 mt-1 leading-relaxed">
+                            With 3 dimensions $(Layer, Row, Col)$, elements are folded using depth layer size ($H \times W = 2 \times 3 = 6$):
+                        </p>
+                        <div class="space-y-1.5 mt-2 bg-gray-100 rounded p-2.5 font-mono text-[10px] text-gray-700">
+                            <div>Layer = floor(${idx} / 6) = <strong class="text-indigo-600 font-black">${d}</strong></div>
+                            <div>Row = floor((${idx} % 6) / 3) = floor(${idx % 6} / 3) = <strong class="text-indigo-600 font-black">${r}</strong></div>
+                            <div>Col = ${idx} % 3 = <strong class="text-indigo-600 font-black">${c}</strong></div>
+                            <div class="border-t border-gray-200 pt-1.5 mt-1.5 font-sans font-bold text-center">➔ 3D Tensor coordinate: [${d}, ${r}, ${c}]</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            mathExplainer.innerHTML = explainerHtml;
+        }
+
+        // Initialize script execution on DOM load
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>

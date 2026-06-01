@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Learning Curve Gap - AI Competition Jr</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .interactive-canvas {
+            cursor: ew-resize;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+
+        <!-- Navigation -->
+        <nav class="mb-6 pt-4 no-print">
+            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-rose-600 transition-colors font-mono" style="text-decoration: none;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Course Hub
+            </a>
+        </nav>
+
+        <!-- Header -->
+        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+            <div>
+                <h1 class="text-4xl font-black tracking-tight text-gray-900 uppercase">Learning Curve <span class="text-rose-600">Gap</span></h1>
+                <p class="text-gray-500 font-medium italic">Adjust noise and model capacity to watch the exact moment High Variance begins</p>
+            </div>
+            <div id="status-badge" class="px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-rose-50 border border-rose-200 text-rose-800 shadow-sm transition-all duration-300">
+                Bias vs Variance
+            </div>
+        </header>
+
+        <!-- Main Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
+
+            <!-- Left Controls Panel (Lg: 5 cols) -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+
+                <!-- Parameters Editor -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-5">
+                    <div>
+                        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-100 pb-2">1. Model & Data Settings</h2>
+                        
+                        <div class="space-y-6">
+                            <!-- Noise Slider -->
+                            <div>
+                                <div class="flex justify-between items-end mb-2">
+                                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Data Noise Level (Irreducible Error)</label>
+                                    <span id="noise-display" class="text-xs font-mono font-black bg-rose-50 text-rose-700 border border-rose-200 px-3 py-1 rounded-full">40%</span>
+                                </div>
+                                <input type="range" id="noise-slider" min="0" max="100" step="5" value="40" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-rose-500">
+                                <div class="flex justify-between text-[9px] font-bold text-gray-400 mt-2 uppercase tracking-tighter">
+                                    <span>Perfect Patterns</span>
+                                    <span>Extreme Random Noise</span>
+                                </div>
+                            </div>
+
+                            <!-- Model Complexity Slider -->
+                            <div>
+                                <div class="flex justify-between items-end mb-2">
+                                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Model Complexity (Degree)</label>
+                                    <span id="complexity-display" class="text-xs font-mono font-black bg-gray-100 text-gray-800 border border-gray-200 px-3 py-1 rounded-full">Degree 4</span>
+                                </div>
+                                <input type="range" id="complexity-slider" min="1" max="10" step="0.1" value="4" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-rose-500">
+                                <div class="flex justify-between text-[9px] font-bold text-gray-400 mt-2 uppercase tracking-tighter">
+                                    <span>Low Capacity (High Bias)</span>
+                                    <span>High Capacity (Overfitting)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Presets Panel -->
+                    <div>
+                        <h3 class="text-[10px] font-black uppercase text-gray-400 tracking-wider mb-2">Scenario Presets</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="loadScenario(0, 5)" class="px-3 py-1.5 bg-gray-100 hover:bg-rose-100 hover:text-rose-800 text-gray-700 text-xs font-bold rounded-lg border border-gray-200 transition-colors">
+                                Clean Data (Zero Noise)
+                            </button>
+                            <button onclick="loadScenario(45, 4)" class="px-3 py-1.5 bg-gray-100 hover:bg-rose-100 hover:text-rose-800 text-gray-700 text-xs font-bold rounded-lg border border-gray-200 transition-colors">
+                                Moderate Overfitting
+                            </button>
+                            <button onclick="loadScenario(90, 8.5)" class="px-3 py-1.5 bg-gray-100 hover:bg-rose-100 hover:text-rose-800 text-gray-700 text-xs font-bold rounded-lg border border-gray-200 transition-colors">
+                                Dirty Data (Severe Overfit)
+                            </button>
+                            <button onclick="findOptimalSweetspot()" class="px-3 py-1.5 bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 text-yellow-800 text-xs font-black rounded-lg transition-colors">
+                                ★ Find Sweetspot
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Overfitting Warning Card -->
+                <div id="status-panel" class="rounded-2xl p-5 border-l-4 transition-colors duration-300">
+                    <h3 id="status-title" class="font-black text-xs uppercase tracking-wider mb-1">Diagnosing...</h3>
+                    <p id="status-desc" class="text-xs font-medium leading-relaxed"></p>
+                </div>
+
+                <!-- Live Metrics Readout -->
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="bg-blue-50 border border-blue-100 rounded-2xl p-3 flex flex-col justify-center items-center text-center">
+                        <span class="text-[8px] uppercase tracking-wider text-blue-600 font-black mb-1">Train Loss</span>
+                        <span id="metric-train" class="text-xl font-mono font-black text-blue-700">0.00</span>
+                    </div>
+                    <div class="bg-rose-50 border border-rose-100 rounded-2xl p-3 flex flex-col justify-center items-center text-center">
+                        <span class="text-[8px] uppercase tracking-wider text-rose-600 font-black mb-1">Val Loss</span>
+                        <span id="metric-val" class="text-xl font-mono font-black text-rose-700">0.00</span>
+                    </div>
+                    <div class="bg-purple-50 border border-purple-100 rounded-2xl p-3 flex flex-col justify-center items-center text-center">
+                        <span class="text-[8px] uppercase tracking-wider text-purple-600 font-black mb-1">Variance Gap</span>
+                        <span id="metric-gap" class="text-xl font-mono font-black text-purple-700">0.00</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Visual Stage & Code Panel (Lg: 7 cols) -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
+
+                <!-- Dynamic Overfitting Curve Plot -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-4">
+                    <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                        <div>
+                            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest">2. Dynamic Overfitting Curve</h2>
+                            <p class="text-[11px] text-gray-400">Click & drag the vertical <strong class="text-rose-600">Model Selector line</strong> directly on the plot!</p>
+                        </div>
+                    </div>
+
+                    <!-- Canvas Box -->
+                    <div class="relative w-full h-[240px] bg-slate-900 border border-slate-800 shadow-inner rounded-xl overflow-hidden">
+                        <canvas id="curve-canvas" class="w-full h-full absolute inset-0 interactive-canvas"></canvas>
+                    </div>
+                </div>
+
+                <!-- live scikit-learn mock array code -->
+                <div class="bg-slate-900 border-2 border-slate-800 p-6 rounded-2xl shadow-inner flex flex-col gap-4 text-white">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <div>
+                            <h2 class="text-xs font-black uppercase tracking-wider text-rose-400">Live Machine Learning Pipeline</h2>
+                            <p class="text-[10px] text-slate-400">Evaluating generalization error gap in Python</p>
+                        </div>
+                        <div class="flex bg-slate-950 p-0.5 rounded-lg border border-slate-800 shadow-inner">
+                            <span class="px-2.5 py-1 text-[9px] font-black uppercase tracking-wider rounded bg-slate-800 text-slate-200 font-mono">sklearn metrics</span>
+                        </div>
+                    </div>
+
+                    <!-- Code block -->
+                    <div class="bg-slate-950/80 rounded-xl border border-slate-800/80 p-4 font-mono text-[10px] text-slate-300 overflow-x-auto shadow-inner leading-relaxed">
+                        <pre id="sklearn-code" class="whitespace-pre"></pre>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- 3-Column Educational Context Footer -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <!-- Core Concept -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-rose-50 text-rose-600 border border-rose-100 rounded-xl flex items-center justify-center font-bold mb-4 font-mono text-xs">01</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">High Bias (Underfitting)</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    At low complexity (left side of chart), the model lacks the capacity to capture structure. 
+                    Both training and validation errors are extremely high.
+                </p>
+                <p class="text-xs text-gray-500 leading-relaxed mt-2">
+                    This is called **High Bias**. The model makes simplistic assumptions, failing to learn patterns even on the training data itself.
+                </p>
+            </div>
+
+            <!-- Validation curve -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-rose-50 text-rose-600 border border-rose-100 rounded-xl flex items-center justify-center font-bold mb-4 font-mono text-xs">02</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">High Variance (Overfitting)</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    At high complexity (right side), the model has massive memory capacity. It starts learning random fluctuations instead of the true pattern.
+                </p>
+                <p class="text-xs text-gray-500 leading-relaxed mt-2">
+                    Training error drops to near-zero as it memorizes details, but **validation error shoots up** on unseen test data. The resulting **"Variance Gap"** reveals severe overfitting.
+                </p>
+            </div>
+
+            <!-- AI Connection -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-rose-50 text-rose-600 border border-rose-100 rounded-xl flex items-center justify-center font-bold mb-4 border border-rose-200 font-mono text-xs">03</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">The Golden Sweetspot</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    The optimal model exists at the **valley** of the validation error curve. Here, complexity is perfectly balanced.
+                </p>
+                <p class="text-xs text-gray-500 leading-relaxed mt-2">
+                    Notice how **adding data noise shifts the sweetspot left**! The dirtier the data, the easier it is to overfit, forcing AI developers to use simpler models or stricter regularization constraints.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MAIN JAVASCRIPT LOGIC -->
+    <script>
+        // State variables
+        let noiseLevel = 40; // 0 to 100%
+        let modelComplexity = 4.0; // 1.0 to 10.0
+
+        // Dragging state on canvas
+        let isDragging = false;
+
+        // DOM elements
+        const canvas = document.getElementById('curve-canvas');
+        const ctx = canvas.getContext('2d');
+        const noiseSlider = document.getElementById('noise-slider');
+        const complexitySlider = document.getElementById('complexity-slider');
+        const noiseDisplay = document.getElementById('noise-display');
+        const complexityDisplay = document.getElementById('complexity-display');
+
+        const metricTrain = document.getElementById('metric-train');
+        const metricVal = document.getElementById('metric-val');
+        const metricGap = document.getElementById('metric-gap');
+        const statusPanel = document.getElementById('status-panel');
+        const statusTitle = document.getElementById('status-title');
+        const statusDesc = document.getElementById('status-desc');
+        const sklearnCode = document.getElementById('sklearn-code');
+
+        /* ─── INITIALIZATION ──────────────────────────────────────────────── */
+        function init() {
+            setupListeners();
+            resizeCanvas();
+        }
+
+        function setupListeners() {
+            noiseSlider.addEventListener('input', () => {
+                noiseLevel = parseFloat(noiseSlider.value);
+                drawPlot();
+            });
+
+            complexitySlider.addEventListener('input', () => {
+                modelComplexity = parseFloat(complexitySlider.value);
+                drawPlot();
+            });
+
+            window.addEventListener('resize', resizeCanvas);
+
+            // Click-and-drag indicator lines directly on canvas
+            canvas.addEventListener('mousedown', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                
+                const padding = 50;
+                const plotWidth = canvas.width - padding * 2;
+                const comp = 1 + ((mouseX - padding) / plotWidth) * 9.0;
+
+                // If user clicks near the complexity indicator vertical line
+                if (Math.abs(comp - modelComplexity) < 0.6) {
+                    isDragging = true;
+                }
+            });
+
+            canvas.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+
+                const padding = 50;
+                const plotWidth = canvas.width - padding * 2;
+                let comp = 1 + ((mouseX - padding) / plotWidth) * 9.0;
+
+                // Boundary check
+                comp = Math.min(10, Math.max(1, comp));
+
+                modelComplexity = Math.round(comp * 10) / 10;
+                complexitySlider.value = modelComplexity;
+
+                drawPlot();
+            });
+
+            window.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+        }
+
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            drawPlot();
+        }
+
+        /* ─── MATHEMATICAL LOSS CURVES MODEL ──────────────────────────────── */
+        function getLossValues(c) {
+            // Base bias decreases exponentially with complexity
+            const baseBias = 70 * Math.exp(-0.32 * c);
+            
+            // Irreducible noise scale factor
+            const nScale = noiseLevel / 100;
+
+            // Train loss continues downward, memorizes noise at high complexity
+            // nScale introduces slight noise penalty at start, but goes to near 0
+            const trainLoss = baseBias + 5 * nScale * (1 - Math.min(1.0, c / 8.5));
+
+            // Validation loss: decreases then explodes at high complexity due to variance
+            // Variance starts blowing up after degree 4. Exacerbated by noise
+            let variance = 0;
+            if (c > 3.5) {
+                // Exponential-like explosion of variance, scaled by data noise
+                variance = Math.pow(c - 3.5, 2.3) * 0.42 * (nScale * 12 + 1);
+            }
+            
+            // Base validation offset (inherits noise as floor limit)
+            const valLoss = baseBias + variance + 10 + nScale * 15;
+
+            return {
+                train: trainLoss,
+                val: valLoss
+            };
+        }
+
+        function loadScenario(noise, comp) {
+            noiseLevel = noise;
+            modelComplexity = comp;
+
+            noiseSlider.value = noise;
+            complexitySlider.value = comp;
+
+            drawPlot();
+        }
+
+        function findOptimalSweetspot() {
+            // Find the complexity that minimizes validation loss under current noise
+            let minVal = 999;
+            let optimalC = 1;
+            
+            for (let c = 1.0; c <= 10.0; c += 0.1) {
+                const loss = getLossValues(c);
+                if (loss.val < minVal) {
+                    minVal = loss.val;
+                    optimalC = c;
+                }
+            }
+
+            modelComplexity = Math.round(optimalC * 10) / 10;
+            complexitySlider.value = modelComplexity;
+
+            drawPlot();
+        }
+
+        /* ─── RENDERING GRAPH VISUALS ───────────────────────────────────────── */
+        function drawPlot() {
+            const w = canvas.width;
+            const h = canvas.height;
+            const padding = 50;
+            const plotW = w - padding * 2;
+            const plotH = h - padding * 2;
+
+            // Coordinate mapping functions
+            const getX = (comp) => padding + ((comp - 1) / 9.0) * plotW;
+            const getY = (loss) => padding + plotH - (loss / 100) * plotH;
+
+            // Update sliders labels
+            noiseDisplay.textContent = `${noiseLevel}%`;
+            complexityDisplay.textContent = `Degree ${modelComplexity.toFixed(1)}`;
+
+            // Clear stage
+            ctx.clearRect(0, 0, w, h);
+
+            // Draw axis borders
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(padding, h - padding);
+            ctx.lineTo(w - padding, h - padding); // X
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, h - padding); // Y
+            ctx.stroke();
+
+            // Axis labels & lines
+            ctx.fillStyle = '#64748b';
+            ctx.font = 'bold 9px monospace';
+            ctx.textAlign = 'center';
+            for (let c = 1; c <= 10; c++) {
+                const px = getX(c);
+                // Grid ticks
+                ctx.strokeStyle = 'rgba(71, 85, 105, 0.2)';
+                ctx.beginPath();
+                ctx.moveTo(px, padding);
+                ctx.lineTo(px, h - padding);
+                ctx.stroke();
+                // Tick coordinate
+                ctx.fillText(c, px, h - padding + 15);
+            }
+
+            ctx.textAlign = 'right';
+            for (let loss = 0; loss <= 100; loss += 20) {
+                const py = getY(loss);
+                ctx.strokeStyle = 'rgba(71, 85, 105, 0.2)';
+                ctx.beginPath();
+                ctx.moveTo(padding, py);
+                ctx.lineTo(w - padding, py);
+                ctx.stroke();
+                ctx.fillText(loss + '%', padding - 10, py + 3);
+            }
+
+            // Labels axis title
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = 'bold 9px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('MODEL COMPLEXITY (POLYNOMIAL DEGREE)', w / 2, h - 12);
+
+            ctx.save();
+            ctx.translate(14, h / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText('LOSS / ERROR RATE', 0, 0);
+            ctx.restore();
+
+            // --- GENERATE GRAPH DATA PATH POINTS ---
+            const trainPoints = [];
+            const valPoints = [];
+            
+            // Find the optimal minimum valley of validation loss
+            let minValLoss = 999;
+            let optimalComp = 1;
+
+            for (let c = 1.0; c <= 10.0; c += 0.05) {
+                const losses = getLossValues(c);
+                trainPoints.push({ x: getX(c), y: getY(losses.train) });
+                valPoints.push({ x: getX(c), y: getY(losses.val) });
+
+                if (losses.val < minValLoss) {
+                    minValLoss = losses.val;
+                    optimalComp = c;
+                }
+            }
+
+            // --- DRAW GENERALIZATION SHADED GAP SPAN ---
+            ctx.fillStyle = 'rgba(168, 85, 247, 0.08)'; // Light purple overlap
+            ctx.beginPath();
+            ctx.moveTo(trainPoints[0].x, trainPoints[0].y);
+            for (let i = 1; i < trainPoints.length; i++) {
+                ctx.lineTo(trainPoints[i].x, trainPoints[i].y);
+            }
+            for (let i = valPoints.length - 1; i >= 0; i--) {
+                ctx.lineTo(valPoints[i].x, valPoints[i].y);
+            }
+            ctx.closePath();
+            ctx.fill();
+
+            // --- DRAW CURVE LINES ---
+            
+            // 1. Train loss line (Blue-slate)
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = 3.5;
+            ctx.beginPath();
+            ctx.moveTo(trainPoints[0].x, trainPoints[0].y);
+            for (let i = 1; i < trainPoints.length; i++) {
+                ctx.lineTo(trainPoints[i].x, trainPoints[i].y);
+            }
+            ctx.stroke();
+
+            // 2. Val loss line (Rose)
+            ctx.strokeStyle = '#f43f5e';
+            ctx.lineWidth = 3.5;
+            ctx.beginPath();
+            ctx.moveTo(valPoints[0].x, valPoints[0].y);
+            for (let i = 1; i < valPoints.length; i++) {
+                ctx.lineTo(valPoints[i].x, valPoints[i].y);
+            }
+            ctx.stroke();
+
+            // --- DRAW SWEETSPOT GOLD STAR MARKER ---
+            const optX = getX(optimalComp);
+            const optY = getY(minValLoss);
+            
+            ctx.fillStyle = '#eab308'; // Gold-500
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(optX, optY, 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#eab308';
+            ctx.font = 'bold 8px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('SWEETSPOT', optX, optY - 10);
+
+            // --- DRAW MODEL COMPLEXITY VERTICAL DASH INDICATOR ---
+            const activeX = getX(modelComplexity);
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(activeX, padding);
+            ctx.lineTo(activeX, h - padding);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Helper active coordinate circles
+            const activeStats = getLossValues(modelComplexity);
+            const activeTrainY = getY(activeStats.train);
+            const activeValY = getY(activeStats.val);
+
+            // Train dot
+            ctx.fillStyle = '#3b82f6';
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(activeX, activeTrainY, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // Val dot
+            ctx.fillStyle = '#f43f5e';
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(activeX, activeValY, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // Drag handle visual
+            ctx.fillStyle = 'rgba(244, 63, 94, 0.15)';
+            ctx.beginPath();
+            ctx.arc(activeX, h - padding, 14, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#f43f5e';
+            ctx.beginPath();
+            ctx.arc(activeX, h - padding, 4.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Update stats text
+            const gap = activeStats.val - activeStats.train;
+            metricTrain.textContent = `${activeStats.train.toFixed(1)}%`;
+            metricVal.textContent = `${activeStats.val.toFixed(1)}%`;
+            metricGap.textContent = `${gap.toFixed(1)}%`;
+
+            updateStatus(modelComplexity, gap, optimalComp);
+            updateCodeRepresentation(activeStats.train, activeStats.val, gap);
+        }
+
+        /* ─── STATUS DIAGNOSTIC REPORTING ──────────────────────────────────── */
+        function updateStatus(c, gap, optC) {
+            const difference = c - optC;
+
+            if (c < 3.0) {
+                statusPanel.className = 'rounded-2xl p-5 border-l-4 border-amber-500 bg-amber-50 text-amber-900 transition-colors duration-300';
+                statusTitle.textContent = 'High Bias (Underfitting)';
+                statusDesc.textContent = 'Model complexity is too low. Both training and validation errors are extremely high. The model fails to capture the underlying data trend.';
+            } else if (Math.abs(difference) < 0.6) {
+                statusPanel.className = 'rounded-2xl p-5 border-l-4 border-emerald-500 bg-emerald-50 text-emerald-900 transition-colors duration-300';
+                statusTitle.textContent = 'Optimal Generalization (Balanced)';
+                statusDesc.textContent = 'Awesome! Model capacity is perfectly balanced. Validation error is minimized, achieving the optimal sweetspot before data noise begins warping predictions.';
+            } else if (difference >= 0.6) {
+                statusPanel.className = 'rounded-2xl p-5 border-l-4 border-rose-500 bg-rose-50 text-rose-900 transition-colors duration-300';
+                statusTitle.textContent = 'High Variance (Overfitting)';
+                statusDesc.textContent = `Overfitting active! The model is memorizing random noise. Training loss is down to ${getLossValues(c).train.toFixed(1)}%, but validation error is shooting up, creating a massive ${gap.toFixed(1)}% generalization gap!`;
+            }
+        }
+
+        /* ─── SKLEARN PYTHON CODE BLOCK GENERATION ──────────────────────────── */
+        function updateCodeRepresentation(trainLoss, valLoss, gap) {
+            let output = `<span class="text-rose-400">from</span> sklearn.metrics <span class="text-rose-400">import</span> mean_squared_error\n`;
+            output += `<span class="text-rose-400">from</span> sklearn.preprocessing <span class="text-rose-400">import</span> PolynomialFeatures\n\n`;
+            
+            output += `# 1. Fit polynomial model with Complexity: Degree ${modelComplexity.toFixed(1)}\n`;
+            output += `poly = PolynomialFeatures(degree=<span class="text-yellow-300 font-bold">${Math.round(modelComplexity)}</span>)\n`;
+            output += `X_poly_train = poly.fit_transform(X_train)\n`;
+            output += `X_poly_val   = poly.transform(X_val)\n\n`;
+
+            output += `# 2. Calculate generalization loss rate (Noise: ${noiseLevel}%)\n`;
+            output += `train_loss = mean_squared_error(y_train, model.predict(X_poly_train)) # Result: <span class="text-yellow-300 font-bold">${(trainLoss / 100).toFixed(3)}</span>\n`;
+            output += `val_loss   = mean_squared_error(y_val, model.predict(X_poly_val))     # Result: <span class="text-yellow-300 font-bold">${(valLoss / 100).toFixed(3)}</span>\n\n`;
+
+            output += `# 3. Generalization Error (Variance Gap)\n`;
+            output += `variance_gap = val_loss - train_loss  # Result: <span class="text-yellow-300 font-bold">${(gap / 100).toFixed(3)}</span>\n`;
+            
+            if (gap > 20) {
+                output += `print(<span class="text-rose-300">"Warning: Severe Overfitting (High Variance) detected!"</span>)`;
+            } else if (trainLoss > 35) {
+                output += `print(<span class="text-amber-300">"Warning: Underfitting (High Bias) detected."</span>)`;
+            } else {
+                output += `print(<span class="text-emerald-300">"Optimal fit. Model generalizes successfully."</span>)`;
+            }
+
+            sklearnCode.innerHTML = output;
+        }
+
+        // Initialize script execution on DOM load
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>

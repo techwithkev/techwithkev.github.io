@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subgroup Bias Dragger - AI Competition Jr</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for interactive canvas */
+        .interactive-canvas {
+            cursor: grab;
+        }
+        .interactive-canvas:active {
+            cursor: grabbing;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+
+        <!-- Navigation -->
+        <nav class="mb-6 pt-4 no-print">
+            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-amber-600 transition-colors font-mono" style="text-decoration: none;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Course Hub
+            </a>
+        </nav>
+
+        <!-- Header -->
+        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+            <div>
+                <h1 class="text-4xl font-black tracking-tight text-gray-900 uppercase">Subgroup Bias <span class="text-amber-600">Dragger</span></h1>
+                <p class="text-gray-500 font-medium italic">Drag a data cluster to introduce subgroup bias and watch overall stats warp</p>
+            </div>
+            <div id="status-badge" class="px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-amber-50 border border-amber-200 text-amber-800 shadow-sm transition-all duration-300">
+                1D Scatter Bias
+            </div>
+        </header>
+
+        <!-- Main Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
+
+            <!-- Left Controls Panel (Lg: 5 cols) -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+
+                <!-- Parameters Editor -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-5">
+                    <div>
+                        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-100 pb-2">1. Bias Parameters</h2>
+                        
+                        <div class="space-y-6">
+                            <!-- Subgroup Mean Slider -->
+                            <div>
+                                <div class="flex justify-between items-end mb-2">
+                                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Subgroup Mean Score</label>
+                                    <span id="subgroup-mean-display" class="text-xs font-mono font-black bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1 rounded-full">75.0</span>
+                                </div>
+                                <input type="range" id="subgroup-mean-slider" min="15" max="95" step="0.5" value="75" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                                <div class="flex justify-between text-[9px] font-bold text-gray-400 mt-2 uppercase tracking-tighter">
+                                    <span>Extreme Underperformance</span>
+                                    <span>Extreme Overperformance</span>
+                                </div>
+                            </div>
+
+                            <!-- Subgroup Size Slider -->
+                            <div>
+                                <div class="flex justify-between items-end mb-2">
+                                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Subgroup Size (Weight)</label>
+                                    <span id="subgroup-size-display" class="text-xs font-mono font-black bg-gray-100 text-gray-800 border border-gray-200 px-3 py-1 rounded-full">15 items</span>
+                                </div>
+                                <input type="range" id="subgroup-size-slider" min="1" max="50" step="1" value="15" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                                <div class="flex justify-between text-[9px] font-bold text-gray-400 mt-2 uppercase tracking-tighter">
+                                    <span>Minimal Weight</span>
+                                    <span>High Weight (50% of Population)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scenario Presets -->
+                    <div>
+                        <h3 class="text-[10px] font-black uppercase text-gray-400 tracking-wider mb-2">Scenario Presets</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="loadScenario(75, 15)" class="px-3 py-1.5 bg-gray-100 hover:bg-amber-100 hover:text-amber-800 text-gray-700 text-xs font-bold rounded-lg border border-gray-200 transition-colors">
+                                Fair & Unbiased
+                            </button>
+                            <button onclick="loadScenario(35, 20)" class="px-3 py-1.5 bg-gray-100 hover:bg-amber-100 hover:text-amber-800 text-gray-700 text-xs font-bold rounded-lg border border-gray-200 transition-colors">
+                                Negative Bias
+                            </button>
+                            <button onclick="loadScenario(95, 15)" class="px-3 py-1.5 bg-gray-100 hover:bg-amber-100 hover:text-amber-800 text-gray-700 text-xs font-bold rounded-lg border border-gray-200 transition-colors">
+                                Positive Bias
+                            </button>
+                            <button onclick="loadScenario(20, 45)" class="px-3 py-1.5 bg-gray-100 hover:bg-amber-100 hover:text-amber-800 text-gray-700 text-xs font-bold rounded-lg border border-gray-200 transition-colors">
+                                Biased Sampling
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Dynamic Warnings Panel -->
+                <div id="warning-panel" class="rounded-2xl p-5 border-l-4 transition-colors duration-300">
+                    <h3 id="warning-title" class="font-black text-xs uppercase tracking-wider mb-1">State Checked</h3>
+                    <p id="warning-desc" class="text-xs font-medium leading-relaxed"></p>
+                </div>
+
+                <!-- Stats Summary Cards -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 flex flex-col justify-center items-center">
+                        <span class="text-[9px] uppercase tracking-wider text-indigo-600 font-black mb-1">Combined Mean Score</span>
+                        <span id="stat-mean" class="text-3xl font-mono font-black text-indigo-700">75.0</span>
+                    </div>
+                    <div class="bg-amber-50 border border-amber-100 rounded-2xl p-4 flex flex-col justify-center items-center">
+                        <span class="text-[9px] uppercase tracking-wider text-amber-600 font-black mb-1">Combined Variance</span>
+                        <span id="stat-variance" class="text-3xl font-mono font-black text-amber-700">64.0</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Visual Stage & Code Panel (Lg: 7 cols) -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
+
+                <!-- 1D Scatter Plot Stage -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-4">
+                    <div>
+                        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest">2. Beeswarm 1D Scatter Plot</h2>
+                        <p class="text-[11px] text-gray-400">Click and drag the <strong class="text-amber-600">amber subgroup cluster</strong> directly on the canvas below!</p>
+                    </div>
+
+                    <!-- Plot container -->
+                    <div class="relative w-full h-[220px] bg-slate-900 border border-slate-800 shadow-inner rounded-xl overflow-hidden">
+                        <canvas id="plot-canvas" class="w-full h-full absolute inset-0 interactive-canvas"></canvas>
+                    </div>
+                </div>
+
+                <!-- NumPy Python Code block -->
+                <div class="bg-slate-900 border-2 border-slate-800 p-6 rounded-2xl shadow-inner flex flex-col gap-4 text-white">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <div>
+                            <h2 class="text-xs font-black uppercase tracking-wider text-amber-400">Live Mathematical Diagnostics</h2>
+                            <p class="text-[10px] text-slate-400">How to calculate this data skew in NumPy / Pandas</p>
+                        </div>
+                        <div class="flex bg-slate-950 p-0.5 rounded-lg border border-slate-800 shadow-inner">
+                            <span class="px-2.5 py-1 text-[9px] font-black uppercase tracking-wider rounded bg-slate-800 text-slate-200 font-mono">NumPy Stats</span>
+                        </div>
+                    </div>
+
+                    <!-- Code block -->
+                    <div class="bg-slate-950/80 rounded-xl border border-slate-800/80 p-4 font-mono text-[10px] text-slate-300 overflow-x-auto shadow-inner leading-relaxed">
+                        <pre id="numpy-code" class="whitespace-pre"></pre>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- 3-Column Educational Context Footer -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <!-- Core Concept -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-gray-700 font-bold mb-4 font-mono text-xs">01</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">What is Data Bias?</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    Data bias occurs when the data collected to train a system is not representative of the real-world population.
+                </p>
+                <p class="text-xs text-gray-500 leading-relaxed mt-2">
+                    In this explorer, shifting the subgroup scores simulates sampling from a biased demographic (e.g. testing only in well-funded schools or ignoring minority regions), dragging down or bloating the statistics.
+                </p>
+            </div>
+
+            <!-- Mathematical model -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-gray-700 font-bold mb-4 font-mono text-xs">02</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">Variance & Mean Math</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    The combined mean $\mu_C$ is the weighted sum of Group A and Group B:
+                    <br>
+                    <span class="font-mono bg-gray-50 px-1 py-0.5 rounded text-[10px]">Mean = (sum_A + sum_B) / (N_A + N_B)</span>
+                </p>
+                <p class="text-xs text-gray-500 leading-relaxed mt-2">
+                    Combined variance balloons exponentially as the subgroups move apart! 
+                    This represents statistical spread: when subgroups are highly polarized, variance reflects group differences rather than natural individual variation.
+                </p>
+            </div>
+
+            <!-- AI Connection -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center font-bold mb-4 border border-amber-200 font-mono text-xs">03</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">How AI Uses This</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    If an AI model (like a neural network predictor) is trained on this combined dataset, the skewed overall statistics will severely impair its fairness.
+                </p>
+                <p class="text-xs text-gray-500 leading-relaxed mt-2">
+                    The model will over-predict or under-predict for specific groups, leading to algorithmic discrimination in critical systems like credit scoring, admissions, or hiring filters.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MAIN JAVASCRIPT LOGIC -->
+    <script>
+        // State variables
+        let subgroupMean = 75;
+        let subgroupSize = 15;
+
+        // Static Main Population (Group A)
+        // 30 points, normally distributed around mean = 75, std = 8
+        const groupAPoints = [
+            73.4, 76.2, 75.1, 79.8, 68.4, 74.2, 77.8, 82.4, 71.2, 75.6,
+            76.9, 74.8, 73.1, 78.5, 69.9, 72.1, 76.5, 81.3, 77.2, 75.0,
+            64.5, 78.9, 70.4, 73.8, 86.2, 75.4, 72.8, 83.1, 76.0, 71.9
+        ];
+
+        // Shaded random Jitter values to create a beautiful dot beeswarm
+        const groupAJitters = groupAPoints.map(() => (Math.random() - 0.5) * 50);
+        let groupBJitters = [];
+
+        // Canvas dragging state
+        let isDragging = false;
+
+        // DOM elements
+        const canvas = document.getElementById('plot-canvas');
+        const ctx = canvas.getContext('2d');
+        const meanSlider = document.getElementById('subgroup-mean-slider');
+        const sizeSlider = document.getElementById('subgroup-size-slider');
+        const meanDisplay = document.getElementById('subgroup-mean-display');
+        const sizeDisplay = document.getElementById('subgroup-size-display');
+        
+        const statMean = document.getElementById('stat-mean');
+        const statVariance = document.getElementById('stat-variance');
+        const warningPanel = document.getElementById('warning-panel');
+        const warningTitle = document.getElementById('warning-title');
+        const warningDesc = document.getElementById('warning-desc');
+        const numpyCode = document.getElementById('numpy-code');
+
+        /* ─── INITIALIZATION ──────────────────────────────────────────────── */
+        function init() {
+            setupListeners();
+            regenerateSubgroupJitters();
+            resizeCanvas();
+        }
+
+        function setupListeners() {
+            meanSlider.addEventListener('input', (e) => {
+                subgroupMean = parseFloat(e.value || meanSlider.value);
+                drawPlot();
+            });
+
+            sizeSlider.addEventListener('input', (e) => {
+                subgroupSize = parseInt(e.value || sizeSlider.value);
+                regenerateSubgroupJitters();
+                drawPlot();
+            });
+
+            window.addEventListener('resize', resizeCanvas);
+
+            // Canvas direct dragging interactions
+            canvas.addEventListener('mousedown', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                
+                // Map mouseX to test score (0 - 100)
+                const padding = 50;
+                const plotWidth = canvas.width - padding * 2;
+                const score = ((mouseX - padding) / plotWidth) * 100;
+
+                // Check if user clicked near the current subgroup mean
+                if (Math.abs(score - subgroupMean) < 10) {
+                    isDragging = true;
+                }
+            });
+
+            canvas.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                
+                const padding = 50;
+                const plotWidth = canvas.width - padding * 2;
+                let score = ((mouseX - padding) / plotWidth) * 100;
+                
+                // Boundaries check
+                score = Math.min(95, Math.max(15, score));
+
+                // Update state & sliders
+                subgroupMean = Math.round(score * 10) / 10;
+                meanSlider.value = subgroupMean;
+                
+                drawPlot();
+            });
+
+            window.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+        }
+
+        function regenerateSubgroupJitters() {
+            groupBJitters = Array.from({ length: 50 }, () => (Math.random() - 0.5) * 50);
+        }
+
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            drawPlot();
+        }
+
+        /* ─── DATA GENERATION & MATH RECALCULATIONS ────────────────────────── */
+        function getCombinedStats() {
+            const groupBPoints = [];
+            // Subgroup SD is modeled as 6
+            const sd = 6;
+            
+            // Seed a deterministic-looking subgroup based on mean
+            // For N elements, distribute them symmetrically around subgroupMean
+            for (let i = 0; i < subgroupSize; i++) {
+                // simple box-muller approximation or deterministic spacing
+                const offset = (i - (subgroupSize - 1) / 2) * (sd * 3 / subgroupSize);
+                groupBPoints.push(subgroupMean + offset);
+            }
+
+            const combinedPoints = [...groupAPoints, ...groupBPoints];
+            
+            // Recalculate combined mean
+            const sum = combinedPoints.reduce((a, b) => a + b, 0);
+            const mean = sum / combinedPoints.length;
+
+            // Recalculate variance
+            const sqDiffSum = combinedPoints.reduce((a, b) => a + Math.pow(b - mean, 2), 0);
+            const variance = sqDiffSum / combinedPoints.length;
+            const stdDev = Math.sqrt(variance);
+
+            return {
+                groupBPoints,
+                combinedPoints,
+                mean,
+                variance,
+                stdDev
+            };
+        }
+
+        function loadScenario(mean, size) {
+            subgroupMean = mean;
+            subgroupSize = size;
+            
+            meanSlider.value = mean;
+            sizeSlider.value = size;
+
+            regenerateSubgroupJitters();
+            drawPlot();
+        }
+
+        /* ─── RENDERING GRAPH VISUALS ───────────────────────────────────────── */
+        function drawPlot() {
+            const w = canvas.width;
+            const h = canvas.height;
+            const padding = 50;
+            const plotW = w - padding * 2;
+
+            // Map data score to pixel coordinates
+            const getPixelX = (score) => padding + (score / 100) * plotW;
+
+            // Recalculate stats
+            const stats = getCombinedStats();
+
+            meanDisplay.textContent = subgroupMean.toFixed(1);
+            sizeDisplay.textContent = `${subgroupSize} item${subgroupSize > 1 ? 's' : ''}`;
+
+            statMean.textContent = stats.mean.toFixed(1);
+            statVariance.textContent = stats.variance.toFixed(1);
+
+            // Clear screen
+            ctx.clearRect(0, 0, w, h);
+
+            // Draw clean background axes
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(padding, h - 50);
+            ctx.lineTo(w - padding, h - 50);
+            ctx.stroke();
+
+            // Draw axis ticks
+            ctx.fillStyle = '#64748b';
+            ctx.font = 'bold 9px monospace';
+            ctx.textAlign = 'center';
+            for (let score = 0; score <= 100; score += 10) {
+                const px = getPixelX(score);
+                // Tic mark
+                ctx.strokeStyle = '#475569';
+                ctx.beginPath();
+                ctx.moveTo(px, h - 50);
+                ctx.lineTo(px, h - 45);
+                ctx.stroke();
+                // Score number
+                ctx.fillText(score, px, h - 30);
+            }
+
+            // Draw Title / Label
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = 'bold 9px sans-serif';
+            ctx.fillText('STUDENT TEST SCORES (0 - 100)', w / 2, h - 12);
+
+            // --- DRAW STANDARD DEVIATION ACCENT RANGE SPAN ---
+            const meanPx = getPixelX(stats.mean);
+            const sdMinusPx = getPixelX(stats.mean - stats.stdDev);
+            const sdPlusPx = getPixelX(stats.mean + stats.stdDev);
+
+            ctx.fillStyle = 'rgba(99, 102, 241, 0.08)'; // Light purple span
+            ctx.fillRect(sdMinusPx, 10, sdPlusPx - sdMinusPx, h - 60);
+
+            // SD Span horizontal bracket lines
+            ctx.strokeStyle = 'rgba(99, 102, 241, 0.3)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(sdMinusPx, h / 2);
+            ctx.lineTo(sdPlusPx, h / 2);
+            ctx.stroke();
+            // End bracket caps
+            ctx.beginPath();
+            ctx.moveTo(sdMinusPx, h / 2 - 8); ctx.lineTo(sdMinusPx, h / 2 + 8);
+            ctx.moveTo(sdPlusPx, h / 2 - 8); ctx.lineTo(sdPlusPx, h / 2 + 8);
+            ctx.stroke();
+
+            // --- DRAW DATA POINTS ---
+            const plotCenterY = (h - 50) / 2;
+
+            // 1. Group A points (Main Population - Slate/Blue)
+            groupAPoints.forEach((score, idx) => {
+                const px = getPixelX(score);
+                // Jitter vertical offset slightly to avoid overlapping points
+                const py = plotCenterY + groupAJitters[idx] * 0.9;
+                
+                ctx.fillStyle = 'rgba(148, 163, 184, 0.65)'; // Transparent Slate
+                ctx.strokeStyle = '#cbd5e1';
+                ctx.lineWidth = 1;
+                
+                ctx.beginPath();
+                ctx.arc(px, py, 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            });
+
+            // 2. Group B points (Subgroup population - Amber)
+            stats.groupBPoints.forEach((score, idx) => {
+                const px = getPixelX(score);
+                const py = plotCenterY + groupBJitters[idx] * 0.9;
+
+                ctx.fillStyle = 'rgba(245, 158, 11, 0.8)'; // Transparent Amber
+                ctx.strokeStyle = '#fef08a';
+                ctx.lineWidth = 1;
+
+                ctx.beginPath();
+                ctx.arc(px, py, 7, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            });
+
+            // --- DRAW STATISTICAL LINE INDICATORS ---
+
+            // A. Combined Overall Mean Line (Purple-Thick)
+            ctx.strokeStyle = '#a855f7'; // Purple-500
+            ctx.lineWidth = 2.5;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(meanPx, 15);
+            ctx.lineTo(meanPx, h - 50);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Label for Combined Mean Line
+            ctx.fillStyle = '#c084fc';
+            ctx.font = 'black 9px sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('COMBINED MEAN: ' + stats.mean.toFixed(1), meanPx + 6, 25);
+
+            // B. Static Group A Mean Line (Slate Blue)
+            const aMeanPx = getPixelX(75);
+            ctx.strokeStyle = '#60a5fa'; // Blue-400
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(aMeanPx, h - 75);
+            ctx.lineTo(aMeanPx, h - 50);
+            ctx.stroke();
+
+            // C. Dynamic Group B Mean Line (Amber)
+            const bMeanPx = getPixelX(subgroupMean);
+            ctx.strokeStyle = '#fbbf24'; // Amber-400
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(bMeanPx, h - 90);
+            ctx.lineTo(bMeanPx, h - 50);
+            ctx.stroke();
+
+            // Drag handle helper circle on the Subgroup Mean axis
+            ctx.fillStyle = 'rgba(245, 158, 11, 0.2)';
+            ctx.beginPath();
+            ctx.arc(bMeanPx, h - 50, 16, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#fbbf24';
+            ctx.beginPath();
+            ctx.arc(bMeanPx, h - 50, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Update warning panel contents based on calculations
+            updateWarning(stats.mean, stats.variance);
+
+            // Update numpy diagnostic codeblock
+            updateCodeRepresentation(stats.groupBPoints);
+        }
+
+        /* ─── DYNAMIC DIAGNOSTIC WARNINGS ──────────────────────────────────── */
+        function updateWarning(combinedMean, combinedVar) {
+            const difference = Math.abs(75 - subgroupMean);
+
+            if (difference < 5) {
+                warningPanel.className = 'rounded-2xl p-5 border-l-4 border-emerald-500 bg-emerald-50 text-emerald-900 transition-colors duration-300';
+                warningTitle.textContent = 'Fair Representation (No Bias)';
+                warningDesc.textContent = 'The subgroup test scores align perfectly with the main population. The overall mean and variance reflect actual representative statistics of a cohesive population sample.';
+            } else if (difference < 20) {
+                warningPanel.className = 'rounded-2xl p-5 border-l-4 border-amber-500 bg-amber-50 text-amber-900 transition-colors duration-300';
+                warningTitle.textContent = 'Moderate Subgroup Skew (Data Bias)';
+                warningDesc.textContent = `The subgroup has drifted ${difference.toFixed(1)} points away from the main group. Combined variance has started to swell as the overall population mean is moderately dragged.`;
+            } else {
+                warningPanel.className = 'rounded-2xl p-5 border-l-4 border-rose-500 bg-rose-50 text-rose-900 transition-colors duration-300';
+                warningTitle.textContent = 'Severe Algorithmic Bias!';
+                warningDesc.textContent = `Extreme statistical skew detected! Shifting the subgroup score by ${difference.toFixed(1)} points drastically warp the overall mean to ${combinedMean.toFixed(1)} and balloons variance to a massive ${combinedVar.toFixed(1)}. Any AI trained on this dataset will inherit severe group disparities!`;
+            }
+        }
+
+        /* ─── NUMPY PYTHON CODE GENERATION ──────────────────────────────────── */
+        function updateCodeRepresentation(subgroupPoints) {
+            let output = `<span class="text-amber-400">import</span> numpy <span class="text-amber-400">as</span> np\n\n`;
+            output += `# Group A: Standard representative population\n`;
+            output += `group_a = np.array([\n    ` + groupAPoints.slice(0, 10).map(p => p.toFixed(1)).join(', ') + `,\n`;
+            output += `    ` + groupAPoints.slice(10, 20).map(p => p.toFixed(1)).join(', ') + `... # 30 elements total\n`;
+            output += `])\n\n`;
+
+            output += `# Group B: Biased sampling subgroup (Mean: ${subgroupMean.toFixed(1)}, Size: ${subgroupSize})\n`;
+            output += `group_b = np.array([\n    ` + subgroupPoints.slice(0, 10).map(p => p.toFixed(1)).join(', ') + (subgroupPoints.length > 10 ? `,\n    ...` : '') + `\n])\n\n`;
+
+            output += `# Concatenate combined populations\n`;
+            output += `combined = np.concatenate([group_a, group_b])\n\n`;
+
+            output += `# Calculate live statistical metrics\n`;
+            
+            const stats = getCombinedStats();
+            output += `overall_mean = np.mean(combined)       # Result: <span class="text-yellow-300 font-bold">${stats.mean.toFixed(2)}</span>\n`;
+            output += `overall_var  = np.var(combined)        # Result: <span class="text-yellow-300 font-bold">${stats.variance.toFixed(2)}</span>\n`;
+
+            numpyCode.innerHTML = output;
+        }
+
+        // Initialize script execution on DOM load
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>

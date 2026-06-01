@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The K-Fold Carousel - AI Competition Jr</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .point-dot {
+            transition: background-color 0.4s ease, transform 0.4s ease, border-color 0.4s ease;
+        }
+        .fold-block {
+            transition: all 0.4s ease;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+
+        <!-- Navigation -->
+        <nav class="mb-6 pt-4 no-print">
+            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-violet-600 transition-colors font-mono" style="text-decoration: none;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Course Hub
+            </a>
+        </nav>
+
+        <!-- Header -->
+        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+            <div>
+                <h1 class="text-4xl font-black tracking-tight text-gray-900 uppercase">K-Fold <span class="text-violet-600">Carousel</span></h1>
+                <p class="text-gray-500 font-medium italic">Animate how test folds rotate across your dataset to calculate performance without data leakage</p>
+            </div>
+            <div id="status-badge" class="px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-violet-50 border border-violet-200 text-violet-800 shadow-sm transition-all duration-300">
+                Cross-Validation
+            </div>
+        </header>
+
+        <!-- Main Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
+
+            <!-- Left Controls Panel (Lg: 5 cols) -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+
+                <!-- Parameters Editor -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-5">
+                    <div>
+                        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-100 pb-2">1. Validation Settings</h2>
+                        
+                        <div class="space-y-6">
+                            <!-- K Splits Slider -->
+                            <div>
+                                <div class="flex justify-between items-end mb-2">
+                                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Number of Folds (K)</label>
+                                    <span id="k-splits-display" class="text-xs font-mono font-black bg-violet-50 text-violet-700 border border-violet-200 px-3 py-1 rounded-full">5 Folds</span>
+                                </div>
+                                <input type="range" id="k-splits-slider" min="2" max="10" step="1" value="5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-violet-500">
+                                <div class="flex justify-between text-[9px] font-bold text-gray-400 mt-2 uppercase tracking-tighter">
+                                    <span>2 Folds (50/50 split)</span>
+                                    <span>10 Folds (90/10 split)</span>
+                                </div>
+                            </div>
+
+                            <!-- Active Fold Iterator -->
+                            <div>
+                                <div class="flex justify-between items-end mb-2">
+                                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Active Iteration (Fold)</label>
+                                    <span id="active-fold-display" class="text-xs font-mono font-black bg-gray-100 text-gray-800 border border-gray-200 px-3 py-1 rounded-full">Fold 1 of 5</span>
+                                </div>
+                                <input type="range" id="active-fold-slider" min="0" max="4" step="1" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-violet-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visual Carousel Player Buttons -->
+                    <div class="flex items-center gap-3">
+                        <button onclick="togglePlay()" id="btn-play" class="flex-grow py-2.5 px-4 bg-violet-600 hover:bg-violet-700 border border-violet-500 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-sm transition-all flex items-center justify-center gap-2">
+                            <!-- Play Icon -->
+                            <svg id="play-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <!-- Pause Icon (Hidden) -->
+                            <svg id="pause-icon" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span id="play-text">Auto Rotate</span>
+                        </button>
+                        <button onclick="stepForward()" class="py-2.5 px-4 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 text-xs font-black uppercase tracking-wider rounded-xl transition-all">
+                            Next Fold ➔
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Split statistics panels -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-4">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 pb-2">Active Data Split</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-3 flex flex-col items-center">
+                            <span class="text-[9px] uppercase tracking-wider text-indigo-600 font-black mb-1">Training Set</span>
+                            <span id="stat-train" class="text-xl font-mono font-black text-indigo-700">80 pts</span>
+                            <span id="pct-train" class="text-[8px] font-mono text-indigo-500 font-bold uppercase">80% of data</span>
+                        </div>
+                        <div class="bg-violet-50 border border-violet-100 rounded-xl p-3 flex flex-col items-center">
+                            <span class="text-[9px] uppercase tracking-wider text-violet-600 font-black mb-1">Validation Set</span>
+                            <span id="stat-val" class="text-xl font-mono font-black text-violet-700">20 pts</span>
+                            <span id="pct-val" class="text-[8px] font-mono text-violet-500 font-bold uppercase">20% of data</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fold accuracy summary list -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                    <div class="flex justify-between items-center border-b border-gray-100 pb-2 mb-3">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Fold Accuracy Tracker</h3>
+                        <div class="bg-yellow-50 border border-yellow-100 text-yellow-800 text-[10px] font-mono font-black px-2 py-0.5 rounded shadow-sm">
+                            Avg: <span id="stat-avg-acc">84.8%</span>
+                        </div>
+                    </div>
+                    <!-- accuracy table -->
+                    <div id="accuracy-table" class="space-y-1.5 max-h-[140px] overflow-y-auto custom-scrollbar pr-1">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Visual Stage & Code Panel (Lg: 7 cols) -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
+
+                <!-- Dynamic Data Visual Grid -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-4">
+                    <div>
+                        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest">2. Visual Dataset (100 points)</h2>
+                        <p class="text-[11px] text-gray-400">See the rotating validation chunk (colored in <strong class="text-violet-600">Violet</strong>) cycle through the full dataset without overlapping.</p>
+                    </div>
+
+                    <!-- Folds bar layout -->
+                    <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 flex flex-col gap-3 shadow-inner">
+                        <div class="text-[9px] font-black uppercase text-gray-400 tracking-wider">Sequential Fold Blocks</div>
+                        <div id="folds-bar" class="w-full h-8 flex gap-1 rounded-lg overflow-hidden border border-gray-300">
+                            <!-- Populated dynamically by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Individual point grids representation -->
+                    <div class="flex items-center justify-center p-4 bg-gray-50 rounded-2xl border border-gray-200 shadow-inner min-h-[180px]">
+                        <div id="grid-points" class="grid grid-cols-10 gap-2 w-full max-w-[360px] aspect-square">
+                            <!-- Populated dynamically by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- scikit-learn Code view -->
+                <div class="bg-slate-900 border-2 border-slate-800 p-6 rounded-2xl shadow-inner flex flex-col gap-4 text-white">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <div>
+                            <h2 class="text-xs font-black uppercase tracking-wider text-violet-400">Live Cross-Validation Pipeline</h2>
+                            <p class="text-[10px] text-slate-400">Implementing K-Fold split execution in Scikit-Learn</p>
+                        </div>
+                        <div class="flex bg-slate-950 p-0.5 rounded-lg border border-slate-800 shadow-inner font-mono text-[9px] text-slate-300 uppercase tracking-widest px-2.5 py-1">
+                            sklearn.model_selection
+                        </div>
+                    </div>
+
+                    <!-- Code block -->
+                    <div class="bg-slate-950/80 rounded-xl border border-slate-800/80 p-4 font-mono text-[10px] text-slate-300 overflow-x-auto shadow-inner leading-relaxed">
+                        <pre id="sklearn-code" class="whitespace-pre"></pre>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- 3-Column Educational Context Footer -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <!-- Core Concept -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-violet-50 text-violet-600 rounded-xl flex items-center justify-center font-bold mb-4 border border-violet-100 font-mono text-xs">01</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">Why K-Fold?</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    A single train/test split can be lucky or unlucky depending on which items land in the test set, warping your reported performance.
+                </p>
+                <p class="text-xs text-gray-500 leading-relaxed mt-2">
+                    K-Fold splits the dataset into $K$ equal segments. We train $K$ separate times, using a different segment as the validation set each time, yielding a highly stable overall estimate.
+                </p>
+            </div>
+
+            <!-- Validation curve -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-violet-50 text-violet-600 rounded-xl flex items-center justify-center font-bold mb-4 border border-violet-100 font-mono text-xs">02</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">Preventing Data Leakage</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    Data leakage occurs when information from the validation set accidentally spills into the training cycle.
+                </p>
+                <p class="text-xs text-gray-500 leading-relaxed mt-2">
+                    In K-Fold, the active validation fold is completely held out. 
+                    The model is trained strictly on the $K-1$ training folds before predicting on the untouched test fold, maintaining pristine boundaries.
+                </p>
+            </div>
+
+            <!-- AI Connection -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-violet-50 text-violet-600 rounded-xl flex items-center justify-center font-bold mb-4 border border-violet-200 font-mono text-xs">03</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">How AI Uses This</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    Cross-validation is standard for **hyperparameter tuning** (e.g., selecting the optimal depth of a Decision Tree or regularization scale in neural networks).
+                </p>
+                <p class="text-xs text-gray-500 leading-relaxed mt-2">
+                    AI developers run K-Fold across different hyperparameters and select the configuration that yields the highest average validation accuracy, protecting against overfitting.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MAIN JAVASCRIPT LOGIC -->
+    <script>
+        // State variables
+        let kSplits = 5;
+        let activeFoldIdx = 0; // 0 to K-1
+
+        // Play auto rotation state
+        let isPlaying = false;
+        let playInterval = null;
+
+        // Mock deterministic accuracies for folds (seeded to look realistic)
+        const MOCK_BASE_ACCURACIES = [84.2, 87.5, 81.3, 85.6, 88.1, 83.4, 86.9, 82.1, 85.0, 84.8];
+
+        // DOM elements
+        const kSlider = document.getElementById('k-splits-slider');
+        const activeSlider = document.getElementById('active-fold-slider');
+        const kDisplay = document.getElementById('k-splits-display');
+        const activeDisplay = document.getElementById('active-fold-display');
+
+        const statTrain = document.getElementById('stat-train');
+        const statVal = document.getElementById('stat-val');
+        const pctTrain = document.getElementById('pct-train');
+        const pctVal = document.getElementById('pct-val');
+        
+        const statAvgAcc = document.getElementById('stat-avg-acc');
+        const accTable = document.getElementById('accuracy-table');
+
+        const foldsBar = document.getElementById('folds-bar');
+        const gridPoints = document.getElementById('grid-points');
+        const sklearnCode = document.getElementById('sklearn-code');
+
+        const btnPlay = document.getElementById('btn-play');
+        const playText = document.getElementById('play-text');
+        const playIcon = document.getElementById('play-icon');
+        const pauseIcon = document.getElementById('pause-icon');
+
+        /* ─── INITIALIZATION ──────────────────────────────────────────────── */
+        function init() {
+            setupListeners();
+            updateUI();
+        }
+
+        function setupListeners() {
+            kSlider.addEventListener('input', () => {
+                kSplits = parseInt(kSlider.value);
+                
+                // Adjust active fold bounds
+                activeSlider.max = kSplits - 1;
+                if (activeFoldIdx >= kSplits) {
+                    activeFoldIdx = kSplits - 1;
+                    activeSlider.value = activeFoldIdx;
+                }
+
+                updateUI();
+            });
+
+            activeSlider.addEventListener('input', () => {
+                activeFoldIdx = parseInt(activeSlider.value);
+                updateUI();
+            });
+        }
+
+        /* ─── PLAY AUTO ROTATE CAROUSEL ───────────────────────────────────── */
+        function togglePlay() {
+            isPlaying = !isPlaying;
+
+            if (isPlaying) {
+                playText.textContent = "Pause Rotation";
+                playIcon.classList.add('hidden');
+                pauseIcon.classList.remove('hidden');
+                btnPlay.className = "flex-grow py-2.5 px-4 bg-amber-600 hover:bg-amber-700 border border-amber-500 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-sm transition-all flex items-center justify-center gap-2";
+
+                playInterval = setInterval(() => {
+                    stepForward();
+                }, 1400);
+            } else {
+                clearInterval(playInterval);
+                playText.textContent = "Auto Rotate";
+                playIcon.classList.remove('hidden');
+                pauseIcon.classList.add('hidden');
+                btnPlay.className = "flex-grow py-2.5 px-4 bg-violet-600 hover:bg-violet-700 border border-violet-500 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-sm transition-all flex items-center justify-center gap-2";
+            }
+        }
+
+        function stepForward() {
+            activeFoldIdx = (activeFoldIdx + 1) % kSplits;
+            activeSlider.value = activeFoldIdx;
+            updateUI();
+        }
+
+        /* ─── MOCK ACCURACY GENERATION ────────────────────────────────────── */
+        function getFoldAccuracies() {
+            const list = [];
+            // Seed unique offsets depending on K splits to represent natural dataset variance
+            for (let i = 0; i < kSplits; i++) {
+                const base = MOCK_BASE_ACCURACIES[i % MOCK_BASE_ACCURACIES.length];
+                // subtle noise addition based on K
+                const noise = Math.sin(i * 3 + kSplits) * 1.5;
+                list.push(Math.round((base + noise) * 10) / 10);
+            }
+
+            const sum = list.reduce((a, b) => a + b, 0);
+            const avg = Math.round((sum / list.length) * 10) / 10;
+
+            return {
+                list,
+                avg
+            };
+        }
+
+        /* ─── UI RENDER RECALCULATIONS ─────────────────────────────────────── */
+        function updateUI() {
+            kDisplay.textContent = `${kSplits} Folds`;
+            activeDisplay.textContent = `Fold ${activeFoldIdx + 1} of ${kSplits}`;
+
+            // 1. Calculate train/val point bounds
+            const testSize = Math.floor(100 / kSplits);
+            const testStart = activeFoldIdx * testSize;
+            // The last fold absorbs the remainder elements if 100 doesn't divide evenly
+            const testEnd = (activeFoldIdx === kSplits - 1) ? 100 : (activeFoldIdx + 1) * testSize;
+
+            const valCount = testEnd - testStart;
+            const trainCount = 100 - valCount;
+
+            statTrain.textContent = `${trainCount} pts`;
+            statVal.textContent = `${valCount} pts`;
+            pctTrain.textContent = `${trainCount}% of data`;
+            pctVal.textContent = `${valCount}% of data`;
+
+            // 2. Render sequential fold blocks bar
+            foldsBar.innerHTML = '';
+            for (let i = 0; i < kSplits; i++) {
+                const isActive = i === activeFoldIdx;
+                const sizePct = (i === kSplits - 1) ? (100 - (kSplits - 1) * testSize) : testSize;
+                
+                const block = document.createElement('div');
+                block.className = `fold-block h-full flex flex-col justify-center items-center font-mono text-[9px] font-black uppercase text-center cursor-pointer ${isActive ? 'bg-violet-600 text-white flex-grow border-l border-r border-violet-500' : 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200 border-r border-indigo-200'}`;
+                block.style.width = `${sizePct}%`;
+                block.innerHTML = `
+                    <span>Fold ${i+1}</span>
+                    <span class="text-[7px] font-bold opacity-80 mt-0.5">${isActive ? 'VAL' : 'TRAIN'}</span>
+                `;
+                block.onclick = () => {
+                    activeFoldIdx = i;
+                    activeSlider.value = i;
+                    updateUI();
+                };
+
+                foldsBar.appendChild(block);
+            }
+
+            // 3. Render 100 point grids representation
+            gridPoints.innerHTML = '';
+            for (let i = 0; i < 100; i++) {
+                const isValidationPoint = i >= testStart && i < testEnd;
+
+                const dot = document.createElement('div');
+                // styled point
+                dot.className = `point-dot w-full aspect-square rounded-full border shadow-sm ${isValidationPoint ? 'bg-violet-600 border-violet-400 scale-105 shadow-violet-900/10' : 'bg-indigo-100 border-indigo-200'}`;
+                dot.title = `Data Index: ${i} | Role: ${isValidationPoint ? 'Validation' : 'Training'}`;
+                
+                gridPoints.appendChild(dot);
+            }
+
+            // 4. Render Accuracy list and average
+            const accs = getFoldAccuracies();
+            statAvgAcc.textContent = `${accs.avg.toFixed(1)}%`;
+
+            accTable.innerHTML = accs.list.map((acc, i) => {
+                const isActive = i === activeFoldIdx;
+                return `
+                    <div onclick="activeFoldIdx=${i}; activeSlider.value=${i}; updateUI();" class="flex justify-between items-center px-3 py-1.5 rounded-lg border text-[10px] font-mono font-bold cursor-pointer transition-all duration-200 ${isActive ? 'bg-violet-600 text-white border-violet-500 shadow-sm scale-[1.02]' : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border-gray-200/80' }">
+                        <span>➔ Iteration ${i + 1} (${isActive ? 'Active Val Fold' : 'Hold-out Folds'})</span>
+                        <span class="${isActive ? 'text-white font-black' : 'text-violet-600'}">${acc.toFixed(1)}%</span>
+                    </div>
+                `;
+            }).join('');
+
+            // 5. Update scikit-learn cross validation python code
+            updateCodeRepresentation();
+        }
+
+        /* ─── SKLEARN PYTHON CODE BLOCK GENERATION ──────────────────────────── */
+        function updateCodeRepresentation() {
+            let output = `<span class="text-violet-400">from</span> sklearn.model_selection <span class="text-violet-400">import</span> KFold\n`;
+            output += `<span class="text-violet-400">from</span> sklearn.linear_model <span class="text-violet-400">import</span> LogisticRegression\n`;
+            output += `<span class="text-violet-400">import</span> numpy <span class="text-violet-400">as</span> np\n\n`;
+
+            output += `# 1. Configure cross-validator: K = ${kSplits} splits\n`;
+            output += `kf = KFold(n_splits=<span class="text-yellow-300 font-bold">${kSplits}</span>, shuffle=<span class="text-violet-300">True</span>, random_state=<span class="text-violet-300">42</span>)\n`;
+            output += `scores = []\n\n`;
+
+            output += `# 2. Active cross-validation iteration: ${activeFoldIdx + 1} of ${kSplits}\n`;
+            output += `for train_idx, test_idx in kf.split(X):\n`;
+            output += `    # Active validation boundaries: index ${activeFoldIdx * Math.floor(100 / kSplits)} to ${((activeFoldIdx === kSplits - 1) ? 100 : (activeFoldIdx + 1) * Math.floor(100 / kSplits))}\n`;
+            output += `    X_train, X_val = X[train_idx], X[test_idx]\n`;
+            output += `    y_train, y_val = y[train_idx], y[test_idx]\n\n`;
+
+            output += `    # Model fit & prediction check (Pristine - no data leakage!)\n`;
+            output += `    model.fit(X_train, y_train)\n`;
+            
+            const accs = getFoldAccuracies();
+            output += `    scores.append(model.score(X_val, y_val)) # Active fold score: <span class="text-yellow-300 font-bold">${accs.list[activeFoldIdx]}%</span>\n\n`;
+
+            output += `# 3. Final average cross-validation score\n`;
+            output += `cv_score = np.mean(scores) # Result: <span class="text-yellow-300 font-bold">${accs.avg.toFixed(1)}%</span>`;
+
+            sklearnCode.innerHTML = output;
+        }
+
+        // Initialize script execution on DOM load
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>
