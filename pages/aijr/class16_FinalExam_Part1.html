@@ -1830,9 +1830,17 @@
         }
 
         // Increment uses_count
-        await db.from(ACCESS_TABLE)
+        const { error: updateErr } = await db.from(ACCESS_TABLE)
           .update({ uses_count: data.uses_count + 1 })
           .eq('id', data.id);
+
+        if (updateErr) {
+          console.error('uses_count update failed:', updateErr);
+          errD.textContent = 'Error validating code. Please try again.';
+          errD.style.display = 'block';
+          btn.disabled = false; btn.textContent = 'Continue →';
+          return;
+        }
 
         validatedCode = code;
         inp.value = '';
@@ -1868,38 +1876,6 @@
       window.scrollTo(0, 0);
       attachListeners();
     }
-
-    /* ══════════════════════════════════════════════════
-       ANSWER KEYS
-       ══════════════════════════════════════════════════ */
-    const MCQ = {
-      q1: 'C', q2: 'B', q3: 'C', q4: 'B', q5: 'C',
-      q6: 'B', q7: 'A', q8: 'B', q9: 'C', q10: 'B',
-      q11: 'B', q12: 'B', q13: 'C', q14: 'B', q15: 'C'
-    };
-
-    const BLANKS = {
-      // Q16 — A* Search
-      q16_b1: ['0'],
-      q16_b2: ['heappop'],
-      q16_b3: ['h[neighbor]'],
-      q16_b4: ['heappush'],
-      q16_b5: ['node'],
-      q16_b6: ['append'],
-      // Q19 — k-Means
-      q19_b1: ['cluster'],
-      q19_b2: ['3'],
-      q19_b3: ['fit'],
-      q19_b4: ['labels'],
-      q19_b5: ['inertia'],
-      q19_b6: ['labels'],
-      // Q20 — Q-learning
-      q20_b1: ['state'],
-      q20_b2: ['action'],
-      q20_b3: ['max'],
-      q20_b4: ['best_next'],
-      q20_b5: ['alpha'],
-    };
 
     const QLBLS = {
       1: 'Information Gain — Decision Tree split (Class 9)',
@@ -1937,15 +1913,7 @@
       q15: { A: 'Silhouette score — maximize', B: 'Inter-cluster distance — maximize', C: 'Within-cluster sum of squared distances — choose k at elbow ✓', D: 'Inertia reaches 0 at k=1', E: 'Equivalent to F1 Score' },
     };
 
-    const RUBRICS = {
-      16: 'b1:0  b2:heappop  b3:h[neighbor]  b4:heappush  b5:node  b6:append',
-      17: 'Centroid A=(3,2.67) · Centroid B=(9,7) · Inertia(A)=(1²+1²)+(0²+1.33²)+(2²+0.67²)=4+1.78+4.45=10.22',
-      18: 'Score(Spam)=0.40×0.80×0.70=0.224 · Score(NotSpam)=0.60×0.10×0.05=0.003 · P(Spam|email)=0.224/0.227≈0.987 → Spam',
-      19: 'b1:cluster  b2:3  b3:fit  b4:labels  b5:inertia  b6:labels',
-      20: 'b1:state  b2:action  b3:max  b4:best_next  b5:alpha',
-      21: 'A*: fixed map, known costs, admissible heuristic → optimal path guaranteed. Q-learning: dynamic environment, unknown map, learns from rewards. State=position; Action=move direction; Reward=negative distance penalty/+bonus on arrival. γ=0.9 → future rewards count heavily; robot motivated to reach goal quickly rather than accumulate small rewards along the way.',
-    };
-
+    // BLANK_IDS used only for collect() — contains no answers, just field names
     const BLANK_IDS = {
       q16: ['q16_b1', 'q16_b2', 'q16_b3', 'q16_b4', 'q16_b5', 'q16_b6'],
       q19: ['q19_b1', 'q19_b2', 'q19_b3', 'q19_b4', 'q19_b5', 'q19_b6'],
@@ -1983,7 +1951,7 @@
     }
 
     /* ══════════════════════════════════════════════════
-       COLLECT & GRADE
+       COLLECT (raw answers only — no grading here)
        ══════════════════════════════════════════════════ */
     function collect() {
       const a = {};
@@ -2004,72 +1972,88 @@
       return a;
     }
 
-    function matchBlank(id, val) {
-      if (!val) return false;
-      const n = val.toLowerCase().replace(/\s/g, '');
-      return (BLANKS[id] || []).some(ans => {
-        const an = ans.toLowerCase().replace(/\s/g, '');
-        return n === an || n.includes(an) || an.includes(n);
-      });
-    }
-
-    function gradeAll(a) {
-      const res = {}; let mcqS = 0, blankS = 0;
-      for (let q = 1; q <= 15; q++) {
-        const ok = a[`q${q}`] === MCQ[`q${q}`];
-        if (ok) mcqS += 2;
-        res[`q${q}`] = { ok, s: a[`q${q}`], c: MCQ[`q${q}`] };
-      }
-      function blanksGroup(key, ids) {
-        const cor = ids.filter(id => matchBlank(id, a[id])).length;
-        const pts = Math.round((cor / ids.length) * 5);
-        blankS += pts;
-        res[key] = { type: 'blanks', pts, cor, of: ids.length, items: ids.map(id => ({ id, val: a[id], ok: matchBlank(id, a[id]) })) };
-      }
-      blanksGroup('q16', BLANK_IDS.q16);
-      blanksGroup('q19', BLANK_IDS.q19);
-      blanksGroup('q20', BLANK_IDS.q20);
-      [17, 18, 21].forEach(q => { res[`q${q}`] = { type: 'oe', text: a[`q${q}_text`] || '' }; });
-      return { res, mcqS, blankS, auto: mcqS + blankS };
-    }
-
     /* ══════════════════════════════════════════════════
-       SUBMIT
+       SUBMIT — sends raw answers to Edge Function for
+       server-side grading. Answer keys never in browser.
        ══════════════════════════════════════════════════ */
-    function submitTest() {
+    async function submitTest() {
       const btn = document.getElementById('sub-btn');
-      btn.disabled = true; btn.textContent = 'Grading…';
-      const a = collect();
-      const { res, mcqS, blankS, auto } = gradeAll(a);
-      showResults(res, mcqS, blankS, auto);
-      upload(a, res, mcqS, blankS, auto);
+      btn.disabled = true;
+      btn.textContent = '⏳ Grading…';
+
+      const answers = collect();
+
+      const EDGE_URL = `${SUPABASE_URL}/functions/v1/grade-exam`;
+
+      try {
+        const resp = await fetch(EDGE_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+          },
+          body: JSON.stringify({
+            studentName,
+            accessCode: validatedCode,
+            examClass: EXAM_CLASS,
+            answers,
+          }),
+        });
+
+        const result = await resp.json();
+
+        if (!resp.ok) {
+          btn.disabled = false;
+          btn.textContent = 'Submit Assessment';
+          alert(`Submission error: ${result.error || 'Please try again.'}`);
+          return;
+        }
+
+        // result = { mcqScore, blankScore, autoScore, breakdown, rubrics }
+        showResults(result);
+
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = 'Submit Assessment';
+        alert('Network error — check your connection and try again.');
+        console.error('submitTest error:', err);
+      }
     }
 
     /* ══════════════════════════════════════════════════
-       SHOW RESULTS
+       SHOW RESULTS — consumes server response
+       breakdown shape mirrors what the Edge Function returns
        ══════════════════════════════════════════════════ */
-    function showResults(res, mcqS, blankS, auto) {
+    function showResults({ mcqScore, blankScore, autoScore, breakdown, rubrics }) {
       document.getElementById('test-area').style.display = 'none';
       document.getElementById('results-area').style.display = 'block';
       window.scrollTo(0, 0);
 
       document.getElementById('r-name').textContent = studentName;
-      document.getElementById('r-score').textContent = auto;
-      document.getElementById('r-pct').textContent = Math.round((auto / 60) * 100) + '%';
+      document.getElementById('r-score').textContent = autoScore;
+      document.getElementById('r-pct').textContent = Math.round((autoScore / 60) * 100) + '%';
 
-      const mcqC = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].filter(q => res[`q${q}`].ok).length;
+      const mcqCorrect = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+        .filter(q => breakdown[`q${q}`]?.ok).length;
       const ms = document.getElementById('r-mcq');
-      ms.textContent = mcqS + ' / 30';
-      if (mcqS >= 20) ms.classList.add('g');
-      document.getElementById('r-mcqc').textContent = mcqC + ' / 15';
-      document.getElementById('r-blank').textContent = blankS + ' / 15';
+      ms.textContent = mcqScore + ' / 30';
+      if (mcqScore >= 20) ms.classList.add('g');
+      document.getElementById('r-mcqc').textContent = mcqCorrect + ' / 15';
+      document.getElementById('r-blank').textContent = blankScore + ' / 15';
+
+      // Upload status — already saved by Edge Function
+      const box = document.getElementById('upload-box');
+      const ico = document.getElementById('r-upload-icon');
+      box.innerHTML = '<div class="upload-status success">✅ Results saved. Your instructor will review open-ended answers.</div>';
+      ico.textContent = '✅';
 
       // MCQ review
       const md = document.getElementById('mcq-rev'); md.innerHTML = '';
       for (let q = 1; q <= 15; q++) {
-        const r = res[`q${q}`]; const o = OPTS[`q${q}`] || {};
-        const sl = r.s ? `${r.s}) ${o[r.s] || r.s}` : 'No answer';
-        const cl = `${r.c}) ${o[r.c] || r.c}`;
+        const r = breakdown[`q${q}`];
+        const o = OPTS[`q${q}`] || {};
+        const sl = r.submitted ? `${r.submitted}) ${o[r.submitted] || r.submitted}` : 'No answer';
+        const cl = `${r.correctAnswer}) ${o[r.correctAnswer] || r.correctAnswer}`;
         const d = document.createElement('div');
         d.className = `rev-c ${r.ok ? 'ok' : 'bad'}`;
         d.innerHTML = `<div class="rev-qn">Q${q} · MCQ · ${r.ok ? '+2 pts' : '0 pts'}</div>
@@ -2092,7 +2076,7 @@
         21: 'A* vs Q-Learning — open-ended justification',
       };
       [16, 17, 18, 19, 20, 21].forEach(q => {
-        const r = res[`q${q}`];
+        const r = breakdown[`q${q}`];
         const d = document.createElement('div');
         d.className = 'rev-c man';
         let inner = '';
@@ -2103,68 +2087,18 @@
           inner = `<div class="pill-row"><span class="pill mn">Submitted · pending instructor review</span></div>
         <div class="oe-ans">${esc(r.text || '(no answer)')}</div>`;
         }
+        // rubrics come from server — only available after submission
+        const rubricText = rubrics?.[q] || '';
         d.innerHTML = `<div class="rev-qn">Q${q} · ${r.type === 'blanks' ? 'Fill-in-blanks' : 'Open-ended / Calculation'} · 5 pts</div>
       <div class="rev-qt">${qLabels[q]}</div>
       ${inner}
-      <div class="rubric">📋 Marking guide: ${RUBRICS[q]}</div>`;
+      ${rubricText ? `<div class="rubric">📋 Marking guide: ${esc(rubricText)}</div>` : ''}`;
         od.appendChild(d);
       });
     }
 
     function esc(s) {
       return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
-    }
-
-    /* ══════════════════════════════════════════════════
-       UPLOAD TO SUPABASE
-       ══════════════════════════════════════════════════ */
-    async function upload(a, res, mcqS, blankS, auto) {
-      const box = document.getElementById('upload-box');
-      const ico = document.getElementById('r-upload-icon');
-      box.innerHTML = '<div class="upload-status uploading">⏳ Saving results…</div>';
-
-      const mcqD = {};
-      for (let q = 1; q <= 15; q++) mcqD[`q${q}`] = { answer: a[`q${q}`], correct: res[`q${q}`].ok };
-
-      const payload = {
-        student_name: studentName,
-        class_number: EXAM_CLASS,
-        access_code: validatedCode,
-        submitted_at: new Date().toISOString(),
-        mcq_score: mcqS,
-        blank_score: blankS,
-        auto_score: auto,
-        mcq_details: mcqD,
-        // Q16 blanks
-        q16_b1: a.q16_b1, q16_b2: a.q16_b2, q16_b3: a.q16_b3,
-        q16_b4: a.q16_b4, q16_b5: a.q16_b5, q16_b6: a.q16_b6,
-        // Q19 blanks
-        q19_b1: a.q19_b1, q19_b2: a.q19_b2, q19_b3: a.q19_b3,
-        q19_b4: a.q19_b4, q19_b5: a.q19_b5, q19_b6: a.q19_b6,
-        // Q20 blanks
-        q20_b1: a.q20_b1, q20_b2: a.q20_b2, q20_b3: a.q20_b3,
-        q20_b4: a.q20_b4, q20_b5: a.q20_b5,
-        // Open-ended
-        q17_text: a.q17_text,
-        q18_text: a.q18_text,
-        q21_text: a.q21_text,
-      };
-
-      if (SUPABASE_URL.includes('YOUR_PROJECT')) {
-        box.innerHTML = '<div class="upload-status failed">⚠️ Supabase not configured — screenshot this page and send it to your instructor.</div>';
-        ico.textContent = '⚠️';
-        return;
-      }
-
-      try {
-        const { error } = await db.from(RESULTS_TABLE).insert(payload);
-        if (error) throw error;
-        box.innerHTML = '<div class="upload-status success">✅ Results saved. Your instructor will review open-ended answers.</div>';
-        ico.textContent = '✅';
-      } catch (e) {
-        box.innerHTML = `<div class="upload-status failed">⚠️ Upload failed — screenshot this page and send it to your instructor.<br><small>${e.message || e}</small></div>`;
-        ico.textContent = '⚠️';
-      }
     }
 
     /* ── START ── */

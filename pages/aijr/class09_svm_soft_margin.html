@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVM Soft Margin — C Parameter | AI Competition Jr</title>
+    <meta name="description"
+        content="Interactive SVM C-parameter explorer. Drag the regularization slider and watch the decision boundary margin widen (soft) or narrow (hard) as the penalty for misclassified outliers changes.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=JetBrains+Mono:wght@700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Slider track */
+        input[type=range] { -webkit-appearance: none; appearance: none; }
+        input[type=range]::-webkit-slider-runnable-track {
+            height: 6px; border-radius: 3px;
+            background: linear-gradient(to right, #818cf8, #4f46e5);
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px; height: 22px; border-radius: 50%;
+            background: #4f46e5; cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 2px 6px rgba(79,70,229,.45);
+            margin-top: -8px;
+        }
+
+        /* Smooth canvas transitions */
+        #svm-canvas { transition: none; }
+
+        /* Violation dot pulse */
+        @keyframes violationPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,.5); }
+            50%       { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
+        }
+        .violation-dot { animation: violationPulse 1.4s ease infinite; }
+
+        /* Margin bar animate */
+        @keyframes barGrow {
+            from { width: 0; }
+        }
+        .bar-anim { animation: barGrow 0.5s ease; }
+
+        /* Badge */
+        @keyframes badgePop {
+            0%   { transform: scale(.88); opacity: 0; }
+            60%  { transform: scale(1.06); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .badge-pop { animation: badgePop 0.3s ease forwards; }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen p-4 md:p-8">
+<div class="max-w-5xl mx-auto">
+
+    <!-- Nav -->
+    <nav class="mb-6 pt-4">
+        <a href="index.html"
+           class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest transition-colors"
+           style="text-decoration:none; color:#9ca3af;">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Back to Course Hub
+        </a>
+    </nav>
+
+    <!-- Header -->
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+            <h1 class="text-4xl font-black tracking-tight">SVM <span class="text-indigo-600">SOFT MARGIN</span></h1>
+            <p class="text-gray-500 font-medium italic">Drag C to trade margin width for misclassification tolerance</p>
+        </div>
+        <div id="status-badge"
+             class="px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest bg-white border border-gray-200 text-gray-400 shadow-sm transition-all duration-300">
+            C = 1.0
+        </div>
+    </header>
+
+    <!-- ── MAIN GRID ───────────────────────────────────────────────────────── -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+
+        <!-- Canvas (2 cols) -->
+        <div class="lg:col-span-2 bg-white border border-gray-200 p-5 rounded-2xl shadow-sm flex flex-col gap-4">
+            <h2 class="text-xs font-bold text-gray-400 uppercase tracking-tighter border-b border-gray-100 pb-2">
+                Decision Boundary — margin shaded · violations circled in red
+            </h2>
+
+            <!-- C Slider -->
+            <div class="px-1">
+                <div class="flex justify-between items-end mb-2">
+                    <label class="text-sm font-bold text-gray-500 uppercase tracking-wide">C — Regularization Penalty</label>
+                    <span id="c-display"
+                          class="mono text-base font-black bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-1 rounded-full">
+                        1.00
+                    </span>
+                </div>
+                <input id="c-slider" type="range" min="1" max="100" value="10" step="1" class="w-full outline-none">
+                <div class="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-tighter mt-1.5">
+                    <span>C = 0.1 · Wide Margin (Soft)</span>
+                    <span>C = 10 · Narrow Margin (Hard)</span>
+                </div>
+            </div>
+
+            <!-- Canvas wrapper -->
+            <div id="canvas-wrap"
+                 class="relative rounded-xl overflow-hidden bg-gray-50 border-2 border-gray-200 flex-grow"
+                 style="min-height:380px;">
+                <canvas id="svm-canvas" class="absolute inset-0 w-full h-full"></canvas>
+            </div>
+
+            <!-- Legend row -->
+            <div class="flex flex-wrap gap-5 items-center">
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 rounded-full bg-indigo-500 border-2 border-indigo-700"></div>
+                    <span class="text-xs font-bold text-gray-500 uppercase">Class +1 (Circle)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 rounded-full bg-rose-500 border-2 border-rose-700"></div>
+                    <span class="text-xs font-bold text-gray-500 uppercase">Class −1 (Cross)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-0.5 bg-indigo-600"></div>
+                    <span class="text-xs font-bold text-gray-500 uppercase">Decision Boundary</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-0.5 border-t-2 border-dashed border-indigo-400"></div>
+                    <span class="text-xs font-bold text-gray-500 uppercase">Margin Edge</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 rounded-full bg-yellow-300 border-2 border-yellow-500"></div>
+                    <span class="text-xs font-bold text-gray-500 uppercase">Support Vector ★</span>
+                </div>
+            </div>
+
+            <!-- New data -->
+            <button id="btn-new"
+                class="self-start py-2 px-5 rounded-xl font-black text-xs uppercase tracking-widest bg-gray-100 text-gray-600 hover:bg-gray-200 active:scale-95 transition-all">
+                🔀 New Noisy Dataset
+            </button>
+        </div>
+
+        <!-- Right panel -->
+        <div class="flex flex-col gap-5">
+
+            <!-- C interpretation -->
+            <div id="c-interp-box"
+                 class="bg-white border border-gray-200 p-5 rounded-2xl shadow-sm transition-all duration-300">
+                <h2 class="text-xs font-bold text-gray-400 uppercase tracking-tighter border-b border-gray-100 pb-2 mb-4">
+                    C Interpretation
+                </h2>
+                <div id="c-interp-icon" class="text-4xl mb-2 text-center">⚖️</div>
+                <p id="c-interp-title" class="font-black text-sm uppercase tracking-wide text-center mb-2">Balanced</p>
+                <p id="c-interp-desc"  class="text-xs text-gray-600 leading-relaxed text-center"></p>
+            </div>
+
+            <!-- Metrics -->
+            <div class="bg-white border border-gray-200 p-5 rounded-2xl shadow-sm flex-grow flex flex-col gap-4">
+                <h2 class="text-xs font-bold text-gray-400 uppercase tracking-tighter border-b border-gray-100 pb-2">
+                    Live Metrics
+                </h2>
+
+                <!-- Margin width -->
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-xs font-bold text-gray-500 uppercase">Margin Width</span>
+                        <span id="margin-display" class="mono text-lg font-black text-indigo-700">—</span>
+                    </div>
+                    <div class="h-3 rounded-full bg-gray-100 overflow-hidden">
+                        <div id="margin-bar"
+                             class="h-full rounded-full bg-indigo-500 transition-all duration-500"
+                             style="width:0%"></div>
+                    </div>
+                    <p class="text-[10px] text-gray-400 mt-1">Wider = softer constraint · Narrower = harder constraint</p>
+                </div>
+
+                <!-- Violations -->
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-xs font-bold text-gray-500 uppercase">Margin Violations</span>
+                        <span id="violations-display" class="mono text-lg font-black text-rose-600">—</span>
+                    </div>
+                    <div class="h-3 rounded-full bg-gray-100 overflow-hidden">
+                        <div id="violations-bar"
+                             class="h-full rounded-full bg-rose-400 transition-all duration-500"
+                             style="width:0%"></div>
+                    </div>
+                    <p class="text-[10px] text-gray-400 mt-1">Points inside or across the margin boundary (ξ > 0)</p>
+                </div>
+
+                <!-- Support vectors -->
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-xs font-bold text-gray-500 uppercase">Support Vectors</span>
+                        <span id="sv-display" class="mono text-lg font-black text-yellow-600">—</span>
+                    </div>
+                    <div class="h-3 rounded-full bg-gray-100 overflow-hidden">
+                        <div id="sv-bar"
+                             class="h-full rounded-full bg-yellow-400 transition-all duration-500"
+                             style="width:0%"></div>
+                    </div>
+                    <p class="text-[10px] text-gray-400 mt-1">Points on or inside the margin (determine the boundary)</p>
+                </div>
+
+                <!-- Objective -->
+                <div class="rounded-xl bg-indigo-50 border border-indigo-200 p-4 mt-1">
+                    <p class="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-2">SVM Objective</p>
+                    <div class="mono text-xs text-indigo-800 leading-relaxed">
+                        min ½‖w‖² + C·Σξᵢ<br>
+                        <span class="text-indigo-500 text-[10px]">
+                            &nbsp;&nbsp;&nbsp;↑ margin&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↑ violations
+                        </span>
+                    </div>
+                    <p id="obj-desc" class="text-[10px] text-indigo-700 mt-2 font-medium"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── FOOTER INFO ─────────────────────────────────────────────────────── -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+            <h3 class="text-xs font-black text-indigo-600 uppercase tracking-widest mb-3">What is a Support Vector Machine?</h3>
+            <p class="text-sm text-gray-600 leading-relaxed">
+                An SVM finds the <strong>maximum-margin hyperplane</strong> — the decision boundary that is as far as possible from both classes. Only the points closest to the boundary (the <em>support vectors</em>) actually determine where it sits.
+            </p>
+        </div>
+        <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+            <h3 class="text-xs font-black text-indigo-600 uppercase tracking-widest mb-3">Hard vs. Soft Margin</h3>
+            <p class="text-sm text-gray-600 leading-relaxed">
+                A <strong>hard margin</strong> (high C) requires every point to be outside the margin — great for clean data, terrible for noise. A <strong>soft margin</strong> (low C) introduces slack variables <em>ξᵢ ≥ 0</em> allowing violations, trading a wider margin for a few misclassifications.
+            </p>
+        </div>
+        <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+            <h3 class="text-xs font-black text-indigo-600 uppercase tracking-widest mb-3">Choosing C in Practice</h3>
+            <p class="text-sm text-gray-600 leading-relaxed">
+                C is a <strong>hyperparameter</strong> tuned by cross-validation. Low C → high bias, low variance (underfitting). High C → low bias, high variance (overfitting to outliers). The best C balances generalisation vs. training accuracy.
+            </p>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// ─── CONFIG ────────────────────────────────────────────────────────────────────
+const PAD   = 40;
+const N_POS = 28;  // class +1
+const N_NEG = 28;  // class -1
+
+// ─── STATE ─────────────────────────────────────────────────────────────────────
+// Each point: { x, y, cls: +1|-1, isOutlier }
+// x, y in [-1, 1] space (model space)
+let points    = [];
+let cValue    = 1.0;   // mapped from slider
+
+// ─── ELEMENTS ──────────────────────────────────────────────────────────────────
+const canvas      = document.getElementById('svm-canvas');
+const ctx         = canvas.getContext('2d');
+const wrap        = document.getElementById('canvas-wrap');
+const cSlider     = document.getElementById('c-slider');
+const cDisplay    = document.getElementById('c-display');
+const statusBadge = document.getElementById('status-badge');
+
+const marginDisplay     = document.getElementById('margin-display');
+const marginBar         = document.getElementById('margin-bar');
+const violationsDisplay = document.getElementById('violations-display');
+const violationsBar     = document.getElementById('violations-bar');
+const svDisplay         = document.getElementById('sv-display');
+const svBar             = document.getElementById('sv-bar');
+const objDesc           = document.getElementById('obj-desc');
+
+const cInterpBox   = document.getElementById('c-interp-box');
+const cInterpIcon  = document.getElementById('c-interp-icon');
+const cInterpTitle = document.getElementById('c-interp-title');
+const cInterpDesc  = document.getElementById('c-interp-desc');
+
+// ─── C MAPPING ─────────────────────────────────────────────────────────────────
+// Slider 1–100 → C 0.05–10 (logarithmic feel)
+function sliderToC(v) {
+    // log scale: 1→0.05, 100→10
+    return 0.05 * Math.pow(10 / 0.05, (v - 1) / 99);
+}
+
+// ─── DATA ──────────────────────────────────────────────────────────────────────
+function gaussRand(mu, sigma) {
+    const u1 = Math.random(), u2 = Math.random();
+    const z  = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+    return mu + z * sigma;
+}
+
+function generatePoints() {
+    points = [];
+    // Class +1: upper-left cluster
+    for (let i = 0; i < N_POS; i++) {
+        let x = gaussRand(-0.40, 0.20);
+        let y = gaussRand( 0.25, 0.20);
+        points.push({ x, y, cls: 1, isOutlier: false });
+    }
+    // Class -1: lower-right cluster
+    for (let i = 0; i < N_NEG; i++) {
+        let x = gaussRand( 0.40, 0.20);
+        let y = gaussRand(-0.25, 0.20);
+        points.push({ x, y, cls: -1, isOutlier: false });
+    }
+    // Add 4–6 noisy outliers (wrong side)
+    const nOutliers = 4 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < nOutliers; i++) {
+        const cls  = i % 2 === 0 ? 1 : -1;
+        // Place on the "wrong" side
+        const x = gaussRand(cls === 1 ? 0.35 : -0.35, 0.12);
+        const y = gaussRand(cls === 1 ? -0.20 :  0.20, 0.12);
+        points.push({ x, y, cls, isOutlier: true });
+    }
+}
+
+// ─── SVM GEOMETRY (analytic, axis-aligned) ─────────────────────────────────────
+// We fix the decision boundary at x = 0 (vertical line in model space).
+// The hyperplane normal is w = [1, 0], bias b = 0.
+// For each point p: f(p) = p.x * cls should ideally be >= 1.
+// Slack: ξᵢ = max(0, 1 − cls·f(p))
+// Margin width (in canvas coords) depends on 1/‖w‖.
+// We SIMULATE margin width by: base_margin + soft_addition based on C.
+// At high C → margin ≈ 0.25 (narrow, strict)
+// At low  C → margin ≈ 0.70 (wide, lenient)
+
+function marginHalfWidth(c) {
+    // Smooth sigmoid-ish mapping: high C → small margin
+    // margin ∈ [0.18, 0.65]
+    const t = Math.log10(c);                 // roughly -1.3 to 1
+    const norm = (t + 1.3) / 2.3;           // 0→1
+    return 0.65 - norm * 0.47;              // 0.65 (low C) → 0.18 (high C)
+}
+
+function computeSVMStats(c) {
+    const mhw = marginHalfWidth(c); // in model coords (x-axis)
+
+    // Count violations: points where cls·x < mhw (inside or across margin)
+    // Support vectors: on or inside margin boundary (|x| <= mhw for each class side)
+    let violations = 0;
+    let svCount    = 0;
+
+    points.forEach(p => {
+        const signedDist = p.cls * p.x;  // positive if on correct side
+        // violation: inside margin (signedDist < mhw * some factor)
+        const inMargin = signedDist < mhw + 0.05;
+        if (inMargin) svCount++;
+        if (p.cls * p.x < 0 || Math.abs(p.x) < mhw) violations++;
+    });
+
+    return { mhw, violations, svCount };
+}
+
+// ─── COORDINATE MAPPING ────────────────────────────────────────────────────────
+function modelToCanvas(mx, my) {
+    const cw = canvas.width  - PAD * 2;
+    const ch = canvas.height - PAD * 2;
+    // model space: [-1, 1] → canvas
+    const x = PAD + (mx + 1) / 2 * cw;
+    const y = PAD + (1 - (my + 1) / 2) * ch;
+    return { x, y };
+}
+
+// ─── DRAWING ───────────────────────────────────────────────────────────────────
+function resizeCanvas() {
+    canvas.width  = wrap.clientWidth;
+    canvas.height = wrap.clientHeight;
+    draw();
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const { mhw, violations, svCount } = computeSVMStats(cValue);
+
+    // Grid
+    ctx.strokeStyle = '#f3f4f6';
+    ctx.lineWidth   = 1;
+    for (let i = -1; i <= 1.01; i += 0.5) {
+        const { x: gx } = modelToCanvas(i, 0);
+        const { y: gy } = modelToCanvas(0, i);
+        ctx.beginPath(); ctx.moveTo(gx, PAD); ctx.lineTo(gx, canvas.height - PAD); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(PAD, gy); ctx.lineTo(canvas.width - PAD, gy); ctx.stroke();
+    }
+
+    // Class background tints
+    const bnd  = modelToCanvas(0,  1);
+    const bndB = modelToCanvas(0, -1);
+    const { x: bndX } = bnd;
+
+    // +1 side (left) — indigo tint
+    ctx.fillStyle = 'rgba(99,102,241,0.07)';
+    ctx.fillRect(PAD, PAD, bndX - PAD, canvas.height - PAD * 2);
+    // -1 side (right) — rose tint
+    ctx.fillStyle = 'rgba(244,63,94,0.07)';
+    ctx.fillRect(bndX, PAD, canvas.width - PAD - bndX, canvas.height - PAD * 2);
+
+    // Margin shading
+    const { x: mLeft  } = modelToCanvas(-mhw, 0);
+    const { x: mRight } = modelToCanvas( mhw, 0);
+    const grad = ctx.createLinearGradient(mLeft, 0, mRight, 0);
+    grad.addColorStop(0,   'rgba(99,102,241,0.0)');
+    grad.addColorStop(0.3, 'rgba(99,102,241,0.18)');
+    grad.addColorStop(0.5, 'rgba(99,102,241,0.28)');
+    grad.addColorStop(0.7, 'rgba(99,102,241,0.18)');
+    grad.addColorStop(1,   'rgba(99,102,241,0.0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(mLeft, PAD, mRight - mLeft, canvas.height - PAD * 2);
+
+    // Margin edge lines (dashed)
+    ctx.setLineDash([6, 4]);
+    ctx.strokeStyle = 'rgba(99,102,241,0.55)';
+    ctx.lineWidth   = 1.8;
+    [mLeft, mRight].forEach(x => {
+        ctx.beginPath();
+        ctx.moveTo(x, PAD);
+        ctx.lineTo(x, canvas.height - PAD);
+        ctx.stroke();
+    });
+    ctx.setLineDash([]);
+
+    // Decision boundary (solid indigo)
+    ctx.strokeStyle = '#4338ca';
+    ctx.lineWidth   = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(bndX, PAD);
+    ctx.lineTo(bndX, canvas.height - PAD);
+    ctx.stroke();
+
+    // "w·x = 0" label
+    ctx.fillStyle = '#4338ca';
+    ctx.font      = 'bold 10px Inter, sans-serif';
+    ctx.fillText('w·x = 0', bndX + 4, PAD + 14);
+
+    // Margin width label (bidirectional arrow)
+    const midY = canvas.height / 2;
+    ctx.strokeStyle = '#818cf8';
+    ctx.lineWidth   = 1.5;
+    ctx.beginPath(); ctx.moveTo(mLeft, midY); ctx.lineTo(mRight, midY); ctx.stroke();
+    // arrowheads
+    [[mLeft, 1], [mRight, -1]].forEach(([x, dir]) => {
+        ctx.beginPath();
+        ctx.moveTo(x, midY);
+        ctx.lineTo(x + dir * 8, midY - 5);
+        ctx.lineTo(x + dir * 8, midY + 5);
+        ctx.closePath();
+        ctx.fillStyle = '#818cf8';
+        ctx.fill();
+    });
+    ctx.fillStyle = '#4f46e5';
+    ctx.font      = 'bold 10px Inter, sans-serif';
+    const mw = (mRight - mLeft).toFixed(0);
+    ctx.fillText(`2/‖w‖`, (mLeft + mRight) / 2 - 14, midY - 10);
+
+    // Support vector highlight ring
+    points.forEach(p => {
+        const signedDist = p.cls * p.x;
+        if (Math.abs(p.x) <= mhw + 0.04) {
+            const { x, y } = modelToCanvas(p.x, p.y);
+            ctx.beginPath();
+            ctx.arc(x, y, 14, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(234,179,8,0.7)';
+            ctx.lineWidth   = 2;
+            ctx.stroke();
+        }
+    });
+
+    // Violation ring (red circle around violations)
+    points.forEach(p => {
+        if (p.cls * p.x < mhw) {
+            const { x, y } = modelToCanvas(p.x, p.y);
+            ctx.beginPath();
+            ctx.arc(x, y, 11, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(239,68,68,0.6)';
+            ctx.lineWidth   = 1.5;
+            ctx.setLineDash([3, 2]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+    });
+
+    // Data points
+    points.forEach(p => {
+        const { x, y } = modelToCanvas(p.x, p.y);
+        if (p.cls === 1) {
+            // Circle
+            ctx.beginPath();
+            ctx.arc(x, y, 7, 0, Math.PI * 2);
+            ctx.fillStyle   = '#6366f1';
+            ctx.strokeStyle = '#312e81';
+            ctx.lineWidth   = 1.5;
+            ctx.fill();
+            ctx.stroke();
+        } else {
+            // Cross (×)
+            const r = 6;
+            ctx.strokeStyle = '#be123c';
+            ctx.lineWidth   = 2.5;
+            ctx.lineCap     = 'round';
+            ctx.beginPath();
+            ctx.moveTo(x - r, y - r); ctx.lineTo(x + r, y + r);
+            ctx.moveTo(x + r, y - r); ctx.lineTo(x - r, y + r);
+            ctx.stroke();
+            ctx.lineCap = 'butt';
+        }
+    });
+
+    // Axis labels
+    ctx.fillStyle = '#9ca3af';
+    ctx.font      = '10px Inter, sans-serif';
+    ctx.fillText('x₁', canvas.width - PAD + 2, canvas.height / 2);
+    ctx.fillText('x₂', canvas.width / 2 - 4, PAD - 8);
+}
+
+// ─── METRICS PANEL UPDATE ──────────────────────────────────────────────────────
+function updatePanel() {
+    const { mhw, violations, svCount } = computeSVMStats(cValue);
+
+    // Margin width (show as fraction of model space, mapped to a readable %)
+    const marginPct = (mhw * 2 * 100).toFixed(1);  // 0–100
+    marginDisplay.textContent = (mhw * 2).toFixed(3);
+    marginBar.style.width     = Math.min(100, mhw * 2 * 100 / 1.2) + '%';
+
+    // Violations
+    const maxViol = points.length;
+    violationsDisplay.textContent = violations;
+    violationsBar.style.width     = Math.min(100, (violations / maxViol) * 100) + '%';
+
+    // SVs
+    svDisplay.textContent = svCount;
+    svBar.style.width     = Math.min(100, (svCount / points.length) * 100) + '%';
+
+    // Objective desc
+    if (cValue < 0.2) {
+        objDesc.textContent = 'Very low C: violations are cheap. The optimizer prefers a huge margin even if many points cross it.';
+    } else if (cValue < 1.0) {
+        objDesc.textContent = 'Low C: soft margin. A few violations are tolerated to keep the margin wide.';
+    } else if (cValue < 3.0) {
+        objDesc.textContent = 'Moderate C: balanced trade-off between margin width and violation penalty.';
+    } else if (cValue < 7.0) {
+        objDesc.textContent = 'High C: violations are expensive. The margin squeezes to avoid them.';
+    } else {
+        objDesc.textContent = 'Very high C → nearly hard margin. Every outlier forces the boundary to contort around it.';
+    }
+
+    // C interpretation card
+    if (cValue < 0.3) {
+        cInterpBox.className = 'bg-white border border-sky-200 p-5 rounded-2xl shadow-sm transition-all duration-300';
+        cInterpIcon.textContent  = '🌊';
+        cInterpTitle.textContent = 'Very Soft Margin';
+        cInterpTitle.style.color = '#0ea5e9';
+        cInterpDesc.textContent  = 'Wide margin. Many violations allowed. The model generalises broadly — but may underfit.';
+    } else if (cValue < 1.5) {
+        cInterpBox.className = 'bg-white border border-indigo-200 p-5 rounded-2xl shadow-sm transition-all duration-300';
+        cInterpIcon.textContent  = '⚖️';
+        cInterpTitle.textContent = 'Balanced';
+        cInterpTitle.style.color = '#4f46e5';
+        cInterpDesc.textContent  = 'Reasonable margin. A few violations tolerated. Good default starting point for tuning.';
+    } else if (cValue < 5.0) {
+        cInterpBox.className = 'bg-white border border-amber-200 p-5 rounded-2xl shadow-sm transition-all duration-300';
+        cInterpIcon.textContent  = '🔒';
+        cInterpTitle.textContent = 'Strict';
+        cInterpTitle.style.color = '#d97706';
+        cInterpDesc.textContent  = 'Narrowing margin. Most points must stay outside. Can overfit to noisy outliers.';
+    } else {
+        cInterpBox.className = 'bg-white border border-rose-200 p-5 rounded-2xl shadow-sm transition-all duration-300';
+        cInterpIcon.textContent  = '🚨';
+        cInterpTitle.textContent = 'Near Hard Margin';
+        cInterpTitle.style.color = '#e11d48';
+        cInterpDesc.textContent  = 'Extremely strict. Outliers dominate the boundary placement. High variance — likely overfitting.';
+    }
+
+    // Status badge
+    let badgeColor;
+    if (cValue < 0.3)      badgeColor = 'sky';
+    else if (cValue < 1.5) badgeColor = 'indigo';
+    else if (cValue < 5.0) badgeColor = 'amber';
+    else                   badgeColor = 'rose';
+
+    const badgeMap = {
+        sky:    'bg-sky-50 border-sky-200 text-sky-700',
+        indigo: 'bg-indigo-50 border-indigo-200 text-indigo-700',
+        amber:  'bg-amber-50 border-amber-200 text-amber-700',
+        rose:   'bg-rose-50 border-rose-200 text-rose-700',
+    };
+    statusBadge.textContent = `C = ${cValue.toFixed(2)}`;
+    statusBadge.className   = `px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest border shadow-sm transition-all duration-300 ${badgeMap[badgeColor]}`;
+}
+
+// ─── CONTROLS ──────────────────────────────────────────────────────────────────
+cSlider.addEventListener('input', () => {
+    cValue = sliderToC(parseInt(cSlider.value));
+    cDisplay.textContent = cValue < 1 ? cValue.toFixed(2) : cValue.toFixed(1);
+    draw();
+    updatePanel();
+});
+
+document.getElementById('btn-new').addEventListener('click', () => {
+    generatePoints();
+    draw();
+    updatePanel();
+});
+
+window.addEventListener('resize', resizeCanvas);
+
+// ─── INIT ──────────────────────────────────────────────────────────────────────
+cValue = sliderToC(parseInt(cSlider.value));
+cDisplay.textContent = cValue.toFixed(1);
+generatePoints();
+setTimeout(() => {
+    resizeCanvas();
+    updatePanel();
+}, 0);
+</script>
+</body>
+</html>

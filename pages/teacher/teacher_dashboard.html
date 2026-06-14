@@ -1,0 +1,2424 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Junior — Teacher Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --navy: #1B2A4A;
+      --teal: #0D6E8A;
+      --mint: #02A89E;
+      --gold: #C87A00;
+      --offwhite: #F4F7FA;
+      --gray: #5B6E85;
+      --red: #B00020;
+      --green: #1A6B3C;
+      --sky: #C7E9F3;
+      --white: #FFFFFF;
+      --border: #DDE3EC;
+      --code-bg: #1E2D3D;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--offwhite);
+      color: var(--navy);
+      min-height: 100vh;
+    }
+
+    /* ── LOGIN SCREEN ─────────────────────────────────────────────────────── */
+    #login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--navy);
+      background-image:
+        radial-gradient(ellipse at 20% 50%, rgba(2, 168, 158, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(13, 110, 138, 0.15) 0%, transparent 50%);
+    }
+
+    .login-card {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 48px 44px;
+      width: 420px;
+      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.4);
+    }
+
+    .login-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .login-logo-mark {
+      width: 40px;
+      height: 40px;
+      background: var(--navy);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-logo-mark svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .login-logo-text {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 15px;
+      color: var(--navy);
+      line-height: 1.2;
+    }
+
+    .login-logo-text span {
+      display: block;
+      font-weight: 400;
+      font-size: 12px;
+      color: var(--gray);
+    }
+
+    .login-card h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+
+    .login-card p {
+      font-size: 14px;
+      color: var(--gray);
+      margin-bottom: 32px;
+    }
+
+    .field-group {
+      margin-bottom: 18px;
+    }
+
+    .field-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+
+    .field-group input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--navy);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .field-group input:focus {
+      border-color: var(--teal);
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 13px;
+      background: var(--navy);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 8px;
+    }
+
+    .login-btn:hover {
+      background: var(--teal);
+    }
+
+    .login-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .login-error {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--red);
+      text-align: center;
+      min-height: 20px;
+    }
+
+    .config-note {
+      margin-top: 24px;
+      padding: 14px;
+      background: #FFF8E1;
+      border-left: 3px solid var(--gold);
+      border-radius: 6px;
+      font-size: 12px;
+      color: #7A5200;
+      line-height: 1.6;
+    }
+
+    .config-note strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .config-note code {
+      font-family: 'DM Mono', monospace;
+      background: rgba(0, 0, 0, 0.06);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 11px;
+    }
+
+    /* ── APP SHELL ─────────────────────────────────────────────────────────── */
+    #app {
+      display: none;
+    }
+
+    /* ── SIDEBAR ───────────────────────────────────────────────────────────── */
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 240px;
+      min-height: 100vh;
+      background: var(--navy);
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sidebar-logo-mark {
+      width: 34px;
+      height: 34px;
+      background: var(--mint);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .sidebar-logo-mark svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .sidebar-logo-text {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.3;
+    }
+
+    .sidebar-logo-text span {
+      display: block;
+      font-size: 10px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .sidebar-nav {
+      padding: 16px 12px;
+      flex: 1;
+    }
+
+    .nav-section-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.3);
+      padding: 0 8px;
+      margin: 16px 0 6px;
+    }
+
+    .nav-section-label:first-child {
+      margin-top: 0;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.55);
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.07);
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .nav-item.active {
+      background: rgba(2, 168, 158, 0.2);
+      color: var(--mint);
+    }
+
+    .nav-item svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      opacity: 0.7;
+    }
+
+    .nav-item.active svg {
+      opacity: 1;
+    }
+
+    .sidebar-footer {
+      padding: 14px 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .teacher-info {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.45);
+      line-height: 1.3;
+    }
+
+    .teacher-info strong {
+      display: block;
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 13px;
+    }
+
+    .logout-btn {
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.35);
+      cursor: pointer;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: all 0.15s;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* ── MAIN CONTENT ───────────────────────────────────────────────────────── */
+    .main {
+      flex: 1;
+      padding: 32px 36px;
+      overflow-y: auto;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    /* ── PAGE HEADERS ────────────────────────────────────────────────────────── */
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+
+    .page-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .page-subtitle {
+      font-size: 14px;
+      color: var(--gray);
+      margin-top: 4px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+    }
+
+    .btn svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    .btn-primary {
+      background: var(--navy);
+      color: var(--white);
+    }
+
+    .btn-primary:hover {
+      background: var(--teal);
+    }
+
+    .btn-secondary {
+      background: var(--white);
+      color: var(--navy);
+      border: 1.5px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--teal);
+      color: var(--teal);
+    }
+
+    .btn-mint {
+      background: var(--mint);
+      color: var(--white);
+    }
+
+    .btn-mint:hover {
+      background: #019990;
+    }
+
+    /* ── STAT CARDS ──────────────────────────────────────────────────────────── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 20px 22px;
+      border: 1.5px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--mint);
+    }
+
+    .stat-card.gold::before {
+      background: var(--gold);
+    }
+
+    .stat-card.teal::before {
+      background: var(--teal);
+    }
+
+    .stat-card.red::before {
+      background: var(--red);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-family: 'Syne', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1;
+    }
+
+    .stat-sub {
+      font-size: 12px;
+      color: var(--gray);
+      margin-top: 6px;
+    }
+
+    .stat-icon {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      opacity: 0.08;
+    }
+
+    .stat-icon svg {
+      width: 36px;
+      height: 36px;
+    }
+
+    /* ── CARDS / PANELS ──────────────────────────────────────────────────────── */
+    .panel {
+      background: var(--white);
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--offwhite);
+    }
+
+    .panel-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--navy);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-title svg {
+      width: 16px;
+      height: 16px;
+      color: var(--teal);
+    }
+
+    .panel-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* ── TABLE ────────────────────────────────────────────────────────────────── */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .data-table th {
+      padding: 11px 14px;
+      background: var(--navy);
+      color: var(--white);
+      font-weight: 600;
+      font-size: 11px;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .data-table th:first-child {
+      border-radius: 0;
+    }
+
+    .data-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--navy);
+      vertical-align: middle;
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .data-table tr:nth-child(even) td {
+      background: #fafbfd;
+    }
+
+    .data-table tr:hover td {
+      background: var(--sky) !important;
+    }
+
+    /* ── BADGES ───────────────────────────────────────────────────────────────── */
+    .badge {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.3px;
+    }
+
+    .badge-green {
+      background: #d1f0e0;
+      color: var(--green);
+    }
+
+    .badge-gold {
+      background: #fff3cc;
+      color: var(--gold);
+    }
+
+    .badge-red {
+      background: #fde8ec;
+      color: var(--red);
+    }
+
+    .badge-teal {
+      background: var(--sky);
+      color: var(--teal);
+    }
+
+    .badge-gray {
+      background: #edf0f4;
+      color: var(--gray);
+    }
+
+    /* ── SCORE BAR ─────────────────────────────────────────────────────────────── */
+    .score-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 140px;
+    }
+
+    .score-bar-bg {
+      flex: 1;
+      height: 6px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: var(--mint);
+      transition: width 0.4s;
+    }
+
+    .score-bar-fill.low {
+      background: var(--red);
+    }
+
+    .score-bar-fill.mid {
+      background: var(--gold);
+    }
+
+    .score-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      min-width: 30px;
+      text-align: right;
+      color: var(--navy);
+    }
+
+    /* ── CHARTS AREA ──────────────────────────────────────────────────────────── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .three-col {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    /* ── DISTRIBUTION BAR CHART ───────────────────────────────────────────────── */
+    .dist-chart {
+      padding: 20px;
+    }
+
+    .dist-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 12px;
+    }
+
+    .dist-bar-label {
+      width: 90px;
+      text-align: right;
+      color: var(--gray);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+
+    .dist-bar-track {
+      flex: 1;
+      height: 22px;
+      background: var(--offwhite);
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .dist-bar-fill {
+      height: 100%;
+      background: var(--mint);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      padding-left: 8px;
+      transition: width 0.6s ease;
+    }
+
+    .dist-bar-count {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--white);
+      font-family: 'DM Mono', monospace;
+    }
+
+    .dist-bar-count.outside {
+      color: var(--gray);
+      padding-left: 8px;
+    }
+
+    /* ── FILTER ROW ───────────────────────────────────────────────────────────── */
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      background: var(--offwhite);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .filter-row label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .filter-select {
+      padding: 7px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 7px;
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--navy);
+      background: var(--white);
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .filter-select:focus {
+      border-color: var(--teal);
+    }
+
+    .search-input {
+      padding: 7px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 7px;
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--navy);
+      background: var(--white);
+      outline: none;
+      width: 200px;
+      transition: border-color 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--teal);
+    }
+
+    /* ── EMPTY / LOADING ─────────────────────────────────────────────────────── */
+    .empty-state {
+      padding: 48px 20px;
+      text-align: center;
+    }
+
+    .empty-state svg {
+      width: 40px;
+      height: 40px;
+      color: var(--border);
+      margin-bottom: 12px;
+    }
+
+    .empty-state p {
+      color: var(--gray);
+      font-size: 14px;
+    }
+
+    .empty-state .empty-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--gray);
+      font-size: 14px;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--border);
+      border-top-color: var(--mint);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 12px;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ── EXAM RESULTS DETAIL ─────────────────────────────────────────────────── */
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      padding: 20px;
+    }
+
+    .detail-cell {
+      background: var(--offwhite);
+      border-radius: 8px;
+      padding: 14px;
+      border: 1px solid var(--border);
+    }
+
+    .detail-cell-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 6px;
+    }
+
+    .detail-cell-val {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .detail-cell-sub {
+      font-size: 11px;
+      color: var(--gray);
+      margin-top: 3px;
+    }
+
+    .answer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+      gap: 8px;
+      padding: 16px 20px;
+    }
+
+    .answer-pill {
+      padding: 6px 4px;
+      border-radius: 6px;
+      text-align: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .answer-pill .qnum {
+      font-size: 9px;
+      color: var(--gray);
+      margin-bottom: 2px;
+    }
+
+    .answer-pill.correct {
+      background: #d1f0e0;
+      color: var(--green);
+    }
+
+    .answer-pill.wrong {
+      background: #fde8ec;
+      color: var(--red);
+    }
+
+    .answer-pill.empty {
+      background: var(--offwhite);
+      color: var(--gray);
+    }
+
+    .open-answer-block {
+      margin: 12px 20px;
+      padding: 14px;
+      background: var(--offwhite);
+      border-radius: 8px;
+      border-left: 3px solid var(--teal);
+    }
+
+    .open-answer-block label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      color: var(--teal);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .open-answer-block p {
+      font-size: 13px;
+      color: var(--navy);
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    /* ── MODAL ───────────────────────────────────────────────────────────────── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--white);
+      border-radius: 14px;
+      width: 720px;
+      max-width: 95vw;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--navy);
+      border-radius: 14px 14px 0 0;
+      flex-shrink: 0;
+    }
+
+    .modal-header h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      color: var(--white);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      font-size: 22px;
+      line-height: 1;
+      padding: 0;
+      transition: color 0.15s;
+    }
+
+    .modal-close:hover {
+      color: var(--white);
+    }
+
+    .modal-body {
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    /* ── TOAST ───────────────────────────────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--navy);
+      color: var(--white);
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      max-width: 320px;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--mint);
+      flex-shrink: 0;
+    }
+
+    /* ── OVERVIEW TAB TABS ────────────────────────────────────────────────────── */
+    .tab-bar {
+      display: flex;
+      border-bottom: 2px solid var(--border);
+      padding: 0 20px;
+      background: var(--white);
+      gap: 4px;
+    }
+
+    .tab-btn {
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray);
+      border: none;
+      background: none;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.15s;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .tab-btn:hover {
+      color: var(--teal);
+    }
+
+    .tab-btn.active {
+      color: var(--teal);
+      border-bottom-color: var(--teal);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* ── CLASS PROGRESS GRID ──────────────────────────────────────────────────── */
+    .class-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      padding: 20px;
+    }
+
+    .class-tile {
+      border-radius: 10px;
+      padding: 14px 16px;
+      border: 1.5px solid var(--border);
+      background: var(--white);
+      position: relative;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      cursor: default;
+    }
+
+    .class-tile:hover {
+      border-color: var(--mint);
+      box-shadow: 0 4px 12px rgba(2, 168, 158, 0.1);
+    }
+
+    .class-tile-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--gray);
+      margin-bottom: 4px;
+    }
+
+    .class-tile-count {
+      font-family: 'Syne', sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--navy);
+    }
+
+    .class-tile-label {
+      font-size: 11px;
+      color: var(--gray);
+      margin-top: 2px;
+    }
+
+    .class-tile-bar {
+      margin-top: 10px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .class-tile-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: var(--mint);
+    }
+
+    .class-tile-avg {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--teal);
+    }
+
+    /* ── RESPONSIVE ────────────────────────────────────────────────────────────── */
+    @media (max-width: 1100px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .two-col,
+      .three-col {
+        grid-template-columns: 1fr;
+      }
+
+      .class-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+
+      .main {
+        padding: 20px;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .class-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .text-mono {
+      font-family: 'DM Mono', monospace;
+    }
+
+    .text-muted {
+      color: var(--gray);
+    }
+
+    .text-small {
+      font-size: 12px;
+    }
+
+    /* Last refresh indicator */
+    .refresh-time {
+      font-size: 11px;
+      color: var(--gray);
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* ── COHORT PICKER (sidebar) ─────────────────────────────────────────────── */
+    .cohort-picker {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .cohort-picker-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.35);
+      margin-bottom: 7px;
+      display: block;
+    }
+
+    .cohort-select {
+      width: 100%;
+      padding: 7px 10px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 7px;
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 12px;
+      font-family: 'DM Mono', monospace;
+      outline: none;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(255,255,255,0.4)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 28px;
+    }
+
+    .cohort-select:focus,
+    .cohort-select:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(2, 168, 158, 0.5);
+    }
+
+    .cohort-select option {
+      background: #1B2A4A;
+      color: #fff;
+    }
+
+    .cohort-active-pill {
+      margin-top: 6px;
+      font-size: 10px;
+      color: var(--mint);
+      font-family: 'DM Mono', monospace;
+      display: none;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .cohort-active-pill.show {
+      display: flex;
+    }
+
+    .cohort-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--mint);
+      flex-shrink: 0;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══════════════════ LOGIN SCREEN ══════════════════ -->
+  <div id="login-screen">
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="login-logo-mark">
+          <svg viewBox="0 0 22 22" fill="none" stroke="white" stroke-width="2">
+            <circle cx="11" cy="11" r="8" />
+            <path d="M8 11h6M11 8v6" />
+          </svg>
+        </div>
+        <div class="login-logo-text">
+          AI JUNIOR COMPETITION
+          <span>Teacher Dashboard</span>
+        </div>
+      </div>
+      <h1>Sign In</h1>
+      <p>Instructor access only. Use your Supabase teacher account.</p>
+
+      <div class="field-group">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="teacher@school.com" autocomplete="email" />
+      </div>
+      <div class="field-group">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+      <button class="login-btn" id="login-btn" onclick="doLogin()">Sign In</button>
+      <div class="login-error" id="login-error"></div>
+
+      <div class="config-note">
+        <strong>⚙ Setup required before first use</strong>
+        Replace <code>YOUR_SUPABASE_URL</code> and <code>YOUR_ANON_KEY</code> at the top of this file's script with your
+        project credentials.
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ MAIN APP ══════════════════ -->
+  <div id="app">
+    <div class="layout">
+
+      <!-- SIDEBAR -->
+      <nav class="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-logo">
+            <div class="sidebar-logo-mark">
+              <svg viewBox="0 0 18 18" fill="none" stroke="white" stroke-width="2">
+                <circle cx="9" cy="9" r="6.5" />
+                <path d="M6.5 9h5M9 6.5v5" />
+              </svg>
+            </div>
+            <div class="sidebar-logo-text">
+              AI JUNIOR
+              <span>Teacher Dashboard</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- COHORT PICKER -->
+        <div class="cohort-picker">
+          <span class="cohort-picker-label">Cohort</span>
+          <select class="cohort-select" id="sidebar-cohort" onchange="setActiveCohort(this.value)">
+            <option value="">All cohorts</option>
+          </select>
+          <div class="cohort-active-pill" id="cohort-pill">
+            <div class="cohort-dot"></div>
+            <span id="cohort-pill-text"></span>
+          </div>
+        </div>
+
+        <div class="sidebar-nav">
+          <div class="nav-section-label">Overview</div>
+          <button class="nav-item active" onclick="showPage('overview')">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+              <rect x="1" y="1" width="6" height="6" rx="1.5" />
+              <rect x="9" y="1" width="6" height="6" rx="1.5" />
+              <rect x="1" y="9" width="6" height="6" rx="1.5" />
+              <rect x="9" y="9" width="6" height="6" rx="1.5" />
+            </svg>
+            Overview
+          </button>
+
+          <div class="nav-section-label">Homework</div>
+          <button class="nav-item" onclick="showPage('hw-results')">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M3 4h10M3 8h10M3 12h6" />
+            </svg>
+            All Submissions
+          </button>
+          <button class="nav-item" onclick="showPage('hw-by-class')">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+              <rect x="2" y="2" width="12" height="12" rx="2" />
+              <path d="M6 6h4M6 10h2" />
+            </svg>
+            By Class
+          </button>
+
+          <div class="nav-section-label">Final Exam</div>
+          <button class="nav-item" onclick="showPage('exam-results')">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M8 1l2 4 4.5.5-3 3 .5 4.5L8 11l-4 2.5.5-4.5-3-3L6 5z" />
+            </svg>
+            Exam Results
+          </button>
+          <button class="nav-item" onclick="showPage('exam-detail')">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="8" cy="8" r="6" />
+              <path d="M8 5v4l2.5 1.5" />
+            </svg>
+            Student Detail
+          </button>
+
+          <div class="nav-section-label">Access</div>
+          <button class="nav-item" onclick="showPage('codes')">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+              <rect x="3" y="7" width="10" height="8" rx="1.5" />
+              <path d="M5 7V5a3 3 0 016 0v2" />
+            </svg>
+            Access Codes
+          </button>
+        </div>
+
+        <div class="sidebar-footer">
+          <div class="teacher-info">
+            <strong id="teacher-name">Teacher</strong>
+            Authenticated
+          </div>
+          <button class="logout-btn" onclick="doLogout()">Sign out</button>
+        </div>
+      </nav>
+
+      <!-- MAIN CONTENT -->
+      <main class="main">
+
+        <!-- ── OVERVIEW PAGE ──────────────────────────────────────────────── -->
+        <div class="page active" id="page-overview">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Dashboard Overview</div>
+              <div class="page-subtitle">Live summary across all classes and students</div>
+            </div>
+            <div class="header-actions">
+              <span class="refresh-time" id="last-refresh"></span>
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon"><svg viewBox="0 0 36 36" fill="currentColor">
+                  <path d="M18 4a6 6 0 110 12A6 6 0 0118 4zm-8 22c0-4.4 3.6-8 8-8s8 3.6 8 8H10z" />
+                </svg></div>
+              <div class="stat-label">Total Students</div>
+              <div class="stat-value" id="stat-students">—</div>
+              <div class="stat-sub">Unique names across all submissions</div>
+            </div>
+            <div class="stat-card teal">
+              <div class="stat-icon"><svg viewBox="0 0 36 36" fill="currentColor">
+                  <path d="M6 28V8l12 6 12-6v20l-12-5z" />
+                </svg></div>
+              <div class="stat-label">Homework Submissions</div>
+              <div class="stat-value" id="stat-hw-total">—</div>
+              <div class="stat-sub" id="stat-hw-sub">Across all classes</div>
+            </div>
+            <div class="stat-card gold">
+              <div class="stat-icon"><svg viewBox="0 0 36 36" fill="currentColor">
+                  <path d="M18 3l3.5 7 7.5 1-5.5 5.5 1 7.5L18 21l-6.5 3 1-7.5L7 11l7.5-1z" />
+                </svg></div>
+              <div class="stat-label">Avg Homework Score</div>
+              <div class="stat-value" id="stat-hw-avg">—</div>
+              <div class="stat-sub">Out of 100</div>
+            </div>
+            <div class="stat-card red">
+              <div class="stat-icon"><svg viewBox="0 0 36 36" fill="currentColor">
+                  <path d="M18 4a6 6 0 110 12A6 6 0 0118 4zm-8 22c0-4.4 3.6-8 8-8s8 3.6 8 8H10z" />
+                </svg></div>
+              <div class="stat-label">Final Exam Submissions</div>
+              <div class="stat-value" id="stat-exam-total">—</div>
+              <div class="stat-sub" id="stat-exam-avg-sub">Class 16 practice exam</div>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <!-- Homework by class -->
+            <div class="panel">
+              <div class="panel-header">
+                <div class="panel-title">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <rect x="2" y="2" width="12" height="12" rx="2" />
+                    <path d="M5 8h6M5 5h6M5 11h3" />
+                  </svg>
+                  Submissions per Class
+                </div>
+              </div>
+              <div class="dist-chart" id="class-dist-chart">
+                <div class="loading">
+                  <div class="spinner"></div><br>Loading…
+                </div>
+              </div>
+            </div>
+
+            <!-- Score distribution -->
+            <div class="panel">
+              <div class="panel-header">
+                <div class="panel-title">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M2 14V8l3-3 3 3 3-5 3 3" />
+                  </svg>
+                  Score Distribution (Homework)
+                </div>
+              </div>
+              <div class="dist-chart" id="score-dist-chart">
+                <div class="loading">
+                  <div class="spinner"></div><br>Loading…
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top performers -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1l2 4 4.5.5-3 3 .5 4.5L8 11l-4 2.5.5-4.5-3-3L6 5z" />
+                </svg>
+                Top Performers (Highest Average Homework Score)
+              </div>
+            </div>
+            <div id="top-performers-body">
+              <div class="loading">
+                <div class="spinner"></div><br>Loading…
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── HW ALL SUBMISSIONS ──────────────────────────────────────────── -->
+        <div class="page" id="page-hw-results">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Homework Submissions</div>
+              <div class="page-subtitle">All student homework results across all classes</div>
+            </div>
+            <button class="btn btn-mint" onclick="exportCSV('hw')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M8 1v9M4 7l4 4 4-4" />
+                <path d="M2 13h12" />
+              </svg>
+              Export CSV
+            </button>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Class:</label>
+              <select class="filter-select" id="hw-filter-class" onchange="renderHWTable()">
+                <option value="">All classes</option>
+              </select>
+              <label>Search:</label>
+              <input class="search-input" id="hw-search" type="text" placeholder="Student name…"
+                oninput="renderHWTable()" />
+              <span class="text-small text-muted" id="hw-count"></span>
+            </div>
+            <div id="hw-table-wrap">
+              <div class="loading">
+                <div class="spinner"></div><br>Loading submissions…
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── HW BY CLASS ───────────────────────────────────────────────────── -->
+        <div class="page" id="page-hw-by-class">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Class Progress</div>
+              <div class="page-subtitle">Submission counts and average scores by class</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">All Classes</div>
+            </div>
+            <div class="class-grid" id="class-tiles-grid">
+              <div class="loading" style="grid-column:1/-1">
+                <div class="spinner"></div><br>Loading…
+              </div>
+            </div>
+          </div>
+
+          <div class="panel" id="class-detail-panel" style="display:none">
+            <div class="panel-header">
+              <div class="panel-title" id="class-detail-title">Class detail</div>
+            </div>
+            <div id="class-detail-body"></div>
+          </div>
+        </div>
+
+        <!-- ── EXAM RESULTS ──────────────────────────────────────────────────── -->
+        <div class="page" id="page-exam-results">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Final Exam Results</div>
+              <div class="page-subtitle">Class 16 practice exam · MCQ + Fill-in-the-blank + Open-ended</div>
+            </div>
+            <button class="btn btn-mint" onclick="exportCSV('exam')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M8 1v9M4 7l4 4 4-4" />
+                <path d="M2 13h12" />
+              </svg>
+              Export CSV
+            </button>
+          </div>
+
+          <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+            <div class="stat-card">
+              <div class="stat-label">Submissions</div>
+              <div class="stat-value" id="exam-stat-count">—</div>
+              <div class="stat-sub">Class 16 practice exam</div>
+            </div>
+            <div class="stat-card teal">
+              <div class="stat-label">Average Auto-Score</div>
+              <div class="stat-value" id="exam-stat-avg">—</div>
+              <div class="stat-sub">MCQ + fill-in-the-blank</div>
+            </div>
+            <div class="stat-card gold">
+              <div class="stat-label">Avg MCQ Score</div>
+              <div class="stat-value" id="exam-stat-mcq">—</div>
+              <div class="stat-sub">Multiple choice section</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Search:</label>
+              <input class="search-input" id="exam-search" type="text" placeholder="Student name…"
+                oninput="renderExamTable()" />
+              <span class="text-small text-muted" id="exam-count"></span>
+            </div>
+            <div id="exam-table-wrap">
+              <div class="loading">
+                <div class="spinner"></div><br>Loading exam results…
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── EXAM DETAIL ────────────────────────────────────────────────────── -->
+        <div class="page" id="page-exam-detail">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Student Exam Detail</div>
+              <div class="page-subtitle">Full breakdown per student</div>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-bottom:20px">
+            <div class="filter-row">
+              <label>Select student:</label>
+              <select class="filter-select" id="exam-student-select" onchange="loadExamDetail()">
+                <option value="">— choose —</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="exam-detail-content">
+            <div class="empty-state">
+              <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="20" cy="20" r="16" />
+                <path d="M20 12v10l5 3" />
+              </svg>
+              <div class="empty-title">Select a student</div>
+              <p>Choose a student from the dropdown to see their full exam breakdown.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── ACCESS CODES ──────────────────────────────────────────────────── -->
+        <div class="page" id="page-codes">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Access Codes</div>
+              <div class="page-subtitle">Manage one-use entry codes for each class</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Class:</label>
+              <select class="filter-select" id="codes-filter-class" onchange="renderCodesTable()">
+                <option value="">All classes</option>
+              </select>
+              <label>Status:</label>
+              <select class="filter-select" id="codes-filter-status" onchange="renderCodesTable()">
+                <option value="">All</option>
+                <option value="active">Active</option>
+                <option value="used">Used</option>
+                <option value="inactive">Inactive</option>
+              </select>
+              <span class="text-small text-muted" id="codes-count"></span>
+              <button class="btn btn-mint" onclick="exportCSV('codes')" style="margin-left:auto">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
+                </svg>
+                Export
+              </button>
+            </div>
+            <div id="codes-table-wrap">
+              <div class="loading">
+                <div class="spinner"></div><br>Loading codes…
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ── MODAL ── -->
+  <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <h2 id="modal-title">Detail</h2>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- ── TOAST ── -->
+  <div class="toast" id="toast">
+    <div class="toast-dot"></div><span id="toast-msg"></span>
+  </div>
+
+
+  <script>
+    // ════════════════════════════════════════════════════════════════════════════
+    // CONFIG — replace with your Supabase project credentials
+    // ════════════════════════════════════════════════════════════════════════════
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+
+
+    // ════════════════════════════════════════════════════════════════════════════
+    // STATE
+    // ════════════════════════════════════════════════════════════════════════════
+    let sb;
+    let hwData = [];     // homework_submissions rows
+    let examData = [];   // caio_final_exam_results rows
+    let codesData = [];  // access_codes rows
+    let activeCohort = ''; // global cohort filter (’’ = all)
+
+    // ════════════════════════════════════════════════════════════════════════════
+    // SUPABASE INIT & AUTH
+    // ════════════════════════════════════════════════════════════════════════════
+    function initSupabase() {
+      sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    }
+
+    async function doLogin() {
+      const email = document.getElementById('login-email').value.trim();
+      const pwd = document.getElementById('login-password').value;
+      const errEl = document.getElementById('login-error');
+      const btn = document.getElementById('login-btn');
+
+      errEl.textContent = '';
+      btn.disabled = true;
+      btn.textContent = 'Signing in…';
+
+      try {
+        const { data, error } = await sb.auth.signInWithPassword({ email, password: pwd });
+        if (error) throw error;
+
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        const name = data.user.email.split('@')[0];
+        document.getElementById('teacher-name').textContent = name.charAt(0).toUpperCase() + name.slice(1);
+        await loadAll();
+      } catch (e) {
+        errEl.textContent = e.message || 'Sign-in failed. Check credentials.';
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
+      }
+    }
+
+    async function doLogout() {
+      await sb.auth.signOut();
+      location.reload();
+    }
+
+    // Enter key on login
+    document.getElementById('login-password').addEventListener('keydown', e => {
+      if (e.key === 'Enter') doLogin();
+    });
+    document.getElementById('login-email').addEventListener('keydown', e => {
+      if (e.key === 'Enter') doLogin();
+    });
+
+    // ════════════════════════════════════════════════════════════════════════════
+    // NAVIGATION
+    // ════════════════════════════════════════════════════════════════════════════
+    function showPage(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('page-' + id).classList.add('active');
+      const map = { overview: 'overview', 'hw-results': 'hw-results', 'hw-by-class': 'hw-by-class', 'exam-results': 'exam-results', 'exam-detail': 'exam-detail', codes: 'codes' };
+      document.querySelectorAll('.nav-item').forEach(n => {
+        if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + id + "'")) n.classList.add('active');
+      });
+    }
+
+    // ════════════════════════════════════════════════════════════════════════════
+    // DATA LOADING
+    // ════════════════════════════════════════════════════════════════════════════
+    async function loadAll() {
+      document.getElementById('last-refresh').textContent = 'Refreshing…';
+      try {
+        const [hw, exam, codes] = await Promise.all([
+          sb.from('homework_submissions').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('caio_final_exam_results').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('access_codes').select('*').order('created_at', { ascending: false }).limit(10000)
+        ]);
+
+        // Surface per-table errors so failures are visible
+        if (hw.error) {
+          console.error('homework_submissions error:', hw.error);
+          toast('⚠ Homework load error: ' + hw.error.message);
+        }
+        if (exam.error) {
+          console.error('caio_final_exam_results error:', exam.error);
+          toast('⚠ Exam load error: ' + exam.error.message);
+        }
+        if (codes.error) {
+          console.error('access_codes error:', codes.error);
+          toast('⚠ Codes load error: ' + codes.error.message);
+        }
+
+        hwData = hw.data || [];
+        examData = exam.data || [];
+        codesData = codes.data || [];
+
+        console.log(`Loaded: ${hwData.length} homework rows, ${examData.length} exam rows, ${codesData.length} code rows`);
+
+        populateFilters();
+        renderOverview();
+        renderHWTable();
+        renderClassTiles();
+        renderExamTable();
+        renderExamStudentSelect();
+        renderCodesTable();
+
+        const now = new Date();
+        document.getElementById('last-refresh').textContent = 'Updated ' + now.toLocaleTimeString();
+        toast('Data refreshed');
+      } catch (e) {
+        toast('Error: ' + e.message);
+        console.error(e);
+      }
+    }
+
+    function populateFilters() {
+      const classes = [...new Set(hwData.map(r => r.class_number))].sort((a, b) => a - b);
+      const cohorts = [...new Set([
+        ...hwData.map(r => r.cohort).filter(Boolean),
+        ...codesData.map(r => r.cohort).filter(Boolean)
+      ])].sort();
+
+      // Sidebar global cohort selector
+      const sidebarSel = document.getElementById('sidebar-cohort');
+      const prevCohort = sidebarSel.value;
+      sidebarSel.innerHTML = '<option value="">All cohorts</option>';
+      cohorts.forEach(c => {
+        sidebarSel.innerHTML += `<option value="${esc(c)}">${esc(c)}</option>`;
+      });
+      // Restore previous selection if it still exists
+      if (prevCohort && cohorts.includes(prevCohort)) sidebarSel.value = prevCohort;
+
+      // Per-page class selectors
+      const hwClassSel = document.getElementById('hw-filter-class');
+      const codesClassSel = document.getElementById('codes-filter-class');
+      hwClassSel.innerHTML = '<option value="">All classes</option>';
+      codesClassSel.innerHTML = '<option value="">All classes</option>';
+      classes.forEach(c => {
+        hwClassSel.innerHTML += `<option value="${c}">Class ${c}</option>`;
+        codesClassSel.innerHTML += `<option value="${c}">Class ${c}</option>`;
+      });
+    }
+
+    function setActiveCohort(cohort) {
+      activeCohort = cohort;
+      const pill = document.getElementById('cohort-pill');
+      const pillText = document.getElementById('cohort-pill-text');
+      if (cohort) {
+        pillText.textContent = cohort;
+        pill.classList.add('show');
+      } else {
+        pill.classList.remove('show');
+      }
+      // Re-render all views with the new cohort filter
+      renderOverview();
+      renderHWTable();
+      renderClassTiles();
+      renderCodesTable();
+    }
+
+    // ════════════════════════════════════════════════════════════════════════════
+    // OVERVIEW
+    // ════════════════════════════════════════════════════════════════════════════
+    function renderOverview() {
+      const hw = activeCohort ? hwData.filter(r => r.cohort === activeCohort) : hwData;
+      const exam = activeCohort ? examData.filter(r => r.cohort === activeCohort) : examData;
+
+      const uniqueStudents = new Set([
+        ...hw.map(r => r.student_name),
+        ...exam.map(r => r.student_name)
+      ]).size;
+
+      document.getElementById('stat-students').textContent = uniqueStudents;
+      document.getElementById('stat-hw-total').textContent = hw.length;
+      document.getElementById('stat-exam-total').textContent = exam.length;
+
+      const hwAvg = hw.length ? Math.round(hw.reduce((s, r) => s + (r.score || 0), 0) / hw.length) : '—';
+      document.getElementById('stat-hw-avg').textContent = hwAvg;
+
+      if (exam.length) {
+        const examAvg = Math.round(exam.reduce((s, r) => s + (r.auto_score || 0), 0) / exam.length);
+        document.getElementById('stat-exam-avg-sub').textContent = `Avg auto-score: ${examAvg}`;
+      } else {
+        document.getElementById('stat-exam-avg-sub').textContent = 'Class 16 practice exam';
+      }
+
+      // Class distribution chart
+      const classCounts = {};
+      hw.forEach(r => { classCounts[r.class_number] = (classCounts[r.class_number] || 0) + 1; });
+      const maxCount = Math.max(...Object.values(classCounts), 1);
+      const sorted = Object.entries(classCounts).sort((a, b) => +a[0] - +b[0]);
+      const chartEl = document.getElementById('class-dist-chart');
+      if (!sorted.length) { chartEl.innerHTML = '<div class="empty-state"><p>No submissions yet</p></div>'; }
+      else {
+        chartEl.innerHTML = sorted.map(([cls, cnt]) => {
+          const pct = Math.round((cnt / maxCount) * 100);
+          const color = pct > 60 ? 'var(--mint)' : pct > 30 ? 'var(--teal)' : 'var(--gold)';
+          const inside = pct > 20;
+          return `<div class="dist-bar-row">
+        <div class="dist-bar-label">Class ${cls}</div>
+        <div class="dist-bar-track">
+          <div class="dist-bar-fill" style="width:${pct}%;background:${color}">
+            ${inside ? `<span class="dist-bar-count">${cnt}</span>` : ''}
+          </div>
+        </div>
+        ${!inside ? `<span class="dist-bar-count outside">${cnt}</span>` : ''}
+      </div>`;
+        }).join('');
+      }
+
+      // Score distribution
+      const buckets = { '0–39': 0, '40–59': 0, '60–74': 0, '75–89': 0, '90–100': 0 };
+      hw.forEach(r => {
+        const s = r.score || 0;
+        if (s < 40) buckets['0–39']++;
+        else if (s < 60) buckets['40–59']++;
+        else if (s < 75) buckets['60–74']++;
+        else if (s < 90) buckets['75–89']++;
+        else buckets['90–100']++;
+      });
+      const maxBucket = Math.max(...Object.values(buckets), 1);
+      const scoreColors = { '0–39': 'var(--red)', '40–59': '#E07A00', '60–74': 'var(--gold)', '75–89': 'var(--teal)', '90–100': 'var(--mint)' };
+      document.getElementById('score-dist-chart').innerHTML = Object.entries(buckets).map(([label, cnt]) => {
+        const pct = Math.round((cnt / maxBucket) * 100);
+        const inside = pct > 20;
+        return `<div class="dist-bar-row">
+      <div class="dist-bar-label">${label}</div>
+      <div class="dist-bar-track">
+        <div class="dist-bar-fill" style="width:${pct}%;background:${scoreColors[label]}">
+          ${inside ? `<span class="dist-bar-count">${cnt}</span>` : ''}
+        </div>
+      </div>
+      ${!inside ? `<span class="dist-bar-count outside">${cnt}</span>` : ''}
+    </div>`;
+      }).join('');
+
+      // Top performers
+      const studentMap = {};
+      hw.forEach(r => {
+        if (!studentMap[r.student_name]) studentMap[r.student_name] = { scores: [], classes: new Set() };
+        studentMap[r.student_name].scores.push(r.score || 0);
+        studentMap[r.student_name].classes.add(r.class_number);
+      });
+      const sorted_students = Object.entries(studentMap)
+        .map(([name, d]) => ({ name, avg: Math.round(d.scores.reduce((a, b) => a + b, 0) / d.scores.length), count: d.scores.length, classes: d.classes.size }))
+        .sort((a, b) => b.avg - a.avg || b.count - a.count)
+        .slice(0, 10);
+
+      const topEl = document.getElementById('top-performers-body');
+      if (!sorted_students.length) {
+        topEl.innerHTML = '<div class="empty-state"><p>No homework submissions yet</p></div>';
+      } else {
+        topEl.innerHTML = `<table class="data-table">
+      <thead><tr><th>#</th><th>Student</th><th>Avg Score</th><th>Submissions</th><th>Classes Attempted</th><th>Performance</th></tr></thead>
+      <tbody>
+        ${sorted_students.map((s, i) => `<tr>
+          <td class="text-mono">${i + 1}</td>
+          <td><strong>${esc(s.name)}</strong></td>
+          <td>${scoreBadge(s.avg)}</td>
+          <td class="text-mono">${s.count}</td>
+          <td class="text-mono">${s.classes}</td>
+          <td>${scoreBar(s.avg)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+      }
+    }
+
+    // ════════════════════════════════════════════════════════════════════════════
+    // HOMEWORK TABLE
+    // ════════════════════════════════════════════════════════════════════════════
+    function renderHWTable() {
+      const cls = document.getElementById('hw-filter-class').value;
+      const search = document.getElementById('hw-search').value.toLowerCase();
+
+      let rows = hwData.filter(r => {
+        if (activeCohort && r.cohort !== activeCohort) return false;
+        if (cls && r.class_number != cls) return false;
+        if (search && !r.student_name.toLowerCase().includes(search)) return false;
+        return true;
+      });
+
+      document.getElementById('hw-count').textContent = rows.length + ' result' + (rows.length !== 1 ? 's' : '');
+
+      if (!rows.length) {
+        document.getElementById('hw-table-wrap').innerHTML = '<div class="empty-state"><p>No matching submissions</p></div>';
+        return;
+      }
+
+      document.getElementById('hw-table-wrap').innerHTML = `<table class="data-table">
+    <thead><tr>
+      <th>Student</th><th>Cohort</th><th>Class</th><th>Score</th><th>Performance</th>
+      <th>Submitted</th><th>Access Code</th>
+    </tr></thead>
+    <tbody>
+      ${rows.map(r => `<tr>
+        <td><strong>${esc(r.student_name)}</strong></td>
+        <td><span class="badge badge-gray">${esc(r.cohort || '—')}</span></td>
+        <td><span class="badge badge-teal">Class ${r.class_number}</span></td>
+        <td>${scoreBadge(r.score)}</td>
+        <td>${scoreBar(r.score)}</td>
+        <td class="text-small text-muted text-mono">${fmtDate(r.submitted_at)}</td>
+        <td class="text-mono text-small">${r.access_code || '—'}</td>
+      </tr>`).join('')}
+    </tbody>
+  </table>`;
+    }
+
+    // ════════════════════════════════════════════════════════════════════════════
+    // CLASS TILES
+    // ════════════════════════════════════════════════════════════════════════════
+    function renderClassTiles() {
+      const source = activeCohort ? hwData.filter(r => r.cohort === activeCohort) : hwData;
+      const classMap = {};
+      source.forEach(r => {
+        if (!classMap[r.class_number]) classMap[r.class_number] = { count: 0, total: 0 };
+        classMap[r.class_number].count++;
+        classMap[r.class_number].total += r.score || 0;
+      });
+
+      const el = document.getElementById('class-tiles-grid');
+      const sorted = Object.entries(classMap).sort((a, b) => +a[0] - +b[0]);
+
+      if (!sorted.length) {
+        el.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><p>No submissions yet</p></div>';
+        return;
+      }
+
+      const maxCount = Math.max(...sorted.map(([, d]) => d.count));
+      el.innerHTML = sorted.map(([cls, d]) => {
+        const avg = Math.round(d.total / d.count);
+        const barPct = Math.round((d.count / maxCount) * 100);
+        const avgColor = avg >= 75 ? 'var(--mint)' : avg >= 50 ? 'var(--gold)' : 'var(--red)';
+        return `<div class="class-tile" onclick="showClassDetail(${cls})">
+      <div class="class-tile-avg" style="color:${avgColor}">${avg}</div>
+      <div class="class-tile-num">CLASS ${cls}</div>
+      <div class="class-tile-count">${d.count}</div>
+      <div class="class-tile-label">submission${d.count !== 1 ? 's' : ''}</div>
+      <div class="class-tile-bar"><div class="class-tile-bar-fill" style="width:${barPct}%"></div></div>
+    </div>`;
+      }).join('');
+    }
+
+    function showClassDetail(cls) {
+      const rows = hwData.filter(r => r.class_number == cls).sort((a, b) => b.score - a.score);
+      const panel = document.getElementById('class-detail-panel');
+      document.getElementById('class-detail-title').textContent = `Class ${cls} · ${rows.length} submissions`;
+
+      document.getElementById('class-detail-body').innerHTML = `
+    <table class="data-table">
+      <thead><tr><th>Student</th><th>Score</th><th>Performance</th><th>Submitted</th></tr></thead>
+      <tbody>
+        ${rows.map(r => `<tr>
+          <td><strong>${esc(r.student_name)}</strong></td>
+          <td>${scoreBadge(r.score)}</td>
+          <td>${scoreBar(r.score)}</td>
+          <td class="text-small text-muted text-mono">${fmtDate(r.submitted_at)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+      panel.style.display = 'block';
+      panel.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ════════════════════════════════════════════════════════════════════════════
+    // EXAM TABLE
+    // ════════════════════════════════════════════════════════════════════════════
+    function renderExamTable() {
+      const search = document.getElementById('exam-search').value.toLowerCase();
+      let rows = examData.filter(r => !search || r.student_name.toLowerCase().includes(search));
+
+      document.getElementById('exam-count').textContent = rows.length + ' result' + (rows.length !== 1 ? 's' : '');
+
+      if (!rows.length) {
+        document.getElementById('exam-table-wrap').innerHTML = '<div class="empty-state"><p>No exam submissions yet</p></div>';
+        document.getElementById('exam-stat-count').textContent = '0';
+        document.getElementById('exam-stat-avg').textContent = '—';
+        document.getElementById('exam-stat-mcq').textContent = '—';
+        return;
+      }
+
+      document.getElementById('exam-stat-count').textContent = examData.length;
+      document.getElementById('exam-stat-avg').textContent = Math.round(examData.reduce((s, r) => s + (r.auto_score || 0), 0) / examData.length);
+      document.getElementById('exam-stat-mcq').textContent = Math.round(examData.reduce((s, r) => s + (r.mcq_score || 0), 0) / examData.length);
+
+      document.getElementById('exam-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student</th><th>Total Auto-Score</th><th>MCQ</th><th>Fill-in-Blank</th>
+        <th>Performance</th><th>Submitted</th><th>Detail</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `<tr>
+          <td><strong>${esc(r.student_name)}</strong></td>
+          <td>${scoreBadge(r.auto_score)}</td>
+          <td class="text-mono">${r.mcq_score ?? '—'}</td>
+          <td class="text-mono">${r.blank_score ?? '—'}</td>
+          <td>${scoreBar(r.auto_score)}</td>
+          <td class="text-small text-muted text-mono">${fmtDate(r.submitted_at)}</td>
+          <td><button class="btn btn-secondary" style="padding:5px 10px;font-size:11px" onclick="openExamModal('${r.id}')">View</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+    }
+
+    function openExamModal(id) {
+      const r = examData.find(x => x.id === id);
+      if (!r) return;
+
+      document.getElementById('modal-title').textContent = r.student_name + ' — Exam Detail';
+
+      let html = '';
+
+      // Score summary
+      html += `<div class="detail-grid">
+    <div class="detail-cell">
+      <div class="detail-cell-label">Auto-Score</div>
+      <div class="detail-cell-val">${r.auto_score ?? '—'}</div>
+      <div class="detail-cell-sub">MCQ + fill-in-blank</div>
+    </div>
+    <div class="detail-cell">
+      <div class="detail-cell-label">MCQ Score</div>
+      <div class="detail-cell-val">${r.mcq_score ?? '—'}</div>
+    </div>
+    <div class="detail-cell">
+      <div class="detail-cell-label">Blank Score</div>
+      <div class="detail-cell-val">${r.blank_score ?? '—'}</div>
+    </div>
+  </div>`;
+
+      // MCQ answers
+      if (r.mcq_details) {
+        const details = typeof r.mcq_details === 'string' ? JSON.parse(r.mcq_details) : r.mcq_details;
+        html += `<div style="padding:14px 20px 6px;border-top:1px solid var(--border)">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--gray);margin-bottom:10px;">MCQ Answers</div>
+    </div>
+    <div class="answer-grid">`;
+        Object.entries(details).forEach(([q, d]) => {
+          const cls2 = d.correct ? 'correct' : 'wrong';
+          const ans = d.answer || '?';
+          html += `<div class="answer-pill ${cls2}"><div class="qnum">${q}</div>${esc(String(ans))}</div>`;
+        });
+        html += '</div>';
+      }
+
+      // Fill-in-the-blank answers
+      const blankSections = [
+        { label: 'Q16 — A* Search', keys: ['q16_b1', 'q16_b2', 'q16_b3', 'q16_b4', 'q16_b5', 'q16_b6'] },
+        { label: 'Q19 — k-Means sklearn', keys: ['q19_b1', 'q19_b2', 'q19_b3', 'q19_b4', 'q19_b5', 'q19_b6'] },
+        { label: 'Q20 — Q-learning', keys: ['q20_b1', 'q20_b2', 'q20_b3', 'q20_b4', 'q20_b5'] },
+      ];
+      blankSections.forEach(sec => {
+        const filled = sec.keys.filter(k => r[k]);
+        if (!filled.length) return;
+        html += `<div style="padding:12px 20px 4px;border-top:1px solid var(--border)">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--gray);margin-bottom:8px;">${sec.label}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        ${sec.keys.map((k, i) => `<span style="background:var(--offwhite);border:1px solid var(--border);border-radius:5px;padding:4px 10px;font-family:'DM Mono',monospace;font-size:12px;color:var(--navy)"><span style="color:var(--gray);font-size:10px">[${i + 1}] </span>${esc(r[k] || '—')}</span>`).join('')}
+      </div>
+    </div>`;
+      });
+
+      // Open-ended answers
+      const openQ = [
+        { label: 'Q17 — Open Ended', key: 'q17_text' },
+        { label: 'Q18 — Open Ended', key: 'q18_text' },
+        { label: 'Q21 — Open Ended', key: 'q21_text' },
+      ];
+      openQ.forEach(q => {
+        if (!r[q.key]) return;
+        html += `<div class="open-answer-block" style="margin:10px 20px">
+      <label>${q.label}</label>
+      <p>${esc(r[q.key])}</p>
+    </div>`;
+      });
+
+      document.getElementById('modal-body').innerHTML = html;
+      document.getElementById('modal-overlay').classList.add('open');
+    }
+
+    // ════════════════════════════════════════════════════════════════════════════
+    // EXAM STUDENT DETAIL PAGE
+    // ════════════════════════════════════════════════════════════════════════════
+    function renderExamStudentSelect() {
+      const sel = document.getElementById('exam-student-select');
+      const names = [...new Set(examData.map(r => r.student_name))].sort();
+      sel.innerHTML = '<option value="">— choose —</option>' + names.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
+    }
+
+    function loadExamDetail() {
+      const name = document.getElementById('exam-student-select').value;
+      const r = examData.find(x => x.student_name === name);
+      const el = document.getElementById('exam-detail-content');
+      if (!r) {
+        el.innerHTML = '<div class="empty-state"><div class="empty-title">Select a student</div><p>Choose a student to see their full exam breakdown.</p></div>';
+        return;
+      }
+
+      let html = `<div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+    <div class="stat-card"><div class="stat-label">Auto-Score</div><div class="stat-value">${r.auto_score ?? '—'}</div><div class="stat-sub">Total automated</div></div>
+    <div class="stat-card teal"><div class="stat-label">MCQ</div><div class="stat-value">${r.mcq_score ?? '—'}</div></div>
+    <div class="stat-card gold"><div class="stat-label">Fill-in-Blank</div><div class="stat-value">${r.blank_score ?? '—'}</div></div>
+  </div>`;
+
+      // MCQ breakdown
+      if (r.mcq_details) {
+        const details = typeof r.mcq_details === 'string' ? JSON.parse(r.mcq_details) : r.mcq_details;
+        const correct = Object.values(details).filter(d => d.correct).length;
+        const total = Object.keys(details).length;
+        html += `<div class="panel" style="margin-bottom:20px">
+      <div class="panel-header"><div class="panel-title">MCQ Answers — ${correct}/${total} correct</div></div>
+      <div class="answer-grid">
+        ${Object.entries(details).map(([q, d]) => {
+          const cls2 = d.correct ? 'correct' : 'wrong';
+          return `<div class="answer-pill ${cls2}"><div class="qnum">${q}</div>${esc(String(d.answer || '?'))}</div>`;
+        }).join('')}
+      </div>
+    </div>`;
+      }
+
+      // Fill-in-blank
+      const blanks = [
+        { label: 'Q16 — A* Search Blanks', keys: ['q16_b1', 'q16_b2', 'q16_b3', 'q16_b4', 'q16_b5', 'q16_b6'] },
+        { label: 'Q19 — k-Means sklearn Blanks', keys: ['q19_b1', 'q19_b2', 'q19_b3', 'q19_b4', 'q19_b5', 'q19_b6'] },
+        { label: 'Q20 — Q-learning Blanks', keys: ['q20_b1', 'q20_b2', 'q20_b3', 'q20_b4', 'q20_b5'] },
+      ];
+      blanks.forEach(sec => {
+        if (!sec.keys.some(k => r[k])) return;
+        html += `<div class="panel" style="margin-bottom:20px">
+      <div class="panel-header"><div class="panel-title">${sec.label}</div></div>
+      <div style="padding:16px 20px;display:flex;flex-wrap:wrap;gap:10px;">
+        ${sec.keys.map((k, i) => `<div style="background:var(--offwhite);border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;min-width:120px">
+          <div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:4px">Blank ${i + 1}</div>
+          <div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--navy)">${esc(r[k] || '—')}</div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+      });
+
+      // Open-ended
+      const openQ = [['Q17', r.q17_text], ['Q18', r.q18_text], ['Q21', r.q21_text]];
+      const hasOpen = openQ.some(([, t]) => t);
+      if (hasOpen) {
+        html += `<div class="panel" style="margin-bottom:20px">
+      <div class="panel-header"><div class="panel-title">Open-Ended Answers</div></div>
+      ${openQ.filter(([, t]) => t).map(([q, t]) => `
+        <div class="open-answer-block"><label>${q}</label><p>${esc(t)}</p></div>
+      `).join('')}
+      <div style="height:8px"></div>
+    </div>`;
+      }
+
+      el.innerHTML = html;
+    }
+
+    // ════════════════════════════════════════════════════════════════════════════
+    // ACCESS CODES TABLE
+    // ════════════════════════════════════════════════════════════════════════════
+    function renderCodesTable() {
+      const cls = document.getElementById('codes-filter-class').value;
+      const status = document.getElementById('codes-filter-status').value;
+
+      let rows = codesData.filter(r => {
+        if (activeCohort && r.cohort !== activeCohort) return false;
+        if (cls && r.class_number != cls) return false;
+        if (status === 'active' && !(r.is_active && r.uses_count < r.max_uses)) return false;
+        if (status === 'used' && !(r.uses_count >= r.max_uses)) return false;
+        if (status === 'inactive' && r.is_active) return false;
+        return true;
+      });
+
+      document.getElementById('codes-count').textContent = rows.length + ' code' + (rows.length !== 1 ? 's' : '');
+
+      if (!rows.length) {
+        document.getElementById('codes-table-wrap').innerHTML = '<div class="empty-state"><p>No codes match this filter</p></div>';
+        return;
+      }
+
+      document.getElementById('codes-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr><th>Code</th><th>Cohort</th><th>Class</th><th>Status</th><th>Uses</th><th>Max Uses</th><th>Created</th></tr></thead>
+      <tbody>
+        ${rows.map(r => {
+        const used = r.uses_count >= r.max_uses;
+        const label = used ? 'Used' : r.is_active ? 'Active' : 'Inactive';
+        const badgeCls = used ? 'badge-red' : r.is_active ? 'badge-green' : 'badge-gray';
+        return `<tr>
+            <td class="text-mono" style="font-size:14px;font-weight:500;letter-spacing:2px">${esc(r.code)}</td>
+            <td><span class="badge badge-gray">${esc(r.cohort || '—')}</span></td>
+            <td><span class="badge badge-teal">Class ${r.class_number}</span></td>
+            <td><span class="badge ${badgeCls}">${label}</span></td>
+            <td class="text-mono">${r.uses_count}</td>
+            <td class="text-mono">${r.max_uses}</td>
+            <td class="text-small text-muted text-mono">${fmtDate(r.created_at)}</td>
+          </tr>`;
+      }).join('')}
+      </tbody>
+    </table>`;
+    }
+
+    // ════════════════════════════════════════════════════════════════════════════
+    // MODAL
+    // ════════════════════════════════════════════════════════════════════════════
+    function closeModal(e) {
+      if (!e || e.target === document.getElementById('modal-overlay') || !e.target) {
+        document.getElementById('modal-overlay').classList.remove('open');
+      }
+    }
+
+    // ════════════════════════════════════════════════════════════════════════════
+    // CSV EXPORT
+    // ════════════════════════════════════════════════════════════════════════════
+    function exportCSV(type) {
+      let rows, filename;
+      if (type === 'hw') {
+        rows = [['student_name', 'cohort', 'class_number', 'homework_title', 'score', 'total', 'pct', 'submitted_at', 'access_code']];
+        hwData.forEach(r => rows.push([r.student_name, r.cohort, r.class_number, r.homework_title, r.score, r.total, r.pct, r.submitted_at, r.access_code]));
+        filename = 'homework_submissions.csv';
+      } else if (type === 'exam') {
+        rows = [['student_name', 'auto_score', 'mcq_score', 'blank_score', 'submitted_at', 'access_code']];
+        examData.forEach(r => rows.push([r.student_name, r.auto_score, r.mcq_score, r.blank_score, r.submitted_at, r.access_code]));
+        filename = 'exam_results.csv';
+      } else {
+        rows = [['code', 'cohort', 'class_number', 'is_active', 'uses_count', 'max_uses', 'created_at']];
+        codesData.forEach(r => rows.push([r.code, r.cohort, r.class_number, r.is_active, r.uses_count, r.max_uses, r.created_at]));
+        filename = 'access_codes.csv';
+      }
+      const csv = rows.map(r => r.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+      toast('Exported ' + filename);
+    }
+
+    // ════════════════════════════════════════════════════════════════════════════
+    // HELPERS
+    // ════════════════════════════════════════════════════════════════════════════
+    function scoreBadge(score) {
+      if (score == null) return '<span class="badge badge-gray">—</span>';
+      const cls2 = score >= 75 ? 'badge-green' : score >= 50 ? 'badge-gold' : 'badge-red';
+      return `<span class="badge ${cls2}">${score}</span>`;
+    }
+
+    function scoreBar(score) {
+      if (score == null) return '';
+      const pct = Math.min(score, 100);
+      const fillClass = pct >= 75 ? '' : pct >= 50 ? 'mid' : 'low';
+      return `<div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill ${fillClass}" style="width:${pct}%"></div></div><div class="score-num">${score}</div></div>`;
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function esc(str) {
+      return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function toast(msg) {
+      const el = document.getElementById('toast');
+      document.getElementById('toast-msg').textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 3000);
+    }
+
+    // ════════════════════════════════════════════════════════════════════════════
+    // INIT — restore existing session if the teacher is already logged in
+    // ════════════════════════════════════════════════════════════════════════════
+    initSupabase();
+
+    (async () => {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        const email = session.user.email;
+        const name = email.split('@')[0];
+        document.getElementById('teacher-name').textContent = name.charAt(0).toUpperCase() + name.slice(1);
+        await loadAll();
+      }
+    })();
+  </script>
+</body>
+
+</html>

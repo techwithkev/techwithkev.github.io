@@ -784,6 +784,7 @@
     let studentName = '';
     let validatedClassNumber = null;
     let validatedAccessCode = null;
+    let validatedCohort = null;
     const startedAt = new Date().toISOString();
     const MAX_STRIKES = 3;
     let TOTAL = 0;
@@ -868,7 +869,7 @@
       try {
         const { data, error } = await db
           .from('access_codes')
-          .select('id, class_number, max_uses, uses_count, is_active')
+          .select('id, class_number, cohort, max_uses, uses_count, is_active')
           .eq('code', code)
           .single();
 
@@ -921,6 +922,7 @@
         }
 
         validatedClassNumber = data.class_number;
+        validatedCohort = data.cohort || 'aijr';
         validatedAccessCode = code;
 
         hide('access-code-gate');
@@ -1204,6 +1206,7 @@
       const payload = {
         student_name: studentName,
         class_number: validatedClassNumber,
+        cohort: validatedCohort,
         homework_title: classConfig.homework_title || classConfig.title,
         score,
         total: TOTAL,

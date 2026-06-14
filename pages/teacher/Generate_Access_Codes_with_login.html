@@ -310,7 +310,23 @@
           <option value="13">Class 13 — Reinforcement Learning</option>
           <option value="14">Class 14 — Recommender Systems & CSPs</option>
           <option value="15">Class 15 — Generative AI & LLMs</option>
+          <option value="16">Class 16</option>
         </select>
+
+        <label for="cohort-input">Cohort (group label):</label>
+        <input type="text" id="cohort-input" list="cohort-suggestions"
+          placeholder="e.g. aijr-winter-2025" autocomplete="off"
+          style="margin-bottom:0.25rem">
+        <datalist id="cohort-suggestions">
+          <option value="aijr-winter-2025">
+          <option value="aijr-summer-2025">
+          <option value="aijr-winter-2026">
+          <option value="aijr-summer-2026">
+        </datalist>
+        <div style="font-size:0.8rem;color:#5B6E85;margin-bottom:1rem">
+          This label is stored on every code and forwarded to homework submissions.
+          Students never see it — it lets you filter by cohort in the dashboard.
+        </div>
 
         <label for="num-codes">Number of codes:</label>
         <input type="number" id="num-codes" value="30" min="1" max="500">
@@ -446,15 +462,22 @@
       }
 
       const classNum = parseInt(document.getElementById('class-selector').value);
+      const cohort = document.getElementById('cohort-input').value.trim();
       const numCodes = parseInt(document.getElementById('num-codes').value);
       const maxUses = parseInt(document.getElementById('max-uses').value);
+
+      if (!cohort) {
+        showStatus('Please enter a cohort label (e.g. aijr-winter-2025).', 'error');
+        document.getElementById('cohort-input').focus();
+        return;
+      }
 
       if (numCodes < 1 || numCodes > 500) {
         showStatus('Number of codes must be between 1 and 500.', 'error');
         return;
       }
 
-      showStatus(`⏳ Generating ${numCodes} codes for Class ${classNum}…`, 'info');
+      showStatus(`⏳ Generating ${numCodes} codes for Class ${classNum} · ${cohort}…`, 'info');
 
       const codes = [];
       const codeSet = new Set();
@@ -472,6 +495,7 @@
       const rows = codes.map(code => ({
         code,
         class_number: classNum,
+        cohort,
         max_uses: maxUses,
         uses_count: 0,
         is_active: true,
@@ -490,7 +514,7 @@
         // Display codes
         document.getElementById('codes-output').value = codes.join('\n');
         document.getElementById('output-section').style.display = 'block';
-        showStatus(`✓ Successfully generated ${numCodes} access codes for Class ${classNum}. Copy and share with your students.`, 'success');
+        showStatus(`✓ Generated ${numCodes} access codes — Class ${classNum} · cohort "${cohort}". Copy and share with your students.`, 'success');
 
       } catch (err) {
         console.error('Generation error:', err);
@@ -511,11 +535,12 @@
     function downloadCodesTxt() {
       const text = document.getElementById('codes-output').value;
       const classNum = document.getElementById('class-selector').value;
+      const cohort = document.getElementById('cohort-input').value.trim() || 'codes';
       const blob = new Blob([text], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `access_codes_class${classNum}.txt`;
+      a.download = `access_codes_class${classNum}_${cohort}.txt`;
       a.click();
       URL.revokeObjectURL(url);
       showStatus('✓ Downloaded!', 'success');
@@ -523,8 +548,9 @@
 
     function resetForm() {
       document.getElementById('class-selector').value = '10';
-      document.getElementById('num-codes').value = '1';
-      document.getElementById('max-uses').value = '20';
+      document.getElementById('cohort-input').value = '';
+      document.getElementById('num-codes').value = '30';
+      document.getElementById('max-uses').value = '1';
       document.getElementById('codes-output').value = '';
       document.getElementById('output-section').style.display = 'none';
       document.getElementById('status-message').className = 'status';
