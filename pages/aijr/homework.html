@@ -1060,7 +1060,7 @@
 
         // Code snippet (optional)
         const codeBlock = q.code_snippet
-          ? `<div class="code-snippet">${escapeHtml(q.code_snippet)}</div>`
+          ? `<div class="code-snippet">${escapeHtml(q.code_snippet).replace(/\\n/g, '\n')}</div>`
           : '';
 
         // Store explanation and hints in lookup — never embed text in onclick attributes

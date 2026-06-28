@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Cohorts — Instructor Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+</head>
+
+<body class="bg-[#0e0f11] text-gray-100 min-h-screen font-sans antialiased flex flex-col justify-between">
+
+  <!-- Main Content Wrap -->
+  <div class="max-w-4xl mx-auto px-6 py-12 md:py-20 w-full">
+    
+    <!-- Navigation back to Hub -->
+    <div class="mb-6">
+      <a href="index.html" class="text-xs font-mono font-bold text-amber-500 hover:underline">← Back to Instructor Hub</a>
+    </div>
+
+    <!-- Header -->
+    <header class="mb-12 border-b border-gray-800 pb-8">
+      <p class="text-xs font-bold text-amber-500 uppercase tracking-widest mb-2 font-mono">Administration Hub</p>
+      <h1 class="text-4xl font-extrabold tracking-tight text-white mb-3">MANAGE <span class="text-amber-500">COHORTS</span></h1>
+      <p class="text-gray-400 text-base font-light">
+        Add, view, and delete student cohorts. These labels are used to filter homework submissions and organize access codes.
+      </p>
+    </header>
+
+    <!-- Auth Gate -->
+    <div id="auth-gate" class="bg-[#14161a] border border-gray-800 p-8 rounded-2xl shadow-xl max-w-md mx-auto">
+      <h2 class="text-xl font-bold text-white mb-4">🔑 Teacher Verification</h2>
+      <input type="email" id="teacher-email" placeholder="teacher@school.edu" class="w-full bg-[#1c1e24] border border-gray-800 rounded-lg p-3 mb-3 text-white focus:outline-none focus:border-amber-500 font-mono text-sm">
+      <input type="password" id="teacher-password" placeholder="Password" class="w-full bg-[#1c1e24] border border-gray-800 rounded-lg p-3 mb-4 text-white focus:outline-none focus:border-amber-500 font-mono text-sm">
+      <div id="auth-error" class="text-red-400 text-xs mb-3 hidden"></div>
+      <button onclick="login()" id="login-btn" class="w-full bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold py-3 rounded-lg transition duration-200">Verify Identity</button>
+    </div>
+
+    <!-- Management Dashboard (Hidden until Auth) -->
+    <div id="manager-panel" class="hidden space-y-8">
+      
+      <!-- Top Status Indicator -->
+      <div class="flex justify-between items-center bg-[#14161a] border border-gray-800 px-6 py-4 rounded-xl">
+        <div id="logged-in-as" class="text-sm font-mono text-gray-400"></div>
+        <button onclick="logout()" class="text-xs font-mono bg-red-900/20 text-red-400 border border-red-900/30 px-3 py-1.5 rounded hover:bg-red-900/40 transition">Logout</button>
+      </div>
+
+      <!-- Grid: Add Cohort and Current Cohorts -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Add Cohort Form -->
+        <div class="md:col-span-1 bg-[#14161a] border border-gray-800 p-6 rounded-2xl shadow-xl h-fit">
+          <h3 class="text-lg font-bold text-white mb-4">Create Cohort</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-mono text-gray-400 uppercase tracking-wider mb-2">Cohort Name</label>
+              <input type="text" id="cohort-name" placeholder="e.g. aijr-winter-2026" class="w-full bg-[#1c1e24] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-amber-500 font-mono text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-mono text-gray-400 uppercase tracking-wider mb-2">Description</label>
+              <textarea id="cohort-desc" placeholder="Optional notes..." rows="3" class="w-full bg-[#1c1e24] border border-gray-800 rounded-lg p-3 text-white focus:outline-none focus:border-amber-500 text-sm"></textarea>
+            </div>
+            <button onclick="createCohort()" class="w-full bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold py-3 rounded-lg transition duration-200">Add Cohort</button>
+          </div>
+        </div>
+
+        <!-- Cohorts List -->
+        <div class="md:col-span-2 bg-[#14161a] border border-gray-800 p-6 rounded-2xl shadow-xl">
+          <h3 class="text-lg font-bold text-white mb-4">Active Cohorts</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-400">
+              <thead class="text-xs font-mono text-gray-500 uppercase border-b border-gray-850">
+                <tr>
+                  <th class="py-3 px-4">Name</th>
+                  <th class="py-3 px-4">Description</th>
+                  <th class="py-3 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="cohorts-table-body" class="divide-y divide-gray-800/50">
+                <tr>
+                  <td colspan="3" class="py-6 text-center font-mono text-gray-600">Loading cohorts...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="border-t border-gray-900 bg-[#0a0b0d] py-6 text-center text-xs font-mono text-gray-600">
+    Instructor Tools · AI Junior Competition
+  </footer>
+
+  <script>
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+      auth: { persistSession: true }
+    });
+
+    let currentUser = null;
+
+    async function init() {
+      const { data: { session } } = await db.auth.getSession();
+      if (session?.user) {
+        setAuthenticated(session.user);
+      }
+    }
+
+    function setAuthenticated(user) {
+      currentUser = user;
+      document.getElementById('auth-gate').classList.add('hidden');
+      document.getElementById('manager-panel').classList.remove('hidden');
+      document.getElementById('logged-in-as').textContent = `👤 Logged in as: ${user.email}`;
+      loadCohorts();
+    }
+
+    async function login() {
+      const email = document.getElementById('teacher-email').value.trim();
+      const password = document.getElementById('teacher-password').value;
+      const errorDiv = document.getElementById('auth-error');
+      
+      errorDiv.classList.add('hidden');
+
+      if (!email || !password) {
+        errorDiv.textContent = 'Email and password required.';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+
+      const { data, error } = await db.auth.signInWithPassword({ email, password });
+      if (error) {
+        errorDiv.textContent = `Error: ${error.message}`;
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+
+      setAuthenticated(data.user);
+    }
+
+    async function logout() {
+      await db.auth.signOut();
+      currentUser = null;
+      document.getElementById('auth-gate').classList.remove('hidden');
+      document.getElementById('manager-panel').classList.add('hidden');
+    }
+
+    async function loadCohorts() {
+      const tbody = document.getElementById('cohorts-table-body');
+      tbody.innerHTML = '<tr><td colspan="3" class="py-6 text-center font-mono text-gray-600">Fetching cohorts...</td></tr>';
+
+      const { data, error } = await db
+        .from('cohorts')
+        .select('*')
+        .order('name', { ascending: true });
+
+      if (error) {
+        tbody.innerHTML = `<tr><td colspan="3" class="py-6 text-center text-red-400">Failed to load cohorts: ${error.message}</td></tr>`;
+        return;
+      }
+
+      if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" class="py-6 text-center font-mono text-gray-600">No cohorts registered yet.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = data.map(cohort => `
+        <tr class="hover:bg-[#1a1c23]/40 transition">
+          <td class="py-4 px-4 font-mono text-white font-medium">${cohort.name}</td>
+          <td class="py-4 px-4 text-xs text-gray-400">${cohort.description || '—'}</td>
+          <td class="py-4 px-4 text-right">
+            <button onclick="deleteCohort(${cohort.id}, '${cohort.name}')" class="text-xs font-mono text-red-400 hover:text-red-300 hover:underline bg-red-950/20 px-2.5 py-1 rounded border border-red-900/30">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function createCohort() {
+      const nameInput = document.getElementById('cohort-name');
+      const descInput = document.getElementById('cohort-desc');
+      const name = nameInput.value.trim().toLowerCase();
+      const description = descInput.value.trim();
+
+      if (!name) {
+        alert('Cohort name is required.');
+        return;
+      }
+
+      const { error } = await db
+        .from('cohorts')
+        .insert([{ name, description, created_by: currentUser.id }]);
+
+      if (error) {
+        alert(`Error adding cohort: ${error.message}`);
+        return;
+      }
+
+      nameInput.value = '';
+      descInput.value = '';
+      loadCohorts();
+    }
+
+    async function deleteCohort(id, name) {
+      if (!confirm(`Are you sure you want to delete cohort "${name}"?`)) return;
+
+      const { error } = await db
+        .from('cohorts')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        alert(`Error deleting cohort: ${error.message}`);
+        return;
+      }
+
+      loadCohorts();
+    }
+
+    // Allow Enter key on login password input
+    document.getElementById('teacher-password')?.addEventListener('keydown', e => {
+      if (e.key === 'Enter') login();
+    });
+
+    init();
+  </script>
+</body>
+
+</html>

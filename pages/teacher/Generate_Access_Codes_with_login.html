@@ -308,15 +308,13 @@
         </select>
 
         <label for="cohort-input">Cohort (group label):</label>
-        <input type="text" id="cohort-input" list="cohort-suggestions"
-          placeholder="e.g. aijr-winter-2025" autocomplete="off"
-          style="margin-bottom:0.25rem">
-        <datalist id="cohort-suggestions">
-          <option value="aijr-winter-2025">
-          <option value="aijr-summer-2025">
-          <option value="aijr-winter-2026">
-          <option value="aijr-summer-2026">
-        </datalist>
+        <div class="flex gap-2 mb-1">
+          <input type="text" id="cohort-input" list="cohort-suggestions"
+            placeholder="e.g. aijr-winter-2025" autocomplete="off"
+            style="margin-bottom:0; flex: 1;">
+          <a href="manage_cohorts.html" target="_blank" class="secondary-btn" style="padding: 0.75rem 1rem; border-radius: 6px; text-decoration: none; font-size: 0.9rem; text-align: center; display: inline-block; flex-shrink: 0; font-weight: 600; background: #0D6E8A; color: #fff; border: none; cursor: pointer; transition: background 0.15s;">Manage Cohorts</a>
+        </div>
+        <datalist id="cohort-suggestions"></datalist>
         <div style="font-size:0.8rem;color:#5B6E85;margin-bottom:1rem">
           This label is stored on every code and forwarded to homework submissions.
           Students never see it — it lets you filter by cohort in the dashboard.
@@ -387,6 +385,7 @@
       document.getElementById('generator-form').style.display = 'block';
       document.getElementById('logged-in-as').textContent = `👤 ${user.email}`;
       loadClasses();
+      loadCohorts();
     }
 
     // ── Load classes from class_config ────────────────────────────────────────
@@ -418,6 +417,27 @@
         // Fall back to a static placeholder so the form is still usable
         select.innerHTML = '<option value="" disabled selected>Error loading classes</option>';
         showStatus(`Could not load class list: ${err.message}`, 'error');
+      }
+    }
+
+    // ── Load cohorts dynamically ──────────────────────────────────────────────
+    async function loadCohorts() {
+      const datalist = document.getElementById('cohort-suggestions');
+      datalist.innerHTML = '';
+
+      try {
+        const { data, error } = await db
+          .from('cohorts')
+          .select('name')
+          .order('name', { ascending: true });
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          datalist.innerHTML = data.map(c => `<option value="${c.name}">`).join('');
+        }
+      } catch (err) {
+        console.error('Failed to load cohorts:', err);
       }
     }
 
