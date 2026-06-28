@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Is it AI? — Sorting Activity</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    .drag-over-rule {
+      background-color: rgba(59, 130, 246, 0.1) !important;
+      border-color: #3b82f6 !important;
+      transform: scale(1.02);
+    }
+
+    .drag-over-ai {
+      background-color: rgba(139, 92, 246, 0.1) !important;
+      border-color: #8b5cf6 !important;
+      transform: scale(1.02);
+    }
+
+    .card-transition {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Glassmorphism details */
+    .glass {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+  </style>
+</head>
+
+<body class="bg-[#F9FAFB] text-gray-900 min-h-screen font-sans antialiased pb-12">
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-50 hidden"></canvas>
+
+  <div class="max-w-5xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <!-- Header -->
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+      <div>
+        <!-- Back Link -->
+        <a href="index.html" class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-blue-600 mb-3 hover:text-blue-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">IS IT <span class="text-blue-600">AI?</span></h1>
+        <p class="text-gray-500 font-medium italic mt-1">Sorting Activity · Module 1 Foundations &amp; Thinking</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-blue-50 border border-blue-200 text-blue-800 shadow-sm self-start md:self-auto">
+        Week 1 Activity
+      </div>
+    </header>
+
+    <!-- Context Explanation Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div class="bg-blue-50/50 border border-blue-100 rounded-2xl p-6 flex gap-4">
+        <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+        </div>
+        <div>
+          <h3 class="font-bold text-blue-900 mb-1">Rule-Based Software</h3>
+          <p class="text-xs text-blue-700 leading-relaxed">
+            Follows deterministic rules and manual logic (like nested <strong>IF-ELSE</strong> checks). The output is 100% predictable based on hardcoded equations, calculations, or direct matches.
+          </p>
+        </div>
+      </div>
+
+      <div class="bg-purple-50/50 border border-purple-100 rounded-2xl p-6 flex gap-4">
+        <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center flex-shrink-0">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+          </svg>
+        </div>
+        <div>
+          <h3 class="font-bold text-purple-900 mb-1">AI-Driven Systems</h3>
+          <p class="text-xs text-purple-700 leading-relaxed">
+            Uses <strong>Machine Learning</strong> models trained on datasets. Instead of explicit rules, these systems discover patterns, generalize from examples, and make probabilistic predictions or actions.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Indicator -->
+    <div class="bg-white border border-gray-200 p-4 rounded-2xl shadow-sm mb-8">
+      <div class="flex justify-between items-center mb-2">
+        <span class="text-xs font-black text-gray-400 uppercase tracking-widest">Progress</span>
+        <span class="text-sm font-mono font-bold text-blue-600" id="progress-text">Sorted 0 / 10</span>
+      </div>
+      <div class="w-full bg-gray-100 rounded-full h-2">
+        <div id="progress-bar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <!-- Interactive Game Workspace -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch mb-8">
+
+      <!-- Left Dropzone: Rule-Based -->
+      <div id="dropzone-rule" 
+        class="lg:col-span-3 border-2 border-dashed border-blue-200 bg-white rounded-3xl p-6 flex flex-col items-center justify-center text-center card-transition min-h-[250px] lg:min-h-0 select-none shadow-sm"
+        ondragover="handleDragOver(event, 'rule')"
+        ondragleave="handleDragLeave('rule')"
+        ondrop="handleDrop(event, 'rule')">
+        <div class="w-16 h-16 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center mb-4 border border-blue-100 pointer-events-none">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+          </svg>
+        </div>
+        <h4 class="font-bold text-gray-800 mb-1 pointer-events-none">Rule-Based Software</h4>
+        <p class="text-[11px] text-gray-400 pointer-events-none mb-3">Drag here for explicit logic</p>
+        <span class="px-3 py-1 bg-blue-50 border border-blue-100 text-blue-700 font-mono text-[10px] font-black uppercase rounded-md pointer-events-none">DROP ZONE</span>
+      </div>
+
+      <!-- Center Active Card Workspace -->
+      <div class="lg:col-span-6 flex flex-col justify-center">
+        
+        <!-- Active Sorting Card -->
+        <div id="active-card-container" class="relative min-h-[360px]">
+          
+          <!-- Loading / Next state wrapper card -->
+          <div id="game-card" 
+            class="bg-white border border-gray-200 p-8 rounded-3xl shadow-md flex flex-col justify-between items-center text-center cursor-grab active:cursor-grabbing card-transition h-full w-full absolute top-0 left-0"
+            draggable="true"
+            ondragstart="handleDragStart(event)">
+            
+            <div class="w-full">
+              <!-- Card Top Badge -->
+              <div class="flex justify-between items-center mb-6">
+                <span class="px-3 py-1 bg-gray-100 text-gray-500 font-mono text-[10px] font-black uppercase tracking-widest rounded-md" id="card-badge">Card 1 of 10</span>
+                <span class="w-7 h-7 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center" title="Drag me!">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path>
+                  </svg>
+                </span>
+              </div>
+
+              <!-- Icon placeholder / illustration -->
+              <div class="w-20 h-20 mx-auto rounded-2xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center mb-6 shadow-sm">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="card-icon">
+                  <!-- Dynamic SVG path will load here -->
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+              </div>
+
+              <!-- Product Details -->
+              <h3 class="text-2xl font-black text-gray-900 mb-3 tracking-tight" id="card-title">ChatGPT / LLM Chatbots</h3>
+              <p class="text-sm text-gray-500 leading-relaxed px-4" id="card-description">Generates human-like text responses dynamically based on user prompts.</p>
+            </div>
+
+            <!-- Drag indicator label -->
+            <p class="text-xs text-gray-400 font-medium italic mt-6 select-none flex items-center gap-1.5">
+              <span>← Drag Left to Classify</span>
+              <span class="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
+              <span>Drag Right to Classify →</span>
+            </p>
+          </div>
+
+          <!-- Feedback & Explanation Card (Hidden by default, overlays game-card when sorted) -->
+          <div id="feedback-card" 
+            class="bg-white border-2 border-gray-200 p-8 rounded-3xl shadow-lg flex flex-col justify-between items-center text-center card-transition h-full w-full absolute top-0 left-0 opacity-0 pointer-events-none transform scale-95">
+            
+            <div class="w-full">
+              <!-- Result Icon & Header -->
+              <div class="flex items-center justify-center gap-2 mb-4">
+                <span id="feedback-result-badge" class="px-4 py-1.5 rounded-full font-black text-xs uppercase tracking-widest shadow-sm">
+                  Correct
+                </span>
+              </div>
+
+              <h4 class="text-xl font-bold text-gray-900 mb-4" id="feedback-title">ChatGPT</h4>
+
+              <!-- Explanation -->
+              <div class="bg-gray-50 border border-gray-100 rounded-2xl p-5 text-left mb-6">
+                <span class="block text-[10px] font-black font-mono uppercase tracking-widest text-gray-400 mb-2">Educational Context</span>
+                <p class="text-xs text-gray-600 leading-relaxed font-normal" id="feedback-explanation">
+                  Explanation text will load dynamically.
+                </p>
+              </div>
+            </div>
+
+            <!-- Next button -->
+            <button id="next-btn" onclick="nextCard()" 
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 px-8 rounded-xl shadow-md transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2">
+              <span>Next Card</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Accessible Buttons / Mobile Click Fallbacks -->
+        <div class="flex gap-4 mt-6">
+          <button onclick="classifyCard('rule')" 
+            class="flex-1 bg-white border border-gray-200 hover:border-blue-400 hover:bg-blue-50/10 text-blue-700 font-bold py-3.5 px-4 rounded-xl text-sm transition-all active:scale-95 shadow-sm flex items-center justify-center gap-2">
+            <span>← Rule-Based</span>
+          </button>
+          <button onclick="classifyCard('ai')" 
+            class="flex-1 bg-white border border-gray-200 hover:border-purple-400 hover:bg-purple-50/10 text-purple-700 font-bold py-3.5 px-4 rounded-xl text-sm transition-all active:scale-95 shadow-sm flex items-center justify-center gap-2">
+            <span>AI-Driven →</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Right Dropzone: AI-Driven -->
+      <div id="dropzone-ai" 
+        class="lg:col-span-3 border-2 border-dashed border-purple-200 bg-white rounded-3xl p-6 flex flex-col items-center justify-center text-center card-transition min-h-[250px] lg:min-h-0 select-none shadow-sm"
+        ondragover="handleDragOver(event, 'ai')"
+        ondragleave="handleDragLeave('ai')"
+        ondrop="handleDrop(event, 'ai')">
+        <div class="w-16 h-16 rounded-2xl bg-purple-50 text-purple-500 flex items-center justify-center mb-4 border border-purple-100 pointer-events-none">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+          </svg>
+        </div>
+        <h4 class="font-bold text-gray-800 mb-1 pointer-events-none">AI-Driven System</h4>
+        <p class="text-[11px] text-gray-400 pointer-events-none mb-3">Drag here for pattern learning</p>
+        <span class="px-3 py-1 bg-purple-50 border border-purple-100 text-purple-700 font-mono text-[10px] font-black uppercase rounded-md pointer-events-none">DROP ZONE</span>
+      </div>
+
+    </div>
+
+    <!-- Final Summary Modal Overlay (Hidden initially) -->
+    <div id="summary-overlay" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+      <div class="bg-white border border-gray-200 p-8 md:p-10 rounded-3xl shadow-xl max-w-lg w-full text-center transform scale-95 transition-transform duration-300">
+        <!-- Badge -->
+        <span class="px-4 py-1 bg-blue-50 border border-blue-200 text-blue-800 font-black text-xs uppercase tracking-widest rounded-full shadow-sm mb-4 inline-block">Activity Complete</span>
+        
+        <!-- Score Title -->
+        <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-3 tracking-tight">Excellent Job!</h2>
+        
+        <p class="text-gray-500 mb-6">You've successfully categorized all 10 digital tools.</p>
+        
+        <!-- Large Score Box -->
+        <div class="bg-gray-50 border border-gray-100 p-6 rounded-2xl mb-8 flex justify-around items-center">
+          <div class="text-left">
+            <span class="block text-[10px] font-black font-mono uppercase tracking-widest text-gray-400">Your Score</span>
+            <span class="text-4xl font-black text-blue-600 font-mono" id="score-text">10 / 10</span>
+          </div>
+          <div class="w-px h-12 bg-gray-200"></div>
+          <div class="text-left">
+            <span class="block text-[10px] font-black font-mono uppercase tracking-widest text-gray-400">Class Rank</span>
+            <span class="text-2xl font-black text-gray-800" id="rank-text">AI Master</span>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4">
+          <button onclick="resetActivity()" 
+            class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3.5 rounded-xl text-sm transition-all active:scale-95 flex items-center justify-center gap-2">
+            <span>Play Again</span>
+          </button>
+          <a href="index.html" 
+            class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-black py-3.5 rounded-xl text-sm transition-all active:scale-95 shadow-md flex items-center justify-center gap-2">
+            <span>Return to Hub</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- History / Review List Log (Shows item outcomes below) -->
+    <div class="bg-white border border-gray-200 p-6 md:p-8 rounded-3xl shadow-sm mt-12">
+      <div class="flex items-baseline gap-3 mb-6 border-b border-gray-100 pb-3">
+        <span class="text-3xl font-black text-gray-300 font-mono italic">Log</span>
+        <h2 class="text-xl font-bold text-gray-900 tracking-tight">Classification History</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        
+        <!-- Rule-Based list -->
+        <div>
+          <h4 class="text-xs font-black text-blue-500 uppercase tracking-widest mb-4 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-blue-500"></span>Rule-Based Log
+          </h4>
+          <div class="space-y-3" id="log-rule">
+            <p class="text-xs font-medium text-gray-400 italic">No tools sorted here yet.</p>
+          </div>
+        </div>
+
+        <!-- AI-Driven list -->
+        <div>
+          <h4 class="text-xs font-black text-purple-500 uppercase tracking-widest mb-4 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-purple-500"></span>AI-Driven Log
+          </h4>
+          <div class="space-y-3" id="log-ai">
+            <p class="text-xs font-medium text-gray-400 italic">No tools sorted here yet.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Cards Dataset
+    const items = [
+      {
+        id: "chatgpt",
+        name: "ChatGPT / LLMs",
+        description: "Generates human-like text responses dynamically based on user prompts.",
+        isAi: true,
+        icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>',
+        explanation: "ChatGPT is AI-driven because it uses a Large Language Model (transformer neural network) trained on billions of parameters. It predicts the next most likely words based on patterns in its training data, rather than following pre-written rules or templates."
+      },
+      {
+        id: "excel_sum",
+        name: "Spreadsheet SUM Formula",
+        description: "Adds up a column of numbers in Excel to produce a total.",
+        isAi: false,
+        icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>',
+        explanation: "This is a deterministic, rule-based algorithm (addition). There is no learning or adaptive pattern matching; the formula executes the exact same mathematical instructions every single time."
+      },
+      {
+        id: "google_translate",
+        name: "Google Translate",
+        description: "Translates blocks of text from one language to another.",
+        isAi: true,
+        icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 11.37 7.363 16.5 3 19"></path>',
+        explanation: "Modern language translation tools use Neural Machine Translation (NMT) models. These deep learning networks analyze the contextual semantic meaning of whole sentences to generate translations, rather than looking up words in a direct rule-based dictionary."
+      },
+      {
+        id: "alarm_clock",
+        name: "Digital Alarm Clock",
+        description: "Triggers a sound effect when the system time matches a user-specified wake-up time.",
+        isAi: false,
+        icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+        explanation: "This clock runs on a direct conditional rule: 'IF current_time EQUALS wake_time, THEN play_sound.' There is no prediction or pattern recognition involved; it is a basic static system rule."
+      },
+      {
+        id: "tesla_fsd",
+        name: "Tesla Full Self-Driving (FSD)",
+        description: "Steers, accelerates, and brakes a car autonomously through city traffic.",
+        isAi: true,
+        icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>',
+        explanation: "FSD is heavily AI-driven. It inputs live streams from surrounding cameras into deep computer vision neural networks to detect pedestrians, lane markers, and obstacles, planning driving path probabilities dynamically in real-time."
+      },
+      {
+        id: "basic_thermostat",
+        name: "Traditional Digital Thermostat",
+        description: "Turns on the furnace when the room temperature falls below a set temperature.",
+        isAi: false,
+        icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>',
+        explanation: "This is a simple binary rule-based system. It monitors a thermal threshold (if current_temp < target_temp, turn heater on). It doesn't analyze climate trends, make forecasts, or learn daily habits."
+      },
+      {
+        id: "netflix_rec",
+        name: "Netflix Movie Recommendations",
+        description: "Suggests a list of TV shows you might like on your home screen.",
+        isAi: true,
+        icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>',
+        explanation: "This recommendation engine uses Machine Learning. It analyzes your user profile, viewing history, interactions, search parameters, and matches it with metadata of similar users to continuously predict and rank content you are most likely to click."
+      },
+      {
+        id: "tic_tac_toe_bot",
+        name: "Tic-Tac-Toe Minimax Bot",
+        description: "Plays a perfect game of Tic-Tac-Toe against a human player.",
+        isAi: false,
+        icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+        explanation: "This bot uses Minimax, a traditional rule-based search algorithm. It mathematically checks every possible outcome (easy for Tic-Tac-Toe's tiny game board) to select the optimal path. It doesn't 'learn' from plays; it calculates the game tree deterministically based on static rules."
+      },
+      {
+        id: "gmail_spam",
+        name: "Gmail Spam Filter",
+        description: "Detects new types of junk emails and routes them away from your primary inbox.",
+        isAi: true,
+        icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>',
+        explanation: "Gmail's spam system uses classification machine learning models. It dynamically checks hundreds of signals (e.g. sender reputation, semantics, link layouts) and updates its threshold over time as new spam formats appear."
+      },
+      {
+        id: "spell_checker",
+        name: "Basic Word Spell Checker",
+        description: "Underlines words in red if they aren't found in a built-in dictionary file.",
+        isAi: false,
+        icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>',
+        explanation: "This is a basic rule-based lookup algorithm. It checks if each string exists in a static list of spelling dictionary words. If it is not found, the software flags it. It does not understand context or grammar rules dynamically."
+      }
+    ];
+
+    let currentCardIndex = 0;
+    let score = 0;
+    const classifications = [];
+
+    // Initialize Game UI
+    function renderCard() {
+      if (currentCardIndex >= items.length) {
+        showSummary();
+        return;
+      }
+
+      const item = items[currentCardIndex];
+
+      // Update progress details
+      const progressPercent = (currentCardIndex / items.length) * 100;
+      document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+      document.getElementById('progress-text').textContent = `Sorted ${currentCardIndex} / ${items.length}`;
+
+      // Reset Card display
+      const gameCard = document.getElementById('game-card');
+      const feedbackCard = document.getElementById('feedback-card');
+
+      gameCard.classList.remove('opacity-0', 'pointer-events-none', 'scale-95');
+      feedbackCard.classList.add('opacity-0', 'pointer-events-none', 'scale-95');
+
+      document.getElementById('card-badge').textContent = `Card ${currentCardIndex + 1} of ${items.length}`;
+      document.getElementById('card-title').textContent = item.name;
+      document.getElementById('card-description').textContent = item.description;
+      document.getElementById('card-icon').innerHTML = item.icon;
+    }
+
+    // Drag and Drop Logic
+    function handleDragStart(e) {
+      e.dataTransfer.setData("text/plain", currentCardIndex);
+      // Subtle visual feedback during drag start
+      setTimeout(() => {
+        document.getElementById('game-card').classList.add('opacity-40');
+      }, 0);
+    }
+
+    document.getElementById('game-card').addEventListener('dragend', () => {
+      document.getElementById('game-card').classList.remove('opacity-40');
+    });
+
+    function handleDragOver(e, zone) {
+      e.preventDefault();
+      const el = document.getElementById(`dropzone-${zone}`);
+      el.classList.add(`drag-over-${zone}`);
+    }
+
+    function handleDragLeave(zone) {
+      const el = document.getElementById(`dropzone-${zone}`);
+      el.classList.remove(`drag-over-${zone}`);
+    }
+
+    function handleDrop(e, zone) {
+      e.preventDefault();
+      handleDragLeave(zone);
+      
+      const draggedIndex = parseInt(e.dataTransfer.getData("text/plain"));
+      if (draggedIndex === currentCardIndex) {
+        processClassification(zone);
+      }
+    }
+
+    // Accessible Button Click classification
+    function classifyCard(zone) {
+      processClassification(zone);
+    }
+
+    // Process correctness and transition to explanation state
+    function processClassification(chosenZone) {
+      const item = items[currentCardIndex];
+      const isAiChoice = (chosenZone === 'ai');
+      const isCorrect = (item.isAi === isAiChoice);
+
+      if (isCorrect) {
+        score++;
+      }
+
+      classifications.push({
+        item: item,
+        choice: chosenZone,
+        isCorrect: isCorrect
+      });
+
+      // Update feedback card UI elements
+      const feedbackCard = document.getElementById('feedback-card');
+      const feedbackBadge = document.getElementById('feedback-result-badge');
+      
+      feedbackBadge.textContent = isCorrect ? "Correct ✓" : "Incorrect ✗";
+      if (isCorrect) {
+        feedbackBadge.className = "px-4 py-1.5 rounded-full font-black text-xs uppercase tracking-widest shadow-sm bg-green-50 border border-green-200 text-green-700";
+        feedbackCard.className = "bg-white border-2 border-green-400 p-8 rounded-3xl shadow-lg flex flex-col justify-between items-center text-center card-transition h-full w-full absolute top-0 left-0 opacity-100 transform scale-100 z-10";
+      } else {
+        feedbackBadge.className = "px-4 py-1.5 rounded-full font-black text-xs uppercase tracking-widest shadow-sm bg-red-50 border border-red-200 text-red-700";
+        feedbackCard.className = "bg-white border-2 border-red-400 p-8 rounded-3xl shadow-lg flex flex-col justify-between items-center text-center card-transition h-full w-full absolute top-0 left-0 opacity-100 transform scale-100 z-10";
+      }
+
+      document.getElementById('feedback-title').textContent = item.name;
+      document.getElementById('feedback-explanation').textContent = item.explanation;
+
+      // Swap view from active card to feedback card
+      const gameCard = document.getElementById('game-card');
+      gameCard.classList.add('opacity-0', 'pointer-events-none', 'scale-95');
+      feedbackCard.classList.remove('opacity-0', 'pointer-events-none', 'scale-95');
+
+      // Add to running history logs immediately
+      addToHistoryLog(item, isCorrect, chosenZone);
+    }
+
+    function nextCard() {
+      currentCardIndex++;
+      renderCard();
+    }
+
+    // Dynamic History Logs update
+    function addToHistoryLog(item, isCorrect, zone) {
+      const containerId = (zone === 'rule') ? 'log-rule' : 'log-ai';
+      const container = document.getElementById(containerId);
+      
+      // Clear placeholders on the first classification
+      if (classifications.length === 1) {
+        document.getElementById('log-rule').innerHTML = '';
+        document.getElementById('log-ai').innerHTML = '';
+      }
+
+      const logCard = document.createElement('div');
+      logCard.className = `p-4 rounded-xl border flex items-start gap-3 transition-all ${
+        isCorrect ? 'bg-green-50/20 border-green-100' : 'bg-red-50/20 border-red-100'
+      }`;
+      
+      const badgeColor = isCorrect ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
+      const badgeIcon = isCorrect ? '✓' : '✗';
+
+      logCard.innerHTML = `
+        <div class="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-xs ${badgeColor}">
+          ${badgeIcon}
+        </div>
+        <div class="flex-1">
+          <h5 class="text-xs font-bold text-gray-900">${item.name}</h5>
+          <p class="text-[10px] text-gray-400 mt-1 leading-relaxed">${item.explanation}</p>
+        </div>
+      `;
+      
+      container.appendChild(logCard);
+    }
+
+    // End Game Summary Page
+    function showSummary() {
+      // Complete Progress Bar
+      document.getElementById('progress-bar').style.width = '100%';
+      document.getElementById('progress-text').textContent = `Sorted ${items.length} / ${items.length}`;
+
+      // Update Text scores
+      const scoreEl = document.getElementById('score-text');
+      scoreEl.textContent = `${score} / ${items.length}`;
+
+      // Rank Label
+      const rankEl = document.getElementById('rank-text');
+      if (score === items.length) rankEl.textContent = "AI Master";
+      else if (score >= 8) rankEl.textContent = "AI Specialist";
+      else if (score >= 6) rankEl.textContent = "AI Apprentice";
+      else rankEl.textContent = "AI Novice";
+
+      // Show overlay
+      const overlay = document.getElementById('summary-overlay');
+      overlay.classList.remove('opacity-0', 'pointer-events-none');
+      overlay.firstElementChild.classList.remove('scale-95');
+
+      // Trigger Confetti
+      triggerConfetti();
+    }
+
+    function resetActivity() {
+      currentCardIndex = 0;
+      score = 0;
+      classifications.length = 0;
+
+      // Reset logs visual
+      document.getElementById('log-rule').innerHTML = '<p class="text-xs font-medium text-gray-400 italic">No tools sorted here yet.</p>';
+      document.getElementById('log-ai').innerHTML = '<p class="text-xs font-medium text-gray-400 italic">No tools sorted here yet.</p>';
+
+      // Hide overlay
+      const overlay = document.getElementById('summary-overlay');
+      overlay.classList.add('opacity-0', 'pointer-events-none');
+      overlay.firstElementChild.classList.add('scale-95');
+
+      stopConfetti();
+      renderCard();
+    }
+
+    // Canvas Confetti Code (No dependencies)
+    let confettiInterval = null;
+    let particles = [];
+    const colors = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ec4899'];
+
+    function triggerConfetti() {
+      const canvas = document.getElementById('confetti-canvas');
+      canvas.classList.remove('hidden');
+      const ctx = canvas.getContext('2d');
+      
+      // Resize handler
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      particles = [];
+      for (let i = 0; i < 150; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          r: Math.random() * 6 + 4,
+          d: Math.random() * canvas.height,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          tilt: Math.random() * 10 - 5,
+          tiltAngleIncremental: Math.random() * 0.07 + 0.02,
+          tiltAngle: 0
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        particles.forEach((p, index) => {
+          p.tiltAngle += p.tiltAngleIncremental;
+          p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+          p.x += Math.sin(p.tiltAngle);
+          p.tilt = Math.sin(p.tiltAngle - index / 3) * 15;
+
+          ctx.beginPath();
+          ctx.lineWidth = p.r;
+          ctx.strokeStyle = p.color;
+          ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
+          ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
+          ctx.stroke();
+
+          // Reset falling particle
+          if (p.y > canvas.height) {
+            particles[index] = {
+              x: Math.random() * canvas.width,
+              y: -20,
+              r: p.r,
+              d: p.d,
+              color: p.color,
+              tilt: p.tilt,
+              tiltAngleIncremental: p.tiltAngleIncremental,
+              tiltAngle: p.tiltAngle
+            };
+          }
+        });
+      }
+
+      confettiInterval = setInterval(draw, 20);
+    }
+
+    function stopConfetti() {
+      if (confettiInterval) {
+        clearInterval(confettiInterval);
+        confettiInterval = null;
+      }
+      const canvas = document.getElementById('confetti-canvas');
+      canvas.classList.add('hidden');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // Resize canvas on orientation / window changes
+    window.addEventListener('resize', () => {
+      const canvas = document.getElementById('confetti-canvas');
+      if (canvas && !canvas.classList.contains('hidden')) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+    });
+
+    // Start Page Render
+    renderCard();
+  </script>
+</body>
+
+</html>

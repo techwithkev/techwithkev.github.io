@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCA Concept Visualizer | AI Competition Jr</title>
+    <meta name="description" content="Interactive Principal Component Analysis (PCA) visualizer. Rotate the projection line, maximize captured variance, and see reconstruction error in real-time.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Smooth transition for active scales and colors */
+        .transition-all {
+            transition: all 0.2s ease-in-out;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+
+        <!-- Navigation -->
+        <nav class="mb-6 pt-2 no-print">
+            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-indigo-600 transition-colors font-mono" style="text-decoration: none;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Course Hub
+            </a>
+        </nav>
+
+        <!-- Header -->
+        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+            <div>
+                <h1 class="text-4xl font-black tracking-tight text-gray-900 uppercase">Principal Component <span class="text-indigo-600">Analysis (PCA)</span></h1>
+                <p class="text-gray-500 font-medium italic">Rotate a projection line through a 2D dataset to maximize captured variance, calculate eigenvalues, and see reconstruction error live.</p>
+            </div>
+            <div id="status-badge" class="px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest border bg-indigo-50 border-indigo-200 text-indigo-800 shadow-sm transition-all duration-300">
+                Standard Dataset
+            </div>
+        </header>
+
+        <!-- Main Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
+
+            <!-- Left Controls & Metrics Panel (5/12 width) -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+                
+                <!-- 1. Interactive Controls -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 border-b border-gray-100 pb-2">1. Interactive Controls</h2>
+                    
+                    <div class="space-y-5">
+                        <!-- Correlation Slider -->
+                        <div>
+                            <div class="flex justify-between items-end mb-2">
+                                <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Data Correlation (r)</label>
+                                <span id="r-display" class="text-xs font-mono font-black bg-indigo-50 text-indigo-600 border border-indigo-200 px-3 py-1 rounded-full">+0.70</span>
+                            </div>
+                            <input type="range" id="r-slider" min="-0.95" max="0.95" step="0.05" value="0.70" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                        </div>
+
+                        <!-- Angle Slider -->
+                        <div>
+                            <div class="flex justify-between items-end mb-2">
+                                <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Projection Angle (θ)</label>
+                                <span id="angle-display" class="text-xs font-mono font-black bg-slate-100 text-slate-800 border border-slate-200 px-3 py-1 rounded-full">30.0°</span>
+                            </div>
+                            <input type="range" id="angle-slider" min="0" max="180" step="1" value="30" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                        </div>
+
+                        <!-- Buttons Row -->
+                        <div class="grid grid-cols-3 gap-2 pt-2">
+                            <button id="btn-find-pc1" class="col-span-2 py-2.5 px-4 rounded-xl font-black text-xs uppercase tracking-wider bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95 transition-all shadow-sm">
+                                ⚡ Find Best Axis (PC1)
+                            </button>
+                            <button id="btn-regenerate" class="py-2.5 px-3 rounded-xl font-black text-xs uppercase tracking-wider bg-gray-100 text-gray-700 hover:bg-gray-200 active:scale-95 transition-all">
+                                🔀 Reset
+                            </button>
+                        </div>
+                        
+                        <div class="flex justify-end">
+                            <button id="btn-clear-custom" class="py-1 px-3 text-[10px] font-black uppercase tracking-wider text-red-500 hover:text-red-700 active:scale-95 transition-all hidden">
+                                🧹 Clear Custom Points
+                            </button>
+                        </div>
+
+                        <!-- Display Checkboxes -->
+                        <div class="border-t border-gray-100 pt-4 space-y-3">
+                            <p class="text-[10px] font-black text-gray-400 uppercase tracking-wider">Visual Overlays</p>
+                            
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="flex items-center gap-2 text-xs text-gray-600 font-bold uppercase tracking-wider cursor-pointer">
+                                    <input type="checkbox" id="chk-errors" checked class="w-4 h-4 cursor-pointer text-indigo-600 rounded border-gray-300 accent-indigo-600">
+                                    Projection Lines
+                                </label>
+                                <label class="flex items-center gap-2 text-xs text-gray-600 font-bold uppercase tracking-wider cursor-pointer">
+                                    <input type="checkbox" id="chk-variance-bar" checked class="w-4 h-4 cursor-pointer text-indigo-600 rounded border-gray-300 accent-indigo-600">
+                                    Variance Spread
+                                </label>
+                                <label class="flex items-center gap-2 text-xs text-gray-600 font-bold uppercase tracking-wider cursor-pointer">
+                                    <input type="checkbox" id="chk-pc2" checked class="w-4 h-4 cursor-pointer text-indigo-600 rounded border-gray-300 accent-indigo-600">
+                                    Show PC2 Axis
+                                </label>
+                                <label class="flex items-center gap-2 text-xs text-gray-600 font-bold uppercase tracking-wider cursor-pointer">
+                                    <input type="checkbox" id="chk-grid" checked class="w-4 h-4 cursor-pointer text-indigo-600 rounded border-gray-300 accent-indigo-600">
+                                    Gridlines
+                                </label>
+                                <label class="flex items-center gap-2 text-xs text-gray-600 font-bold uppercase tracking-wider cursor-pointer">
+                                    <input type="checkbox" id="chk-squares" checked class="w-4 h-4 cursor-pointer text-indigo-600 rounded border-gray-300 accent-indigo-600">
+                                    Error Squares
+                                </label>
+                                <label class="flex items-center gap-2 text-xs text-gray-600 font-bold uppercase tracking-wider cursor-pointer">
+                                    <input type="checkbox" id="chk-strip" checked class="w-4 h-4 cursor-pointer text-indigo-600 rounded border-gray-300 accent-indigo-600">
+                                    1D Proj. Strip
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Live PCA Mathematical Metrics -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm space-y-5">
+                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 border-b border-gray-100 pb-2">2. Live PCA Math</h2>
+                    
+                    <!-- Covariance Matrix & Eigenvalues Split -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-[9px] font-black text-gray-400 uppercase tracking-wider mb-2">Covariance Matrix (Σ)</p>
+                            <div class="grid grid-cols-2 gap-1 max-w-[180px] font-mono text-[11px] font-bold text-slate-800">
+                                <div class="bg-slate-50 border border-slate-200 rounded p-1.5 text-center">
+                                    <div class="text-[8px] text-gray-400 font-sans uppercase">Var(X)</div>
+                                    <span id="cov-xx">1.00</span>
+                                </div>
+                                <div class="bg-slate-50 border border-slate-200 rounded p-1.5 text-center">
+                                    <div class="text-[8px] text-gray-400 font-sans uppercase">Cov(X,Y)</div>
+                                    <span id="cov-xy">0.70</span>
+                                </div>
+                                <div class="bg-slate-50 border border-slate-200 rounded p-1.5 text-center">
+                                    <div class="text-[8px] text-gray-400 font-sans uppercase">Cov(Y,X)</div>
+                                    <span id="cov-yx">0.70</span>
+                                </div>
+                                <div class="bg-slate-50 border border-slate-200 rounded p-1.5 text-center">
+                                    <div class="text-[8px] text-gray-400 font-sans uppercase">Var(Y)</div>
+                                    <span id="cov-yy">1.00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <p class="text-[9px] font-black text-gray-400 uppercase tracking-wider">Eigenvalues (Variance)</p>
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="font-bold text-indigo-600">λ₁ (PC1):</span>
+                                    <span id="val-lambda1" class="font-mono font-black">1.70</span>
+                                </div>
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="font-bold text-purple-500">λ₂ (PC2):</span>
+                                    <span id="val-lambda2" class="font-mono font-black">0.30</span>
+                                </div>
+                                <div class="flex justify-between items-center text-xs border-t border-gray-100 pt-1">
+                                    <span class="font-bold text-slate-500">Total Variance:</span>
+                                    <span id="val-totalvar" class="font-mono font-black">2.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Variance Explained Progress Bar -->
+                    <div class="border-t border-gray-100 pt-4">
+                        <div class="flex justify-between items-end mb-1.5 text-xs">
+                            <span class="font-bold text-slate-600 uppercase">Variance Captured by PC1 (PVE)</span>
+                            <span id="pve-display" class="font-mono font-black text-indigo-600">85.0%</span>
+                        </div>
+                        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                            <div id="pve-bar" class="bg-indigo-600 h-full rounded-full transition-all duration-300" style="width: 85%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Current Projections Stats -->
+                    <div class="border-t border-gray-100 pt-4 space-y-2">
+                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-wider">Active Projection Angle Stats</p>
+                        
+                        <div class="grid grid-cols-2 gap-3 text-xs">
+                            <div class="bg-indigo-50/50 rounded-xl p-3 border border-indigo-100/50">
+                                <div class="text-[9px] font-bold text-indigo-500 uppercase tracking-wider mb-1">Projected Variance</div>
+                                <span id="stat-projected-var" class="text-base font-mono font-black text-indigo-700">1.52</span>
+                                <span id="stat-projected-pct" class="text-[9px] font-bold text-indigo-500 block mt-0.5">89.4% of maximum</span>
+                            </div>
+                            <div class="bg-red-50/50 rounded-xl p-3 border border-red-100/50">
+                                <div class="text-[9px] font-bold text-red-500 uppercase tracking-wider mb-1">Reconstruction SSE</div>
+                                <span id="stat-reconstruction-error" class="text-base font-mono font-black text-red-700">0.48</span>
+                                <span class="text-[9px] font-bold text-red-500 block mt-0.5">Sum of Squared Errors</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Visualizer & Code Panel (7/12 width) -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
+                
+                <!-- 3. Dynamic Concept Render -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col">
+                    <div class="flex justify-between items-center mb-4 border-b border-gray-100 pb-2">
+                        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest">3. Interactive 2D Coordinate Space</h2>
+                        <span class="text-[10px] text-indigo-500 font-bold bg-indigo-50 border border-indigo-100 rounded px-2 py-0.5">Click to place custom outliers!</span>
+                    </div>
+                    
+                    <!-- Graph Canvas Box -->
+                    <div class="bg-slate-950 border-2 border-slate-900 rounded-xl relative h-96 w-full overflow-hidden flex items-center justify-center">
+                        <canvas id="pca-canvas" class="w-full h-full absolute inset-0"></canvas>
+                        
+                        <!-- Canvas center crosshair guide (hidden unless needed) -->
+                        <div id="hover-overlay" class="absolute pointer-events-none text-[9px] font-mono font-black bg-black/85 text-slate-300 rounded px-1.5 py-0.5 border border-slate-700 hidden"></div>
+                    </div>
+                    
+                    <div class="mt-4 flex flex-wrap gap-4 items-center justify-between">
+                        <div class="flex flex-wrap gap-4 items-center">
+                            <div class="flex items-center gap-1.5">
+                                <div class="w-3 h-3 rounded-full bg-white border border-indigo-500"></div>
+                                <span class="text-[10px] font-bold text-slate-500 uppercase">Standard Point</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <div class="w-3 h-3 rounded-full bg-pink-100 border border-pink-500"></div>
+                                <span class="text-[10px] font-bold text-slate-500 uppercase">Custom Point</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <div class="w-4 h-0.5 bg-indigo-600"></div>
+                                <span class="text-[10px] font-bold text-slate-500 uppercase">Projected Axis</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <div class="w-4 h-0.5 border-t border-dashed border-red-400"></div>
+                                <span class="text-[10px] font-bold text-slate-500 uppercase">Error Projection</span>
+                            </div>
+                        </div>
+                        <div id="point-count-badge" class="text-[10px] font-black uppercase text-slate-400 font-mono">
+                            Points: 50
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Python / NumPy Code View -->
+                <div class="bg-slate-950 border border-slate-900 rounded-2xl p-5 font-mono text-[11px] text-slate-300 shadow-lg">
+                    <div class="text-[9px] uppercase font-black text-indigo-400 mb-2 tracking-wider">Live scikit-learn Code Implementation</div>
+                    <pre id="math-display" class="whitespace-pre overflow-x-auto text-slate-200 leading-relaxed"></pre>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- 3-Column Educational Context Footer -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <!-- Core Concept -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-indigo-50 border border-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center font-bold mb-4 font-mono text-xs">01</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">The PCA Intuition</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    Principal Component Analysis (PCA) is an <strong>unsupervised</strong> dimension reduction method. It looks for new, perpendicular directions (principal components) that represent the structural directions of the data. 
+                    <br><br>
+                    <strong>PC1 (First Component)</strong> points in the direction of the highest variance. By projecting the dataset onto PC1, we compress our coordinates from 2D down to 1D while preserving as much of the original variation (information) as possible.
+                </p>
+            </div>
+
+            <!-- Mathematical Model -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-indigo-50 border border-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center font-bold mb-4 font-mono text-xs">02</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">Variance vs Error</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    PCA performs two tasks simultaneously:
+                    <br><br>
+                    <strong>① Maximizing Projected Variance</strong>: Spreading the data coordinates as far apart as possible along the projection line.
+                    <br><br>
+                    <strong>② Minimizing Reconstruction Error</strong>: Making the perpendicular line segments (red dashed lines) as short as possible. 
+                    <br><br>
+                    Because of the Pythagorean theorem, these two goals are mathematically equivalent! Finding the angle that maximizes the projected variance automatically minimizes the sum of squared reconstruction errors (SSE).
+                </p>
+            </div>
+
+            <!-- AI Connection -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-indigo-50 border border-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center font-bold mb-4 border border-indigo-200 font-mono text-xs">03</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">How AI Uses PCA</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    In modern AI, datasets often contain hundreds or thousands of features (e.g., pixel intensities in image recognition). High-dimensional spaces suffer from the <em>"Curse of Dimensionality"</em>, making models overfit and slow to train.
+                    <br><br>
+                    AI engineers use PCA to compress features into a compact, uncorrelated subset before feeding them into classifiers. It is also used to visualize high-dimensional embeddings and acts as a linear foundation for neural network autoencoders.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Interactive script logic -->
+    <script>
+        const canvas = document.getElementById('pca-canvas');
+        const ctx = canvas.getContext('2d');
+        const rSlider = document.getElementById('r-slider');
+        const rDisplay = document.getElementById('r-display');
+        const angleSlider = document.getElementById('angle-slider');
+        const angleDisplay = document.getElementById('angle-display');
+        const btnFindPC1 = document.getElementById('btn-find-pc1');
+        const btnRegenerate = document.getElementById('btn-regenerate');
+        const btnClearCustom = document.getElementById('btn-clear-custom');
+        const pointCountBadge = document.getElementById('point-count-badge');
+        const statusBadge = document.getElementById('status-badge');
+        
+        // Toggles
+        const chkErrors = document.getElementById('chk-errors');
+        const chkVarianceBar = document.getElementById('chk-variance-bar');
+        const chkPC2 = document.getElementById('chk-pc2');
+        const chkGrid = document.getElementById('chk-grid');
+        const chkSquares = document.getElementById('chk-squares');
+        const chkStrip = document.getElementById('chk-strip');
+
+        // Metrics elements
+        const covXX = document.getElementById('cov-xx');
+        const covXY = document.getElementById('cov-xy');
+        const covYX = document.getElementById('cov-yx');
+        const covYY = document.getElementById('cov-yy');
+        const valLambda1 = document.getElementById('val-lambda1');
+        const valLambda2 = document.getElementById('val-lambda2');
+        const valTotalVar = document.getElementById('val-totalvar');
+        const pveDisplay = document.getElementById('pve-display');
+        const pveBar = document.getElementById('pve-bar');
+        const statProjectedVar = document.getElementById('stat-projected-var');
+        const statProjectedPct = document.getElementById('stat-projected-pct');
+        const statReconstructionError = document.getElementById('stat-reconstruction-error');
+
+        const mathDisplay = document.getElementById('math-display');
+        const hoverOverlay = document.getElementById('hover-overlay');
+
+        // ─── STATE ────────────────────────────────────────────────────────
+        let points = [];           // [{x, y}] standard points in math space [-5, 5]
+        let customPoints = [];     // [{x, y}] user clicked points
+        let centroid = { x: 0, y: 0 };
+        let cov = { xx: 1, yy: 1, xy: 0 };
+        let eigenvalues = { lambda1: 1, lambda2: 0 };
+        let eigenvectors = { v1: { x: 1, y: 0 }, v2: { x: 0, y: 1 } };
+        let pc1AngleRad = 0;       // Angle of PC1 in radians [0, PI]
+        let isAnimating = false;
+        let draggedIndex = -1;     // Dragging a point index
+        let draggedIsCustom = false; // Is the dragged point in the customPoints array?
+
+        const N_POINTS = 50;
+
+        // ─── COORDINATE CONVERSIONS ───────────────────────────────────────
+        // Mathematical space ranges from approx -5.0 to +5.0 in both directions.
+        function getScale() {
+            return Math.min(canvas.width, canvas.height) / 10;
+        }
+
+        function mathToCanvas(mx, my) {
+            const scale = getScale();
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            return {
+                x: cx + mx * scale,
+                y: cy - my * scale // flip y axis
+            };
+        }
+
+        function canvasToMath(cx_val, cy_val) {
+            const scale = getScale();
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            return {
+                x: (cx_val - cx) / scale,
+                y: (cy - cy_val) / scale
+            };
+        }
+
+        // ─── DATA GENERATION ──────────────────────────────────────────────
+        // Generate bivariate normal data with correlation r
+        function generateData() {
+            points = [];
+            const r = parseFloat(rSlider.value);
+            
+            for (let i = 0; i < N_POINTS; i++) {
+                // Box-Muller transform for independent Gaussian samples
+                const u1 = Math.random();
+                const u2 = Math.random();
+                const z1 = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+                const z2 = Math.sqrt(-2 * Math.log(u1)) * Math.sin(2 * Math.PI * u2);
+                
+                // Scale values to fit coordinate grid nicely (stddev ~ 1.5)
+                const x = 1.6 * z1;
+                // Correlate: Y = r * X + sqrt(1 - r^2) * Z_2
+                const y = 1.6 * (r * z1 + Math.sqrt(1 - r * r) * z2);
+                points.push({ x: x, y: y });
+            }
+        }
+
+        // ─── PCA MATHEMATICAL CALCULATION ─────────────────────────────────
+        function calculatePCA() {
+            const allPoints = points.concat(customPoints);
+            const n = allPoints.length;
+            
+            if (n < 2) {
+                centroid = { x: 0, y: 0 };
+                cov = { xx: 1, yy: 1, xy: 0 };
+                eigenvalues = { lambda1: 1, lambda2: 0 };
+                eigenvectors = { v1: { x: 1, y: 0 }, v2: { x: 0, y: 1 } };
+                pc1AngleRad = 0;
+                return;
+            }
+
+            // 1. Calculate Centroid (Mean)
+            let sumX = 0, sumY = 0;
+            for (let p of allPoints) {
+                sumX += p.x;
+                sumY += p.y;
+            }
+            centroid.x = sumX / n;
+            centroid.y = sumY / n;
+
+            // 2. Compute Covariance Matrix Elements
+            let xx = 0, yy = 0, xy = 0;
+            for (let p of allPoints) {
+                const dx = p.x - centroid.x;
+                const dy = p.y - centroid.y;
+                xx += dx * dx;
+                yy += dy * dy;
+                xy += dx * dy;
+            }
+            cov.xx = xx / (n - 1);
+            cov.yy = yy / (n - 1);
+            cov.xy = xy / (n - 1);
+
+            // 3. Compute Eigenvalues
+            const a = cov.xx;
+            const b = cov.xy;
+            const d = cov.yy;
+            const trace = a + d;
+            const determinant = a * d - b * b;
+            
+            // Discriminant = (a-d)^2 + 4b^2
+            const discriminant = Math.max(0, (a - d) * (a - d) + 4 * b * b);
+            const sqrtDisc = Math.sqrt(discriminant);
+
+            eigenvalues.lambda1 = (trace + sqrtDisc) / 2;
+            eigenvalues.lambda2 = (trace - sqrtDisc) / 2;
+
+            // 4. Compute Eigenvectors
+            if (Math.abs(b) > 1e-9) {
+                // PC1 Eigenvector corresponding to lambda1
+                const v1x = eigenvalues.lambda1 - d;
+                const v1y = b;
+                const len1 = Math.sqrt(v1x * v1x + v1y * v1y);
+                eigenvectors.v1 = { x: v1x / len1, y: v1y / len1 };
+
+                // PC2 Eigenvector corresponding to lambda2
+                const v2x = eigenvalues.lambda2 - d;
+                const v2y = b;
+                const len2 = Math.sqrt(v2x * v2x + v2y * v2y);
+                eigenvectors.v2 = { x: v2x / len2, y: v2y / len2 };
+            } else {
+                // Diagonal covariance matrix
+                if (a >= d) {
+                    eigenvectors.v1 = { x: 1, y: 0 };
+                    eigenvectors.v2 = { x: 0, y: 1 };
+                } else {
+                    eigenvectors.v1 = { x: 0, y: 1 };
+                    eigenvectors.v2 = { x: 1, y: 0 };
+                }
+            }
+
+            // PC1 angle in radians mapped to range [0, PI]
+            pc1AngleRad = Math.atan2(eigenvectors.v1.y, eigenvectors.v1.x);
+            if (pc1AngleRad < 0) {
+                pc1AngleRad += Math.PI;
+            }
+        }
+
+        // ─── RENDERING ROUTINES ───────────────────────────────────────────
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            drawVisuals();
+        }
+
+        function drawVisuals() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const w = canvas.width;
+            const h = canvas.height;
+            const scale = getScale();
+            const cx = w / 2;
+            const cy = h / 2;
+
+            const allPoints = points.concat(customPoints);
+            
+            // Re-run math calculations
+            calculatePCA();
+            updateUI(allPoints);
+
+            // 1. Gridlines
+            if (chkGrid.checked) {
+                ctx.strokeStyle = '#1e293b';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                // Draw vertical lines
+                for (let x = -5; x <= 5; x++) {
+                    const canvasCoord = mathToCanvas(x, 0);
+                    ctx.moveTo(canvasCoord.x, 0);
+                    ctx.lineTo(canvasCoord.x, h);
+                }
+                // Draw horizontal lines
+                for (let y = -5; y <= 5; y++) {
+                    const canvasCoord = mathToCanvas(0, y);
+                    ctx.moveTo(0, canvasCoord.y);
+                    ctx.lineTo(w, canvasCoord.y);
+                }
+                ctx.stroke();
+            }
+
+            // 2. Axes
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            // X-Axis
+            const axisXLeft = mathToCanvas(-5, 0);
+            const axisXRight = mathToCanvas(5, 0);
+            ctx.moveTo(axisXLeft.x, axisXLeft.y);
+            ctx.lineTo(axisXRight.x, axisXRight.y);
+            // Y-Axis
+            const axisYTop = mathToCanvas(0, 5);
+            const axisYBottom = mathToCanvas(0, -5);
+            ctx.moveTo(axisYTop.x, axisYTop.y);
+            ctx.lineTo(axisYBottom.x, axisYBottom.y);
+            ctx.stroke();
+
+            // Label axes ticks
+            ctx.fillStyle = '#64748b';
+            ctx.font = '9px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            for (let x = -4; x <= 4; x++) {
+                if (x === 0) continue;
+                const canvasCoord = mathToCanvas(x, 0);
+                ctx.fillText(x.toString(), canvasCoord.x, canvasCoord.y + 4);
+            }
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'middle';
+            for (let y = -4; y <= 4; y++) {
+                if (y === 0) continue;
+                const canvasCoord = mathToCanvas(0, y);
+                ctx.fillText(y.toString(), canvasCoord.x - 6, canvasCoord.y);
+            }
+
+            // 3. Draw Mean (Centroid) as a helper guides
+            const centroidCanvas = mathToCanvas(centroid.x, centroid.y);
+            if (customPoints.length > 0) {
+                // Centroid plus marker
+                ctx.strokeStyle = '#f59e0b';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(centroidCanvas.x - 8, centroidCanvas.y);
+                ctx.lineTo(centroidCanvas.x + 8, centroidCanvas.y);
+                ctx.moveTo(centroidCanvas.x, centroidCanvas.y - 8);
+                ctx.lineTo(centroidCanvas.x, centroidCanvas.y + 8);
+                ctx.stroke();
+                
+                ctx.fillStyle = '#f59e0b';
+                ctx.font = 'bold 9px sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText('Mean Centroid', centroidCanvas.x + 10, centroidCanvas.y - 4);
+            }
+
+            // 4. Calculate Current Projections
+            const angleDeg = parseFloat(angleSlider.value);
+            const angleRad = angleDeg * Math.PI / 180;
+            
+            // Unit vectors for active projection axis
+            const ux = Math.cos(angleRad);
+            const uy = Math.sin(angleRad);
+            
+            // Compute projected variance and projections
+            let sumProjSq = 0;
+            let sumErrSq = 0;
+            const n = allPoints.length;
+
+            const pointProjections = allPoints.map(p => {
+                const dx = p.x - centroid.x;
+                const dy = p.y - centroid.y;
+                // Dot product project centered point onto direction u
+                const projDistance = dx * ux + dy * uy;
+                
+                // Reconstructed point in math space
+                const rx = centroid.x + projDistance * ux;
+                const ry = centroid.y + projDistance * uy;
+                
+                // Reconstruction error distance squared
+                const errSq = (p.x - rx) * (p.x - rx) + (p.y - ry) * (p.y - ry);
+                
+                sumProjSq += projDistance * projDistance;
+                sumErrSq += errSq;
+
+                return {
+                    original: p,
+                    dist: projDistance,
+                    reconstructed: { x: rx, y: ry },
+                    errorSq: errSq
+                };
+            });
+
+            const activeProjectedVar = n > 1 ? sumProjSq / (n - 1) : 0;
+            const activeSSE = sumErrSq;
+
+            // 5. Draw PC2 Perpendicular Axis if enabled
+            if (chkPC2.checked) {
+                const u2x = -uy;
+                const u2y = ux;
+                
+                ctx.strokeStyle = 'rgba(168, 85, 247, 0.45)'; // Purple-500 transparent
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([4, 6]);
+                ctx.beginPath();
+                const pc2Start = mathToCanvas(centroid.x - 10 * u2x, centroid.y - 10 * u2y);
+                const pc2End = mathToCanvas(centroid.x + 10 * u2x, centroid.y + 10 * u2y);
+                ctx.moveTo(pc2Start.x, pc2Start.y);
+                ctx.lineTo(pc2End.x, pc2End.y);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // Label PC2 Axis
+                const labelPC2Pos = mathToCanvas(centroid.x + 4.2 * u2x, centroid.y + 4.2 * u2y);
+                ctx.fillStyle = 'rgba(168, 85, 247, 0.8)';
+                ctx.font = 'bold 9px sans-serif';
+                ctx.fillText('PC2 Line (Perpendicular)', labelPC2Pos.x + 8, labelPC2Pos.y);
+            }
+
+            // 6. Draw Variance Spread Capsule on Axis (representing the variance value)
+            if (chkVarianceBar.checked && n > 0) {
+                const stdDev = Math.sqrt(activeProjectedVar);
+                // Draw variance bar extending 2 standard deviations in both directions from mean centroid
+                const varStart = mathToCanvas(centroid.x - 2 * stdDev * ux, centroid.y - 2 * stdDev * uy);
+                const varEnd = mathToCanvas(centroid.x + 2 * stdDev * ux, centroid.y + 2 * stdDev * uy);
+
+                ctx.strokeStyle = 'rgba(99, 102, 241, 0.18)'; // Indigo spread
+                ctx.lineWidth = 20;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(varStart.x, varStart.y);
+                ctx.lineTo(varEnd.x, varEnd.y);
+                ctx.stroke();
+
+                ctx.strokeStyle = 'rgba(99, 102, 241, 0.35)';
+                ctx.lineWidth = 6;
+                ctx.beginPath();
+                ctx.moveTo(varStart.x, varStart.y);
+                ctx.lineTo(varEnd.x, varEnd.y);
+                ctx.stroke();
+                ctx.lineWidth = 1; // restore
+            }
+
+            // 7. Draw Active Projection Axis Line
+            ctx.strokeStyle = '#6366f1'; // Indigo-500
+            ctx.lineWidth = 3.5;
+            ctx.shadowBlur = 4;
+            ctx.shadowColor = 'rgba(99, 102, 241, 0.5)';
+            ctx.beginPath();
+            const axisStart = mathToCanvas(centroid.x - 10 * ux, centroid.y - 10 * uy);
+            const axisEnd = mathToCanvas(centroid.x + 10 * ux, centroid.y + 10 * uy);
+            ctx.moveTo(axisStart.x, axisStart.y);
+            ctx.lineTo(axisEnd.x, axisEnd.y);
+            ctx.stroke();
+            
+            // Reset shadows
+            ctx.shadowBlur = 0;
+
+            // Draw Projection line label
+            const labelPC1Pos = mathToCanvas(centroid.x + 4.2 * ux, centroid.y + 4.2 * uy);
+            ctx.fillStyle = '#818cf8';
+            ctx.font = 'bold 9.5px sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('Projected Axis (θ)', labelPC1Pos.x + 8, labelPC1Pos.y - 8);
+
+            // 8. Draw Error Lines and Projections
+            pointProjections.forEach(proj => {
+                const canvasOrig = mathToCanvas(proj.original.x, proj.original.y);
+                const canvasProj = mathToCanvas(proj.reconstructed.x, proj.reconstructed.y);
+
+                // Perpendicular error lines
+                if (chkErrors.checked) {
+                    ctx.strokeStyle = 'rgba(248, 113, 113, 0.55)'; // Red-400 transparent
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([2, 4]);
+                    ctx.beginPath();
+                    ctx.moveTo(canvasOrig.x, canvasOrig.y);
+                    ctx.lineTo(canvasProj.x, canvasProj.y);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+
+                // Error Squares (MSE visual representation)
+                if (chkSquares.checked) {
+                    const dx = canvasProj.x - canvasOrig.x;
+                    const dy = canvasProj.y - canvasOrig.y;
+                    
+                    ctx.fillStyle = 'rgba(239, 68, 68, 0.08)'; // semi-transparent red
+                    ctx.strokeStyle = 'rgba(239, 68, 68, 0.25)'; // thin red outline
+                    ctx.lineWidth = 0.8;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(canvasOrig.x, canvasOrig.y);
+                    ctx.lineTo(canvasProj.x, canvasProj.y);
+                    ctx.lineTo(canvasProj.x - dy, canvasProj.y + dx);
+                    ctx.lineTo(canvasOrig.x - dy, canvasOrig.y + dx);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                }
+
+                // Projection dot on the line
+                ctx.fillStyle = '#818cf8'; // Indigo-400
+                ctx.beginPath();
+                ctx.arc(canvasProj.x, canvasProj.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // 9. Draw Original Data Points (on top of everything)
+            allPoints.forEach((p, idx) => {
+                const isCustom = idx >= points.length;
+                const canvasPoint = mathToCanvas(p.x, p.y);
+                
+                ctx.beginPath();
+                ctx.arc(canvasPoint.x, canvasPoint.y, isCustom ? 6.5 : 5, 0, Math.PI * 2);
+                
+                if (isCustom) {
+                    // Highlight custom points in Pink
+                    ctx.fillStyle = '#fbcfe8'; // pink-200
+                    ctx.strokeStyle = '#db2777'; // pink-600
+                    ctx.lineWidth = 2.5;
+                } else {
+                    // Standard points in indigo/white
+                    ctx.fillStyle = '#ffffff';
+                    ctx.strokeStyle = '#4f46e5'; // indigo-600
+                    ctx.lineWidth = 1.8;
+                }
+                
+                ctx.fill();
+                ctx.stroke();
+            });
+
+            // 10. Draw Separator Line & Horizontal 1D Projection Strip
+            if (chkStrip.checked) {
+                // Separator Line
+                ctx.strokeStyle = '#1e293b';
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([4, 6]);
+                ctx.beginPath();
+                ctx.moveTo(0, h - 85);
+                ctx.lineTo(w, h - 85);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // Partition Title
+                ctx.fillStyle = '#64748b';
+                ctx.font = 'bold 9px sans-serif';
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('1D PROJECTION DISTRIBUTION STRIP', 15, h - 72);
+
+                const stripY = h - 35;
+                const stripCX = w / 2;
+
+                // Axis Line
+                ctx.strokeStyle = '#334155';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(stripCX - 4.5 * scale, stripY);
+                ctx.lineTo(stripCX + 4.5 * scale, stripY);
+                ctx.stroke();
+
+                // Tick Marks
+                ctx.fillStyle = '#64748b';
+                ctx.font = '8px monospace';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                for (let x = -4; x <= 4; x++) {
+                    const tx = stripCX + x * scale;
+                    ctx.strokeStyle = '#334155';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(tx, stripY - 3);
+                    ctx.lineTo(tx, stripY + 3);
+                    ctx.stroke();
+                    ctx.fillText(x.toString(), tx, stripY + 6);
+                }
+
+                // Variance spread bar on 1D strip
+                const stdDev = Math.sqrt(activeProjectedVar);
+                ctx.strokeStyle = 'rgba(99, 102, 241, 0.25)';
+                ctx.lineWidth = 7;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(stripCX - 2 * stdDev * scale, stripY);
+                ctx.lineTo(stripCX + 2 * stdDev * scale, stripY);
+                ctx.stroke();
+
+                // Kernel Density Curve (bell curve of projections)
+                const h_bandwidth = 0.4;
+                ctx.beginPath();
+                let first = true;
+                for (let mx = -4.5; mx <= 4.5; mx += 0.05) {
+                    let sumK = 0;
+                    for (let proj of pointProjections) {
+                        const diff = mx - proj.dist;
+                        sumK += Math.exp(- (diff * diff) / (2 * h_bandwidth * h_bandwidth));
+                    }
+                    const density = sumK / (n * h_bandwidth * Math.sqrt(2 * Math.PI));
+                    
+                    const px = stripCX + mx * scale;
+                    const py = stripY - Math.min(45, density * scale * 1.3);
+                    
+                    if (first) {
+                        ctx.moveTo(px, py);
+                        first = false;
+                    } else {
+                        ctx.lineTo(px, py);
+                    }
+                }
+                ctx.lineTo(stripCX + 4.5 * scale, stripY);
+                ctx.lineTo(stripCX - 4.5 * scale, stripY);
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(99, 102, 241, 0.12)';
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(99, 102, 241, 0.55)';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+
+                // Projected Dots
+                pointProjections.forEach(proj => {
+                    const px = stripCX + proj.dist * scale;
+                    ctx.fillStyle = 'rgba(129, 140, 248, 0.8)';
+                    ctx.beginPath();
+                    ctx.arc(px, stripY, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#4f46e5';
+                    ctx.lineWidth = 0.7;
+                    ctx.stroke();
+                });
+            }
+
+            // Render stats readout updates
+            statProjectedVar.innerText = activeProjectedVar.toFixed(3);
+            const pctOfMax = eigenvalues.lambda1 > 0 ? (activeProjectedVar / eigenvalues.lambda1 * 100) : 0;
+            statProjectedPct.innerText = `${pctOfMax.toFixed(1)}% of maximum (PC1)`;
+            statReconstructionError.innerText = activeSSE.toFixed(3);
+        }
+
+        // ─── UI & METRICS UPDATE ──────────────────────────────────────────
+        function updateUI(allPoints) {
+            // Sliders Display text
+            rDisplay.innerText = (cov.xy >= 0 ? '+' : '') + parseFloat(rSlider.value).toFixed(2);
+            angleDisplay.innerText = parseFloat(angleSlider.value).toFixed(1) + "°";
+
+            // Covariance Matrix Text Display
+            covXX.innerText = cov.xx.toFixed(3);
+            covXY.innerText = cov.xy.toFixed(3);
+            covYX.innerText = cov.xy.toFixed(3);
+            covYY.innerText = cov.yy.toFixed(3);
+
+            // Eigenvalues
+            valLambda1.innerText = eigenvalues.lambda1.toFixed(3);
+            valLambda2.innerText = eigenvalues.lambda2.toFixed(3);
+            
+            const totalVar = eigenvalues.lambda1 + eigenvalues.lambda2;
+            valTotalVar.innerText = totalVar.toFixed(3);
+
+            // Proportion of Variance Explained (PVE)
+            const pve = totalVar > 0 ? (eigenvalues.lambda1 / totalVar) * 100 : 100;
+            pveDisplay.innerText = pve.toFixed(1) + "%";
+            pveBar.style.width = pve.toFixed(1) + "%";
+
+            // Point counter
+            pointCountBadge.innerText = `Points: ${allPoints.length}`;
+            if (customPoints.length > 0) {
+                statusBadge.innerText = "Custom Dataset Active";
+                statusBadge.className = "px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest border bg-pink-50 border-pink-200 text-pink-800 shadow-sm transition-all duration-300";
+                btnClearCustom.classList.remove('hidden');
+            } else {
+                statusBadge.innerText = "Standard Dataset";
+                statusBadge.className = "px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest border bg-indigo-50 border-indigo-200 text-indigo-800 shadow-sm transition-all duration-300";
+                btnClearCustom.classList.add('hidden');
+            }
+
+            // Live code block
+            updateCodeSnippet(allPoints);
+        }
+
+        function updateCodeSnippet(allPoints) {
+            const pointsSlice = allPoints.slice(0, 5);
+            const pointsStr = pointsSlice.map(p => `[${p.x.toFixed(2)}, ${p.y.toFixed(2)}]`).join(',\n    ');
+            
+            const v1Str = `[${eigenvectors.v1.x.toFixed(3)}, ${eigenvectors.v1.y.toFixed(3)}]`;
+            const v2Str = `[${eigenvectors.v2.x.toFixed(3)}, ${eigenvectors.v2.y.toFixed(3)}]`;
+            const lambdasStr = `[${eigenvalues.lambda1.toFixed(3)}, ${eigenvalues.lambda2.toFixed(3)}]`;
+            
+            const totalVar = eigenvalues.lambda1 + eigenvalues.lambda2;
+            const ratio1 = totalVar > 0 ? (eigenvalues.lambda1 / totalVar) : 0;
+            const ratio2 = totalVar > 0 ? (eigenvalues.lambda2 / totalVar) : 0;
+            
+            const pveStr = `[${ratio1.toFixed(3)}, ${ratio2.toFixed(3)}]`;
+            const pc1AngleDeg = (pc1AngleRad * 180 / Math.PI).toFixed(1);
+
+            mathDisplay.innerHTML = `import numpy as np
+from sklearn.decomposition import PCA
+
+# 1. 2D Coordinate Data (showing first 5 of ${allPoints.length} points)
+X = np.array([
+    ${pointsStr},
+    ...
+])
+
+# 2. Fit PCA (means calculated at centroid: [${centroid.x.toFixed(2)}, ${centroid.y.toFixed(2)}])
+pca = PCA(n_components=2)
+pca.fit(X)
+
+# 3. Retrieve Components and Explained Variance
+print("Eigenvectors (Principal Components):")
+print(pca.components_) 
+# Outputs: 
+#   PC1: ${v1Str}  (Direction of Max Variance, Angle: ${pc1AngleDeg}°)
+#   PC2: ${v2Str}
+
+print("Explained Variance Ratio (PVE):")
+print(pca.explained_variance_ratio_) 
+# Outputs: ${pveStr} (PC1: ${(ratio1 * 100).toFixed(1)}%, PC2: ${(ratio2 * 100).toFixed(1)}%)`;
+        }
+
+        // ─── FIND PC1 ANGLE ANIMATION ────────────────────────────────────
+        function animateToPC1() {
+            if (isAnimating) return;
+            isAnimating = true;
+            btnFindPC1.disabled = true;
+
+            const targetAngleDeg = pc1AngleRad * 180 / Math.PI;
+            const startAngleDeg = parseFloat(angleSlider.value);
+            
+            // Shortest rotation path (mod 180)
+            let diff = targetAngleDeg - startAngleDeg;
+            diff = ((diff + 90) % 180) - 90; // clamp to [-90, 90]
+            
+            const finalAngleDeg = startAngleDeg + diff;
+            const duration = 750; // ms
+            const startTime = performance.now();
+
+            function step(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Ease out cubic
+                const ease = 1 - Math.pow(1 - progress, 3);
+                const currentAngle = startAngleDeg + (finalAngleDeg - startAngleDeg) * ease;
+                
+                // Wrap to standard range [0, 180]
+                let wrapped = currentAngle % 180;
+                if (wrapped < 0) wrapped += 180;
+                
+                angleSlider.value = Math.round(wrapped);
+                drawVisuals();
+                
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                } else {
+                    isAnimating = false;
+                    btnFindPC1.disabled = false;
+                }
+            }
+            
+            requestAnimationFrame(step);
+        }
+
+        // ─── CANVAS INTERACTION (CLICK & DRAG) ─────────────────────────────
+        function getMousePos(e) {
+            const rect = canvas.getBoundingClientRect();
+            // Support Touch Events
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+
+        canvas.addEventListener('mousedown', onStartDrag);
+        canvas.addEventListener('mousemove', onDrag);
+        canvas.addEventListener('mouseup', onEndDrag);
+        canvas.addEventListener('mouseleave', onEndDrag);
+        
+        canvas.addEventListener('touchstart', (e) => {
+            onStartDrag(e);
+            if (draggedIndex !== -1) e.preventDefault(); // Stop scrolling when dragging points
+        }, { passive: false });
+        canvas.addEventListener('touchmove', (e) => {
+            onDrag(e);
+            if (draggedIndex !== -1) e.preventDefault();
+        }, { passive: false });
+        canvas.addEventListener('touchend', onEndDrag);
+
+        function onStartDrag(e) {
+            const mousePos = getMousePos(e);
+            const clickMath = canvasToMath(mousePos.x, mousePos.y);
+            
+            // Bounding radius check for selecting/dragging points (approx 8 pixels)
+            const scale = getScale();
+            const hitRadiusMath = 12 / scale; 
+            
+            // Check custom points first (top priority to drag)
+            for (let i = 0; i < customPoints.length; i++) {
+                const dist = Math.hypot(customPoints[i].x - clickMath.x, customPoints[i].y - clickMath.y);
+                if (dist < hitRadiusMath) {
+                    draggedIndex = i;
+                    draggedIsCustom = true;
+                    canvas.style.cursor = 'grabbing';
+                    return;
+                }
+            }
+
+            // Check standard random points
+            for (let i = 0; i < points.length; i++) {
+                const dist = Math.hypot(points[i].x - clickMath.x, points[i].y - clickMath.y);
+                if (dist < hitRadiusMath) {
+                    // Convert clicked standard point to a custom point so we can drag it permanently
+                    const p = points.splice(i, 1)[0];
+                    customPoints.push(p);
+                    draggedIndex = customPoints.length - 1;
+                    draggedIsCustom = true;
+                    canvas.style.cursor = 'grabbing';
+                    drawVisuals();
+                    return;
+                }
+            }
+
+            // If we didn't hit any points, add a custom point at the cursor (only if inside boundary bounds)
+            if (Math.abs(clickMath.x) <= 4.7 && Math.abs(clickMath.y) <= 4.7) {
+                customPoints.push({ x: clickMath.x, y: clickMath.y });
+                drawVisuals();
+            }
+        }
+
+        function onDrag(e) {
+            const mousePos = getMousePos(e);
+            const mathPos = canvasToMath(mousePos.x, mousePos.y);
+
+            // Bounds check hover indicator
+            if (Math.abs(mathPos.x) <= 5.0 && Math.abs(mathPos.y) <= 5.0) {
+                hoverOverlay.style.left = `${mousePos.x + 12}px`;
+                hoverOverlay.style.top = `${mousePos.y - 20}px`;
+                hoverOverlay.style.display = 'block';
+                hoverOverlay.textContent = `x: ${mathPos.x.toFixed(2)}, y: ${mathPos.y.toFixed(2)}`;
+            } else {
+                hoverOverlay.style.display = 'none';
+            }
+
+            if (draggedIndex !== -1 && draggedIsCustom) {
+                // Keep point coordinate within plotting grid
+                customPoints[draggedIndex].x = Math.max(-4.6, Math.min(4.6, mathPos.x));
+                customPoints[draggedIndex].y = Math.max(-4.6, Math.min(4.6, mathPos.y));
+                drawVisuals();
+            } else {
+                // Adjust cursor if hovering over a point
+                const hitRadiusMath = 12 / getScale();
+                let hover = false;
+                
+                const allPoints = points.concat(customPoints);
+                for (let p of allPoints) {
+                    if (Math.hypot(p.x - mathPos.x, p.y - mathPos.y) < hitRadiusMath) {
+                        hover = true;
+                        break;
+                    }
+                }
+                canvas.style.cursor = hover ? 'grab' : 'crosshair';
+            }
+        }
+
+        function onEndDrag() {
+            draggedIndex = -1;
+            draggedIsCustom = false;
+            canvas.style.cursor = 'crosshair';
+            hoverOverlay.style.display = 'none';
+        }
+
+        // ─── CONTROL EVENT LISTENERS ──────────────────────────────────────
+        rSlider.addEventListener('input', () => {
+            customPoints = []; // Clear custom entries when correlation changes
+            generateData();
+            drawVisuals();
+        });
+        
+        angleSlider.addEventListener('input', drawVisuals);
+        
+        // Checklist switches redraw
+        chkErrors.addEventListener('change', drawVisuals);
+        chkVarianceBar.addEventListener('change', drawVisuals);
+        chkPC2.addEventListener('change', drawVisuals);
+        chkGrid.addEventListener('change', drawVisuals);
+        chkSquares.addEventListener('change', drawVisuals);
+        chkStrip.addEventListener('change', drawVisuals);
+
+        // Buttons
+        btnFindPC1.addEventListener('click', animateToPC1);
+        
+        btnRegenerate.addEventListener('click', () => {
+            customPoints = [];
+            generateData();
+            drawVisuals();
+        });
+
+        btnClearCustom.addEventListener('click', () => {
+            customPoints = [];
+            drawVisuals();
+        });
+
+        window.addEventListener('resize', resizeCanvas);
+
+        // ─── INIT ─────────────────────────────────────────────────────────
+        generateData();
+        // Give layout time to settle, then resize canvas and render
+        setTimeout(resizeCanvas, 50);
+    </script>
+</body>
+
+</html>

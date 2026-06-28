@@ -304,13 +304,7 @@
       <div class="form-group">
         <label for="class-selector">Select Class:</label>
         <select id="class-selector">
-          <option value="10">Class 10 — AI Search</option>
-          <option value="11">Class 11 — Unsupervised Learning</option>
-          <option value="12">Class 12 — Evaluation Metrics</option>
-          <option value="13">Class 13 — Reinforcement Learning</option>
-          <option value="14">Class 14 — Recommender Systems & CSPs</option>
-          <option value="15">Class 15 — Generative AI & LLMs</option>
-          <option value="16">Class 16</option>
+          <option value="" disabled selected>Loading classes…</option>
         </select>
 
         <label for="cohort-input">Cohort (group label):</label>
@@ -392,6 +386,39 @@
       document.getElementById('auth-gate').style.display = 'none';
       document.getElementById('generator-form').style.display = 'block';
       document.getElementById('logged-in-as').textContent = `👤 ${user.email}`;
+      loadClasses();
+    }
+
+    // ── Load classes from class_config ────────────────────────────────────────
+    async function loadClasses() {
+      const select = document.getElementById('class-selector');
+      select.innerHTML = '<option value="" disabled selected>Loading…</option>';
+
+      try {
+        const { data, error } = await db
+          .from('class_config')
+          .select('class_number, title')
+          .order('class_number', { ascending: true });
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+          select.innerHTML = '<option value="" disabled selected>No classes found</option>';
+          return;
+        }
+
+        select.innerHTML = data.map(cls =>
+          `<option value="${cls.class_number}">Class ${cls.class_number}${
+            cls.title ? ` — ${cls.title}` : ''
+          }</option>`
+        ).join('');
+
+      } catch (err) {
+        console.error('Failed to load classes:', err);
+        // Fall back to a static placeholder so the form is still usable
+        select.innerHTML = '<option value="" disabled selected>Error loading classes</option>';
+        showStatus(`Could not load class list: ${err.message}`, 'error');
+      }
     }
 
     async function loginWithEmail() {
