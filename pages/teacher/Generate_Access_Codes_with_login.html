@@ -268,6 +268,194 @@
       color: #1a4db5;
       border: 1px solid #bed1f7;
     }
+
+    /* ── Active Codes Panel ─────────────────────────────────────────── */
+    .codes-panel {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #dde4ed;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+
+    .codes-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #dde4ed;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .codes-panel-header h3 {
+      margin: 0;
+      color: #1B2A4A;
+      font-size: 1rem;
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-bar input, .filter-bar select {
+      padding: 0.4rem 0.7rem;
+      border: 1.5px solid #dde4ed;
+      border-radius: 5px;
+      font-size: 0.82rem;
+      font-family: inherit;
+      color: #1B2A4A;
+      background: #F4F7FA;
+      margin-bottom: 0;
+      width: auto;
+    }
+
+    .filter-bar input:focus, .filter-bar select:focus {
+      outline: none;
+      border-color: #0D6E8A;
+    }
+
+    .codes-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .codes-table th {
+      text-align: left;
+      padding: 0.6rem 1rem;
+      background: #F4F7FA;
+      color: #5B6E85;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border-bottom: 1px solid #dde4ed;
+    }
+
+    .codes-table td {
+      padding: 0.6rem 1rem;
+      border-bottom: 1px solid #f0f4f8;
+      vertical-align: middle;
+      color: #1B2A4A;
+    }
+
+    .codes-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .codes-table tr:hover td {
+      background: #f9fbfc;
+    }
+
+    .code-mono {
+      font-family: 'Courier New', monospace;
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: 0.06em;
+      color: #1B2A4A;
+    }
+
+    .badge-active {
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-active.on  { background: #e8f8f0; color: #1A6B3C; }
+    .badge-active.off { background: #fee8e8; color: #B00020; }
+
+    .uses-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .uses-bar {
+      flex: 1;
+      height: 5px;
+      background: #dde4ed;
+      border-radius: 3px;
+      overflow: hidden;
+      min-width: 50px;
+    }
+
+    .uses-bar-fill {
+      height: 100%;
+      background: #0D6E8A;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    .uses-bar-fill.full { background: #B00020; }
+
+    .uses-label {
+      font-size: 0.78rem;
+      color: #5B6E85;
+      white-space: nowrap;
+    }
+
+    .tbl-action-btn {
+      padding: 0.28rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border: 1px solid;
+      cursor: pointer;
+      transition: background 0.15s;
+      flex: unset;
+      margin: 0;
+    }
+
+    .tbl-action-btn.edit-btn  { background: #e8f0fe; color: #1a4db5; border-color: #bed1f7; }
+    .tbl-action-btn.edit-btn:hover { background: #bed1f7; }
+    .tbl-action-btn.toggle-btn { background: #e8f8f0; color: #1A6B3C; border-color: #a3d9b8; }
+    .tbl-action-btn.toggle-btn.deactivate { background: #fff8e1; color: #7a5500; border-color: #ffe082; }
+    .tbl-action-btn.toggle-btn:hover { opacity: 0.8; }
+    .tbl-action-btn.del-btn   { background: #fee8e8; color: #B00020; border-color: #f5c2c2; }
+    .tbl-action-btn.del-btn:hover { background: #f5c2c2; }
+    .tbl-action-btn.save-btn  { background: #1A6B3C; color: #fff; border-color: #1A6B3C; }
+    .tbl-action-btn.save-btn:hover { background: #145530; }
+    .tbl-action-btn.cancel-btn { background: #f0f4f8; color: #5B6E85; border-color: #dde4ed; }
+    .tbl-action-btn.cancel-btn:hover { background: #dde4ed; }
+
+    .inline-edit-input {
+      padding: 0.3rem 0.5rem;
+      border: 1.5px solid #0D6E8A;
+      border-radius: 4px;
+      font-size: 0.82rem;
+      font-family: inherit;
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 0;
+    }
+
+    .action-group {
+      display: flex;
+      gap: 0.35rem;
+      align-items: center;
+    }
+
+    .codes-empty {
+      text-align: center;
+      padding: 2.5rem;
+      color: #5B6E85;
+      font-size: 0.88rem;
+    }
+
+    .panel-footer {
+      padding: 0.6rem 1.5rem;
+      background: #F4F7FA;
+      border-top: 1px solid #dde4ed;
+      font-size: 0.75rem;
+      color: #5B6E85;
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -321,10 +509,10 @@
         </div>
 
         <label for="num-codes">Number of codes:</label>
-        <input type="number" id="num-codes" value="30" min="1" max="500">
+        <input type="number" id="num-codes" value="1" min="1" max="500">
 
         <label for="max-uses">Max uses per code:</label>
-        <input type="number" id="max-uses" value="1" min="1" max="999">
+        <input type="number" id="max-uses" value="30" min="1" max="999">
 
         <div class="button-group">
           <button onclick="generateCodes()">Generate Codes</button>
@@ -341,6 +529,48 @@
           <button onclick="copyCodes()">Copy All Codes</button>
           <button class="secondary-btn" onclick="downloadCodesTxt()">Download TXT</button>
         </div>
+      </div>
+
+      <!-- ── Active Codes Panel ── -->
+      <div class="codes-panel" id="active-codes-panel" style="display:none;">
+        <div class="codes-panel-header">
+          <h3>🗂 Active Access Codes</h3>
+          <div class="filter-bar">
+            <input type="text" id="filter-code" placeholder="Search code…" oninput="filterCodesTable()">
+            <select id="filter-class" onchange="filterCodesTable()">
+              <option value="">All Classes</option>
+            </select>
+            <select id="filter-cohort" onchange="filterCodesTable()">
+              <option value="">All Cohorts</option>
+            </select>
+            <select id="filter-status" onchange="filterCodesTable()">
+              <option value="">All Statuses</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+            <button class="tbl-action-btn edit-btn" onclick="loadActiveCodes()" style="padding:0.35rem 0.8rem;">↻ Refresh</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="codes-table" id="codes-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Class</th>
+                <th>Cohort</th>
+                <th>Usage</th>
+                <th>Max Uses</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="codes-tbody">
+              <tr><td colspan="8" class="codes-empty">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel-footer" id="codes-panel-footer"></div>
       </div>
     </main>
   </div>
@@ -386,6 +616,166 @@
       document.getElementById('logged-in-as').textContent = `👤 ${user.email}`;
       loadClasses();
       loadCohorts();
+      loadActiveCodes();
+    }
+
+    // ── Active codes state ────────────────────────────────────────────────────
+    let allCodes = [];
+
+    // ── Load all active codes ─────────────────────────────────────────────────
+    async function loadActiveCodes() {
+      document.getElementById('active-codes-panel').style.display = 'block';
+      document.getElementById('codes-tbody').innerHTML =
+        '<tr><td colspan="8" class="codes-empty">⏳ Loading codes…</td></tr>';
+
+      const { data, error } = await db
+        .from('access_codes')
+        .select('id, code, class_number, cohort, uses_count, max_uses, is_active, created_at')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        document.getElementById('codes-tbody').innerHTML =
+          `<tr><td colspan="8" class="codes-empty" style="color:#B00020;">Failed to load codes: ${error.message}</td></tr>`;
+        return;
+      }
+
+      allCodes = data || [];
+
+      // Populate filter dropdowns
+      const classes = [...new Set(allCodes.map(c => c.class_number))].sort((a,b)=>a-b);
+      const cohorts = [...new Set(allCodes.map(c => c.cohort))].sort();
+      const classFilter = document.getElementById('filter-class');
+      const cohortFilter = document.getElementById('filter-cohort');
+      const currentClass = classFilter.value;
+      const currentCohort = cohortFilter.value;
+      classFilter.innerHTML = '<option value="">All Classes</option>' +
+        classes.map(c => `<option value="${c}" ${String(c)===currentClass?'selected':''}>Class ${c}</option>`).join('');
+      cohortFilter.innerHTML = '<option value="">All Cohorts</option>' +
+        cohorts.map(c => `<option value="${c}" ${c===currentCohort?'selected':''}>` + c + '</option>').join('');
+
+      renderCodesTable(allCodes);
+    }
+
+    function renderCodesTable(codes) {
+      const tbody = document.getElementById('codes-tbody');
+      const footer = document.getElementById('codes-panel-footer');
+
+      if (!codes.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="codes-empty">No codes match your filters.</td></tr>';
+        footer.textContent = '';
+        return;
+      }
+
+      tbody.innerHTML = codes.map(c => {
+        const pct = c.max_uses > 0 ? Math.min((c.uses_count / c.max_uses) * 100, 100) : 0;
+        const isFull = c.uses_count >= c.max_uses;
+        const created = new Date(c.created_at).toLocaleDateString();
+        return `
+          <tr id="row-${c.id}">
+            <td><span class="code-mono">${c.code}</span></td>
+            <td>Class ${c.class_number}</td>
+            <td>${c.cohort}</td>
+            <td>
+              <div class="uses-bar-wrap">
+                <div class="uses-bar"><div class="uses-bar-fill${isFull?' full':''}" style="width:${pct}%"></div></div>
+                <span class="uses-label">${c.uses_count}</span>
+              </div>
+            </td>
+            <td>${c.max_uses}</td>
+            <td><span class="badge-active ${c.is_active?'on':'off'}">${c.is_active?'Active':'Inactive'}</span></td>
+            <td style="color:#5B6E85;font-size:0.78rem;">${created}</td>
+            <td>
+              <div class="action-group">
+                <button class="tbl-action-btn edit-btn" onclick="startEdit('${c.id}')">Edit</button>
+                <button class="tbl-action-btn toggle-btn ${c.is_active?'deactivate':''}" onclick="toggleCode('${c.id}', ${c.is_active})">${c.is_active?'Deactivate':'Activate'}</button>
+                <button class="tbl-action-btn del-btn" onclick="deleteCode('${c.id}', '${c.code}')">Delete</button>
+              </div>
+            </td>
+          </tr>
+          <tr id="edit-row-${c.id}" style="display:none;background:#f9fbfc;">
+            <td colspan="8" style="padding:1rem 1.5rem;">
+              <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end;">
+                <div style="flex:1;min-width:120px;">
+                  <label style="font-size:0.72rem;color:#5B6E85;margin-bottom:0.3rem;">Max Uses</label>
+                  <input class="inline-edit-input" type="number" id="edit-maxuses-${c.id}" value="${c.max_uses}" min="1" max="999">
+                </div>
+                <div style="flex:2;min-width:160px;">
+                  <label style="font-size:0.72rem;color:#5B6E85;margin-bottom:0.3rem;">Cohort</label>
+                  <input class="inline-edit-input" type="text" id="edit-cohort-${c.id}" value="${c.cohort}">
+                </div>
+                <div class="action-group">
+                  <button class="tbl-action-btn save-btn" onclick="saveEdit('${c.id}')">Save</button>
+                  <button class="tbl-action-btn cancel-btn" onclick="cancelEdit('${c.id}')">Cancel</button>
+                </div>
+              </div>
+            </td>
+          </tr>`;
+      }).join('');
+
+      footer.textContent = `Showing ${codes.length} of ${allCodes.length} codes`;
+    }
+
+    function filterCodesTable() {
+      const codeQ   = document.getElementById('filter-code').value.trim().toUpperCase();
+      const classQ  = document.getElementById('filter-class').value;
+      const cohortQ = document.getElementById('filter-cohort').value;
+      const statusQ = document.getElementById('filter-status').value;
+
+      const filtered = allCodes.filter(c => {
+        if (codeQ   && !c.code.toUpperCase().includes(codeQ)) return false;
+        if (classQ  && String(c.class_number) !== classQ)     return false;
+        if (cohortQ && c.cohort !== cohortQ)                  return false;
+        if (statusQ === 'active'   && !c.is_active)           return false;
+        if (statusQ === 'inactive' && c.is_active)            return false;
+        return true;
+      });
+      renderCodesTable(filtered);
+    }
+
+    function startEdit(id) {
+      document.getElementById(`edit-row-${id}`).style.display = 'table-row';
+    }
+
+    function cancelEdit(id) {
+      document.getElementById(`edit-row-${id}`).style.display = 'none';
+    }
+
+    async function saveEdit(id) {
+      const maxUses = parseInt(document.getElementById(`edit-maxuses-${id}`).value);
+      const cohort  = document.getElementById(`edit-cohort-${id}`).value.trim();
+
+      if (!cohort) { alert('Cohort cannot be empty.'); return; }
+      if (!maxUses || maxUses < 1) { alert('Max uses must be at least 1.'); return; }
+
+      const { error } = await db
+        .from('access_codes')
+        .update({ max_uses: maxUses, cohort })
+        .eq('id', id);
+
+      if (error) { alert(`Save failed: ${error.message}`); return; }
+      loadActiveCodes();
+    }
+
+    async function toggleCode(id, currentlyActive) {
+      const { error } = await db
+        .from('access_codes')
+        .update({ is_active: !currentlyActive })
+        .eq('id', id);
+
+      if (error) { alert(`Update failed: ${error.message}`); return; }
+      loadActiveCodes();
+    }
+
+    async function deleteCode(id, code) {
+      if (!confirm(`Permanently delete code "${code}"? This cannot be undone.`)) return;
+
+      const { error } = await db
+        .from('access_codes')
+        .delete()
+        .eq('id', id);
+
+      if (error) { alert(`Delete failed: ${error.message}`); return; }
+      loadActiveCodes();
     }
 
     // ── Load classes from class_config ────────────────────────────────────────
@@ -562,6 +952,7 @@
         document.getElementById('codes-output').value = codes.join('\n');
         document.getElementById('output-section').style.display = 'block';
         showStatus(`✓ Generated ${numCodes} access codes — Class ${classNum} · cohort "${cohort}". Copy and share with your students.`, 'success');
+        loadActiveCodes(); // Refresh the active codes panel
 
       } catch (err) {
         console.error('Generation error:', err);
@@ -596,8 +987,8 @@
     function resetForm() {
       document.getElementById('class-selector').value = '10';
       document.getElementById('cohort-input').value = '';
-      document.getElementById('num-codes').value = '30';
-      document.getElementById('max-uses').value = '1';
+      document.getElementById('num-codes').value = '1';
+      document.getElementById('max-uses').value = '30';
       document.getElementById('codes-output').value = '';
       document.getElementById('output-section').style.display = 'none';
       document.getElementById('status-message').className = 'status';
