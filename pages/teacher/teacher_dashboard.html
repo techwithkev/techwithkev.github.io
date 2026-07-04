@@ -1409,6 +1409,19 @@
             </svg>
             Self-Assessment
           </button>
+          <button class="nav-item" onclick="showPage('introai-scavenger-hunt')">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="7" cy="7" r="4.5" />
+              <path d="M10.5 10.5L14 14" stroke-linecap="round" />
+            </svg>
+            Ex1: Scavenger Hunt
+          </button>
+          <button class="nav-item" onclick="showPage('introai-chatbots')">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M2 3h12a1 1 0 011 1v6a1 1 0 01-1 1H5l-3 3V4a1 1 0 011-1z" />
+            </svg>
+            Ex2: Chatbots
+          </button>
         </div>
 
         <div class="sidebar-footer">
@@ -1782,6 +1795,136 @@
           </div>
         </div>
 
+        <!-- ── INTRO TO AI: SCAVENGER HUNT ──────────────────────────────── -->
+        <div class="page" id="page-introai-scavenger-hunt">
+          <div class="page-header">
+            <div>
+              <div class="page-title">AI Scavenger Hunt — Week 1 Ex 1</div>
+              <div class="page-subtitle">Students spot AI behind the scenes in a tool they use</div>
+            </div>
+            <button class="btn btn-mint" onclick="exportCSV('sh')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
+              </svg>
+              Export CSV
+            </button>
+          </div>
+
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card">
+              <div class="stat-label">Submissions</div>
+              <div class="stat-value" id="sh-stat-count">—</div>
+              <div class="stat-sub">Students submitted</div>
+            </div>
+            <div class="stat-card teal">
+              <div class="stat-label">Avg AI Instances Found</div>
+              <div class="stat-value" id="sh-stat-avg-instances">—</div>
+              <div class="stat-sub">Out of 5 max</div>
+            </div>
+            <div class="stat-card gold">
+              <div class="stat-label">Most Used Category</div>
+              <div class="stat-value" id="sh-stat-top-cat" style="font-size:14px">—</div>
+              <div class="stat-sub">Tool type</div>
+            </div>
+            <div class="stat-card red">
+              <div class="stat-label">Surprised by AI</div>
+              <div class="stat-value" id="sh-stat-surprised">—</div>
+              <div class="stat-sub">Said &ldquo;Yes, a lot!&rdquo;</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Search:</label>
+              <input class="search-input" id="sh-search" type="text" placeholder="Student or tool…"
+                oninput="renderSHTable()" />
+              <span class="text-small text-muted" id="sh-count"></span>
+            </div>
+            <div id="sh-table-wrap">
+              <div class="loading"><div class="spinner"></div><br>Loading scavenger hunt data…</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── INTRO TO AI: CHATBOTS ──────────────────────────────────── -->
+        <div class="page" id="page-introai-chatbots">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Intro to Chatbots — Week 1 Ex 2</div>
+              <div class="page-subtitle">4-task chatbot exploration: define, factual, summarise, creative</div>
+            </div>
+            <button class="btn btn-mint" onclick="exportCSV('cb')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
+              </svg>
+              Export CSV
+            </button>
+          </div>
+
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card">
+              <div class="stat-label">Submissions</div>
+              <div class="stat-value" id="cb-stat-count">—</div>
+              <div class="stat-sub">Students submitted</div>
+            </div>
+            <div class="stat-card teal">
+              <div class="stat-label">Most Used Chatbot</div>
+              <div class="stat-value" id="cb-stat-top-bot" style="font-size:14px">—</div>
+              <div class="stat-sub">Platform</div>
+            </div>
+            <div class="stat-card gold">
+              <div class="stat-label">Avg Impression</div>
+              <div class="stat-value" id="cb-stat-impression">—</div>
+              <div class="stat-sub">Out of 5.00</div>
+            </div>
+            <div class="stat-card red">
+              <div class="stat-label">Accurate Answers</div>
+              <div class="stat-value" id="cb-stat-accurate">—</div>
+              <div class="stat-sub">Factual Q fully correct</div>
+            </div>
+          </div>
+
+          <!-- Chatbot distribution -->
+          <div class="panel" style="margin-bottom:20px">
+            <div class="panel-header">
+              <div class="panel-title">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 14V8l3-3 3 3 3-5 3 3" />
+                </svg>
+                Chatbot Usage &amp; Accuracy Breakdown
+              </div>
+            </div>
+            <div id="cb-breakdown" style="padding:20px 20px 8px">
+              <div class="loading"><div class="spinner"></div><br>Loading…</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Chatbot:</label>
+              <select class="filter-select" id="cb-filter-bot" onchange="renderCBTable()">
+                <option value="">All</option>
+                <option>ChatGPT</option><option>Gemini</option><option>Claude</option>
+                <option>Copilot</option><option>Perplexity</option><option>Other</option>
+              </select>
+              <label>Accuracy:</label>
+              <select class="filter-select" id="cb-filter-acc" onchange="renderCBTable()">
+                <option value="">All</option>
+                <option value="accurate">Accurate</option>
+                <option value="partially_accurate">Partial</option>
+                <option value="inaccurate">Inaccurate</option>
+              </select>
+              <label>Search:</label>
+              <input class="search-input" id="cb-search" type="text" placeholder="Student name…"
+                oninput="renderCBTable()" />
+              <span class="text-small text-muted" id="cb-count"></span>
+            </div>
+            <div id="cb-table-wrap">
+              <div class="loading"><div class="spinner"></div><br>Loading chatbot data…</div>
+            </div>
+          </div>
+        </div>
+
       </main>
     </div>
   </div>
@@ -1818,6 +1961,9 @@
     let hwData = [];     // homework_submissions rows
     let examData = [];   // caio_final_exam_results rows
     let codesData = [];  // access_codes rows
+    let saData = [];     // introai_week01_self_assessment rows
+    let shData = [];     // introai_week01_scavenger_hunt rows
+    let cbData = [];     // introai_week01_chatbots rows
     let activeCohort = ''; // global cohort filter (’’ = all)
 
     // ════════════════════════════════════════════════════════════════════════════
@@ -1885,37 +2031,30 @@
     async function loadAll() {
       document.getElementById('last-refresh').textContent = 'Refreshing…';
       try {
-        const [hw, exam, codes, sa] = await Promise.all([
+        const [hw, exam, codes, sa, sh, cb] = await Promise.all([
           sb.from('homework_submissions').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('caio_final_exam_results').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('access_codes').select('*').order('created_at', { ascending: false }).limit(10000),
-          sb.from('introai_week01_self_assessment').select('*').order('submitted_at', { ascending: false }).limit(10000)
+          sb.from('introai_week01_self_assessment').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('introai_week01_scavenger_hunt').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('introai_week01_chatbots').select('*').order('submitted_at', { ascending: false }).limit(10000)
         ]);
 
-        // Surface per-table errors so failures are visible
-        if (hw.error) {
-          console.error('homework_submissions error:', hw.error);
-          toast('⚠ Homework load error: ' + hw.error.message);
-        }
-        if (exam.error) {
-          console.error('caio_final_exam_results error:', exam.error);
-          toast('⚠ Exam load error: ' + exam.error.message);
-        }
-        if (codes.error) {
-          console.error('access_codes error:', codes.error);
-          toast('⚠ Codes load error: ' + codes.error.message);
-        }
-        if (sa.error) {
-          console.error('introai_week01_self_assessment error:', sa.error);
-          toast('⚠ Self-assessment load error: ' + sa.error.message);
-        }
+        if (hw.error)   { console.error('hw error:', hw.error);       toast('⚠ Homework load error: '       + hw.error.message); }
+        if (exam.error) { console.error('exam error:', exam.error);   toast('⚠ Exam load error: '          + exam.error.message); }
+        if (codes.error){ console.error('codes error:', codes.error); toast('⚠ Codes load error: '         + codes.error.message); }
+        if (sa.error)   { console.error('sa error:', sa.error);       toast('⚠ Self-assessment error: '    + sa.error.message); }
+        if (sh.error)   { console.error('sh error:', sh.error);       toast('⚠ Scavenger hunt error: '     + sh.error.message); }
+        if (cb.error)   { console.error('cb error:', cb.error);       toast('⚠ Chatbots error: '           + cb.error.message); }
 
         hwData    = hw.data    || [];
         examData  = exam.data  || [];
         codesData = codes.data || [];
         saData    = sa.data    || [];
+        shData    = sh.data    || [];
+        cbData    = cb.data    || [];
 
-        console.log(`Loaded: ${hwData.length} hw, ${examData.length} exam, ${codesData.length} codes, ${saData.length} self-assessment rows`);
+        console.log(`Loaded: ${hwData.length} hw, ${examData.length} exam, ${codesData.length} codes, ${saData.length} SA, ${shData.length} SH, ${cbData.length} CB rows`);
 
         populateFilters();
         renderOverview();
@@ -1925,6 +2064,8 @@
         renderExamStudentSelect();
         renderCodesTable();
         renderSAPage();
+        renderSHPage();
+        renderCBPage();
 
         const now = new Date();
         document.getElementById('last-refresh').textContent = 'Updated ' + now.toLocaleTimeString();
@@ -2442,6 +2583,14 @@
         rows = [['student_name', 'auto_score', 'mcq_score', 'blank_score', 'submitted_at', 'access_code']];
         examData.forEach(r => rows.push([r.student_name, r.auto_score, r.mcq_score, r.blank_score, r.submitted_at, r.access_code]));
         filename = 'exam_results.csv';
+      } else if (type === 'sh') {
+        rows = [['student_name', 'student_email', 'tool_name', 'tool_category', 'tool_description', 'ai_instance_1', 'ai_instance_2', 'ai_instance_3', 'ai_instance_4', 'ai_instance_5', 'instance_count', 'surprised', 'reflection', 'submitted_at']];
+        shData.forEach(r => rows.push([r.student_name, r.student_email, r.tool_name, r.tool_category, r.tool_description, r.ai_instance_1, r.ai_instance_2, r.ai_instance_3, r.ai_instance_4, r.ai_instance_5, r.instance_count, r.surprised, r.reflection, r.submitted_at]));
+        filename = 'introai_week01_scavenger_hunt.csv';
+      } else if (type === 'cb') {
+        rows = [['student_name', 'student_email', 'chatbot_used', 't1_chatbot_definition', 't1_comparison', 't1_notes', 't2_question', 't2_chatbot_answer', 't2_accuracy', 't3_original_text', 't3_chatbot_summary', 't3_summary_quality', 't4_creative_prompt', 't4_creative_response', 'overall_impression', 'reflection', 'submitted_at']];
+        cbData.forEach(r => rows.push([r.student_name, r.student_email, r.chatbot_used, r.t1_chatbot_definition, r.t1_comparison, r.t1_notes, r.t2_question, r.t2_chatbot_answer, r.t2_accuracy, r.t3_original_text, r.t3_chatbot_summary, r.t3_summary_quality, r.t4_creative_prompt, r.t4_creative_response, r.overall_impression, r.reflection, r.submitted_at]));
+        filename = 'introai_week01_chatbots.csv';
       } else {
         rows = [['code', 'cohort', 'class_number', 'is_active', 'uses_count', 'max_uses', 'created_at']];
         codesData.forEach(r => rows.push([r.code, r.cohort, r.class_number, r.is_active, r.uses_count, r.max_uses, r.created_at]));
@@ -2602,6 +2751,238 @@
       a.download = 'introai_week01_self_assessment.csv';
       a.click();
     }
+
+    // ════════════════════════════════════════════════════════════════════════════
+    // INTRO TO AI — SCAVENGER HUNT (Ex 1)
+    // ════════════════════════════════════════════════════════════════════════════
+    const CAT_LABELS = {
+      social_media:'Social Media', streaming:'Streaming', search:'Search',
+      navigation:'Navigation', shopping:'Shopping', messaging:'Messaging',
+      gaming:'Gaming', productivity:'Productivity', health_fitness:'Health & Fitness', other:'Other'
+    };
+
+    function renderSHPage() {
+      if (!shData.length) {
+        ['sh-stat-count','sh-stat-avg-instances','sh-stat-top-cat','sh-stat-surprised'].forEach(id => {
+          document.getElementById(id).textContent = '0';
+        });
+        renderSHTable();
+        return;
+      }
+      document.getElementById('sh-stat-count').textContent = shData.length;
+
+      const avgInst = (shData.reduce((s, r) => s + (r.instance_count || 0), 0) / shData.length).toFixed(1);
+      document.getElementById('sh-stat-avg-instances').textContent = avgInst;
+
+      // Most common category
+      const catCounts = {};
+      shData.forEach(r => { if (r.tool_category) catCounts[r.tool_category] = (catCounts[r.tool_category] || 0) + 1; });
+      const topCat = Object.entries(catCounts).sort((a,b) => b[1]-a[1])[0];
+      document.getElementById('sh-stat-top-cat').textContent = topCat ? (CAT_LABELS[topCat[0]] || topCat[0]) : '—';
+
+      const surprised = shData.filter(r => r.surprised === 'yes').length;
+      document.getElementById('sh-stat-surprised').textContent = surprised;
+
+      renderSHTable();
+    }
+
+    function renderSHTable() {
+      const search = (document.getElementById('sh-search')?.value || '').toLowerCase();
+      const rows = shData.filter(r =>
+        !search ||
+        (r.student_name || '').toLowerCase().includes(search) ||
+        (r.tool_name || '').toLowerCase().includes(search)
+      );
+      document.getElementById('sh-count').textContent = rows.length + ' student' + (rows.length !== 1 ? 's' : '');
+
+      if (!rows.length) {
+        document.getElementById('sh-table-wrap').innerHTML = '<div class="empty-state"><p>No matching submissions.</p></div>';
+        return;
+      }
+
+      function surprisedBadge(v) {
+        if (!v) return '<span style="color:var(--gray)">—</span>';
+        const map = { yes:'#d1fae5:#065f46:😲 Yes', somewhat:'#fef9c3:#713f12:🤔 Somewhat', no:'#f3f4f6:#374151:😐 No' };
+        const parts = (map[v] || '#f3f4f6:#374151:' + v).split(':');
+        return `<span style="padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;background:${parts[0]};color:${parts[1]}">${parts[2]}</span>`;
+      }
+
+      document.getElementById('sh-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Student</th><th>Tool</th><th>Category</th><th>AI Spots</th><th>Surprised?</th><th>Submitted</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr>
+          <td>${esc(r.student_name)}</td>
+          <td><strong>${esc(r.tool_name)}</strong></td>
+          <td style="font-size:11px;color:var(--gray)">${esc(CAT_LABELS[r.tool_category] || r.tool_category || '—')}</td>
+          <td style="font-family:'DM Mono',monospace;font-weight:700;color:var(--teal)">${r.instance_count || '—'}</td>
+          <td>${surprisedBadge(r.surprised)}</td>
+          <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+        </tr>
+        <tr style="background:#fafafa;border-top:none">
+          <td colspan="6" style="padding:8px 16px 12px;font-size:11px;color:#64748b;line-height:1.6">
+            ${[1,2,3,4,5].filter(i => r['ai_instance_'+i]).map((i,idx) =>
+              `<span style="font-weight:600;color:#475569">${idx+1}.</span> ${esc(r['ai_instance_'+i])}`
+            ).join(' &nbsp;·&nbsp; ')}
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+    }
+
+    // ════════════════════════════════════════════════════════════════════════════
+    // INTRO TO AI — CHATBOTS (Ex 2)
+    // ════════════════════════════════════════════════════════════════════════════
+    function renderCBPage() {
+      if (!cbData.length) {
+        ['cb-stat-count','cb-stat-top-bot','cb-stat-impression','cb-stat-accurate'].forEach(id =>
+          document.getElementById(id).textContent = '0');
+        document.getElementById('cb-breakdown').innerHTML = '<p style="color:var(--gray);font-size:13px">No submissions yet.</p>';
+        renderCBTable();
+        return;
+      }
+      document.getElementById('cb-stat-count').textContent = cbData.length;
+
+      // Most used chatbot
+      const botCounts = {};
+      cbData.forEach(r => { botCounts[r.chatbot_used] = (botCounts[r.chatbot_used] || 0) + 1; });
+      const topBot = Object.entries(botCounts).sort((a,b) => b[1]-a[1])[0];
+      document.getElementById('cb-stat-top-bot').textContent = topBot ? topBot[0] : '—';
+
+      // Avg impression
+      const withImp = cbData.filter(r => r.overall_impression);
+      const avgImp = withImp.length ? (withImp.reduce((s,r) => s + r.overall_impression, 0) / withImp.length).toFixed(2) : '—';
+      document.getElementById('cb-stat-impression').textContent = avgImp;
+
+      // Accurate count
+      const accurate = cbData.filter(r => r.t2_accuracy === 'accurate').length;
+      document.getElementById('cb-stat-accurate').textContent = accurate + ' / ' + cbData.length;
+
+      // Breakdown bars
+      const bots = ['ChatGPT','Gemini','Claude','Copilot','Perplexity','Other'];
+      const botColors = { ChatGPT:'#10b981', Gemini:'#6366f1', Claude:'#f59e0b', Copilot:'#3b82f6', Perplexity:'#8b5cf6', Other:'#94a3b8' };
+      const breakdownEl = document.getElementById('cb-breakdown');
+      if (Object.keys(botCounts).length) {
+        const max = Math.max(...Object.values(botCounts));
+        breakdownEl.innerHTML = Object.entries(botCounts).sort((a,b) => b[1]-a[1]).map(([bot, count]) => {
+          const pct = (count / max) * 100;
+          const color = botColors[bot] || '#94a3b8';
+          const accCount = cbData.filter(r => r.chatbot_used === bot && r.t2_accuracy === 'accurate').length;
+          const partCount = cbData.filter(r => r.chatbot_used === bot && r.t2_accuracy === 'partially_accurate').length;
+          return `<div style="margin-bottom:14px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px">
+              <span style="font-size:12px;font-weight:600;color:var(--navy)">${esc(bot)}</span>
+              <span style="font-size:11px;color:var(--gray)">${count} student${count!==1?'s':''} · ✅ ${accCount} accurate · 🟡 ${partCount} partial</span>
+            </div>
+            <div style="height:8px;background:var(--border);border-radius:99px;overflow:hidden">
+              <div style="height:100%;width:${pct.toFixed(1)}%;background:${color};border-radius:99px;transition:width 0.5s ease"></div>
+            </div>
+          </div>`;
+        }).join('');
+      } else {
+        breakdownEl.innerHTML = '<p style="color:var(--gray);font-size:13px">No submissions yet.</p>';
+      }
+
+      renderCBTable();
+    }
+
+    function renderCBTable() {
+      const search  = (document.getElementById('cb-search')?.value || '').toLowerCase();
+      const botFilt = document.getElementById('cb-filter-bot')?.value || '';
+      const accFilt = document.getElementById('cb-filter-acc')?.value || '';
+
+      const rows = cbData.filter(r =>
+        (!search  || (r.student_name || '').toLowerCase().includes(search)) &&
+        (!botFilt || r.chatbot_used === botFilt) &&
+        (!accFilt || r.t2_accuracy === accFilt)
+      );
+      document.getElementById('cb-count').textContent = rows.length + ' student' + (rows.length !== 1 ? 's' : '');
+
+      if (!rows.length) {
+        document.getElementById('cb-table-wrap').innerHTML = '<div class="empty-state"><p>No matching submissions.</p></div>';
+        return;
+      }
+
+      function accBadge(v) {
+        if (!v) return '<span style="color:var(--gray)">—</span>';
+        const map = {
+          accurate:'#d1fae5:#065f46:✅ Accurate',
+          partially_accurate:'#fef9c3:#713f12:🟡 Partial',
+          inaccurate:'#fee2e2:#991b1b:❌ Wrong'
+        };
+        const parts = (map[v] || '#f3f4f6:#374151:' + v).split(':');
+        return `<span style="padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;background:${parts[0]};color:${parts[1]}">${parts[2]}</span>`;
+      }
+
+      function impBadge(v) {
+        if (!v) return '<span style="color:var(--gray)">—</span>';
+        const colors = ['','#fee2e2:#991b1b','#fef9c3:#713f12','#fef9c3:#713f12','#d1fae5:#065f46','#d1fae5:#065f46'];
+        const parts = colors[v].split(':');
+        return `<span style="padding:2px 8px;border-radius:6px;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;background:${parts[0]};color:${parts[1]}">${v}/5</span>`;
+      }
+
+      document.getElementById('cb-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Student</th><th>Chatbot</th><th>Def. vs Class</th><th>Factual Q Accuracy</th><th>Summary Quality</th><th>Impression</th><th>Submitted</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr onclick="showCBDetail(${r.id})" style="cursor:pointer" title="Click to see full responses">
+          <td>${esc(r.student_name)}<br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
+          <td style="font-weight:600">${esc(r.chatbot_used)}</td>
+          <td style="font-size:11px">${esc(r.t1_comparison?.replace(/_/g,' ') || '—')}</td>
+          <td>${accBadge(r.t2_accuracy)}</td>
+          <td style="font-size:11px">${esc(r.t3_summary_quality || '—')}</td>
+          <td>${impBadge(r.overall_impression)}</td>
+          <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+    }
+
+    function showCBDetail(id) {
+      const r = cbData.find(x => x.id === id);
+      if (!r) return;
+      document.getElementById('modal-title').textContent = esc(r.student_name) + ' — Chatbot Exercise';
+      document.getElementById('modal-body').innerHTML = `
+        <div style="font-size:13px;line-height:1.7">
+          <p style="margin-bottom:8px"><strong>Chatbot:</strong> ${esc(r.chatbot_used)}</p>
+          <hr style="margin:12px 0;border-color:var(--border)">
+          <p style="font-weight:700;color:var(--navy);margin-bottom:6px">Task 1 — AI/ML Definition</p>
+          <p style="background:#f8fafc;padding:10px;border-radius:8px;margin-bottom:6px;white-space:pre-wrap">${esc(r.t1_chatbot_definition || '—')}</p>
+          <p><strong>Comparison:</strong> ${esc(r.t1_comparison?.replace(/_/g,' ') || '—')}</p>
+          ${r.t1_notes ? `<p><strong>Notes:</strong> ${esc(r.t1_notes)}</p>` : ''}
+          <hr style="margin:12px 0;border-color:var(--border)">
+          <p style="font-weight:700;color:var(--navy);margin-bottom:6px">Task 2 — Factual Question</p>
+          <p><strong>Q:</strong> ${esc(r.t2_question || '—')}</p>
+          <p style="background:#f8fafc;padding:10px;border-radius:8px;margin:6px 0;white-space:pre-wrap">${esc(r.t2_chatbot_answer || '—')}</p>
+          <p><strong>Accuracy:</strong> ${esc(r.t2_accuracy?.replace(/_/g,' ') || '—')}</p>
+          <hr style="margin:12px 0;border-color:var(--border)">
+          <p style="font-weight:700;color:var(--navy);margin-bottom:6px">Task 3 — Summary</p>
+          <p><strong>Original text:</strong></p>
+          <p style="background:#f8fafc;padding:10px;border-radius:8px;margin:6px 0;white-space:pre-wrap">${esc(r.t3_original_text || '—')}</p>
+          <p><strong>Chatbot summary:</strong></p>
+          <p style="background:#f8fafc;padding:10px;border-radius:8px;margin:6px 0;white-space:pre-wrap">${esc(r.t3_chatbot_summary || '—')}</p>
+          <p><strong>Quality:</strong> ${esc(r.t3_summary_quality || '—')}</p>
+          <hr style="margin:12px 0;border-color:var(--border)">
+          <p style="font-weight:700;color:var(--navy);margin-bottom:6px">Task 4 — Creative</p>
+          <p><strong>Prompt:</strong> ${esc(r.t4_creative_prompt || '—')}</p>
+          <p style="background:#f8fafc;padding:10px;border-radius:8px;margin:6px 0;white-space:pre-wrap">${esc(r.t4_creative_response || '—')}</p>
+          ${r.reflection ? `<hr style="margin:12px 0;border-color:var(--border)"><p><strong>Reflection:</strong> ${esc(r.reflection)}</p>` : ''}
+        </div>`;
+      document.getElementById('modal-overlay').style.display = 'flex';
+    }
+
+    // ── Extended exportCSV to handle sh and cb ──────────────────────────────
+    const _origExportCSV = typeof exportCSV === 'function' ? exportCSV : null;
 
     function fmtDate(iso) {
       if (!iso) return '—';

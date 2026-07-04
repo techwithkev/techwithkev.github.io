@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intro to Chatbots — Intro to AI · Week 1</title>
+  <meta name="description"
+    content="Exercise 2: Explore an AI chatbot by asking it to define AI, answer a factual question, summarise text, and do something creative. Week 1 class exercise.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    /* ── Registration gate ── */
+    #registration-overlay { transition: opacity 0.4s ease; }
+    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
+    #registration-overlay .reg-card {
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
+    }
+    #registration-overlay.hiding .reg-card {
+      transform: scale(0.95) translateY(-10px); opacity: 0;
+    }
+
+    .reg-input:focus {
+      outline: none; border-color: #7c3aed;
+      box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
+    }
+    .reg-input.error {
+      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+    }
+
+    /* Task card */
+    .task-card {
+      border-left: 3px solid transparent;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .task-card.complete { border-left-color: #7c3aed; }
+
+    /* Form inputs */
+    .form-input:focus {
+      outline: none; border-color: #7c3aed;
+      box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+    }
+    .form-input.error { border-color: #ef4444; }
+
+    /* Option toggle buttons */
+    .opt-btn {
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .opt-btn:hover { transform: translateY(-1px); }
+    .opt-btn.selected {
+      border-color: #7c3aed !important;
+      background: #f5f3ff !important;
+      color: #5b21b6 !important;
+      font-weight: 700;
+    }
+
+    /* Accuracy badges */
+    .acc-btn { transition: all 0.15s ease; cursor: pointer; }
+    .acc-btn:hover { transform: translateY(-1px); }
+    .acc-btn.selected-accurate { background:#d1fae5; border-color:#059669; color:#065f46; font-weight:700; }
+    .acc-btn.selected-partial  { background:#fef9c3; border-color:#ca8a04; color:#713f12; font-weight:700; }
+    .acc-btn.selected-wrong    { background:#fee2e2; border-color:#dc2626; color:#991b1b; font-weight:700; }
+
+    /* Spinner */
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Char counter */
+    .char-count { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #9ca3af; }
+  </style>
+</head>
+
+<body class="bg-[#F9FAFB] text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- ══ REGISTRATION GATE ══ -->
+  <div id="registration-overlay"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+    style="background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 55%, #1e1b4b 100%);">
+
+    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
+        style="background: radial-gradient(circle, #a78bfa, transparent);"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
+        style="background: radial-gradient(circle, #7c3aed, transparent);"></div>
+    </div>
+
+    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center"
+          style="background: linear-gradient(135deg, #7c3aed, #6d28d9);">
+          <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+          </svg>
+        </div>
+        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3"
+          style="background: #ede9fe; color: #5b21b6;">Week 1 · Exercise 2</div>
+        <h1 class="text-2xl font-black text-gray-900 tracking-tight">Intro to <span style="color:#7c3aed;">Chatbots</span></h1>
+        <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">Enter your details to begin recording your chatbot experiment.</p>
+      </div>
+
+      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
+        <div class="space-y-4 mb-6">
+          <div>
+            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Full Name</label>
+            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Jane Smith"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name.</p>
+          </div>
+          <div>
+            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
+            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. jane@school.edu"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
+          </div>
+        </div>
+        <button id="reg-submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2"
+          style="background: linear-gradient(135deg, #7c3aed, #6d28d9);">
+          <span id="reg-btn-label">Start Exercise →</span>
+        </button>
+      </form>
+      <p class="text-center text-[10px] text-gray-400 font-medium mt-5">Your submission will be visible to your teacher.</p>
+    </div>
+  </div>
+
+  <!-- ══ MAIN CONTENT ══ -->
+  <div id="main-content" class="max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <!-- Header -->
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+      <div>
+        <a href="index.html"
+          class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-violet-600 mb-3 hover:text-violet-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">
+          Intro to <span class="text-violet-600">Chatbots</span>
+        </h1>
+        <p class="text-gray-500 font-medium italic mt-1">Exercise 2 · Module 1 Foundations &amp; Thinking</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-violet-50 border border-violet-200 text-violet-800 shadow-sm self-start md:self-auto">
+        Week 1
+      </div>
+    </header>
+
+    <!-- Brief card -->
+    <div class="rounded-2xl p-6 mb-8 border" style="background:linear-gradient(135deg,#f5f3ff,#ede9fe); border-color:#c4b5fd;">
+      <div class="flex gap-4">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#7c3aed;">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div>
+          <p class="text-xs font-black uppercase tracking-widest text-violet-700 mb-2">Exercise 2 — Instructions</p>
+          <p class="text-sm text-violet-900 mb-3">Use an AI chatbot (ChatGPT, Gemini, Claude etc.) and complete all 4 tasks below. Record your prompts and the chatbot's responses.</p>
+          <ul class="space-y-1.5">
+            <li class="text-xs text-violet-800 flex items-start gap-2">
+              <span class="w-4 h-4 rounded bg-violet-500 text-white flex items-center justify-center text-[9px] font-black flex-shrink-0 mt-0.5">1</span>
+              Ask it to <strong>define AI or ML</strong> in its own words. Compare to our class definition.
+            </li>
+            <li class="text-xs text-violet-800 flex items-start gap-2">
+              <span class="w-4 h-4 rounded bg-violet-500 text-white flex items-center justify-center text-[9px] font-black flex-shrink-0 mt-0.5">2</span>
+              Ask a <strong>factual question you know the answer to</strong> and check if it's right.
+            </li>
+            <li class="text-xs text-violet-800 flex items-start gap-2">
+              <span class="w-4 h-4 rounded bg-violet-500 text-white flex items-center justify-center text-[9px] font-black flex-shrink-0 mt-0.5">3</span>
+              Ask it to <strong>summarise a short paragraph</strong> of text.
+            </li>
+            <li class="text-xs text-violet-800 flex items-start gap-2">
+              <span class="w-4 h-4 rounded bg-violet-500 text-white flex items-center justify-center text-[9px] font-black flex-shrink-0 mt-0.5">4</span>
+              Ask it to do something <strong>creative</strong> — tell a joke, write a haiku, etc.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <form id="exercise-form" onsubmit="submitExercise(event)" novalidate>
+
+      <!-- CHATBOT SELECTION -->
+      <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-5">
+        <label class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-3">Which chatbot did you use?</label>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5" id="chatbot-picker">
+          <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2.5 px-3 text-sm font-semibold text-gray-600 bg-gray-50" onclick="setChatbot('ChatGPT')">🤖 ChatGPT</button>
+          <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2.5 px-3 text-sm font-semibold text-gray-600 bg-gray-50" onclick="setChatbot('Gemini')">✨ Gemini</button>
+          <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2.5 px-3 text-sm font-semibold text-gray-600 bg-gray-50" onclick="setChatbot('Claude')">🧠 Claude</button>
+          <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2.5 px-3 text-sm font-semibold text-gray-600 bg-gray-50" onclick="setChatbot('Copilot')">💼 Copilot</button>
+          <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2.5 px-3 text-sm font-semibold text-gray-600 bg-gray-50" onclick="setChatbot('Perplexity')">🔍 Perplexity</button>
+          <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2.5 px-3 text-sm font-semibold text-gray-600 bg-gray-50" onclick="setChatbot('Other')">💬 Other</button>
+        </div>
+        <p id="chatbot-error" class="hidden text-xs text-red-500 font-medium mt-2">Please select a chatbot.</p>
+      </div>
+
+      <!-- ── TASK 1: Define AI / ML ── -->
+      <div class="task-card bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-5" id="task1-card">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0"
+            style="background: linear-gradient(135deg,#7c3aed,#6d28d9);">1</div>
+          <div>
+            <h2 class="text-base font-black text-gray-900">Define AI or ML</h2>
+            <p class="text-xs text-gray-400">Ask the chatbot to define AI or ML in its own words</p>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label for="t1-chatbot-response" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+            What did the chatbot say? <span class="text-red-400">*</span>
+          </label>
+          <textarea id="t1-chatbot-response" rows="3"
+            placeholder="Paste or type the chatbot's definition of AI or ML here…"
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"
+            oninput="updateCharCount('t1-chatbot-response','t1-count1',600); checkTask1()"></textarea>
+          <div class="flex justify-between mt-1">
+            <p id="t1-resp-error" class="hidden text-xs text-red-500 font-medium">Required.</p>
+            <span class="char-count ml-auto" id="t1-count1">0 / 600</span>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
+            How did it compare to our class definition? <span class="text-red-400">*</span>
+          </label>
+          <div class="flex gap-2 flex-wrap" id="t1-comparison-picker">
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-4 text-xs font-semibold text-gray-600 bg-gray-50" onclick="setT1Comparison('very_similar')">✅ Very similar</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-4 text-xs font-semibold text-gray-600 bg-gray-50" onclick="setT1Comparison('mostly_similar')">🟡 Mostly similar</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-4 text-xs font-semibold text-gray-600 bg-gray-50" onclick="setT1Comparison('quite_different')">🔶 Quite different</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-4 text-xs font-semibold text-gray-600 bg-gray-50" onclick="setT1Comparison('very_different')">❌ Very different</button>
+          </div>
+          <p id="t1-comp-error" class="hidden text-xs text-red-500 font-medium mt-1">Required.</p>
+        </div>
+
+        <div>
+          <label for="t1-notes" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+            Notes / observations <span class="text-gray-400 normal-case font-medium ml-1">(optional)</span>
+          </label>
+          <textarea id="t1-notes" rows="2"
+            placeholder="What differences or surprises did you notice?"
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"
+            oninput="updateCharCount('t1-notes','t1-count2',300)"></textarea>
+          <div class="flex justify-end mt-1"><span class="char-count" id="t1-count2">0 / 300</span></div>
+        </div>
+      </div>
+
+      <!-- ── TASK 2: Factual Question ── -->
+      <div class="task-card bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-5" id="task2-card">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0"
+            style="background: linear-gradient(135deg,#7c3aed,#6d28d9);">2</div>
+          <div>
+            <h2 class="text-base font-black text-gray-900">Factual Question</h2>
+            <p class="text-xs text-gray-400">Ask it something you already know the answer to</p>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label for="t2-question" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+            What question did you ask? <span class="text-red-400">*</span>
+          </label>
+          <input id="t2-question" type="text"
+            placeholder="e.g. What is the capital of France?"
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all"
+            oninput="checkTask2()" />
+          <p id="t2-q-error" class="hidden text-xs text-red-500 font-medium mt-1">Required.</p>
+        </div>
+
+        <div class="mb-4">
+          <label for="t2-answer" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+            What did the chatbot answer? <span class="text-red-400">*</span>
+          </label>
+          <textarea id="t2-answer" rows="3"
+            placeholder="Paste or summarise the chatbot's response…"
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"
+            oninput="updateCharCount('t2-answer','t2-count1',500); checkTask2()"></textarea>
+          <div class="flex justify-between mt-1">
+            <p id="t2-a-error" class="hidden text-xs text-red-500 font-medium">Required.</p>
+            <span class="char-count ml-auto" id="t2-count1">0 / 500</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
+            Was the answer accurate? <span class="text-red-400">*</span>
+          </label>
+          <div class="flex gap-2 flex-wrap" id="t2-accuracy-picker">
+            <button type="button" class="acc-btn border border-gray-200 rounded-xl py-2 px-4 text-xs font-semibold text-gray-600 bg-gray-50" onclick="setAccuracy('accurate')">✅ Accurate</button>
+            <button type="button" class="acc-btn border border-gray-200 rounded-xl py-2 px-4 text-xs font-semibold text-gray-600 bg-gray-50" onclick="setAccuracy('partially_accurate')">🟡 Partially accurate</button>
+            <button type="button" class="acc-btn border border-gray-200 rounded-xl py-2 px-4 text-xs font-semibold text-gray-600 bg-gray-50" onclick="setAccuracy('inaccurate')">❌ Inaccurate</button>
+          </div>
+          <p id="t2-acc-error" class="hidden text-xs text-red-500 font-medium mt-1">Required.</p>
+        </div>
+      </div>
+
+      <!-- ── TASK 3: Summarise Text ── -->
+      <div class="task-card bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-5" id="task3-card">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0"
+            style="background: linear-gradient(135deg,#7c3aed,#6d28d9);">3</div>
+          <div>
+            <h2 class="text-base font-black text-gray-900">Summarise Text</h2>
+            <p class="text-xs text-gray-400">Give it a short paragraph and ask for a summary</p>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label for="t3-original" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+            The paragraph you gave it <span class="text-red-400">*</span>
+          </label>
+          <textarea id="t3-original" rows="3"
+            placeholder="Paste the paragraph you asked it to summarise…"
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"
+            oninput="updateCharCount('t3-original','t3-count1',800); checkTask3()"></textarea>
+          <div class="flex justify-between mt-1">
+            <p id="t3-orig-error" class="hidden text-xs text-red-500 font-medium">Required.</p>
+            <span class="char-count ml-auto" id="t3-count1">0 / 800</span>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label for="t3-summary" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+            The chatbot's summary <span class="text-red-400">*</span>
+          </label>
+          <textarea id="t3-summary" rows="3"
+            placeholder="Paste the chatbot's summary here…"
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"
+            oninput="updateCharCount('t3-summary','t3-count2',600); checkTask3()"></textarea>
+          <div class="flex justify-between mt-1">
+            <p id="t3-sum-error" class="hidden text-xs text-red-500 font-medium">Required.</p>
+            <span class="char-count ml-auto" id="t3-count2">0 / 600</span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
+            How good was the summary?
+          </label>
+          <div class="flex gap-2 flex-wrap" id="t3-quality-picker">
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-4 text-xs font-semibold text-gray-600 bg-gray-50" onclick="setSummaryQuality('excellent')">🌟 Excellent</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-4 text-xs font-semibold text-gray-600 bg-gray-50" onclick="setSummaryQuality('good')">✅ Good</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-4 text-xs font-semibold text-gray-600 bg-gray-50" onclick="setSummaryQuality('okay')">🟡 Okay</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-4 text-xs font-semibold text-gray-600 bg-gray-50" onclick="setSummaryQuality('poor')">❌ Poor</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TASK 4: Creative ── -->
+      <div class="task-card bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-5" id="task4-card">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0"
+            style="background: linear-gradient(135deg,#7c3aed,#6d28d9);">4</div>
+          <div>
+            <h2 class="text-base font-black text-gray-900">Creative Task</h2>
+            <p class="text-xs text-gray-400">Ask it to tell a joke, write a haiku, invent a story — anything creative</p>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label for="t4-prompt" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+            What did you ask it to do? <span class="text-red-400">*</span>
+          </label>
+          <input id="t4-prompt" type="text"
+            placeholder="e.g. Write a haiku about machine learning"
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all"
+            oninput="checkTask4()" />
+          <p id="t4-p-error" class="hidden text-xs text-red-500 font-medium mt-1">Required.</p>
+        </div>
+
+        <div>
+          <label for="t4-response" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+            The chatbot's creative response <span class="text-red-400">*</span>
+          </label>
+          <textarea id="t4-response" rows="4"
+            placeholder="Paste the chatbot's joke, haiku, story, etc."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"
+            oninput="updateCharCount('t4-response','t4-count1',800); checkTask4()"></textarea>
+          <div class="flex justify-between mt-1">
+            <p id="t4-r-error" class="hidden text-xs text-red-500 font-medium">Required.</p>
+            <span class="char-count ml-auto" id="t4-count1">0 / 800</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── OVERALL REFLECTION ── -->
+      <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-8">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0"
+            style="background: linear-gradient(135deg,#7c3aed,#6d28d9);">★</div>
+          <h2 class="text-base font-black text-gray-900">Overall Reflection</h2>
+        </div>
+
+        <div class="mb-5">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">How would you rate your overall chatbot experience?</label>
+          <div class="flex gap-2" id="impression-picker">
+            <button type="button" class="opt-btn flex-1 py-3 rounded-xl border border-gray-200 bg-gray-50 font-mono font-black text-sm text-gray-500 hover:border-violet-400 hover:bg-violet-50 hover:text-violet-700" onclick="setImpression(1)">1</button>
+            <button type="button" class="opt-btn flex-1 py-3 rounded-xl border border-gray-200 bg-gray-50 font-mono font-black text-sm text-gray-500 hover:border-violet-400 hover:bg-violet-50 hover:text-violet-700" onclick="setImpression(2)">2</button>
+            <button type="button" class="opt-btn flex-1 py-3 rounded-xl border border-gray-200 bg-gray-50 font-mono font-black text-sm text-gray-500 hover:border-violet-400 hover:bg-violet-50 hover:text-violet-700" onclick="setImpression(3)">3</button>
+            <button type="button" class="opt-btn flex-1 py-3 rounded-xl border border-gray-200 bg-gray-50 font-mono font-black text-sm text-gray-500 hover:border-violet-400 hover:bg-violet-50 hover:text-violet-700" onclick="setImpression(4)">4</button>
+            <button type="button" class="opt-btn flex-1 py-3 rounded-xl border border-gray-200 bg-gray-50 font-mono font-black text-sm text-gray-500 hover:border-violet-400 hover:bg-violet-50 hover:text-violet-700" onclick="setImpression(5)">5</button>
+          </div>
+          <div class="flex justify-between mt-1.5">
+            <span class="text-[10px] text-gray-400">Not impressed</span>
+            <span class="text-[10px] text-gray-400">Very impressed</span>
+          </div>
+        </div>
+
+        <div>
+          <label for="reflection" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+            What surprised you most about the chatbot?
+            <span class="normal-case text-gray-400 font-medium ml-1">(optional)</span>
+          </label>
+          <textarea id="reflection" rows="2"
+            placeholder="e.g. I was surprised that it got the capital wrong but wrote a really funny joke…"
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"
+            oninput="updateCharCount('reflection','ref-count',400)"></textarea>
+          <div class="flex justify-end mt-1"><span class="char-count" id="ref-count">0 / 400</span></div>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+        <p id="form-error" class="hidden text-sm font-medium text-red-500 mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+          <span id="form-error-text">Please complete all required fields.</span>
+        </p>
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2"
+          style="background: linear-gradient(135deg, #7c3aed, #6d28d9);">
+          <span id="submit-label">Submit Exercise →</span>
+        </button>
+        <p class="text-center text-xs text-gray-400 font-medium mt-3">Your teacher will be able to see your submission.</p>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- ══ SUCCESS SCREEN ══ -->
+  <div id="success-screen"
+    class="hidden fixed inset-0 z-[90] bg-[#F9FAFB] flex items-center justify-center p-4">
+    <div class="text-center max-w-md">
+      <div class="w-24 h-24 mx-auto rounded-3xl mb-6 flex items-center justify-center shadow-xl"
+        style="background: linear-gradient(135deg, #7c3aed, #6d28d9);">
+        <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <div class="inline-block px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4"
+        style="background:#ede9fe; color:#5b21b6;">Submitted!</div>
+      <h2 class="text-3xl font-black text-gray-900 mb-3 tracking-tight">
+        Great work, <span id="success-name" class="text-violet-600"></span>!
+      </h2>
+      <p class="text-gray-500 mb-8 leading-relaxed text-sm">Your chatbot experiments have been saved. Your teacher can see all your responses — get ready to share your findings!</p>
+      <a href="index.html"
+        class="inline-flex items-center gap-2 text-white font-black py-3.5 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm"
+        style="background: linear-gradient(135deg, #7c3aed, #6d28d9);">
+        Return to Course Hub
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    /* ══ CONFIG ══ */
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+    const TABLE = 'introai_week01_chatbots';
+
+    /* ── State ── */
+    let studentName = '', studentEmail = '';
+    let selectedChatbot = '';
+    let t1Comparison = '', t2Accuracy = '', t3Quality = '', overallImpression = null;
+
+    /* ══ SUPABASE ══ */
+    async function supabaseInsert(payload) {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!resp.ok) { const t = await resp.text(); throw new Error(`HTTP ${resp.status}: ${t}`); }
+    }
+
+    /* ══ REGISTRATION ══ */
+    function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+    async function handleRegistration(ev) {
+      ev.preventDefault();
+      const nameEl = document.getElementById('reg-name');
+      const emailEl = document.getElementById('reg-email');
+      let ok = true;
+      nameEl.classList.remove('error'); document.getElementById('reg-name-error').classList.add('hidden');
+      emailEl.classList.remove('error'); document.getElementById('reg-email-error').classList.add('hidden');
+      if (!nameEl.value.trim()) { nameEl.classList.add('error'); document.getElementById('reg-name-error').classList.remove('hidden'); ok=false; }
+      if (!emailEl.value.trim() || !validateEmail(emailEl.value.trim())) { emailEl.classList.add('error'); document.getElementById('reg-email-error').classList.remove('hidden'); ok=false; }
+      if (!ok) return;
+      const btn = document.getElementById('reg-submit-btn');
+      btn.disabled = true;
+      document.getElementById('reg-btn-label').innerHTML = '<span class="spinner"></span>';
+      studentName = nameEl.value.trim(); studentEmail = emailEl.value.trim();
+      sessionStorage.setItem('introai_cb_name', studentName);
+      sessionStorage.setItem('introai_cb_email', studentEmail);
+      const overlay = document.getElementById('registration-overlay');
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.remove(), 450);
+    }
+
+    (function restoreSession() {
+      const n = sessionStorage.getItem('introai_cb_name');
+      const e = sessionStorage.getItem('introai_cb_email');
+      if (n && e) { studentName = n; studentEmail = e; document.getElementById('registration-overlay').remove(); }
+    })();
+
+    /* ══ CHATBOT SELECTOR ══ */
+    function setChatbot(val) {
+      selectedChatbot = val;
+      document.querySelectorAll('#chatbot-picker .opt-btn').forEach(b => {
+        b.classList.toggle('selected', b.textContent.includes(val));
+      });
+      document.getElementById('chatbot-error').classList.add('hidden');
+    }
+
+    /* ══ TASK 1 ══ */
+    function setT1Comparison(val) {
+      t1Comparison = val;
+      document.querySelectorAll('#t1-comparison-picker .opt-btn').forEach(b => {
+        b.classList.toggle('selected', b.getAttribute('onclick').includes(`'${val}'`));
+      });
+      document.getElementById('t1-comp-error').classList.add('hidden');
+      checkTask1();
+    }
+    function checkTask1() {
+      const done = document.getElementById('t1-chatbot-response').value.trim() && t1Comparison;
+      document.getElementById('task1-card').classList.toggle('complete', !!done);
+    }
+
+    /* ══ TASK 2 ══ */
+    function setAccuracy(val) {
+      t2Accuracy = val;
+      document.querySelectorAll('#t2-accuracy-picker .acc-btn').forEach(b => {
+        b.className = 'acc-btn border rounded-xl py-2 px-4 text-xs font-semibold bg-gray-50 text-gray-600';
+      });
+      const map = { accurate:'selected-accurate', partially_accurate:'selected-partial', inaccurate:'selected-wrong' };
+      document.querySelector(`#t2-accuracy-picker .acc-btn[onclick*="${val}"]`)?.classList.add(map[val]);
+      document.getElementById('t2-acc-error').classList.add('hidden');
+      checkTask2();
+    }
+    function checkTask2() {
+      const done = document.getElementById('t2-question').value.trim() && document.getElementById('t2-answer').value.trim() && t2Accuracy;
+      document.getElementById('task2-card').classList.toggle('complete', !!done);
+    }
+
+    /* ══ TASK 3 ══ */
+    function setSummaryQuality(val) {
+      t3Quality = val;
+      document.querySelectorAll('#t3-quality-picker .opt-btn').forEach(b => {
+        b.classList.toggle('selected', b.getAttribute('onclick').includes(`'${val}'`));
+      });
+      checkTask3();
+    }
+    function checkTask3() {
+      const done = document.getElementById('t3-original').value.trim() && document.getElementById('t3-summary').value.trim();
+      document.getElementById('task3-card').classList.toggle('complete', !!done);
+    }
+
+    /* ══ TASK 4 ══ */
+    function checkTask4() {
+      const done = document.getElementById('t4-prompt').value.trim() && document.getElementById('t4-response').value.trim();
+      document.getElementById('task4-card').classList.toggle('complete', !!done);
+    }
+
+    /* ══ IMPRESSION ══ */
+    function setImpression(val) {
+      overallImpression = val;
+      document.querySelectorAll('#impression-picker .opt-btn').forEach((b, i) => {
+        const v = i + 1;
+        if (v <= val) {
+          b.style.cssText = 'background:#ede9fe;border-color:#7c3aed;color:#5b21b6;font-weight:700;transform:translateY(-2px);';
+        } else {
+          b.style.cssText = '';
+        }
+      });
+    }
+
+    /* ══ CHAR COUNTER ══ */
+    function updateCharCount(id, countId, max) {
+      const len = document.getElementById(id).value.length;
+      const el = document.getElementById(countId);
+      el.textContent = `${len} / ${max}`;
+    }
+
+    /* ══ SUBMIT ══ */
+    async function submitExercise(ev) {
+      ev.preventDefault();
+      let valid = true;
+      const errEl = document.getElementById('form-error');
+      const errTxt = document.getElementById('form-error-text');
+      errEl.classList.add('hidden');
+
+      // Chatbot
+      if (!selectedChatbot) {
+        document.getElementById('chatbot-error').classList.remove('hidden');
+        document.getElementById('chatbot-picker').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      // T1
+      const t1Resp = document.getElementById('t1-chatbot-response').value.trim();
+      if (!t1Resp) { document.getElementById('t1-resp-error').classList.remove('hidden'); valid = false; }
+      else document.getElementById('t1-resp-error').classList.add('hidden');
+      if (!t1Comparison) { document.getElementById('t1-comp-error').classList.remove('hidden'); valid = false; }
+      else document.getElementById('t1-comp-error').classList.add('hidden');
+
+      // T2
+      const t2Q = document.getElementById('t2-question').value.trim();
+      const t2A = document.getElementById('t2-answer').value.trim();
+      if (!t2Q) { document.getElementById('t2-q-error').classList.remove('hidden'); valid = false; }
+      else document.getElementById('t2-q-error').classList.add('hidden');
+      if (!t2A) { document.getElementById('t2-a-error').classList.remove('hidden'); valid = false; }
+      else document.getElementById('t2-a-error').classList.add('hidden');
+      if (!t2Accuracy) { document.getElementById('t2-acc-error').classList.remove('hidden'); valid = false; }
+      else document.getElementById('t2-acc-error').classList.add('hidden');
+
+      // T3
+      const t3Orig = document.getElementById('t3-original').value.trim();
+      const t3Sum  = document.getElementById('t3-summary').value.trim();
+      if (!t3Orig) { document.getElementById('t3-orig-error').classList.remove('hidden'); valid = false; }
+      else document.getElementById('t3-orig-error').classList.add('hidden');
+      if (!t3Sum) { document.getElementById('t3-sum-error').classList.remove('hidden'); valid = false; }
+      else document.getElementById('t3-sum-error').classList.add('hidden');
+
+      // T4
+      const t4P = document.getElementById('t4-prompt').value.trim();
+      const t4R = document.getElementById('t4-response').value.trim();
+      if (!t4P) { document.getElementById('t4-p-error').classList.remove('hidden'); valid = false; }
+      else document.getElementById('t4-p-error').classList.add('hidden');
+      if (!t4R) { document.getElementById('t4-r-error').classList.remove('hidden'); valid = false; }
+      else document.getElementById('t4-r-error').classList.add('hidden');
+
+      if (!valid) {
+        errTxt.textContent = 'Please complete all required fields before submitting.';
+        errEl.classList.remove('hidden');
+        // Scroll to first error
+        document.querySelector('.form-input.error, [id$="-error"]:not(.hidden)')
+          ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting…';
+
+      const payload = {
+        student_name:    studentName,
+        student_email:   studentEmail,
+        chatbot_used:    selectedChatbot,
+        // Task 1
+        t1_chatbot_definition: t1Resp,
+        t1_comparison:         t1Comparison,
+        t1_notes:              document.getElementById('t1-notes').value.trim() || null,
+        // Task 2
+        t2_question:           t2Q,
+        t2_chatbot_answer:     t2A,
+        t2_accuracy:           t2Accuracy,
+        // Task 3
+        t3_original_text:      t3Orig,
+        t3_chatbot_summary:    t3Sum,
+        t3_summary_quality:    t3Quality || null,
+        // Task 4
+        t4_creative_prompt:    t4P,
+        t4_creative_response:  t4R,
+        // Reflection
+        overall_impression:    overallImpression,
+        reflection:            document.getElementById('reflection').value.trim() || null,
+        submitted_at:          new Date().toISOString()
+      };
+
+      try {
+        await supabaseInsert(payload);
+      } catch (err) {
+        console.error('[Chatbots] Supabase error:', err.message);
+        btn.disabled = false;
+        document.getElementById('submit-label').innerHTML = 'Submit Exercise →';
+        errTxt.textContent = '⚠ Could not save. Please try again or let your teacher know.';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('success-name').textContent = studentName.split(' ')[0];
+      document.getElementById('success-screen').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+
+</body>
+</html>
