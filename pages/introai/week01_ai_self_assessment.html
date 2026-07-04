@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Self-Assessment — Intro to AI · Week 1</title>
+  <meta name="description" content="Rate your confidence in key AI concepts at the start of the course. Week 1 self-assessment survey.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    /* ── Registration / Gate overlay ── */
+    #registration-overlay {
+      transition: opacity 0.4s ease;
+    }
+    #registration-overlay.hiding {
+      opacity: 0;
+      pointer-events: none;
+    }
+    #registration-overlay .reg-card {
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+    }
+    #registration-overlay.hiding .reg-card {
+      transform: scale(0.95) translateY(-10px);
+      opacity: 0;
+    }
+
+    /* Input styling */
+    .reg-input:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+    .reg-input.error {
+      border-color: #ef4444;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+    }
+
+    /* Rating buttons */
+    .rating-btn {
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .rating-btn:hover {
+      transform: translateY(-2px);
+    }
+    .rating-btn.selected {
+      transform: translateY(-2px) scale(1.08);
+    }
+
+    /* Submission spinner */
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Success screen fade */
+    #success-screen {
+      transition: opacity 0.5s ease;
+    }
+
+    /* Question card hover */
+    .question-card {
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .question-card:hover {
+      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.08);
+    }
+    .question-card.answered {
+      border-color: #c7d2fe;
+    }
+  </style>
+</head>
+
+<body class="bg-[#F9FAFB] text-gray-900 min-h-screen font-sans antialiased pb-16">
+
+  <!-- ══════════════════════════════════════════════════════
+       REGISTRATION GATE — full-screen until name + email submitted
+  ══════════════════════════════════════════════════════ -->
+  <div id="registration-overlay"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+    style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #0f172a 100%);">
+
+    <!-- Decorative blobs -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="absolute -top-40 -left-40 w-96 h-96 rounded-full opacity-25"
+        style="background: radial-gradient(circle, #818cf8, transparent);"></div>
+      <div class="absolute -bottom-40 -right-40 w-[500px] h-[500px] rounded-full opacity-20"
+        style="background: radial-gradient(circle, #6366f1, transparent);"></div>
+    </div>
+
+    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
+      <!-- Icon + Title -->
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center"
+          style="background: linear-gradient(135deg, #6366f1, #818cf8);">
+          <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3"
+          style="background: #eef2ff; color: #4338ca;">Week 1 Survey</div>
+        <h1 class="text-2xl font-black text-gray-900 tracking-tight">AI <span style="color:#6366f1;">Self-Assessment</span></h1>
+        <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">Enter your details to begin the confidence survey. Honesty matters — there are no wrong answers!</p>
+      </div>
+
+      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
+        <div class="space-y-4 mb-6">
+          <!-- Full Name -->
+          <div>
+            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Full Name</label>
+            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Jane Smith"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all"
+              required />
+            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name.</p>
+          </div>
+          <!-- Email -->
+          <div>
+            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
+            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. jane@school.edu"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all"
+              required />
+            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
+          </div>
+        </div>
+
+        <button id="reg-submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2"
+          style="background: linear-gradient(135deg, #6366f1, #818cf8);">
+          <span id="reg-btn-label">Begin Survey →</span>
+        </button>
+      </form>
+
+      <p class="text-center text-[10px] text-gray-400 font-medium mt-5">
+        Your responses are shared with your teacher to personalise instruction.
+      </p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       MAIN SURVEY CONTENT
+  ══════════════════════════════════════════════════════ -->
+  <div id="survey-main" class="max-w-3xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <!-- Header -->
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+      <div>
+        <a href="index.html"
+          class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-indigo-600 mb-3 hover:text-indigo-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">AI <span class="text-indigo-600">Self-Assessment</span></h1>
+        <p class="text-gray-500 font-medium italic mt-1">Confidence Survey · Module 1 Foundations &amp; Thinking</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-indigo-50 border border-indigo-200 text-indigo-800 shadow-sm self-start md:self-auto">
+        Week 1 Survey
+      </div>
+    </header>
+
+    <!-- Instructions card -->
+    <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-5 mb-8 flex gap-4">
+      <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center flex-shrink-0">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+      <div>
+        <h3 class="font-bold text-indigo-900 mb-1">How to complete this survey</h3>
+        <p class="text-xs text-indigo-700 leading-relaxed">
+          Rate your confidence in each area on a scale of <strong>1 (Not at all confident)</strong> to <strong>5 (Very confident)</strong>. Answer honestly — this helps your teacher understand where to focus. There are no right or wrong answers.
+        </p>
+      </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="bg-white border border-gray-200 p-4 rounded-2xl shadow-sm mb-8">
+      <div class="flex justify-between items-center mb-2">
+        <span class="text-xs font-black text-gray-400 uppercase tracking-widest">Progress</span>
+        <span class="text-sm font-mono font-bold text-indigo-600" id="progress-text">0 / 15 answered</span>
+      </div>
+      <div class="w-full bg-gray-100 rounded-full h-2">
+        <div id="progress-bar" class="bg-indigo-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <!-- ── SURVEY QUESTIONS ── -->
+    <form id="survey-form" onsubmit="submitSurvey(event)" novalidate>
+
+      <!-- SECTION: What is AI? -->
+      <div class="mb-10">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white text-sm font-black flex items-center justify-center">A</div>
+          <h2 class="text-lg font-black text-gray-900 tracking-tight">What is AI?</h2>
+        </div>
+
+        <div class="space-y-4">
+          <!-- Q1 -->
+          <div class="question-card bg-white border border-gray-200 rounded-2xl p-5 shadow-sm" data-q="1">
+            <p class="text-sm font-semibold text-gray-800 mb-4">I can explain what Artificial Intelligence (AI) is in my own words.</p>
+            <div class="flex gap-2" role="group" aria-label="Rating 1 to 5">
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50" onclick="setRating(1,1)" data-q="1" data-v="1">1</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50" onclick="setRating(1,2)" data-q="1" data-v="2">2</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50" onclick="setRating(1,3)" data-q="1" data-v="3">3</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50" onclick="setRating(1,4)" data-q="1" data-v="4">4</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50" onclick="setRating(1,5)" data-q="1" data-v="5">5</button>
+            </div>
+            <div class="flex justify-between mt-1.5">
+              <span class="text-[10px] text-gray-400 font-medium">Not confident</span>
+              <span class="text-[10px] text-gray-400 font-medium">Very confident</span>
+            </div>
+          </div>
+
+          <!-- Q2 -->
+          <div class="question-card bg-white border border-gray-200 rounded-2xl p-5 shadow-sm" data-q="2">
+            <p class="text-sm font-semibold text-gray-800 mb-4">I can tell the difference between <strong>rule-based software</strong> and <strong>AI-driven systems</strong>.</p>
+            <div class="flex gap-2" role="group">
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50" onclick="setRating(2,1)">1</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50" onclick="setRating(2,2)">2</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50" onclick="setRating(2,3)">3</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50" onclick="setRating(2,4)">4</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50" onclick="setRating(2,5)">5</button>
+            </div>
+            <div class="flex justify-between mt-1.5">
+              <span class="text-[10px] text-gray-400 font-medium">Not confident</span>
+              <span class="text-[10px] text-gray-400 font-medium">Very confident</span>
+            </div>
+          </div>
+
+          <!-- Q3 -->
+          <div class="question-card bg-white border border-gray-200 rounded-2xl p-5 shadow-sm" data-q="3">
+            <p class="text-sm font-semibold text-gray-800 mb-4">I can name at least <strong>3 real-world applications</strong> of AI in everyday life.</p>
+            <div class="flex gap-2" role="group">
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50" onclick="setRating(3,1)">1</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50" onclick="setRating(3,2)">2</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50" onclick="setRating(3,3)">3</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50" onclick="setRating(3,4)">4</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50" onclick="setRating(3,5)">5</button>
+            </div>
+            <div class="flex justify-between mt-1.5">
+              <span class="text-[10px] text-gray-400 font-medium">Not confident</span>
+              <span class="text-[10px] text-gray-400 font-medium">Very confident</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION: Machine Learning & Data -->
+      <div class="mb-10">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-lg bg-purple-600 text-white text-sm font-black flex items-center justify-center">B</div>
+          <h2 class="text-lg font-black text-gray-900 tracking-tight">Machine Learning &amp; Data</h2>
+        </div>
+
+        <div class="space-y-4">
+          <!-- Q4 -->
+          <div class="question-card bg-white border border-gray-200 rounded-2xl p-5 shadow-sm" data-q="4">
+            <p class="text-sm font-semibold text-gray-800 mb-4">I understand what <strong>Machine Learning</strong> is and how it differs from traditional programming.</p>
+            <div class="flex gap-2" role="group">
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-purple-400 hover:text-purple-600 hover:bg-purple-50" onclick="setRating(4,1)">1</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-purple-400 hover:text-purple-600 hover:bg-purple-50" onclick="setRating(4,2)">2</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-purple-400 hover:text-purple-600 hover:bg-purple-50" onclick="setRating(4,3)">3</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-purple-400 hover:text-purple-600 hover:bg-purple-50" onclick="setRating(4,4)">4</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-purple-400 hover:text-purple-600 hover:bg-purple-50" onclick="setRating(4,5)">5</button>
+            </div>
+            <div class="flex justify-between mt-1.5">
+              <span class="text-[10px] text-gray-400 font-medium">Not confident</span>
+              <span class="text-[10px] text-gray-400 font-medium">Very confident</span>
+            </div>
+          </div>
+
+          <!-- Q5 -->
+          <div class="question-card bg-white border border-gray-200 rounded-2xl p-5 shadow-sm" data-q="5">
+            <p class="text-sm font-semibold text-gray-800 mb-4">I understand the role of <strong>training data</strong> in teaching an AI model.</p>
+            <div class="flex gap-2" role="group">
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-purple-400 hover:text-purple-600 hover:bg-purple-50" onclick="setRating(5,1)">1</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-purple-400 hover:text-purple-600 hover:bg-purple-50" onclick="setRating(5,2)">2</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-purple-400 hover:text-purple-600 hover:bg-purple-50" onclick="setRating(5,3)">3</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-purple-400 hover:text-purple-600 hover:bg-purple-50" onclick="setRating(5,4)">4</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-purple-400 hover:text-purple-600 hover:bg-purple-50" onclick="setRating(5,5)">5</button>
+            </div>
+            <div class="flex justify-between mt-1.5">
+              <span class="text-[10px] text-gray-400 font-medium">Not confident</span>
+              <span class="text-[10px] text-gray-400 font-medium">Very confident</span>
+            </div>
+          </div>
+
+          <!-- Q6 -->
+          <div class="question-card bg-white border border-gray-200 rounded-2xl p-5 shadow-sm" data-q="6">
+            <p class="text-sm font-semibold text-gray-800 mb-4">I can explain what <strong>bias in AI</strong> means and why it matters.</p>
+            <div class="flex gap-2" role="group">
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-purple-400 hover:text-purple-600 hover:bg-purple-50" onclick="setRating(6,1)">1</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-purple-400 hover:text-purple-600 hover:bg-purple-50" onclick="setRating(6,2)">2</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-purple-400 hover:text-purple-600 hover:bg-purple-50" onclick="setRating(6,3)">3</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-purple-400 hover:text-purple-600 hover:bg-purple-50" onclick="setRating(6,4)">4</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-purple-400 hover:text-purple-600 hover:bg-purple-50" onclick="setRating(6,5)">5</button>
+            </div>
+            <div class="flex justify-between mt-1.5">
+              <span class="text-[10px] text-gray-400 font-medium">Not confident</span>
+              <span class="text-[10px] text-gray-400 font-medium">Very confident</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION: Responsible AI Use -->
+      <div class="mb-10">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white text-sm font-black flex items-center justify-center">C</div>
+          <h2 class="text-lg font-black text-gray-900 tracking-tight">Responsible &amp; Ethical AI Use</h2>
+        </div>
+
+        <div class="space-y-4">
+          <!-- Q7 -->
+          <div class="question-card bg-white border border-gray-200 rounded-2xl p-5 shadow-sm" data-q="7">
+            <p class="text-sm font-semibold text-gray-800 mb-4">I can identify <strong>ethical concerns</strong> associated with AI (e.g. privacy, fairness, job displacement).</p>
+            <div class="flex gap-2" role="group">
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-emerald-400 hover:text-emerald-600 hover:bg-emerald-50" onclick="setRating(7,1)">1</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-emerald-400 hover:text-emerald-600 hover:bg-emerald-50" onclick="setRating(7,2)">2</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-emerald-400 hover:text-emerald-600 hover:bg-emerald-50" onclick="setRating(7,3)">3</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-emerald-400 hover:text-emerald-600 hover:bg-emerald-50" onclick="setRating(7,4)">4</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-emerald-400 hover:text-emerald-600 hover:bg-emerald-50" onclick="setRating(7,5)">5</button>
+            </div>
+            <div class="flex justify-between mt-1.5">
+              <span class="text-[10px] text-gray-400 font-medium">Not confident</span>
+              <span class="text-[10px] text-gray-400 font-medium">Very confident</span>
+            </div>
+          </div>
+
+          <!-- Q8 -->
+          <div class="question-card bg-white border border-gray-200 rounded-2xl p-5 shadow-sm" data-q="8">
+            <p class="text-sm font-semibold text-gray-800 mb-4">I understand what it means to use <strong>AI tools responsibly</strong> (citing AI, not plagiarising, verifying outputs).</p>
+            <div class="flex gap-2" role="group">
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-emerald-400 hover:text-emerald-600 hover:bg-emerald-50" onclick="setRating(8,1)">1</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-emerald-400 hover:text-emerald-600 hover:bg-emerald-50" onclick="setRating(8,2)">2</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-emerald-400 hover:text-emerald-600 hover:bg-emerald-50" onclick="setRating(8,3)">3</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-emerald-400 hover:text-emerald-600 hover:bg-emerald-50" onclick="setRating(8,4)">4</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-emerald-400 hover:text-emerald-600 hover:bg-emerald-50" onclick="setRating(8,5)">5</button>
+            </div>
+            <div class="flex justify-between mt-1.5">
+              <span class="text-[10px] text-gray-400 font-medium">Not confident</span>
+              <span class="text-[10px] text-gray-400 font-medium">Very confident</span>
+            </div>
+          </div>
+
+          <!-- Q9 -->
+          <div class="question-card bg-white border border-gray-200 rounded-2xl p-5 shadow-sm" data-q="9">
+            <p class="text-sm font-semibold text-gray-800 mb-4">I can evaluate an AI-generated output to check if it is <strong>accurate or misleading</strong>.</p>
+            <div class="flex gap-2" role="group">
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-emerald-400 hover:text-emerald-600 hover:bg-emerald-50" onclick="setRating(9,1)">1</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-emerald-400 hover:text-emerald-600 hover:bg-emerald-50" onclick="setRating(9,2)">2</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-emerald-400 hover:text-emerald-600 hover:bg-emerald-50" onclick="setRating(9,3)">3</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-emerald-400 hover:text-emerald-600 hover:bg-emerald-50" onclick="setRating(9,4)">4</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-emerald-400 hover:text-emerald-600 hover:bg-emerald-50" onclick="setRating(9,5)">5</button>
+            </div>
+            <div class="flex justify-between mt-1.5">
+              <span class="text-[10px] text-gray-400 font-medium">Not confident</span>
+              <span class="text-[10px] text-gray-400 font-medium">Very confident</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION: Working with AI Tools -->
+      <div class="mb-10">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-lg bg-amber-500 text-white text-sm font-black flex items-center justify-center">D</div>
+          <h2 class="text-lg font-black text-gray-900 tracking-tight">Working with AI Tools</h2>
+        </div>
+
+        <div class="space-y-4">
+          <!-- Q10 -->
+          <div class="question-card bg-white border border-gray-200 rounded-2xl p-5 shadow-sm" data-q="10">
+            <p class="text-sm font-semibold text-gray-800 mb-4">I am comfortable using <strong>AI chatbots</strong> (like ChatGPT, Gemini) to help with tasks.</p>
+            <div class="flex gap-2" role="group">
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-amber-400 hover:text-amber-600 hover:bg-amber-50" onclick="setRating(10,1)">1</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-amber-400 hover:text-amber-600 hover:bg-amber-50" onclick="setRating(10,2)">2</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-amber-400 hover:text-amber-600 hover:bg-amber-50" onclick="setRating(10,3)">3</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-amber-400 hover:text-amber-600 hover:bg-amber-50" onclick="setRating(10,4)">4</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-amber-400 hover:text-amber-600 hover:bg-amber-50" onclick="setRating(10,5)">5</button>
+            </div>
+            <div class="flex justify-between mt-1.5">
+              <span class="text-[10px] text-gray-400 font-medium">Not confident</span>
+              <span class="text-[10px] text-gray-400 font-medium">Very confident</span>
+            </div>
+          </div>
+
+          <!-- Q11 -->
+          <div class="question-card bg-white border border-gray-200 rounded-2xl p-5 shadow-sm" data-q="11">
+            <p class="text-sm font-semibold text-gray-800 mb-4">I know how to write an effective <strong>AI prompt</strong> to get useful results.</p>
+            <div class="flex gap-2" role="group">
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-amber-400 hover:text-amber-600 hover:bg-amber-50" onclick="setRating(11,1)">1</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-amber-400 hover:text-amber-600 hover:bg-amber-50" onclick="setRating(11,2)">2</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-amber-400 hover:text-amber-600 hover:bg-amber-50" onclick="setRating(11,3)">3</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-amber-400 hover:text-amber-600 hover:bg-amber-50" onclick="setRating(11,4)">4</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-amber-400 hover:text-amber-600 hover:bg-amber-50" onclick="setRating(11,5)">5</button>
+            </div>
+            <div class="flex justify-between mt-1.5">
+              <span class="text-[10px] text-gray-400 font-medium">Not confident</span>
+              <span class="text-[10px] text-gray-400 font-medium">Very confident</span>
+            </div>
+          </div>
+
+          <!-- Q12 -->
+          <div class="question-card bg-white border border-gray-200 rounded-2xl p-5 shadow-sm" data-q="12">
+            <p class="text-sm font-semibold text-gray-800 mb-4">I could use an <strong>AI image or text generation tool</strong> to create something for a project.</p>
+            <div class="flex gap-2" role="group">
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-amber-400 hover:text-amber-600 hover:bg-amber-50" onclick="setRating(12,1)">1</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-amber-400 hover:text-amber-600 hover:bg-amber-50" onclick="setRating(12,2)">2</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-amber-400 hover:text-amber-600 hover:bg-amber-50" onclick="setRating(12,3)">3</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-amber-400 hover:text-amber-600 hover:bg-amber-50" onclick="setRating(12,4)">4</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-amber-400 hover:text-amber-600 hover:bg-amber-50" onclick="setRating(12,5)">5</button>
+            </div>
+            <div class="flex justify-between mt-1.5">
+              <span class="text-[10px] text-gray-400 font-medium">Not confident</span>
+              <span class="text-[10px] text-gray-400 font-medium">Very confident</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION: AI & Society -->
+      <div class="mb-10">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-lg bg-rose-600 text-white text-sm font-black flex items-center justify-center">E</div>
+          <h2 class="text-lg font-black text-gray-900 tracking-tight">AI &amp; Society</h2>
+        </div>
+
+        <div class="space-y-4">
+          <!-- Q13 -->
+          <div class="question-card bg-white border border-gray-200 rounded-2xl p-5 shadow-sm" data-q="13">
+            <p class="text-sm font-semibold text-gray-800 mb-4">I can describe how AI is <strong>changing industries</strong> like healthcare, education, or transportation.</p>
+            <div class="flex gap-2" role="group">
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-rose-400 hover:text-rose-600 hover:bg-rose-50" onclick="setRating(13,1)">1</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-rose-400 hover:text-rose-600 hover:bg-rose-50" onclick="setRating(13,2)">2</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-rose-400 hover:text-rose-600 hover:bg-rose-50" onclick="setRating(13,3)">3</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-rose-400 hover:text-rose-600 hover:bg-rose-50" onclick="setRating(13,4)">4</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-rose-400 hover:text-rose-600 hover:bg-rose-50" onclick="setRating(13,5)">5</button>
+            </div>
+            <div class="flex justify-between mt-1.5">
+              <span class="text-[10px] text-gray-400 font-medium">Not confident</span>
+              <span class="text-[10px] text-gray-400 font-medium">Very confident</span>
+            </div>
+          </div>
+
+          <!-- Q14 -->
+          <div class="question-card bg-white border border-gray-200 rounded-2xl p-5 shadow-sm" data-q="14">
+            <p class="text-sm font-semibold text-gray-800 mb-4">I can share my <strong>opinion on AI's benefits and risks</strong> and back it up with examples.</p>
+            <div class="flex gap-2" role="group">
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-rose-400 hover:text-rose-600 hover:bg-rose-50" onclick="setRating(14,1)">1</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-rose-400 hover:text-rose-600 hover:bg-rose-50" onclick="setRating(14,2)">2</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-rose-400 hover:text-rose-600 hover:bg-rose-50" onclick="setRating(14,3)">3</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-rose-400 hover:text-rose-600 hover:bg-rose-50" onclick="setRating(14,4)">4</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-rose-400 hover:text-rose-600 hover:bg-rose-50" onclick="setRating(14,5)">5</button>
+            </div>
+            <div class="flex justify-between mt-1.5">
+              <span class="text-[10px] text-gray-400 font-medium">Not confident</span>
+              <span class="text-[10px] text-gray-400 font-medium">Very confident</span>
+            </div>
+          </div>
+
+          <!-- Q15 -->
+          <div class="question-card bg-white border border-gray-200 rounded-2xl p-5 shadow-sm" data-q="15">
+            <p class="text-sm font-semibold text-gray-800 mb-4">I feel <strong>excited and curious</strong> about learning more about AI this term.</p>
+            <div class="flex gap-2" role="group">
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-rose-400 hover:text-rose-600 hover:bg-rose-50" onclick="setRating(15,1)">1</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-rose-400 hover:text-rose-600 hover:bg-rose-50" onclick="setRating(15,2)">2</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-rose-400 hover:text-rose-600 hover:bg-rose-50" onclick="setRating(15,3)">3</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-rose-400 hover:text-rose-600 hover:bg-rose-50" onclick="setRating(15,4)">4</button>
+              <button type="button" class="rating-btn flex-1 py-3 rounded-xl border border-gray-200 font-mono font-black text-sm text-gray-500 bg-gray-50 hover:border-rose-400 hover:text-rose-600 hover:bg-rose-50" onclick="setRating(15,5)">5</button>
+            </div>
+            <div class="flex justify-between mt-1.5">
+              <span class="text-[10px] text-gray-400 font-medium">Strongly disagree</span>
+              <span class="text-[10px] text-gray-400 font-medium">Strongly agree</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Section -->
+      <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+        <p id="submit-validation-msg" class="hidden text-sm font-medium text-red-500 mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+          </svg>
+          Please answer all 15 questions before submitting.
+        </p>
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2"
+          style="background: linear-gradient(135deg, #6366f1, #818cf8);">
+          <span id="submit-label">Submit Self-Assessment →</span>
+        </button>
+        <p class="text-center text-xs text-gray-400 font-medium mt-3">
+          Your responses will be shared with your teacher.
+        </p>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       SUCCESS SCREEN (hidden until submission)
+  ══════════════════════════════════════════════════════ -->
+  <div id="success-screen" class="hidden fixed inset-0 z-[90] bg-[#F9FAFB] flex items-center justify-center p-4">
+    <div class="text-center max-w-md">
+      <div class="w-24 h-24 mx-auto rounded-3xl mb-6 flex items-center justify-center shadow-xl"
+        style="background: linear-gradient(135deg, #6366f1, #818cf8);">
+        <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <div class="inline-block px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4"
+        style="background: #eef2ff; color: #4338ca;">Survey Complete</div>
+      <h2 class="text-3xl font-black text-gray-900 mb-3 tracking-tight">Thank you, <span id="success-name" class="text-indigo-600"></span>!</h2>
+      <p class="text-gray-500 mb-8 leading-relaxed text-sm">Your self-assessment has been saved. Your teacher will review these results to help guide the course. Good luck this term!</p>
+      <a href="index.html"
+        class="inline-flex items-center gap-2 text-white font-black py-3.5 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm"
+        style="background: linear-gradient(135deg, #6366f1, #818cf8);">
+        Return to Course Hub
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    /* ══ SUPABASE CONFIG ══ */
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+    const TABLE = 'introai_week01_self_assessment';
+
+    /* ── Student identity ── */
+    let studentName = '';
+    let studentEmail = '';
+
+    /* ── Ratings store: qNum → 1..5 ── */
+    const ratings = {};
+    const TOTAL_QUESTIONS = 15;
+
+    /* ══ SUPABASE INSERT ══ */
+    async function supabaseInsert(payload) {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!resp.ok) {
+        const text = await resp.text();
+        throw new Error(`HTTP ${resp.status}: ${text}`);
+      }
+    }
+
+    /* ══ REGISTRATION GATE ══ */
+    function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+    async function handleRegistration(ev) {
+      ev.preventDefault();
+
+      const nameEl  = document.getElementById('reg-name');
+      const emailEl = document.getElementById('reg-email');
+      const nameErr = document.getElementById('reg-name-error');
+      const emailErr= document.getElementById('reg-email-error');
+      const btn     = document.getElementById('reg-submit-btn');
+      const label   = document.getElementById('reg-btn-label');
+
+      // Reset
+      nameEl.classList.remove('error');   nameErr.classList.add('hidden');
+      emailEl.classList.remove('error');  emailErr.classList.add('hidden');
+
+      const name  = nameEl.value.trim();
+      const email = emailEl.value.trim();
+      let ok = true;
+
+      if (!name)  { nameEl.classList.add('error');  nameErr.classList.remove('hidden');  ok = false; }
+      if (!email || !validateEmail(email)) { emailEl.classList.add('error'); emailErr.classList.remove('hidden'); ok = false; }
+      if (!ok) return;
+
+      btn.disabled = true;
+      label.innerHTML = '<span class="spinner"></span> Starting…';
+
+      // Store identity
+      studentName  = name;
+      studentEmail = email;
+      sessionStorage.setItem('introai_sa_name',  name);
+      sessionStorage.setItem('introai_sa_email', email);
+
+      // Dismiss overlay
+      const overlay = document.getElementById('registration-overlay');
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.remove(), 450);
+    }
+
+    /* ── Restore session if already registered ── */
+    (function checkSession() {
+      const n = sessionStorage.getItem('introai_sa_name');
+      const e = sessionStorage.getItem('introai_sa_email');
+      if (n && e) {
+        studentName  = n;
+        studentEmail = e;
+        document.getElementById('registration-overlay').remove();
+      }
+    })();
+
+    /* ══ RATING SELECTION ══ */
+    function setRating(qNum, val) {
+      ratings[qNum] = val;
+
+      // Highlight selected button; reset others in same group
+      const card = document.querySelector(`.question-card[data-q="${qNum}"]`);
+      if (!card) return;
+
+      card.querySelectorAll('.rating-btn').forEach((btn, i) => {
+        const btnVal = i + 1;
+        btn.classList.remove('selected');
+        if (btnVal === val) {
+          btn.classList.add('selected');
+          // Apply accent styling based on section colour
+          const sectionColors = {
+            1:'indigo', 2:'indigo', 3:'indigo',
+            4:'purple', 5:'purple', 6:'purple',
+            7:'emerald', 8:'emerald', 9:'emerald',
+            10:'amber', 11:'amber', 12:'amber',
+            13:'rose', 14:'rose', 15:'rose'
+          };
+          const color = sectionColors[qNum] || 'indigo';
+          btn.style.cssText = `background: var(--tw-${color}); border-color: currentColor;`;
+          // Use Tailwind classes instead
+          const colorMap = {
+            indigo: { bg: '#eef2ff', border: '#6366f1', text: '#4338ca' },
+            purple: { bg: '#f5f3ff', border: '#7c3aed', text: '#5b21b6' },
+            emerald:{ bg: '#ecfdf5', border: '#059669', text: '#065f46' },
+            amber:  { bg: '#fffbeb', border: '#d97706', text: '#92400e' },
+            rose:   { bg: '#fff1f2', border: '#e11d48', text: '#9f1239' }
+          };
+          const c = colorMap[color];
+          btn.style.cssText = `background:${c.bg}; border-color:${c.border}; color:${c.text}; transform: translateY(-2px) scale(1.08);`;
+        } else {
+          btn.style.cssText = '';
+        }
+      });
+
+      // Mark card as answered
+      card.classList.add('answered');
+
+      // Update progress
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const answered = Object.keys(ratings).length;
+      document.getElementById('progress-text').textContent = `${answered} / ${TOTAL_QUESTIONS} answered`;
+      document.getElementById('progress-bar').style.width = `${(answered / TOTAL_QUESTIONS) * 100}%`;
+    }
+
+    /* ══ SURVEY SUBMISSION ══ */
+    async function submitSurvey(ev) {
+      ev.preventDefault();
+
+      const validationMsg = document.getElementById('submit-validation-msg');
+      const btn   = document.getElementById('submit-btn');
+      const label = document.getElementById('submit-label');
+
+      // Validate all questions answered
+      if (Object.keys(ratings).length < TOTAL_QUESTIONS) {
+        validationMsg.classList.remove('hidden');
+        // Scroll to first unanswered
+        for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+          if (!ratings[i]) {
+            document.querySelector(`.question-card[data-q="${i}"]`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+            break;
+          }
+        }
+        return;
+      }
+
+      validationMsg.classList.add('hidden');
+      btn.disabled = true;
+      label.innerHTML = '<span class="spinner"></span> Submitting…';
+
+      const payload = {
+        student_name:  studentName,
+        student_email: studentEmail,
+        // Section A — What is AI?
+        q1_explain_ai:         ratings[1],
+        q2_rule_vs_ai:         ratings[2],
+        q3_real_world_apps:    ratings[3],
+        // Section B — ML & Data
+        q4_ml_understanding:   ratings[4],
+        q5_training_data:      ratings[5],
+        q6_ai_bias:            ratings[6],
+        // Section C — Responsible AI
+        q7_ethical_concerns:   ratings[7],
+        q8_responsible_use:    ratings[8],
+        q9_fact_check_ai:      ratings[9],
+        // Section D — Working with AI Tools
+        q10_chatbot_comfort:   ratings[10],
+        q11_prompt_writing:    ratings[11],
+        q12_ai_creation_tools: ratings[12],
+        // Section E — AI & Society
+        q13_industry_impact:   ratings[13],
+        q14_ai_opinion:        ratings[14],
+        q15_excitement:        ratings[15],
+        // Computed averages per section
+        avg_section_a: +((ratings[1] + ratings[2] + ratings[3]) / 3).toFixed(2),
+        avg_section_b: +((ratings[4] + ratings[5] + ratings[6]) / 3).toFixed(2),
+        avg_section_c: +((ratings[7] + ratings[8] + ratings[9]) / 3).toFixed(2),
+        avg_section_d: +((ratings[10] + ratings[11] + ratings[12]) / 3).toFixed(2),
+        avg_section_e: +((ratings[13] + ratings[14] + ratings[15]) / 3).toFixed(2),
+        overall_avg:   +(Object.values(ratings).reduce((s, v) => s + v, 0) / TOTAL_QUESTIONS).toFixed(2),
+        submitted_at:  new Date().toISOString()
+      };
+
+      try {
+        await supabaseInsert(payload);
+      } catch (err) {
+        console.error('[Survey] Supabase error:', err.message);
+        // Show error but allow retry
+        btn.disabled = false;
+        label.innerHTML = 'Submit Self-Assessment →';
+        const msgEl = document.getElementById('submit-validation-msg');
+        msgEl.textContent = '⚠ Could not save. Please try again or let your teacher know.';
+        msgEl.classList.remove('hidden');
+        return;
+      }
+
+      // Show success screen
+      document.getElementById('success-name').textContent = studentName.split(' ')[0];
+      document.getElementById('success-screen').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+
+</body>
+
+</html>

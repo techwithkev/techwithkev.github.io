@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Is it AI? — Sorting Activity</title>
+  <meta name="description" content="Week 1 sorting activity: learn to distinguish rule-based software from AI-driven systems.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
@@ -45,10 +46,132 @@
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
     }
+
+    /* ── Registration Modal Overlay ── */
+    #registration-overlay {
+      transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #registration-overlay.hiding {
+      opacity: 0;
+      pointer-events: none;
+    }
+    #registration-overlay .reg-card {
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #registration-overlay.hiding .reg-card {
+      transform: scale(0.95) translateY(-8px);
+    }
+
+    /* Input focus ring */
+    .reg-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+    .reg-input.error {
+      border-color: #ef4444;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+    }
+
+    /* Spinner */
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 
 <body class="bg-[#F9FAFB] text-gray-900 min-h-screen font-sans antialiased pb-12">
+
+  <!-- ══════════════════════════════════════════
+       REGISTRATION GATE MODAL
+       Shown until the student enters name + email
+  ═══════════════════════════════════════════ -->
+  <div id="registration-overlay"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+    style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);">
+
+    <!-- Decorative background blobs -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="absolute -top-32 -left-32 w-96 h-96 rounded-full opacity-20" style="background: radial-gradient(circle, #6366f1, transparent);"></div>
+      <div class="absolute -bottom-32 -right-32 w-96 h-96 rounded-full opacity-20" style="background: radial-gradient(circle, #3b82f6, transparent);"></div>
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-5" style="background: radial-gradient(circle, #a78bfa, transparent);"></div>
+    </div>
+
+    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 md:p-10">
+
+      <!-- Icon + Header -->
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center" style="background: linear-gradient(135deg, #3b82f6, #6366f1);">
+          <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+          </svg>
+        </div>
+        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3" style="background: #eff6ff; color: #1d4ed8;">Week 1 Activity</div>
+        <h1 class="text-2xl font-black text-gray-900 tracking-tight">Is it <span style="color: #3b82f6;">AI?</span></h1>
+        <p class="text-sm text-gray-500 mt-1">Enter your details to begin the sorting activity.</p>
+      </div>
+
+      <!-- Form -->
+      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
+        <div class="space-y-4 mb-6">
+
+          <!-- Full Name -->
+          <div>
+            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Full Name</label>
+            <input
+              id="reg-name"
+              type="text"
+              autocomplete="name"
+              placeholder="e.g. Jane Smith"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all"
+              required
+            />
+            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name.</p>
+          </div>
+
+          <!-- Email -->
+          <div>
+            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
+            <input
+              id="reg-email"
+              type="email"
+              autocomplete="email"
+              placeholder="e.g. jane@school.edu"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all"
+              required
+            />
+            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
+          </div>
+
+        </div>
+
+        <!-- Status message -->
+        <p id="reg-status" class="hidden text-xs font-medium text-red-500 mb-4 text-center"></p>
+
+        <!-- Submit Button -->
+        <button
+          id="reg-submit-btn"
+          type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2"
+          style="background: linear-gradient(135deg, #3b82f6, #6366f1);"
+        >
+          <span id="reg-btn-label">Start Activity →</span>
+        </button>
+      </form>
+
+      <!-- Footer note -->
+      <p class="text-center text-[10px] text-gray-400 font-medium mt-5">
+        Your name and email are used by your teacher to track progress.
+      </p>
+    </div>
+  </div>
 
   <!-- Confetti Canvas -->
   <canvas id="confetti-canvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-50 hidden"></canvas>
@@ -317,6 +440,113 @@
   </div>
 
   <script>
+    /* ══ SUPABASE CONFIG ══ */
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+    const REG_TABLE   = 'introai_week01_registrations';
+    const SCORE_TABLE = 'introai_week01_scores';
+
+    /* ── Stored student identity ── */
+    let studentName  = '';
+    let studentEmail = '';
+
+    /* ══ SUPABASE HELPERS ══ */
+    async function supabaseInsert(table, payload) {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!resp.ok) {
+        const text = await resp.text();
+        throw new Error(`HTTP ${resp.status}: ${text}`);
+      }
+    }
+
+    /* ══ REGISTRATION GATE ══ */
+    function validateEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    async function handleRegistration(e) {
+      e.preventDefault();
+
+      const nameInput  = document.getElementById('reg-name');
+      const emailInput = document.getElementById('reg-email');
+      const nameError  = document.getElementById('reg-name-error');
+      const emailError = document.getElementById('reg-email-error');
+      const statusEl  = document.getElementById('reg-status');
+      const btn        = document.getElementById('reg-submit-btn');
+      const btnLabel   = document.getElementById('reg-btn-label');
+
+      // Reset errors
+      nameInput.classList.remove('error');
+      emailInput.classList.remove('error');
+      nameError.classList.add('hidden');
+      emailError.classList.add('hidden');
+      statusEl.classList.add('hidden');
+
+      const name  = nameInput.value.trim();
+      const email = emailInput.value.trim();
+
+      let valid = true;
+      if (!name) {
+        nameInput.classList.add('error');
+        nameError.classList.remove('hidden');
+        valid = false;
+      }
+      if (!email || !validateEmail(email)) {
+        emailInput.classList.add('error');
+        emailError.classList.remove('hidden');
+        valid = false;
+      }
+      if (!valid) return;
+
+      // Loading state
+      btn.disabled = true;
+      btnLabel.innerHTML = '<span class="spinner"></span> Saving...';
+
+      try {
+        await supabaseInsert(REG_TABLE, {
+          student_name:  name,
+          student_email: email,
+          registered_at: new Date().toISOString()
+        });
+      } catch (err) {
+        // Log but don't block student — registration failure shouldn't prevent learning
+        console.warn('[Registration] Supabase insert failed:', err.message);
+      }
+
+      // Persist for the session
+      studentName  = name;
+      studentEmail = email;
+      sessionStorage.setItem('introai_w01_name',  name);
+      sessionStorage.setItem('introai_w01_email', email);
+
+      // Dismiss the overlay with animation
+      const overlay = document.getElementById('registration-overlay');
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.remove(), 420);
+    }
+
+    /* Check if already registered this session */
+    (function checkSession() {
+      const savedName  = sessionStorage.getItem('introai_w01_name');
+      const savedEmail = sessionStorage.getItem('introai_w01_email');
+      if (savedName && savedEmail) {
+        studentName  = savedName;
+        studentEmail = savedEmail;
+        document.getElementById('registration-overlay').remove();
+      }
+    })();
+
+  </script>
+  <script>
     // Cards Dataset
     const items = [
       {
@@ -550,7 +780,7 @@
     }
 
     // End Game Summary Page
-    function showSummary() {
+    async function showSummary() {
       // Complete Progress Bar
       document.getElementById('progress-bar').style.width = '100%';
       document.getElementById('progress-text').textContent = `Sorted ${items.length} / ${items.length}`;
@@ -561,10 +791,12 @@
 
       // Rank Label
       const rankEl = document.getElementById('rank-text');
-      if (score === items.length) rankEl.textContent = "AI Master";
-      else if (score >= 8) rankEl.textContent = "AI Specialist";
-      else if (score >= 6) rankEl.textContent = "AI Apprentice";
-      else rankEl.textContent = "AI Novice";
+      let rank;
+      if (score === items.length) rank = "AI Master";
+      else if (score >= 8) rank = "AI Specialist";
+      else if (score >= 6) rank = "AI Apprentice";
+      else rank = "AI Novice";
+      rankEl.textContent = rank;
 
       // Show overlay
       const overlay = document.getElementById('summary-overlay');
@@ -573,6 +805,21 @@
 
       // Trigger Confetti
       triggerConfetti();
+
+      // ── Save score to Supabase ──
+      try {
+        await supabaseInsert(SCORE_TABLE, {
+          student_name:  studentName,
+          student_email: studentEmail,
+          score:         score,
+          total:         items.length,
+          rank:          rank,
+          completed_at:  new Date().toISOString()
+        });
+        console.log('[Score] Saved to Supabase successfully.');
+      } catch (err) {
+        console.warn('[Score] Failed to save to Supabase:', err.message);
+      }
     }
 
     function resetActivity() {
