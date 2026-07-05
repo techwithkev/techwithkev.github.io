@@ -98,12 +98,10 @@
       <form id="identity-form" onsubmit="handleIdentitySubmit(event)" novalidate>
         <div class="space-y-4 mb-6">
           <div>
-            <label for="reg-class" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Class / Cohort Number</label>
-            <select id="reg-class"
-              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 transition-all cursor-pointer animate-pulse" required>
-              <option value="" disabled selected>Loading active classes...</option>
-            </select>
-            <p id="reg-class-error" class="hidden text-xs text-red-500 font-medium mt-1">Please select your class.</p>
+            <label for="reg-code" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Access Code</label>
+            <input id="reg-code" type="text" placeholder="e.g. CODE-1234"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 placeholder-gray-400 transition-all uppercase" required />
+            <p id="reg-code-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid access code.</p>
           </div>
           <div>
             <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Full Name</label>
@@ -288,80 +286,125 @@
       if (!resp.ok) { const t = await resp.text(); throw new Error(`HTTP ${resp.status}: ${t}`); }
     }
 
-    async function loadCohorts() {
-      const select = document.getElementById('reg-class');
-      try {
-        const resp = await fetch(`${SUPABASE_URL}/rest/v1/cohorts?select=name&order=name.asc`, {
-          method: 'GET',
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`
-          }
-        });
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        const data = await resp.json();
-        
-        let html = '<option value="" disabled selected>— Select your Class —</option>';
-        if (data.length) {
-          data.forEach(c => {
-            html += `<option value="${esc(c.name)}">${esc(c.name)}</option>`;
-          });
-        } else {
-          html = '<option value="" disabled selected>No active classes available</option>';
+    async function validateAccessCode(code) {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/access_codes?code=eq.${encodeURIComponent(code)}&select=id,cohort,class_number,max_uses,uses_count,is_active`, {
+        method: 'GET',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`
         }
-        select.innerHTML = html;
-        select.classList.remove('animate-pulse');
-      } catch (err) {
-        console.error('[Load Cohorts] Error:', err.message);
-        select.innerHTML = '<option value="" disabled selected>⚠️ Failed to load classes</option>';
-        select.classList.remove('animate-pulse');
-      }
+      });
+      if (!resp.ok) { const t = await resp.text(); throw new Error(`HTTP ${resp.status}: ${t}`); }
+      const data = await resp.json();
+      return data.length ? data[0] : null;
+    }
+
+    async function incrementCodeUses(id, newUsesCount) {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/access_codes?id=eq.${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`
+        },
+        body: JSON.stringify({ uses_count: newUsesCount })
+      });
+      if (!resp.ok) { const t = await resp.text(); throw new Error(`HTTP ${resp.status}: ${t}`); }
     }
 
     /* ══ IDENTITY / CLASS SETUP ══ */
-    function handleIdentitySubmit(ev) {
+    async function handleIdentitySubmit(ev) {
       ev.preventDefault();
       const nameEl = document.getElementById('reg-name');
       const emailEl = document.getElementById('reg-email');
-      const classEl = document.getElementById('reg-class');
+      const codeEl = document.getElementById('reg-code');
+      const codeErrEl = document.getElementById('reg-code-error');
       let ok = true;
 
       nameEl.classList.remove('error'); document.getElementById('reg-name-error').classList.add('hidden');
       emailEl.classList.remove('error'); document.getElementById('reg-email-error').classList.add('hidden');
-      classEl.classList.remove('error'); document.getElementById('reg-class-error').classList.add('hidden');
+      codeEl.classList.remove('error'); codeErrEl.classList.add('hidden');
 
       const name = nameEl.value.trim();
       const email = emailEl.value.trim();
-      const classNum = classEl.value.trim();
+      const codeVal = codeEl.value.trim();
 
       if (!name) { nameEl.classList.add('error'); document.getElementById('reg-name-error').classList.remove('hidden'); ok = false; }
       if (!email) { emailEl.classList.add('error'); document.getElementById('reg-email-error').classList.remove('hidden'); ok = false; }
-      if (!classNum) { classEl.classList.add('error'); document.getElementById('reg-class-error').classList.remove('hidden'); ok = false; }
+      if (!codeVal) { codeEl.classList.add('error'); codeErrEl.textContent = 'Please enter an access code.'; codeErrEl.classList.remove('hidden'); ok = false; }
 
       if (!ok) return;
 
       const btn = document.getElementById('reg-submit-btn');
       btn.disabled = true;
-      document.getElementById('reg-btn-label').innerHTML = '<span class="spinner"></span> Joining…';
+      document.getElementById('reg-btn-label').innerHTML = '<span class="spinner"></span> Validating…';
 
-      studentName = name;
-      studentEmail = email;
-      classNumber = classNum;
+      try {
+        // Fetch and validate the access code from Supabase
+        const codeRecord = await validateAccessCode(codeVal);
+        
+        if (!codeRecord) {
+          codeEl.classList.add('error');
+          codeErrEl.textContent = 'Invalid access code. Please check with your teacher.';
+          codeErrEl.classList.remove('hidden');
+          btn.disabled = false;
+          document.getElementById('reg-btn-label').textContent = 'Join Storybook →';
+          return;
+        }
 
-      sessionStorage.setItem('introai_w02_story_name', name);
-      sessionStorage.setItem('introai_w02_story_email', email);
-      sessionStorage.setItem('introai_w02_story_class', classNum);
+        if (!codeRecord.is_active) {
+          codeEl.classList.add('error');
+          codeErrEl.textContent = 'This access code is inactive.';
+          codeErrEl.classList.remove('hidden');
+          btn.disabled = false;
+          document.getElementById('reg-btn-label').textContent = 'Join Storybook →';
+          return;
+        }
 
-      document.getElementById('display-class').textContent = classNum;
-      document.getElementById('identity-overlay').classList.add('hiding');
-      setTimeout(() => {
-        document.getElementById('identity-overlay').remove();
-        loadStory();
-      }, 450);
+        if (codeRecord.uses_count >= codeRecord.max_uses) {
+          codeEl.classList.add('error');
+          codeErrEl.textContent = 'This access code has reached its use limit.';
+          codeErrEl.classList.remove('hidden');
+          btn.disabled = false;
+          document.getElementById('reg-btn-label').textContent = 'Join Storybook →';
+          return;
+        }
+
+        // Increment the usage count
+        await incrementCodeUses(codeRecord.id, codeRecord.uses_count + 1);
+
+        // We use the cohort of the access code as the classNumber!
+        const classNum = codeRecord.cohort;
+
+        studentName = name;
+        studentEmail = email;
+        classNumber = classNum;
+
+        sessionStorage.setItem('introai_w02_story_name', name);
+        sessionStorage.setItem('introai_w02_story_email', email);
+        sessionStorage.setItem('introai_w02_story_class', classNum);
+        sessionStorage.setItem('introai_w02_story_code', codeVal);
+
+        document.getElementById('display-class').textContent = classNum;
+        document.getElementById('identity-overlay').classList.add('hiding');
+        setTimeout(() => {
+          document.getElementById('identity-overlay').remove();
+          loadStory();
+        }, 450);
+
+      } catch (err) {
+        console.error('[Identity Validation] Error:', err.message);
+        codeEl.classList.add('error');
+        codeErrEl.textContent = 'Network error during validation. Please try again.';
+        codeErrEl.classList.remove('hidden');
+        btn.disabled = false;
+        document.getElementById('reg-btn-label').textContent = 'Join Storybook →';
+      }
     }
 
     function changeClass() {
       sessionStorage.removeItem('introai_w02_story_class');
+      sessionStorage.removeItem('introai_w02_story_code');
       location.reload();
     }
 
@@ -377,8 +420,6 @@
         document.getElementById('display-class').textContent = c;
         document.getElementById('identity-overlay').remove();
         loadStory();
-      } else {
-        loadCohorts();
       }
     })();
 
