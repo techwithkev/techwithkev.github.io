@@ -489,11 +489,13 @@
     </header>
 
     <main>
-      <div class="form-group">
         <label for="class-selector">Select Class:</label>
-        <select id="class-selector">
-          <option value="" disabled selected>Loading classes…</option>
-        </select>
+        <div style="display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 1rem;">
+          <select id="class-selector" style="margin-bottom: 0; flex: 1;">
+            <option value="" disabled selected>Loading classes…</option>
+          </select>
+          <button type="button" onclick="showAddClassModal()" style="margin-bottom: 0; flex-shrink: 0; max-width: 140px; padding: 0.75rem 1rem; background: #0D6E8A; font-size: 0.9rem; line-height: 1.2;">+ Add Class</button>
+        </div>
 
         <label for="cohort-input">Cohort (group label):</label>
         <div class="flex gap-2 mb-1">
@@ -984,6 +986,82 @@
       showStatus('✓ Downloaded!', 'success');
     }
 
+    function showAddClassModal() {
+      // Suggest next logical class number
+      const select = document.getElementById('class-selector');
+      const currentNums = Array.from(select.options)
+        .map(opt => parseInt(opt.value))
+        .filter(n => !isNaN(n));
+      const nextNum = currentNums.length ? Math.max(...currentNums) + 1 : 1;
+      document.getElementById('new-class-num').value = nextNum;
+      
+      document.getElementById('new-class-title').value = '';
+      document.getElementById('new-class-subtitle').value = '';
+      document.getElementById('new-class-desc').value = '';
+      document.getElementById('new-class-hw').value = '';
+      document.getElementById('new-class-error').style.display = 'none';
+      document.getElementById('class-modal').style.display = 'flex';
+    }
+
+    function closeClassModal() {
+      document.getElementById('class-modal').style.display = 'none';
+    }
+
+    async function saveNewClass() {
+      const numVal = parseInt(document.getElementById('new-class-num').value);
+      const titleVal = document.getElementById('new-class-title').value.trim();
+      const subtitleVal = document.getElementById('new-class-subtitle').value.trim();
+      const descVal = document.getElementById('new-class-desc').value.trim();
+      const hwVal = document.getElementById('new-class-hw').value.trim();
+      const errDiv = document.getElementById('new-class-error');
+
+      errDiv.style.display = 'none';
+
+      if (isNaN(numVal) || numVal <= 0) {
+        errDiv.textContent = 'Please enter a valid Class Number.';
+        errDiv.style.display = 'block';
+        return;
+      }
+      if (!titleVal) {
+        errDiv.textContent = 'Please enter a Class Title.';
+        errDiv.style.display = 'block';
+        return;
+      }
+      if (!subtitleVal) {
+        errDiv.textContent = 'Please enter a Subtitle.';
+        errDiv.style.display = 'block';
+        return;
+      }
+
+      try {
+        const payload = {
+          class_number: numVal,
+          title: titleVal,
+          subtitle: subtitleVal,
+          description: descVal || null,
+          homework_title: hwVal || null,
+          module_badge: 'Intro AI',
+          difficulty_badge: 'Beginner'
+        };
+
+        const { error } = await db
+          .from('class_config')
+          .insert(payload);
+
+        if (error) throw error;
+
+        alert('New class successfully added!');
+        closeClassModal();
+        await loadClasses();
+        // Select the newly added class
+        document.getElementById('class-selector').value = String(numVal);
+      } catch (err) {
+        console.error('[Add Class] Error:', err);
+        errDiv.textContent = `Database error: ${err.message}`;
+        errDiv.style.display = 'block';
+      }
+    }
+
     function resetForm() {
       document.getElementById('class-selector').value = '10';
       document.getElementById('cohort-input').value = '';
@@ -998,6 +1076,44 @@
     // ── Init on page load ──────────────────────────────────────────────────────
     initAuth();
   </script>
+  <!-- Add Class Modal -->
+  <div id="class-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 1rem;">
+    <div style="background: #fff; padding: 2rem; border-radius: 8px; max-width: 500px; width: 100%; box-shadow: 0 4px 20px rgba(0,0,0,0.15); box-sizing: border-box;">
+      <h2 style="margin-top: 0; font-size: 1.4rem; color: #1B2A4A; margin-bottom: 1.5rem;">Add New Class</h2>
+      
+      <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+        <div style="flex: 1;">
+          <label for="new-class-num" style="display: block; font-weight: 600; margin-bottom: 0.25rem; font-size: 0.85rem; color: #0D6E8A;">Class Number</label>
+          <input type="number" id="new-class-num" placeholder="e.g. 18" style="width: 100%; padding: 0.5rem; border: 1px solid #dde4ed; border-radius: 4px; box-sizing: border-box;" required />
+        </div>
+        <div style="flex: 2;">
+          <label for="new-class-title" style="display: block; font-weight: 600; margin-bottom: 0.25rem; font-size: 0.85rem; color: #0D6E8A;">Class Title</label>
+          <input type="text" id="new-class-title" placeholder="e.g. Adv AI Techniques" style="width: 100%; padding: 0.5rem; border: 1px solid #dde4ed; border-radius: 4px; box-sizing: border-box;" required />
+        </div>
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <label for="new-class-subtitle" style="display: block; font-weight: 600; margin-bottom: 0.25rem; font-size: 0.85rem; color: #0D6E8A;">Subtitle</label>
+        <input type="text" id="new-class-subtitle" placeholder="e.g. Module 3 — Deep Learning" style="width: 100%; padding: 0.5rem; border: 1px solid #dde4ed; border-radius: 4px; box-sizing: border-box;" required />
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <label for="new-class-desc" style="display: block; font-weight: 600; margin-bottom: 0.25rem; font-size: 0.85rem; color: #0D6E8A;">Description</label>
+        <input type="text" id="new-class-desc" placeholder="Brief outline..." style="width: 100%; padding: 0.5rem; border: 1px solid #dde4ed; border-radius: 4px; box-sizing: border-box;" />
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <label for="new-class-hw" style="display: block; font-weight: 600; margin-bottom: 0.25rem; font-size: 0.85rem; color: #0D6E8A;">Homework Title</label>
+        <input type="text" id="new-class-hw" placeholder="e.g. Neural Networks Intro" style="width: 100%; padding: 0.5rem; border: 1px solid #dde4ed; border-radius: 4px; box-sizing: border-box;" />
+      </div>
+
+      <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+        <button type="button" onclick="closeClassModal()" style="background: #e2e8f0; color: #475569; max-width: 100px; padding: 0.5rem 1rem;">Cancel</button>
+        <button type="button" onclick="saveNewClass()" style="background: #0D6E8A; max-width: 120px; padding: 0.5rem 1rem;">Save Class</button>
+      </div>
+      <div id="new-class-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 1rem; display: none;"></div>
+    </div>
+  </div>
 </body>
 
 </html>
