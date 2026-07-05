@@ -99,9 +99,11 @@
         <div class="space-y-4 mb-6">
           <div>
             <label for="reg-class" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Class / Cohort Number</label>
-            <input id="reg-class" type="text" placeholder="e.g. 101, Group-A, Cohort-4"
-              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 placeholder-gray-400 transition-all" required />
-            <p id="reg-class-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a class number.</p>
+            <select id="reg-class"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 transition-all cursor-pointer animate-pulse" required>
+              <option value="" disabled selected>Loading active classes...</option>
+            </select>
+            <p id="reg-class-error" class="hidden text-xs text-red-500 font-medium mt-1">Please select your class.</p>
           </div>
           <div>
             <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Full Name</label>
@@ -286,6 +288,36 @@
       if (!resp.ok) { const t = await resp.text(); throw new Error(`HTTP ${resp.status}: ${t}`); }
     }
 
+    async function loadCohorts() {
+      const select = document.getElementById('reg-class');
+      try {
+        const resp = await fetch(`${SUPABASE_URL}/rest/v1/cohorts?select=name&order=name.asc`, {
+          method: 'GET',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`
+          }
+        });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const data = await resp.json();
+        
+        let html = '<option value="" disabled selected>— Select your Class —</option>';
+        if (data.length) {
+          data.forEach(c => {
+            html += `<option value="${esc(c.name)}">${esc(c.name)}</option>`;
+          });
+        } else {
+          html = '<option value="" disabled selected>No active classes available</option>';
+        }
+        select.innerHTML = html;
+        select.classList.remove('animate-pulse');
+      } catch (err) {
+        console.error('[Load Cohorts] Error:', err.message);
+        select.innerHTML = '<option value="" disabled selected>⚠️ Failed to load classes</option>';
+        select.classList.remove('animate-pulse');
+      }
+    }
+
     /* ══ IDENTITY / CLASS SETUP ══ */
     function handleIdentitySubmit(ev) {
       ev.preventDefault();
@@ -345,6 +377,8 @@
         document.getElementById('display-class').textContent = c;
         document.getElementById('identity-overlay').remove();
         loadStory();
+      } else {
+        loadCohorts();
       }
     })();
 
