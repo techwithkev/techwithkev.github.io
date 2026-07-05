@@ -352,6 +352,16 @@
           return;
         }
 
+        // Validate code belongs to Co-Writer Story class (Class 17)
+        if (codeRecord.class_number !== 17) {
+          codeEl.classList.add('error');
+          codeErrEl.textContent = `This code is for Class ${codeRecord.class_number}, not for the Co-Writer Story activity.`;
+          codeErrEl.classList.remove('hidden');
+          btn.disabled = false;
+          document.getElementById('reg-btn-label').textContent = 'Join Storybook →';
+          return;
+        }
+
         if (!codeRecord.is_active) {
           codeEl.classList.add('error');
           codeErrEl.textContent = 'This access code is inactive.';
