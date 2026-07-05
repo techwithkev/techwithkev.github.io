@@ -1571,13 +1571,21 @@
               <div class="page-title">Homework Submissions</div>
               <div class="page-subtitle">All student homework results across all classes</div>
             </div>
-            <button class="btn btn-mint" onclick="exportCSV('hw')">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M8 1v9M4 7l4 4 4-4" />
-                <path d="M2 13h12" />
-              </svg>
-              Export CSV
-            </button>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('hw')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
           </div>
 
           <div class="panel">
@@ -1605,6 +1613,14 @@
             <div>
               <div class="page-title">Class Progress</div>
               <div class="page-subtitle">Submission counts and average scores by class</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
             </div>
           </div>
 
@@ -1634,13 +1650,21 @@
               <div class="page-title">Final Exam Results</div>
               <div class="page-subtitle">Class 16 practice exam · MCQ + Fill-in-the-blank + Open-ended</div>
             </div>
-            <button class="btn btn-mint" onclick="exportCSV('exam')">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M8 1v9M4 7l4 4 4-4" />
-                <path d="M2 13h12" />
-              </svg>
-              Export CSV
-            </button>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('exam')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
           </div>
 
           <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
@@ -1683,6 +1707,14 @@
               <div class="page-title">Student Exam Detail</div>
               <div class="page-subtitle">Full breakdown per student</div>
             </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+            </div>
           </div>
 
           <div class="panel" style="margin-bottom:20px">
@@ -1712,6 +1744,14 @@
             <div>
               <div class="page-title">Access Codes</div>
               <div class="page-subtitle">Manage one-use entry codes for each class</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
             </div>
           </div>
 
@@ -1752,13 +1792,21 @@
               <div class="page-title">AI Self-Assessment — Week 1</div>
               <div class="page-subtitle">Student confidence ratings across 5 AI topic areas</div>
             </div>
-            <button class="btn btn-mint" onclick="exportSelfAssessmentCSV()">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M8 1v9M4 7l4 4 4-4" />
-                <path d="M2 13h12" />
-              </svg>
-              Export CSV
-            </button>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportSelfAssessmentCSV()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
           </div>
 
           <!-- Summary stat cards -->
@@ -1821,12 +1869,20 @@
               <div class="page-title">AI Scavenger Hunt — Week 1 Ex 1</div>
               <div class="page-subtitle">Students spot AI behind the scenes in a tool they use</div>
             </div>
-            <button class="btn btn-mint" onclick="exportCSV('sh')">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
-              </svg>
-              Export CSV
-            </button>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('sh')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
           </div>
 
           <div class="stats-grid" style="margin-bottom:20px">
@@ -1872,12 +1928,20 @@
               <div class="page-title">Intro to Chatbots — Week 1 Ex 2</div>
               <div class="page-subtitle">4-task chatbot exploration: define, factual, summarise, creative</div>
             </div>
-            <button class="btn btn-mint" onclick="exportCSV('cb')">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
-              </svg>
-              Export CSV
-            </button>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('cb')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
           </div>
 
           <div class="stats-grid" style="margin-bottom:20px">
@@ -1951,12 +2015,20 @@
               <div class="page-title">Creative Prompting — Week 2 Ex 1</div>
               <div class="page-subtitle">Writing a robot toast poem under specific constraints</div>
             </div>
-            <button class="btn btn-mint" onclick="exportCSV('cp')">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
-              </svg>
-              Export CSV
-            </button>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('cp')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
           </div>
 
           <div class="stats-grid" style="margin-bottom:20px">
@@ -2029,12 +2101,20 @@
               <div class="page-title">AI Persona Detective — Week 2 Ex 2</div>
               <div class="page-subtitle">Adopting secret character personas and guessing game outcomes</div>
             </div>
-            <button class="btn btn-mint" onclick="exportCSV('pd')">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
-              </svg>
-              Export CSV
-            </button>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('pd')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
           </div>
 
           <div class="stats-grid" style="margin-bottom:20px">
@@ -2107,12 +2187,20 @@
               <div class="page-title">AI Co-Writer Story — Week 2 Ex 3</div>
               <div class="page-subtitle">Collaborative class storytelling with AI assistance</div>
             </div>
-            <button class="btn btn-mint" onclick="exportCSV('ws')">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
-              </svg>
-              Export CSV
-            </button>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('ws')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
           </div>
 
           <div class="stats-grid" style="margin-bottom:20px">
@@ -3227,7 +3315,7 @@
           <p style="background:#f8fafc;padding:10px;border-radius:8px;margin:6px 0;white-space:pre-wrap">${esc(r.t4_creative_response || '—')}</p>
           ${r.reflection ? `<hr style="margin:12px 0;border-color:var(--border)"><p><strong>Reflection:</strong> ${esc(r.reflection)}</p>` : ''}
         </div>`;
-      document.getElementById('modal-overlay').style.display = 'flex';
+      document.getElementById('modal-overlay').classList.add('open');
     }
 
     // ════════════════════════════════════════════════════════════════════════════
@@ -3378,7 +3466,7 @@
             <p style="background:#f5f3ff;padding:10px;border-radius:8px;color:#5b21b6">${esc(r.learning_takeaway)}</p>
           ` : ''}
         </div>`;
-      document.getElementById('modal-overlay').style.display = 'flex';
+      document.getElementById('modal-overlay').classList.add('open');
     }
 
     // ════════════════════════════════════════════════════════════════════════════
@@ -3505,7 +3593,7 @@
           <p style="font-weight:700;color:var(--navy);margin-bottom:6px">AI's Output Response</p>
           <p style="background:#f8fafc;padding:10px;border-radius:8px;margin-bottom:12px;white-space:pre-wrap;font-family:'JetBrains Mono',monospace">${esc(r.ai_response || '—')}</p>
         </div>`;
-      document.getElementById('modal-overlay').style.display = 'flex';
+      document.getElementById('modal-overlay').classList.add('open');
     }
 
     // ════════════════════════════════════════════════════════════════════════════
