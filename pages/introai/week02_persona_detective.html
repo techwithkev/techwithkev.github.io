@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Persona Detective — Intro to AI · Week 2</title>
+  <meta name="description"
+    content="Challenge 1: AI Persona Detective. Adopt a secret persona, prompt an AI to respond as that character, and let your classmates guess the persona.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    /* ── Registration gate ── */
+    #registration-overlay { transition: opacity 0.4s ease; }
+    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
+    #registration-overlay .reg-card {
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
+    }
+    #registration-overlay.hiding .reg-card {
+      transform: scale(0.95) translateY(-10px); opacity: 0;
+    }
+
+    .reg-input:focus {
+      outline: none; border-color: #ec4899;
+      box-shadow: 0 0 0 3px rgba(236,72,153,0.15);
+    }
+    .reg-input.error {
+      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+    }
+
+    /* Form elements */
+    .form-input:focus {
+      outline: none; border-color: #ec4899;
+      box-shadow: 0 0 0 3px rgba(236,72,153,0.1);
+    }
+    .form-input.error { border-color: #ef4444; }
+
+    /* Persona cards styling */
+    .persona-card {
+      transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+    }
+    .persona-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(236,72,153,0.06);
+    }
+
+    /* Option toggle buttons */
+    .opt-btn {
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .opt-btn:hover { transform: translateY(-1px); }
+    .opt-btn.selected {
+      border-color: #ec4899 !important;
+      background: #fdf2f8 !important;
+      color: #9d174d !important;
+      font-weight: 700;
+    }
+
+    /* Secret Reveal Box */
+    .secret-box {
+      background: repeating-linear-gradient(
+        45deg,
+        #fbcfe8,
+        #fbcfe8 10px,
+        #f472b6 10px,
+        #f472b6 20px
+      );
+    }
+
+    /* Spinner */
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body class="bg-[#F9FAFB] text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- ══ REGISTRATION GATE ══ -->
+  <div id="registration-overlay"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+    style="background: linear-gradient(135deg, #31102f 0%, #701a75 55%, #31102f 100%);">
+
+    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
+        style="background: radial-gradient(circle, #fbcfe8, transparent);"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
+        style="background: radial-gradient(circle, #db2777, transparent);"></div>
+    </div>
+
+    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center bg-pink-100 text-pink-600">
+          <!-- Magnifying Glass / Detective Icon -->
+          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 7v3m0 0v3m0-3h3m-3 0H7" />
+          </svg>
+        </div>
+        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 bg-pink-100 text-pink-800">
+          Week 2 · Challenge 1
+        </div>
+        <h1 class="text-2xl font-black text-gray-900 tracking-tight">AI Persona <span class="text-pink-600">Detective</span></h1>
+        <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">Enter your full name to start the prompt roleplay challenge.</p>
+      </div>
+
+      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
+        <div class="space-y-4 mb-6">
+          <div>
+            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Full Name</label>
+            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Jane Smith"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name to proceed.</p>
+          </div>
+          <div>
+            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
+            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. jane@school.edu"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
+          </div>
+        </div>
+        <button id="reg-submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700">
+          <span id="reg-btn-label">Begin Challenge →</span>
+        </button>
+      </form>
+      <p class="text-center text-[10px] text-gray-400 font-medium mt-5">Saved to the Intro to AI student roster.</p>
+    </div>
+  </div>
+
+  <!-- ══ MAIN CONTENT ══ -->
+  <div id="main-content" class="max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <!-- Header -->
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+      <div>
+        <a href="index.html"
+          class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-pink-600 mb-3 hover:text-pink-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">
+          AI Persona <span class="text-pink-500">Detective</span>
+        </h1>
+        <p class="text-gray-500 font-medium italic mt-1">Challenge 1 · Module 1 Foundations &amp; Thinking · Week 2</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-pink-50 border border-pink-200 text-pink-800 shadow-sm self-start md:self-auto">
+        Week 2
+      </div>
+    </header>
+
+    <!-- Game Brief Card -->
+    <div class="rounded-3xl p-6 mb-8 border bg-gradient-to-r from-pink-50 to-rose-50 border-pink-100 shadow-sm">
+      <div class="flex gap-4">
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 bg-pink-500 text-white shadow-md">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-lg font-black text-pink-950 mb-1">Challenge Goal &amp; Gameplay</h2>
+          <p class="text-sm text-pink-900 leading-relaxed mb-3">
+            Master prompt personas! Write a prompt instructing the AI to answer the teacher's question as a secret character. Read the response aloud—can your classmates guess who you are?
+          </p>
+          <ul class="text-xs text-pink-800 space-y-1 bg-white/70 backdrop-blur-sm p-4 rounded-xl border border-pink-100/50">
+            <li>1. Click the button below to draw your <strong>Secret Persona</strong>. Keep it hidden!</li>
+            <li>2. Wait for the teacher to state the class question, then write it in the form.</li>
+            <li>3. Prompt the AI to answer the question in character, and paste its reply.</li>
+            <li>4. Read only the reply to the class and record if they guessed it!</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECRET PERSONA DRAW DRAWER -->
+    <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+      <h3 class="text-xs font-black uppercase tracking-widest text-gray-400 mb-4">Step 1: Draw Your Persona</h3>
+      
+      <!-- Randomiser draw panel -->
+      <div id="draw-panel" class="flex flex-col items-center justify-center p-6 border-2 border-dashed border-pink-100 rounded-2xl bg-pink-50/20">
+        <button type="button" onclick="drawSecretPersona()"
+          class="px-6 py-3.5 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-black rounded-xl text-sm shadow-md active:scale-95 transition-all">
+          🎰 Draw Secret Persona
+        </button>
+        <p class="text-[11px] text-gray-400 mt-2.5">Click to draw from the official guessing list</p>
+      </div>
+
+      <!-- Secret Display (Hidden initially) -->
+      <div id="secret-display" class="hidden flex flex-col items-center justify-center p-5 border border-pink-200 rounded-2xl bg-white shadow-sm">
+        <span class="text-xs font-black uppercase tracking-widest text-pink-500 mb-2">Your Secret Persona</span>
+        
+        <div id="secret-card" class="secret-box w-full max-w-xs h-24 rounded-xl flex items-center justify-center cursor-pointer transition-all border border-pink-300 shadow-sm relative overflow-hidden" onclick="revealPersona()">
+          <span id="reveal-tap-hint" class="font-black text-xs text-white uppercase tracking-widest drop-shadow-md select-none">Click to Reveal Persona 👁</span>
+          
+          <div id="secret-content" class="hidden flex flex-col items-center justify-center">
+            <span id="secret-emoji" class="text-4xl mb-1">🏴‍☠️</span>
+            <span id="secret-title" class="font-black text-lg text-pink-950">A Grumpy Pirate</span>
+          </div>
+        </div>
+
+        <div class="flex gap-2.5 mt-4">
+          <button type="button" onclick="hidePersona()" class="px-4 py-2 border border-gray-200 text-xs font-bold text-gray-500 rounded-lg hover:bg-gray-50">
+            🙈 Hide Again
+          </button>
+          <button type="button" onclick="drawSecretPersona()" class="px-4 py-2 border border-pink-200 text-xs font-bold text-pink-600 rounded-lg hover:bg-pink-50">
+            🔄 Re-draw
+          </button>
+        </div>
+      </div>
+      <p id="persona-error" class="hidden text-xs text-red-500 font-medium mt-2 text-center">Please draw a secret persona first.</p>
+    </div>
+
+    <!-- MAIN FORM -->
+    <form id="detective-form" onsubmit="submitExercise(event)" novalidate>
+
+      <!-- STEP 2: The Question & The Prompt -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-pink-500">2</div>
+          <h2 class="text-base font-black text-gray-900">Adopting The Persona</h2>
+        </div>
+
+        <!-- Teacher's Question -->
+        <div class="mb-4">
+          <label for="class-question" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            The Class Question <span class="text-red-500">*</span>
+          </label>
+          <select id="class-question" onchange="handleQuestionSelect()"
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 transition-all mb-2">
+            <option value="">— Select teacher's question or select Custom —</option>
+            <option value="lunch">What should I have for lunch today?</option>
+            <option value="friday">What is the best thing about Fridays?</option>
+            <option value="weather">What do you think about this rainy weather?</option>
+            <option value="weekend">Do you have any plans for the weekend?</option>
+            <option value="custom">— Write a Custom Question —</option>
+          </select>
+          <input id="custom-question" type="text" placeholder="Type the custom question here..."
+            class="hidden form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" />
+          <p id="question-error" class="hidden text-xs text-red-500 font-medium mt-1">Please select or write a question.</p>
+        </div>
+
+        <!-- The Prompt Used -->
+        <div class="mb-4">
+          <label for="prompt-used" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            Prompt you wrote <span class="text-red-500">*</span>
+          </label>
+          <textarea id="prompt-used" rows="2.5"
+            placeholder="e.g. Answer the following question as a grumpy pirate: 'What should I have for lunch today?' Do not mention that you are a pirate..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"></textarea>
+          <p id="prompt-error" class="hidden text-xs text-red-500 font-medium mt-1">Please record the prompt you used.</p>
+        </div>
+
+        <!-- Chatbot platform -->
+        <div>
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2.5">Which Chatbot did you prompt?</label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="chatbot-picker">
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="setChatbot('ChatGPT')">🤖 ChatGPT</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="setChatbot('Gemini')">✨ Gemini</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="setChatbot('Claude')">🧠 Claude</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="setChatbot('Copilot')">💼 Copilot</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="setChatbot('Other')">💬 Other</button>
+          </div>
+          <p id="chatbot-error" class="hidden text-xs text-red-500 font-medium mt-2">Please choose a chatbot.</p>
+        </div>
+      </div>
+
+      <!-- STEP 3: Paste the Response -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-pink-500">3</div>
+          <h2 class="text-base font-black text-gray-900">The AI's Answer</h2>
+        </div>
+        <p class="text-xs text-gray-500 mb-4">
+          Paste the chatbot's response here. Remember, you will read this aloud to the class:
+        </p>
+
+        <div>
+          <textarea id="ai-response" rows="4.5"
+            placeholder="Paste chatbot's answer..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-mono text-gray-950 placeholder-gray-400 transition-all resize-none"></textarea>
+          <p id="response-error" class="hidden text-xs text-red-500 font-medium mt-1">Please paste the AI's response.</p>
+        </div>
+      </div>
+
+      <!-- STEP 4: Game Outcome -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-8">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-pink-500">4</div>
+          <h2 class="text-base font-black text-gray-900">Did They Guess It?</h2>
+        </div>
+        <p class="text-xs text-gray-500 mb-4">
+          After you read the answer aloud to the class, check the box below based on whether your classmates correctly guessed your secret persona.
+        </p>
+
+        <div class="flex gap-3 mb-4">
+          <button type="button" id="outcome-yes" onclick="setGuessed(true)"
+            class="flex-1 py-3 rounded-xl border border-gray-200 font-bold text-sm text-gray-600 bg-gray-50 hover:border-pink-400 hover:text-pink-700 hover:bg-pink-50 transition-all">
+            🎯 Yes, they guessed it!
+          </button>
+          <button type="button" id="outcome-no" onclick="setGuessed(false)"
+            class="flex-1 py-3 rounded-xl border border-gray-200 font-bold text-sm text-gray-600 bg-gray-50 hover:border-pink-400 hover:text-pink-700 hover:bg-pink-50 transition-all">
+            🕵️‍♂️ No, fooled them!
+          </button>
+        </div>
+        <p id="guessed-error" class="hidden text-xs text-red-500 font-medium mb-3">Please record the game outcome.</p>
+
+        <!-- Time taken -->
+        <div id="time-input-container" class="hidden">
+          <label for="guess-time" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            How many seconds did it take them? <span class="text-red-400">*</span>
+          </label>
+          <input id="guess-time" type="number" min="1" max="30" placeholder="e.g. 15"
+            class="form-input w-28 px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 transition-all" />
+          <p id="time-error" class="hidden text-xs text-red-500 font-medium mt-1">Please specify the seconds (1–30).</p>
+        </div>
+      </div>
+
+      <!-- Submit Section -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-12">
+        <p id="form-error" class="hidden text-sm font-medium text-red-500 mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+          <span id="form-error-text">Please complete all required fields.</span>
+        </p>
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700">
+          <span id="submit-label">Submit Detective Log →</span>
+        </button>
+        <p class="text-center text-xs text-gray-400 font-medium mt-3">Results will be loaded to the teacher dashboard.</p>
+      </div>
+
+    </form>
+
+    <!-- ── THE OFFICIAL PERSONA LIST ── -->
+    <section class="border-t border-gray-200 pt-8">
+      <div class="text-center mb-6">
+        <h3 class="text-lg font-black text-gray-900">Guessing List — Official Personas</h3>
+        <p class="text-xs text-gray-500">Classmates can scan this list while listening to your AI's response</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="official-personas-list">
+        <!-- Rendered dynamically by JS -->
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ══ SUCCESS SCREEN ══ -->
+  <div id="success-screen"
+    class="hidden fixed inset-0 z-[90] bg-[#F9FAFB] flex items-center justify-center p-4">
+    <div class="text-center max-w-md bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+      <div class="w-20 h-20 mx-auto rounded-2xl mb-6 flex items-center justify-center bg-pink-100 text-pink-600 shadow-sm">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <div class="inline-block px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 bg-pink-50 text-pink-800">
+        Challenge Saved!
+      </div>
+      <h2 class="text-3xl font-black text-gray-900 mb-3 tracking-tight">
+        Nice job, Detective <span id="success-name" class="text-pink-600"></span>!
+      </h2>
+      <p class="text-gray-500 mb-8 leading-relaxed text-sm">
+        Your persona prompt and the response have been stored. Your teacher dashboard will show whether you successfully adopted the persona!
+      </p>
+      <a href="index.html"
+        class="inline-flex items-center gap-2 text-white font-black py-3.5 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm bg-gradient-to-r from-pink-500 to-rose-600">
+        Return to Course Hub
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    /* ══ SUPABASE CONFIG ══ */
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+    const TABLE = 'introai_week02_persona_detective';
+
+    /* ── Personas Roster ── */
+    const PERSONAS = [
+      { emoji: '🏴‍☠️', name: 'A Grumpy Pirate', desc: 'Arrr! Complains about sea shanties and bad grog.' },
+      { emoji: '🔬', name: 'An Enthusiastic Scientist', desc: 'Speaks with excessive science jargon and wild energy!' },
+      { emoji: '📱', name: 'A Bored Teenager', desc: 'Answers with "whatever," lots of slang, and eye rolls.' },
+      { emoji: '🎭', name: 'A Shakespearean Actor', desc: 'Uses theatrical, poetic, and outdated language (thee, thy).' },
+      { emoji: '🤠', name: 'A Friendly Cowboy', desc: 'Greets with "howdy partner" and references ranches/horses.' },
+      { emoji: '🧘', name: 'A Calm Yoga Instructor', desc: 'Speaks of inner energy, deep breathing, and mindfulness.' },
+      { emoji: '🕵️', name: 'A Film Noir Detective', desc: 'Moody description of rain, shadows, and mysterious occurrences.' },
+      { emoji: '🏰', name: 'A Snobby Medieval King', desc: 'Demands absolute obedience and looks down on commoners.' },
+      { emoji: '👽', name: 'An Alien Blending In', desc: 'Over-explains human biology and actions awkwardly.' },
+      { emoji: '🤖', name: 'A Hyperactive Robot', desc: 'Constantly mentions battery level, computing speeds, and beep-boops.' },
+      { emoji: '🦥', name: 'A Slow Sloth', desc: 'Takes... a... very... long... time... to... finish... phrases.' },
+      { emoji: '🦸', name: 'A Boastful Superhero', desc: 'Can\'t stop bragging about strength, muscles, and saving the day!' }
+    ];
+
+    /* ── State ── */
+    let studentName = '', studentEmail = '';
+    let selectedChatbot = '';
+    let secretPersonaDrawn = null;
+    let guessedOutcome = null; // true / false
+
+    /* ══ INIT: DRAW PERSONAS LIST ══ */
+    (function initList() {
+      const el = document.getElementById('official-personas-list');
+      el.innerHTML = PERSONAS.map(p => `
+        <div class="persona-card flex gap-3 p-3 bg-white border border-gray-200 rounded-xl">
+          <span class="text-2xl">${p.emoji}</span>
+          <div>
+            <p class="text-xs font-black text-gray-900">${esc(p.name)}</p>
+            <p class="text-[10px] text-gray-500">${esc(p.desc)}</p>
+          </div>
+        </div>
+      `).join('');
+    })();
+
+    /* ══ SUPABASE ══ */
+    async function supabaseInsert(payload) {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!resp.ok) { const t = await resp.text(); throw new Error(`HTTP ${resp.status}: ${t}`); }
+    }
+
+    /* ══ REGISTRATION GATE ══ */
+    function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+    async function handleRegistration(ev) {
+      ev.preventDefault();
+      const nameEl = document.getElementById('reg-name');
+      const emailEl = document.getElementById('reg-email');
+      const nameErr = document.getElementById('reg-name-error');
+      const emailErr = document.getElementById('reg-email-error');
+      let ok = true;
+
+      nameEl.classList.remove('error'); nameErr.classList.add('hidden');
+      emailEl.classList.remove('error'); emailErr.classList.add('hidden');
+
+      if (!nameEl.value.trim()) { nameEl.classList.add('error'); nameErr.classList.remove('hidden'); ok = false; }
+      if (!emailEl.value.trim() || !validateEmail(emailEl.value.trim())) { emailEl.classList.add('error'); emailErr.classList.remove('hidden'); ok = false; }
+      if (!ok) return;
+
+      const btn = document.getElementById('reg-submit-btn');
+      btn.disabled = true;
+      document.getElementById('reg-btn-label').innerHTML = '<span class="spinner"></span> Starting…';
+
+      studentName = nameEl.value.trim();
+      studentEmail = emailEl.value.trim();
+      sessionStorage.setItem('introai_w02_pd_name', studentName);
+      sessionStorage.setItem('introai_w02_pd_email', studentEmail);
+
+      const overlay = document.getElementById('registration-overlay');
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.remove(), 450);
+    }
+
+    (function restoreSession() {
+      const n = sessionStorage.getItem('introai_w02_pd_name');
+      const e = sessionStorage.getItem('introai_w02_pd_email');
+      if (n && e) {
+        studentName = n;
+        studentEmail = e;
+        document.getElementById('registration-overlay').remove();
+      }
+    })();
+
+    /* ══ DRAW SECRET PERSONA ══ */
+    function drawSecretPersona() {
+      const idx = Math.floor(Math.random() * PERSONAS.length);
+      secretPersonaDrawn = PERSONAS[idx];
+
+      document.getElementById('draw-panel').classList.add('hidden');
+      document.getElementById('secret-display').classList.remove('hidden');
+
+      // Update secret cards values (hidden state)
+      document.getElementById('secret-emoji').textContent = secretPersonaDrawn.emoji;
+      document.getElementById('secret-title').textContent = secretPersonaDrawn.name;
+      hidePersona();
+      document.getElementById('persona-error').classList.add('hidden');
+    }
+
+    function revealPersona() {
+      const card = document.getElementById('secret-card');
+      card.classList.remove('secret-box');
+      card.style.background = '#fbcfe8';
+      document.getElementById('reveal-tap-hint').classList.add('hidden');
+      document.getElementById('secret-content').classList.remove('hidden');
+    }
+
+    function hidePersona() {
+      const card = document.getElementById('secret-card');
+      card.className = 'secret-box w-full max-w-xs h-24 rounded-xl flex items-center justify-center cursor-pointer transition-all border border-pink-300 shadow-sm relative overflow-hidden';
+      card.style.background = '';
+      document.getElementById('reveal-tap-hint').classList.remove('hidden');
+      document.getElementById('secret-content').classList.add('hidden');
+    }
+
+    /* ══ FORM CONTROLS ══ */
+    function handleQuestionSelect() {
+      const val = document.getElementById('class-question').value;
+      const customInput = document.getElementById('custom-question');
+      if (val === 'custom') {
+        customInput.classList.remove('hidden');
+        customInput.setAttribute('required', 'true');
+        customInput.focus();
+      } else {
+        customInput.classList.add('hidden');
+        customInput.removeAttribute('required');
+      }
+      document.getElementById('question-error').classList.add('hidden');
+    }
+
+    function setChatbot(val) {
+      selectedChatbot = val;
+      document.querySelectorAll('#chatbot-picker .opt-btn').forEach(b => {
+        b.classList.toggle('selected', b.textContent.includes(val));
+      });
+      document.getElementById('chatbot-error').classList.add('hidden');
+    }
+
+    function setGuessed(val) {
+      guessedOutcome = val;
+      document.getElementById('outcome-yes').style.cssText = val === true ? 'background:#fdf2f8;border-color:#ec4899;color:#9d174d;font-weight:700;' : '';
+      document.getElementById('outcome-no').style.cssText = val === false ? 'background:#fdf2f8;border-color:#ec4899;color:#9d174d;font-weight:700;' : '';
+      
+      const timeContainer = document.getElementById('time-input-container');
+      if (val === true) {
+        timeContainer.classList.remove('hidden');
+      } else {
+        timeContainer.classList.add('hidden');
+      }
+      document.getElementById('guessed-error').classList.add('hidden');
+    }
+
+    /* ══ SUBMIT EXERCISE ══ */
+    async function submitExercise(ev) {
+      ev.preventDefault();
+      let ok = true;
+
+      if (!secretPersonaDrawn) {
+        document.getElementById('persona-error').classList.remove('hidden');
+        document.getElementById('draw-panel').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      // Question validation
+      const qSel = document.getElementById('class-question').value;
+      const customQVal = document.getElementById('custom-question').value.trim();
+      let finalQuestion = '';
+
+      if (!qSel) ok = false;
+      else if (qSel === 'custom') {
+        if (!customQVal) ok = false;
+        else finalQuestion = customQVal;
+      } else {
+        finalQuestion = document.querySelector(`#class-question option[value="${qSel}"]`).textContent;
+      }
+      document.getElementById('question-error').classList.toggle('hidden', !!qSel && (qSel !== 'custom' || !!customQVal));
+
+      // Prompt validation
+      const pVal = document.getElementById('prompt-used').value.trim();
+      document.getElementById('prompt-error').classList.toggle('hidden', !!pVal);
+      if (!pVal) ok = false;
+
+      // Chatbot validation
+      if (!selectedChatbot) {
+        document.getElementById('chatbot-error').classList.remove('hidden');
+        ok = false;
+      }
+
+      // Response validation
+      const rVal = document.getElementById('ai-response').value.trim();
+      document.getElementById('response-error').classList.toggle('hidden', !!rVal);
+      if (!rVal) ok = false;
+
+      // Guessed validation
+      if (guessedOutcome === null) {
+        document.getElementById('guessed-error').classList.remove('hidden');
+        ok = false;
+      }
+
+      // Time validation
+      let guessTime = null;
+      if (guessedOutcome === true) {
+        const timeVal = document.getElementById('guess-time').value.trim();
+        if (!timeVal || isNaN(timeVal) || parseInt(timeVal, 10) < 1 || parseInt(timeVal, 10) > 30) {
+          document.getElementById('time-error').classList.remove('hidden');
+          ok = false;
+        } else {
+          document.getElementById('time-error').classList.add('hidden');
+          guessTime = parseInt(timeVal, 10);
+        }
+      }
+
+      if (!ok) {
+        const formErr = document.getElementById('form-error');
+        formErr.classList.remove('hidden');
+        document.querySelector('.form-input.error, [id$="-error"]:not(.hidden), #chatbot-error:not(.hidden), #guessed-error:not(.hidden)')
+          ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      document.getElementById('form-error').classList.add('hidden');
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting…';
+
+      const payload = {
+        student_name:       studentName,
+        student_email:      studentEmail,
+        secret_persona:     secretPersonaDrawn.name,
+        teacher_question:   finalQuestion,
+        prompt_used:        pVal,
+        chatbot_used:       selectedChatbot,
+        ai_response:        rVal,
+        was_guessed:        guessedOutcome,
+        guess_time_seconds: guessTime,
+        submitted_at:       new Date().toISOString()
+      };
+
+      try {
+        await supabaseInsert(payload);
+      } catch (err) {
+        console.error('[Week 2 PD] Supabase error:', err.message);
+        btn.disabled = false;
+        document.getElementById('submit-label').innerHTML = 'Submit Detective Log →';
+        const formErrTxt = document.getElementById('form-error-text');
+        formErrTxt.textContent = '⚠ Network error. Please try again or notify your teacher.';
+        document.getElementById('form-error').classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('success-name').textContent = studentName.split(' ')[0];
+      document.getElementById('success-screen').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function esc(str) {
+      return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+
+</body>
+
+</html>

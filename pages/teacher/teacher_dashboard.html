@@ -1428,6 +1428,13 @@
             </svg>
             W2 Ex1: Prompting
           </button>
+          <button class="nav-item" onclick="showPage('introai-persona-detective')">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" />
+              <path d="M10 7v3m0 0v3m0-3h3m-3 0H7" stroke-linecap="round" />
+            </svg>
+            W2 Ex2: Detective
+          </button>
         </div>
 
         <div class="sidebar-footer">
@@ -2009,6 +2016,84 @@
           </div>
         </div>
 
+        <!-- ── INTRO TO AI: PERSONA DETECTIVE ──────────────────────────── -->
+        <div class="page" id="page-introai-persona-detective">
+          <div class="page-header">
+            <div>
+              <div class="page-title">AI Persona Detective — Week 2 Ex 2</div>
+              <div class="page-subtitle">Adopting secret character personas and guessing game outcomes</div>
+            </div>
+            <button class="btn btn-mint" onclick="exportCSV('pd')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
+              </svg>
+              Export CSV
+            </button>
+          </div>
+
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card">
+              <div class="stat-label">Submissions</div>
+              <div class="stat-value" id="pd-stat-count">—</div>
+              <div class="stat-sub">Students submitted</div>
+            </div>
+            <div class="stat-card teal">
+              <div class="stat-label">Successfully Guessed</div>
+              <div class="stat-value" id="pd-stat-guessed">—</div>
+              <div class="stat-sub">Classmates identified persona</div>
+            </div>
+            <div class="stat-card gold">
+              <div class="stat-label">Avg Guessing Time</div>
+              <div class="stat-value" id="pd-stat-avg-time">—</div>
+              <div class="stat-sub">Seconds (Max 30s)</div>
+            </div>
+            <div class="stat-card red">
+              <div class="stat-label">Most Common Chatbot</div>
+              <div class="stat-value" id="pd-stat-top-bot" style="font-size:14px">—</div>
+              <div class="stat-sub">Used for roleplay</div>
+            </div>
+          </div>
+
+          <!-- Persona Success Rates -->
+          <div class="panel" style="margin-bottom:20px">
+            <div class="panel-header">
+              <div class="panel-title">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 14V8l3-3 3 3 3-5 3 3" />
+                </svg>
+                Guessed Rates by Persona
+              </div>
+            </div>
+            <div id="pd-persona-bars" style="padding:20px 20px 8px">
+              <div class="loading"><div class="spinner"></div><br>Loading…</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Chatbot:</label>
+              <select class="filter-select" id="pd-filter-bot" onchange="renderPDTable()">
+                <option value="">All</option>
+                <option>ChatGPT</option><option>Gemini</option><option>Claude</option>
+                <option>Copilot</option><option>Other</option>
+              </select>
+              <label>Outcome:</label>
+              <select class="filter-select" id="pd-filter-guessed" onchange="renderPDTable()">
+                <option value="">All</option>
+                <option value="yes">Guessed</option>
+                <option value="no">Not Guessed</option>
+              </select>
+              <label>Search:</label>
+              <input class="search-input" id="pd-search" type="text" placeholder="Student or persona…"
+                oninput="renderPDTable()" />
+              <span class="text-small text-muted" id="pd-count"></span>
+            </div>
+            <div id="pd-table-wrap">
+              <div class="loading"><div class="spinner"></div><br>Loading persona detective data…</div>
+            </div>
+          </div>
+        </div>
+
       </main>
     </div>
   </div>
@@ -2049,6 +2134,7 @@
     let shData = [];     // introai_week01_scavenger_hunt rows
     let cbData = [];     // introai_week01_chatbots rows
     let cpData = [];     // introai_week02_creative_prompting rows
+    let pdData = [];     // introai_week02_persona_detective rows
     let activeCohort = ''; // global cohort filter (’’ = all)
 
     // ════════════════════════════════════════════════════════════════════════════
@@ -2116,14 +2202,15 @@
     async function loadAll() {
       document.getElementById('last-refresh').textContent = 'Refreshing…';
       try {
-        const [hw, exam, codes, sa, sh, cb, cp] = await Promise.all([
+        const [hw, exam, codes, sa, sh, cb, cp, pd] = await Promise.all([
           sb.from('homework_submissions').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('caio_final_exam_results').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('access_codes').select('*').order('created_at', { ascending: false }).limit(10000),
           sb.from('introai_week01_self_assessment').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('introai_week01_scavenger_hunt').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('introai_week01_chatbots').select('*').order('submitted_at', { ascending: false }).limit(10000),
-          sb.from('introai_week02_creative_prompting').select('*').order('submitted_at', { ascending: false }).limit(10000)
+          sb.from('introai_week02_creative_prompting').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('introai_week02_persona_detective').select('*').order('submitted_at', { ascending: false }).limit(10000)
         ]);
 
         if (hw.error)   { console.error('hw error:', hw.error);       toast('⚠ Homework load error: '       + hw.error.message); }
@@ -2133,6 +2220,7 @@
         if (sh.error)   { console.error('sh error:', sh.error);       toast('⚠ Scavenger hunt error: '     + sh.error.message); }
         if (cb.error)   { console.error('cb error:', cb.error);       toast('⚠ Chatbots error: '           + cb.error.message); }
         if (cp.error)   { console.error('cp error:', cp.error);       toast('⚠ Creative prompting error: ' + cp.error.message); }
+        if (pd.error)   { console.error('pd error:', pd.error);       toast('⚠ Persona detective error: '  + pd.error.message); }
 
         hwData    = hw.data    || [];
         examData  = exam.data  || [];
@@ -2141,8 +2229,9 @@
         shData    = sh.data    || [];
         cbData    = cb.data    || [];
         cpData    = cp.data    || [];
+        pdData    = pd.data    || [];
 
-        console.log(`Loaded: ${hwData.length} hw, ${examData.length} exam, ${codesData.length} codes, ${saData.length} SA, ${shData.length} SH, ${cbData.length} CB, ${cpData.length} CP rows`);
+        console.log(`Loaded: ${hwData.length} hw, ${examData.length} exam, ${codesData.length} codes, ${saData.length} SA, ${shData.length} SH, ${cbData.length} CB, ${cpData.length} CP, ${pdData.length} PD rows`);
 
         populateFilters();
         renderOverview();
@@ -2155,6 +2244,7 @@
         renderSHPage();
         renderCBPage();
         renderCPPage();
+        renderPDPage();
 
         const now = new Date();
         document.getElementById('last-refresh').textContent = 'Updated ' + now.toLocaleTimeString();
@@ -2684,6 +2774,10 @@
         rows = [['student_name', 'student_email', 'chatbot_used', 'initial_prompt', 'initial_response', 'followed_task', 'followed_tone', 'followed_persona', 'followed_format', 'actual_line_count', 'refined_prompt', 'refined_response', 'learning_takeaway', 'submitted_at']];
         cpData.forEach(r => rows.push([r.student_name, r.student_email, r.chatbot_used, r.initial_prompt, r.initial_response, r.followed_task, r.followed_tone, r.followed_persona, r.followed_format, r.actual_line_count, r.refined_prompt, r.refined_response, r.learning_takeaway, r.submitted_at]));
         filename = 'introai_week02_creative_prompting.csv';
+      } else if (type === 'pd') {
+        rows = [['student_name', 'student_email', 'secret_persona', 'teacher_question', 'prompt_used', 'chatbot_used', 'ai_response', 'was_guessed', 'guess_time_seconds', 'submitted_at']];
+        pdData.forEach(r => rows.push([r.student_name, r.student_email, r.secret_persona, r.teacher_question, r.prompt_used, r.chatbot_used, r.ai_response, r.was_guessed, r.guess_time_seconds, r.submitted_at]));
+        filename = 'introai_week02_persona_detective.csv';
       } else {
         rows = [['code', 'cohort', 'class_number', 'is_active', 'uses_count', 'max_uses', 'created_at']];
         codesData.forEach(r => rows.push([r.code, r.cohort, r.class_number, r.is_active, r.uses_count, r.max_uses, r.created_at]));
@@ -3225,7 +3319,134 @@
       document.getElementById('modal-overlay').style.display = 'flex';
     }
 
-    // ── Extended exportCSV to handle sh, cb, and cp ──────────────────────────
+    // ════════════════════════════════════════════════════════════════════════════
+    // INTRO TO AI — PERSONA DETECTIVE (Week 2 Ex 2)
+    // ════════════════════════════════════════════════════════════════════════════
+    function renderPDPage() {
+      if (!pdData.length) {
+        ['pd-stat-count','pd-stat-guessed','pd-stat-avg-time','pd-stat-top-bot'].forEach(id =>
+          document.getElementById(id).textContent = '0');
+        document.getElementById('pd-persona-bars').innerHTML = '<p style="color:var(--gray);font-size:13px">No submissions yet.</p>';
+        renderPDTable();
+        return;
+      }
+
+      document.getElementById('pd-stat-count').textContent = pdData.length;
+
+      // Guessed percentage
+      const guessed = pdData.filter(r => r.was_guessed).length;
+      const guessedPct = ((guessed / pdData.length) * 100).toFixed(0);
+      document.getElementById('pd-stat-guessed').textContent = guessedPct + '% (' + guessed + '/' + pdData.length + ')';
+
+      // Avg guessing time
+      const withTime = pdData.filter(r => r.was_guessed && r.guess_time_seconds != null);
+      const avgTime = withTime.length ? (withTime.reduce((s, r) => s + r.guess_time_seconds, 0) / withTime.length).toFixed(1) + 's' : '—';
+      document.getElementById('pd-stat-avg-time').textContent = avgTime;
+
+      // Most used chatbot
+      const botCounts = {};
+      pdData.forEach(r => { botCounts[r.chatbot_used] = (botCounts[r.chatbot_used] || 0) + 1; });
+      const topBot = Object.entries(botCounts).sort((a,b) => b[1]-a[1])[0];
+      document.getElementById('pd-stat-top-bot').textContent = topBot ? topBot[0] : '—';
+
+      // Draw persona guessed success rate breakdown
+      const personasList = [
+        'A Grumpy Pirate', 'An Enthusiastic Scientist', 'A Bored Teenager', 'A Shakespearean Actor',
+        'A Friendly Cowboy', 'A Calm Yoga Instructor', 'A Film Noir Detective', 'A Snobby Medieval King',
+        'An Alien Blending In', 'A Hyperactive Robot', 'A Slow Sloth', 'A Boastful Superhero'
+      ];
+
+      const barsEl = document.getElementById('pd-persona-bars');
+      barsEl.innerHTML = personasList.map(name => {
+        const totalPersona = pdData.filter(r => r.secret_persona === name).length;
+        if (!totalPersona) return '';
+        const guessedPersona = pdData.filter(r => r.secret_persona === name && r.was_guessed).length;
+        const pct = (guessedPersona / totalPersona) * 100;
+        return `
+          <div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+              <span style="font-size:12px;font-weight:600;color:var(--navy)">${esc(name)}</span>
+              <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--pink);font-weight:700">${pct.toFixed(0)}% (${guessedPersona}/${totalPersona})</span>
+            </div>
+            <div style="height:8px;background:var(--border);border-radius:99px;overflow:hidden">
+              <div style="height:100%;width:${pct.toFixed(1)}%;background:var(--pink);border-radius:99px;transition:width 0.5s ease"></div>
+            </div>
+          </div>`;
+      }).filter(Boolean).join('') || '<p style="color:var(--gray);font-size:12px">No persona draws yet.</p>';
+
+      renderPDTable();
+    }
+
+    function renderPDTable() {
+      const search  = (document.getElementById('pd-search')?.value || '').toLowerCase();
+      const botFilt = document.getElementById('pd-filter-bot')?.value || '';
+      const guessedFilt = document.getElementById('pd-filter-guessed')?.value || '';
+
+      const rows = pdData.filter(r => {
+        const matchesSearch = !search ||
+          (r.student_name || '').toLowerCase().includes(search) ||
+          (r.secret_persona || '').toLowerCase().includes(search);
+        
+        const matchesBot = !botFilt || r.chatbot_used === botFilt;
+        const matchesGuessed = !guessedFilt || (guessedFilt === 'yes' ? r.was_guessed : !r.was_guessed);
+
+        return matchesSearch && matchesBot && matchesGuessed;
+      });
+
+      document.getElementById('pd-count').textContent = rows.length + ' student' + (rows.length !== 1 ? 's' : '');
+
+      if (!rows.length) {
+        document.getElementById('pd-table-wrap').innerHTML = '<div class="empty-state"><p>No matching submissions.</p></div>';
+        return;
+      }
+
+      document.getElementById('pd-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Student</th><th>Secret Persona</th><th>Chatbot</th><th>Guessed?</th><th>Time (s)</th><th>Submitted</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr onclick="showPDDetail(${r.id})" style="cursor:pointer" title="Click to view details">
+          <td>${esc(r.student_name)}<br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
+          <td style="font-weight:700">${esc(r.secret_persona)}</td>
+          <td>${esc(r.chatbot_used)}</td>
+          <td>
+            ${r.was_guessed ? '<span class="badge badge-green">🎯 Yes</span>' : '<span class="badge badge-red">🕵️‍♂️ No</span>'}
+          </td>
+          <td style="font-family:'DM Mono',monospace;font-weight:700">${r.guess_time_seconds != null ? r.guess_time_seconds + 's' : '—'}</td>
+          <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+    }
+
+    function showPDDetail(id) {
+      const r = pdData.find(x => x.id === id);
+      if (!r) return;
+      document.getElementById('modal-title').textContent = esc(r.student_name) + ' — Week 2 Persona Detective';
+
+      document.getElementById('modal-body').innerHTML = `
+        <div style="font-size:13px;line-height:1.7">
+          <p style="margin-bottom:8px"><strong>Chatbot Used:</strong> ${esc(r.chatbot_used)}</p>
+          <p style="margin-bottom:8px"><strong>Secret Persona:</strong> <span style="color:var(--pink);font-weight:700">${esc(r.secret_persona)}</span></p>
+          <p style="margin-bottom:8px"><strong>Teacher Question:</strong> &ldquo;${esc(r.teacher_question)}&rdquo;</p>
+          <div style="background:#f8fafc;padding:12px;border-radius:8px;margin-bottom:12px">
+            <div><strong>Was Guessed:</strong> ${r.was_guessed ? '<span style="color:#059669;font-weight:700">🎯 YES</span>' : '<span style="color:#dc2626;font-weight:700">🕵️‍♂️ NO (Fooled Them!)</span>'}</div>
+            ${r.was_guessed ? `<div><strong>Time Taken to Guess:</strong> ${r.guess_time_seconds} seconds</div>` : ''}
+          </div>
+          <hr style="margin:12px 0;border-color:var(--border)">
+          <p style="font-weight:700;color:var(--navy);margin-bottom:6px">Prompt Used</p>
+          <p style="background:#f8fafc;padding:10px;border-radius:8px;margin-bottom:12px;white-space:pre-wrap">${esc(r.prompt_used || '—')}</p>
+          <p style="font-weight:700;color:var(--navy);margin-bottom:6px">AI's Output Response</p>
+          <p style="background:#f8fafc;padding:10px;border-radius:8px;margin-bottom:12px;white-space:pre-wrap;font-family:'JetBrains Mono',monospace">${esc(r.ai_response || '—')}</p>
+        </div>`;
+      document.getElementById('modal-overlay').style.display = 'flex';
+    }
+
+    // ── Extended exportCSV to handle sh, cb, cp, and pd ──────────────────────
     const _origExportCSV = typeof exportCSV === 'function' ? exportCSV : null;
 
     function fmtDate(iso) {
