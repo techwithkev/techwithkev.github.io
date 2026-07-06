@@ -352,8 +352,8 @@
           return;
         }
 
-        // Validate code belongs to Co-Writer Story class (Class 17)
-        if (codeRecord.class_number !== 17) {
+        // Validate code belongs to Co-Writer Story class (Class 102)
+        if (codeRecord.class_number !== 102) {
           codeEl.classList.add('error');
           codeErrEl.textContent = `This code is for Class ${codeRecord.class_number}, not for the Co-Writer Story activity.`;
           codeErrEl.classList.remove('hidden');
