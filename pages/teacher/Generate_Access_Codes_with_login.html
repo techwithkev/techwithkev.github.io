@@ -1033,6 +1033,15 @@
         return;
       }
 
+      // Check if class number already exists in the select dropdown list
+      const select = document.getElementById('class-selector');
+      const exists = Array.from(select.options).some(opt => parseInt(opt.value) === numVal);
+      if (exists) {
+        errDiv.textContent = `Class Number ${numVal} already exists. Please choose a different number.`;
+        errDiv.style.display = 'block';
+        return;
+      }
+
       try {
         const payload = {
           class_number: numVal,
