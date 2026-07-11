@@ -94,6 +94,20 @@
       color: #134e4a !important;
       font-weight: 700;
     }
+
+    /* Image upload zone */
+    .upload-zone {
+      border: 2px dashed #d1fae5; border-radius: 14px;
+      padding: 18px 16px; text-align: center; cursor: pointer;
+      transition: all 0.2s ease; background: #f9fafb;
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: #0d9488; background: #f0fdfa;
+    }
+    .upload-zone .zone-thumb {
+      max-height: 130px; max-width: 100%; border-radius: 10px;
+      object-fit: contain; margin: 0 auto 6px;
+    }
   </style>
 </head>
 
@@ -249,6 +263,33 @@
           <p id="style-obs-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe what you noticed.</p>
         </div>
 
+        <!-- Upload best image -->
+        <div class="mb-4">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            Upload your favourite image <span class="text-gray-300">(optional)</span>
+          </label>
+          <div class="upload-zone" id="style-upload-zone"
+            ondragover="handleDragOver(event,'style-upload-zone')"
+            ondragleave="handleDragLeave('style-upload-zone')"
+            ondrop="handleDrop(event,'style-img','style-upload-zone')"
+            onclick="document.getElementById('style-img').click()">
+            <input type="file" id="style-img" accept="image/*" class="hidden"
+              onchange="previewImage(this,'style-upload-zone','style-img-preview','style-img-thumb')">
+            <div id="style-img-placeholder">
+              <svg class="w-7 h-7 mx-auto mb-1.5 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              <p class="text-xs font-bold text-gray-400">Click or drag &amp; drop an image</p>
+              <p class="text-[10px] text-gray-400 mt-0.5">PNG, JPG, WEBP &middot; Max 5 MB</p>
+            </div>
+            <div id="style-img-preview" class="hidden flex flex-col items-center gap-2">
+              <img id="style-img-thumb" class="zone-thumb" src="" alt="Style image preview">
+              <button type="button" class="text-[10px] font-bold text-red-400 hover:text-red-600"
+                onclick="removeImage('style-img','style-upload-zone','style-img-preview',event)">&#10005; Remove</button>
+            </div>
+          </div>
+        </div>
+
         <!-- Rating -->
         <div>
           <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Which result was more interesting?</label>
@@ -315,6 +356,33 @@
             placeholder="e.g. The vague prompt gave a generic white fluffy castle, but Prompt B had glowing crystal spires, purple dramatic lighting and looked like a fantasy movie..."
             class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"></textarea>
           <p id="detail-obs-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe what you noticed.</p>
+        </div>
+
+        <!-- Upload best image -->
+        <div class="mb-4">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            Upload your favourite image <span class="text-gray-300">(optional)</span>
+          </label>
+          <div class="upload-zone" id="detail-upload-zone"
+            ondragover="handleDragOver(event,'detail-upload-zone')"
+            ondragleave="handleDragLeave('detail-upload-zone')"
+            ondrop="handleDrop(event,'detail-img','detail-upload-zone')"
+            onclick="document.getElementById('detail-img').click()">
+            <input type="file" id="detail-img" accept="image/*" class="hidden"
+              onchange="previewImage(this,'detail-upload-zone','detail-img-preview','detail-img-thumb')">
+            <div id="detail-img-placeholder">
+              <svg class="w-7 h-7 mx-auto mb-1.5 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              <p class="text-xs font-bold text-gray-400">Click or drag &amp; drop an image</p>
+              <p class="text-[10px] text-gray-400 mt-0.5">PNG, JPG, WEBP &middot; Max 5 MB</p>
+            </div>
+            <div id="detail-img-preview" class="hidden flex flex-col items-center gap-2">
+              <img id="detail-img-thumb" class="zone-thumb" src="" alt="Detail image preview">
+              <button type="button" class="text-[10px] font-bold text-red-400 hover:text-red-600"
+                onclick="removeImage('detail-img','detail-upload-zone','detail-img-preview',event)">&#10005; Remove</button>
+            </div>
+          </div>
         </div>
 
         <!-- Fave -->
@@ -395,6 +463,33 @@
             placeholder="e.g. The AI nailed the watercolor look — the dog's suit had realistic folds and the background had a beautiful pastel galaxy. Really surprised by the detail!"
             class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"></textarea>
           <p id="freestyle-result-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe your freestyle result.</p>
+        </div>
+
+        <!-- Upload freestyle image -->
+        <div class="mb-4">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            Upload your freestyle image <span class="text-gray-300">(optional)</span>
+          </label>
+          <div class="upload-zone" id="freestyle-upload-zone"
+            ondragover="handleDragOver(event,'freestyle-upload-zone')"
+            ondragleave="handleDragLeave('freestyle-upload-zone')"
+            ondrop="handleDrop(event,'freestyle-img','freestyle-upload-zone')"
+            onclick="document.getElementById('freestyle-img').click()">
+            <input type="file" id="freestyle-img" accept="image/*" class="hidden"
+              onchange="previewImage(this,'freestyle-upload-zone','freestyle-img-preview','freestyle-img-thumb')">
+            <div id="freestyle-img-placeholder">
+              <svg class="w-7 h-7 mx-auto mb-1.5 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              <p class="text-xs font-bold text-gray-400">Click or drag &amp; drop an image</p>
+              <p class="text-[10px] text-gray-400 mt-0.5">PNG, JPG, WEBP &middot; Max 5 MB</p>
+            </div>
+            <div id="freestyle-img-preview" class="hidden flex flex-col items-center gap-2">
+              <img id="freestyle-img-thumb" class="zone-thumb" src="" alt="Freestyle image preview">
+              <button type="button" class="text-[10px] font-bold text-red-400 hover:text-red-600"
+                onclick="removeImage('freestyle-img','freestyle-upload-zone','freestyle-img-preview',event)">&#10005; Remove</button>
+            </div>
+          </div>
         </div>
 
         <!-- Share highlight -->
@@ -637,6 +732,61 @@
       });
     }
 
+    /* ══ IMAGE UPLOAD ══ */
+    function handleDragOver(ev, zoneId) {
+      ev.preventDefault();
+      document.getElementById(zoneId).classList.add('drag-over');
+    }
+    function handleDragLeave(zoneId) {
+      document.getElementById(zoneId).classList.remove('drag-over');
+    }
+    function handleDrop(ev, inputId, zoneId) {
+      ev.preventDefault();
+      document.getElementById(zoneId).classList.remove('drag-over');
+      const file = ev.dataTransfer.files[0];
+      if (!file) return;
+      const input = document.getElementById(inputId);
+      const dt = new DataTransfer(); dt.items.add(file); input.files = dt.files;
+      input.dispatchEvent(new Event('change'));
+    }
+    function previewImage(input, zoneId, previewId, thumbId) {
+      const file = input.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image is too large. Please choose a file under 5 MB.');
+        input.value = ''; return;
+      }
+      const reader = new FileReader();
+      reader.onload = e => {
+        document.getElementById(thumbId).src = e.target.result;
+        document.getElementById(`${zoneId.replace('-zone','')}-placeholder`).classList.add('hidden');
+        document.getElementById(previewId).classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+    function removeImage(inputId, zoneId, previewId, ev) {
+      ev.stopPropagation();
+      document.getElementById(inputId).value = '';
+      document.getElementById(previewId).classList.add('hidden');
+      document.getElementById(`${zoneId.replace('-zone','')}-placeholder`).classList.remove('hidden');
+    }
+    async function uploadToStorage(file, folder) {
+      const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const path = `week03/${folder}/${Date.now()}_${safe}`;
+      const resp = await fetch(`${SUPABASE_URL}/storage/v1/object/introai-uploads/${path}`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': file.type,
+          'x-upsert': 'true'
+        },
+        body: file
+      });
+      if (!resp.ok) throw new Error(`Upload failed: ${resp.status}`);
+      return `${SUPABASE_URL}/storage/v1/object/public/introai-uploads/${path}`;
+    }
+
     /* ══ SUBMIT ══ */
     async function submitExercise(ev) {
       ev.preventDefault();
@@ -666,7 +816,23 @@
       document.getElementById('form-error').classList.add('hidden');
       const btn = document.getElementById('submit-btn');
       btn.disabled = true;
-      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting\u2026';
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Uploading images…';
+
+      /* Upload images if provided */
+      let styleImgUrl = null, detailImgUrl = null, freestyleImgUrl = null;
+      try {
+        const styleFile     = document.getElementById('style-img').files[0];
+        const detailFile    = document.getElementById('detail-img').files[0];
+        const freestyleFile = document.getElementById('freestyle-img').files[0];
+        if (styleFile)     styleImgUrl     = await uploadToStorage(styleFile,     'style');
+        if (detailFile)    detailImgUrl    = await uploadToStorage(detailFile,    'detail');
+        if (freestyleFile) freestyleImgUrl = await uploadToStorage(freestyleFile, 'freestyle');
+      } catch (err) {
+        console.warn('[Week 3 PC] Image upload warning:', err.message);
+        // Continue without images rather than blocking the student
+      }
+
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting…';
 
       const payload = {
         student_name:         studentName,
@@ -675,14 +841,17 @@
         style_tool:           tools.style   || null,
         style_fave_prompt:    faves.style   || null,
         style_observations:   document.getElementById('style-obs').value.trim(),
+        style_image_url:      styleImgUrl,
         /* Detail Change */
         detail_tool:          tools.detail  || null,
         detail_fave_prompt:   faves.detail  || null,
         detail_observations:  document.getElementById('detail-obs').value.trim(),
+        detail_image_url:     detailImgUrl,
         /* Freestyle */
         freestyle_tool:       tools.freestyle || null,
         freestyle_prompt:     document.getElementById('freestyle-prompt').value.trim(),
         freestyle_result:     document.getElementById('freestyle-result').value.trim(),
+        freestyle_image_url:  freestyleImgUrl,
         share_highlight:      document.getElementById('share-highlight').value.trim() || null,
         /* Reflection */
         big_takeaway:         document.getElementById('big-takeaway').value.trim(),
