@@ -3895,6 +3895,151 @@
       }
     }
 
+    // ════════════════════════════════════════════════════════════════════════════
+    // INTRO TO AI — AI PICTIONARY (W3 Ex 2)
+    // ════════════════════════════════════════════════════════════════════════════
+    function renderAPPage() {
+      if (!apData.length) {
+        ['ap-stat-count','ap-stat-guessed','ap-stat-rate','ap-stat-tool'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = '0';
+        });
+        renderAPTable();
+        return;
+      }
+      document.getElementById('ap-stat-count').textContent = apData.length;
+      const guessed = apData.filter(r => r.was_guessed === true).length;
+      document.getElementById('ap-stat-guessed').textContent = guessed;
+      document.getElementById('ap-stat-rate').textContent = Math.round(guessed / apData.length * 100) + '%';
+      const toolCounts = {};
+      apData.forEach(r => { if (r.ai_tool_used) toolCounts[r.ai_tool_used] = (toolCounts[r.ai_tool_used] || 0) + 1; });
+      const topTool = Object.entries(toolCounts).sort((a,b) => b[1]-a[1])[0];
+      document.getElementById('ap-stat-tool').textContent = topTool ? topTool[0] : '—';
+      renderAPTable();
+    }
+
+    function renderAPTable() {
+      const tool    = document.getElementById('ap-filter-tool')?.value || '';
+      const guessed = document.getElementById('ap-filter-guessed')?.value || '';
+      const search  = (document.getElementById('ap-search')?.value || '').toLowerCase();
+
+      const rows = apData.filter(r => {
+        if (tool && r.ai_tool_used !== tool) return false;
+        if (guessed === 'true'  && r.was_guessed !== true)  return false;
+        if (guessed === 'false' && r.was_guessed !== false) return false;
+        if (search && !((r.student_name||'').toLowerCase().includes(search) || (r.secret_cliche||'').toLowerCase().includes(search))) return false;
+        return true;
+      });
+
+      document.getElementById('ap-count').textContent = rows.length + ' submission' + (rows.length !== 1 ? 's' : '');
+
+      if (!rows.length) {
+        document.getElementById('ap-table-wrap').innerHTML = '<div class="empty-state"><p>No matching submissions.</p></div>';
+        return;
+      }
+
+      document.getElementById('ap-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student</th><th>Clich&eacute;</th><th>AI Tool</th><th>Prompt</th>
+        <th>Image</th><th>Guessed?</th><th>Submitted</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr>
+          <td>${esc(r.student_name)}<br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
+          <td><strong>${esc(r.secret_cliche)}</strong></td>
+          <td><span class="badge badge-teal">${esc(r.ai_tool_used || '—')}</span></td>
+          <td style="max-width:200px;font-size:11px;color:#475569">${esc((r.prompt_used||'').substring(0,120))}${(r.prompt_used||'').length>120?'…':''}</td>
+          <td>${r.generated_image_url ? `<a href="${esc(r.generated_image_url)}" target="_blank" style="color:var(--teal);font-size:11px;font-weight:600">View ↗</a>` : '<span style="color:var(--gray);font-size:11px">—</span>'}</td>
+          <td>${r.was_guessed === true ? '<span class="badge badge-green">✓ Yes</span>' : r.was_guessed === false ? '<span class="badge badge-red">✗ No</span>' : '<span class="badge badge-gray">—</span>'}</td>
+          <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+    }
+
+    // ════════════════════════════════════════════════════════════════════════════
+    // INTRO TO AI — PROMPT COMPARISON (W3 Ex 1)
+    // ════════════════════════════════════════════════════════════════════════════
+    function renderPCPage() {
+      if (!pcData.length) {
+        ['pc-stat-count','pc-stat-enjoy','pc-stat-freestyle','pc-stat-tool'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = '0';
+        });
+        renderPCTable();
+        return;
+      }
+      document.getElementById('pc-stat-count').textContent = pcData.length;
+      const withRating = pcData.filter(r => r.enjoyment_rating);
+      const avgEnjoy = withRating.length
+        ? (withRating.reduce((s,r) => s + r.enjoyment_rating, 0) / withRating.length).toFixed(2)
+        : '—';
+      document.getElementById('pc-stat-enjoy').textContent = avgEnjoy;
+      const freestyleCount = pcData.filter(r => r.freestyle_prompt).length;
+      document.getElementById('pc-stat-freestyle').textContent = freestyleCount;
+      // Most used freestyle tool
+      const toolCounts = {};
+      pcData.forEach(r => { const t = r.freestyle_tool || r.style_tool; if (t) toolCounts[t] = (toolCounts[t] || 0) + 1; });
+      const topTool = Object.entries(toolCounts).sort((a,b) => b[1]-a[1])[0];
+      document.getElementById('pc-stat-tool').textContent = topTool ? topTool[0] : '—';
+      renderPCTable();
+    }
+
+    function renderPCTable() {
+      const tool   = document.getElementById('pc-filter-tool')?.value || '';
+      const search = (document.getElementById('pc-search')?.value || '').toLowerCase();
+
+      const rows = pcData.filter(r => {
+        if (tool && r.freestyle_tool !== tool && r.style_tool !== tool && r.detail_tool !== tool) return false;
+        if (search && !((r.student_name||'').toLowerCase().includes(search) || (r.freestyle_prompt||'').toLowerCase().includes(search))) return false;
+        return true;
+      });
+
+      document.getElementById('pc-count').textContent = rows.length + ' submission' + (rows.length !== 1 ? 's' : '');
+
+      if (!rows.length) {
+        document.getElementById('pc-table-wrap').innerHTML = '<div class="empty-state"><p>No matching submissions.</p></div>';
+        return;
+      }
+
+      function starRating(v) {
+        if (!v) return '<span style="color:var(--gray)">—</span>';
+        const stars = '★'.repeat(v) + '☆'.repeat(5 - v);
+        const col = v >= 4 ? '#059669' : v >= 3 ? '#d97706' : '#dc2626';
+        return `<span style="color:${col};font-size:14px">${stars}</span>`;
+      }
+
+      function imgLink(url) {
+        return url ? `<a href="${esc(url)}" target="_blank" style="color:var(--teal);font-size:11px;font-weight:600">View ↗</a>` : '<span style="color:var(--gray);font-size:11px">—</span>';
+      }
+
+      document.getElementById('pc-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student</th><th>Style Fave</th><th>Style Img</th>
+        <th>Detail Fave</th><th>Detail Img</th>
+        <th>Freestyle Prompt</th><th>Freestyle Img</th>
+        <th>Enjoyment</th><th>Submitted</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr>
+          <td>${esc(r.student_name)}<br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
+          <td><span class="badge ${r.style_fave_prompt === 'A' ? 'badge-teal' : r.style_fave_prompt === 'B' ? 'badge-gold' : 'badge-gray'}">${r.style_fave_prompt || '—'}</span></td>
+          <td>${imgLink(r.style_image_url)}</td>
+          <td><span class="badge ${r.detail_fave_prompt === 'A' ? 'badge-teal' : r.detail_fave_prompt === 'B' ? 'badge-gold' : 'badge-gray'}">${r.detail_fave_prompt || '—'}</span></td>
+          <td>${imgLink(r.detail_image_url)}</td>
+          <td style="max-width:180px;font-size:11px;color:#475569">${esc((r.freestyle_prompt||'').substring(0,100))}${(r.freestyle_prompt||'').length>100?'…':''}</td>
+          <td>${imgLink(r.freestyle_image_url)}</td>
+          <td>${starRating(r.enjoyment_rating)}</td>
+          <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+    }
+
     // ── Extended exportCSV to handle sh, cb, cp, and pd ──────────────────────
     const _origExportCSV = typeof exportCSV === 'function' ? exportCSV : null;
 
