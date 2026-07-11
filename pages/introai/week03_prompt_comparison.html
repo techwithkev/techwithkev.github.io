@@ -761,6 +761,17 @@
         document.getElementById(thumbId).src = e.target.result;
         document.getElementById(`${zoneId.replace('-zone','')}-placeholder`).classList.add('hidden');
         document.getElementById(previewId).classList.remove('hidden');
+        
+        // Add a checkmark visual alert if not already present
+        let badge = document.getElementById(`${zoneId}-success-badge`);
+        if (!badge) {
+          badge = document.createElement('div');
+          badge.id = `${zoneId}-success-badge`;
+          badge.className = 'text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md mt-1 border border-emerald-200 inline-block';
+          badge.innerHTML = '✓ Image Loaded &amp; Ready';
+          const prevEl = document.getElementById(previewId);
+          prevEl.insertBefore(badge, prevEl.lastElementChild);
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -769,6 +780,8 @@
       document.getElementById(inputId).value = '';
       document.getElementById(previewId).classList.add('hidden');
       document.getElementById(`${zoneId.replace('-zone','')}-placeholder`).classList.remove('hidden');
+      const badge = document.getElementById(`${zoneId}-success-badge`);
+      if (badge) badge.remove();
     }
     async function uploadToStorage(file, folder) {
       const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');

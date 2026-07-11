@@ -1442,17 +1442,18 @@
             W2 Ex3: Story
           </button>
           <div class="nav-section-label" style="margin-top:20px">Week 3 — Images</div>
-          <button class="nav-item" onclick="showPage('introai-ai-pictionary')">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path d="M2 11l3-3a1 1 0 011.4 0L8 9.6m0 0l2-2a1 1 0 011.4 0L14 11M2 14h12a1 1 0 001-1V3a1 1 0 00-1-1H2a1 1 0 00-1 1v10a1 1 0 001 1zm7-9.5h.01" stroke-linecap="round" />
-            </svg>
-            W3 Ex1: Pictionary
-          </button>
           <button class="nav-item" onclick="showPage('introai-prompt-comparison')">
             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
               <path d="M3 12V8a2 2 0 012-2h0m4 6V6a2 2 0 012-2h0M7 14V4a2 2 0 012-2h0" stroke-linecap="round" />
             </svg>
-            W3 Ex2: Prompts
+            W3 Ex1: Prompts
+          </button>
+          <button class="nav-item" onclick="showPage('introai-ai-pictionary')">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M2 11l3-3a1 1 0 011.4 0L8 9.6m0 0l2-2a1 1 0 011.4 0L14 11M2 14h12a1 1 0 001-1V3a1 1 0 00-1-1H2a1 1 0 00-1 1v10a1 1 0 001 1zm7-9.5h.01" stroke-linecap="round" />
+            </svg>
+            W3 Ex2: Pictionary
+          </button>
           </button>
         </div>
 
@@ -2248,11 +2249,76 @@
           </div>
         </div>
 
-        <!-- ══ INTRO TO AI: AI PICTIONARY (W3 Ex 1) ══ -->
+        <!-- ══ INTRO TO AI: PROMPT COMPARISON (W3 Ex 1) ══ -->
+        <div class="page" id="page-introai-prompt-comparison">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Prompt Comparison — Week 3 Ex 1</div>
+              <div class="page-subtitle">Style vs. detail prompt comparisons &amp; freestyle image results</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('pc')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card">
+              <div class="stat-label">Total Submissions</div>
+              <div class="stat-value" id="pc-stat-count">—</div>
+              <div class="stat-sub">Students submitted</div>
+            </div>
+            <div class="stat-card teal">
+              <div class="stat-label">Avg Enjoyment</div>
+              <div class="stat-value" id="pc-stat-enjoy">—</div>
+              <div class="stat-sub">Out of 5 stars</div>
+            </div>
+            <div class="stat-card gold">
+              <div class="stat-label">Freestyle Prompts</div>
+              <div class="stat-value" id="pc-stat-freestyle">—</div>
+              <div class="stat-sub">Unique prompts written</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Most Used Tool</div>
+              <div class="stat-value" style="font-size:16px;padding-top:6px" id="pc-stat-tool">—</div>
+              <div class="stat-sub">AI image generator</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Tool:</label>
+              <select class="filter-select" id="pc-filter-tool" onchange="renderPCTable()">
+                <option value="">All</option>
+                <option>ChatGPT/DALL-E</option><option>Gemini</option>
+                <option>Adobe Firefly</option><option>Other</option>
+              </select>
+              <label>Search:</label>
+              <input class="search-input" id="pc-search" type="text" placeholder="Student or prompt&hellip;"
+                oninput="renderPCTable()" />
+              <span class="text-small text-muted" id="pc-count"></span>
+            </div>
+            <div id="pc-table-wrap">
+              <div class="loading"><div class="spinner"></div><br>Loading Prompt Comparison data&hellip;</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ INTRO TO AI: AI PICTIONARY (W3 Ex 2) ══ -->
         <div class="page" id="page-introai-ai-pictionary">
           <div class="page-header">
             <div>
-              <div class="page-title">AI Pictionary — Week 3 Ex 1</div>
+              <div class="page-title">AI Pictionary — Week 3 Ex 2</div>
               <div class="page-subtitle">AI-generated clich&eacute; drawings &amp; guessing game results</div>
             </div>
             <div class="header-actions">
@@ -2315,71 +2381,6 @@
             </div>
             <div id="ap-table-wrap">
               <div class="loading"><div class="spinner"></div><br>Loading AI Pictionary data&hellip;</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ══ INTRO TO AI: PROMPT COMPARISON (W3 Ex 2) ══ -->
-        <div class="page" id="page-introai-prompt-comparison">
-          <div class="page-header">
-            <div>
-              <div class="page-title">Prompt Comparison — Week 3 Ex 2</div>
-              <div class="page-subtitle">Style vs. detail prompt comparisons &amp; freestyle image results</div>
-            </div>
-            <div class="header-actions">
-              <button class="btn btn-secondary" onclick="loadAll()">
-                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
-                </svg>
-                Refresh
-              </button>
-              <button class="btn btn-mint" onclick="exportCSV('pc')">
-                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
-                </svg>
-                Export CSV
-              </button>
-            </div>
-          </div>
-
-          <div class="stats-grid" style="margin-bottom:20px">
-            <div class="stat-card">
-              <div class="stat-label">Total Submissions</div>
-              <div class="stat-value" id="pc-stat-count">—</div>
-              <div class="stat-sub">Students submitted</div>
-            </div>
-            <div class="stat-card teal">
-              <div class="stat-label">Avg Enjoyment</div>
-              <div class="stat-value" id="pc-stat-enjoy">—</div>
-              <div class="stat-sub">Out of 5 stars</div>
-            </div>
-            <div class="stat-card gold">
-              <div class="stat-label">Freestyle Prompts</div>
-              <div class="stat-value" id="pc-stat-freestyle">—</div>
-              <div class="stat-sub">Unique prompts written</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Most Used Tool</div>
-              <div class="stat-value" style="font-size:16px;padding-top:6px" id="pc-stat-tool">—</div>
-              <div class="stat-sub">AI image generator</div>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="filter-row">
-              <label>Tool:</label>
-              <select class="filter-select" id="pc-filter-tool" onchange="renderPCTable()">
-                <option value="">All</option>
-                <option>ChatGPT/DALL-E</option><option>Gemini</option>
-                <option>Adobe Firefly</option><option>Other</option>
-              </select>
-              <label>Search:</label>
-              <input class="search-input" id="pc-search" type="text" placeholder="Student or prompt&hellip;"
-                oninput="renderPCTable()" />
-              <span class="text-small text-muted" id="pc-count"></span>
-            </div>
-            <div id="pc-table-wrap">
-              <div class="loading"><div class="spinner"></div><br>Loading Prompt Comparison data&hellip;</div>
             </div>
           </div>
         </div>
