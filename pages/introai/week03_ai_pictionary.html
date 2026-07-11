@@ -92,6 +92,20 @@
       padding: 2px 8px; border-radius: 9999px;
       font-size: 11px; font-weight: 700;
     }
+
+    /* Image upload zone */
+    .upload-zone {
+      border: 2px dashed #c7d2fe; border-radius: 14px;
+      padding: 18px 16px; text-align: center; cursor: pointer;
+      transition: all 0.2s ease; background: #f9fafb;
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: #6366f1; background: #eef2ff;
+    }
+    .upload-zone .zone-thumb {
+      max-height: 130px; max-width: 100%; border-radius: 10px;
+      object-fit: contain; margin: 0 auto 6px;
+    }
   </style>
 </head>
 
@@ -341,6 +355,33 @@
           <textarea id="result-notes" rows="3"
             placeholder="e.g. The image showed literal cats and dogs falling from the sky, but the cats looked more like lions!"
             class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"></textarea>
+        </div>
+
+        <!-- Upload generated image -->
+        <div class="mt-4">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            Upload your AI-generated image <span class="text-gray-300">(optional)</span>
+          </label>
+          <div class="upload-zone" id="pic-upload-zone"
+            ondragover="handleDragOver(event,'pic-upload-zone')"
+            ondragleave="handleDragLeave('pic-upload-zone')"
+            ondrop="handleDrop(event,'pic-img','pic-upload-zone')"
+            onclick="document.getElementById('pic-img').click()">
+            <input type="file" id="pic-img" accept="image/*" class="hidden"
+              onchange="previewImage(this,'pic-upload-zone','pic-img-preview','pic-img-thumb')">
+            <div id="pic-img-placeholder">
+              <svg class="w-7 h-7 mx-auto mb-1.5 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              <p class="text-xs font-bold text-gray-400">Click or drag &amp; drop your image</p>
+              <p class="text-[10px] text-gray-400 mt-0.5">PNG, JPG, WEBP &middot; Max 5 MB</p>
+            </div>
+            <div id="pic-img-preview" class="hidden flex flex-col items-center gap-2">
+              <img id="pic-img-thumb" class="zone-thumb" src="" alt="Generated image preview">
+              <button type="button" class="text-[10px] font-bold text-red-400 hover:text-red-600"
+                onclick="removeImage('pic-img','pic-upload-zone','pic-img-preview',event)">&#10005; Remove</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -622,6 +663,61 @@
       document.getElementById('guessed-error').classList.add('hidden');
     }
 
+    /* IMAGE UPLOAD */
+    function handleDragOver(ev, zoneId) {
+      ev.preventDefault();
+      document.getElementById(zoneId).classList.add('drag-over');
+    }
+    function handleDragLeave(zoneId) {
+      document.getElementById(zoneId).classList.remove('drag-over');
+    }
+    function handleDrop(ev, inputId, zoneId) {
+      ev.preventDefault();
+      document.getElementById(zoneId).classList.remove('drag-over');
+      const file = ev.dataTransfer.files[0];
+      if (!file) return;
+      const input = document.getElementById(inputId);
+      const dt = new DataTransfer(); dt.items.add(file); input.files = dt.files;
+      input.dispatchEvent(new Event('change'));
+    }
+    function previewImage(input, zoneId, previewId, thumbId) {
+      const file = input.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image is too large. Please choose a file under 5 MB.');
+        input.value = ''; return;
+      }
+      const reader = new FileReader();
+      reader.onload = e => {
+        document.getElementById(thumbId).src = e.target.result;
+        document.getElementById(`${zoneId.replace('-zone','')}-placeholder`).classList.add('hidden');
+        document.getElementById(previewId).classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+    function removeImage(inputId, zoneId, previewId, ev) {
+      ev.stopPropagation();
+      document.getElementById(inputId).value = '';
+      document.getElementById(previewId).classList.add('hidden');
+      document.getElementById(`${zoneId.replace('-zone','')}-placeholder`).classList.remove('hidden');
+    }
+    async function uploadToStorage(file, folder) {
+      const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const path = `week03/${folder}/${Date.now()}_${safe}`;
+      const resp = await fetch(`${SUPABASE_URL}/storage/v1/object/introai-uploads/${path}`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': file.type,
+          'x-upsert': 'true'
+        },
+        body: file
+      });
+      if (!resp.ok) throw new Error(`Upload failed: ${resp.status}`);
+      return `${SUPABASE_URL}/storage/v1/object/public/introai-uploads/${path}`;
+    }
+
     /* SUBMIT EXERCISE */
     async function submitExercise(ev) {
       ev.preventDefault();
@@ -663,22 +759,34 @@
       document.getElementById('form-error').classList.add('hidden');
       const btn = document.getElementById('submit-btn');
       btn.disabled = true;
-      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting\u2026';
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Uploading image…';
+
+      /* Upload image if provided */
+      let generatedImageUrl = null;
+      try {
+        const picFile = document.getElementById('pic-img').files[0];
+        if (picFile) generatedImageUrl = await uploadToStorage(picFile, 'pictionary');
+      } catch (err) {
+        console.warn('[Week 3 AP] Image upload warning:', err.message);
+      }
+
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting…';
 
       const payload = {
-        student_name:  studentName,
-        student_email: studentEmail,
-        secret_cliche: secretClicheDrawn.name,
-        art_style:     selections.artStyle,
-        lighting:      selections.lighting,
-        setting:       selections.setting,
-        mood:          selections.mood,
-        prompt_used:   pVal,
-        ai_tool_used:  selectedAITool,
-        result_notes:  document.getElementById('result-notes').value.trim() || null,
-        was_guessed:   guessedOutcome,
-        reflection:    document.getElementById('reflection').value.trim() || null,
-        submitted_at:  new Date().toISOString()
+        student_name:        studentName,
+        student_email:      studentEmail,
+        secret_cliche:      secretClicheDrawn.name,
+        art_style:          selections.artStyle,
+        lighting:           selections.lighting,
+        setting:            selections.setting,
+        mood:               selections.mood,
+        prompt_used:        pVal,
+        ai_tool_used:       selectedAITool,
+        result_notes:       document.getElementById('result-notes').value.trim() || null,
+        generated_image_url: generatedImageUrl,
+        was_guessed:        guessedOutcome,
+        reflection:         document.getElementById('reflection').value.trim() || null,
+        submitted_at:       new Date().toISOString()
       };
 
       try {
