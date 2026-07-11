@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt Comparison — Intro to AI · Week 3</title>
+  <meta name="description"
+    content="Activity 1: Prompt Comparison. Explore how changing style and detail in your prompt changes the AI image output — then go freestyle with Subject + Style + Detail.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    /* Registration gate */
+    #registration-overlay { transition: opacity 0.4s ease; }
+    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
+    #registration-overlay .reg-card {
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
+    }
+    #registration-overlay.hiding .reg-card {
+      transform: scale(0.95) translateY(-10px); opacity: 0;
+    }
+
+    .reg-input:focus {
+      outline: none; border-color: #0d9488;
+      box-shadow: 0 0 0 3px rgba(13,148,136,0.15);
+    }
+    .reg-input.error {
+      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+    }
+
+    .form-input:focus {
+      outline: none; border-color: #0d9488;
+      box-shadow: 0 0 0 3px rgba(13,148,136,0.1);
+    }
+    .form-input.error { border-color: #ef4444; }
+
+    /* Prompt pair cards */
+    .prompt-pair {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    }
+    @media (max-width: 520px) {
+      .prompt-pair { grid-template-columns: 1fr; }
+    }
+    .prompt-pill {
+      border-radius: 14px; padding: 14px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; line-height: 1.6; font-weight: 500;
+    }
+    .prompt-a { background: #f0fdfa; border: 1.5px solid #99f6e4; color: #134e4a; }
+    .prompt-b { background: #faf5ff; border: 1.5px solid #d8b4fe; color: #3b0764; }
+
+    /* Rating stars */
+    .star-btn {
+      font-size: 22px; cursor: pointer; transition: transform 0.1s ease;
+      background: none; border: none; padding: 2px;
+      filter: grayscale(1) opacity(0.35);
+    }
+    .star-btn.lit { filter: none; }
+    .star-btn:hover { transform: scale(1.25); }
+
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Copy button flash */
+    .copy-btn { transition: all 0.15s ease; }
+    .copy-btn:active { transform: scale(0.95); }
+
+    /* Opt btn */
+    .opt-btn { transition: all 0.15s ease; cursor: pointer; }
+    .opt-btn:hover { transform: translateY(-1px); }
+    .opt-btn.selected {
+      border-color: #0d9488 !important;
+      background: #f0fdfa !important;
+      color: #134e4a !important;
+      font-weight: 700;
+    }
+  </style>
+</head>
+
+<body class="bg-[#F9FAFB] text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- ══ REGISTRATION GATE ══ -->
+  <div id="registration-overlay"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+    style="background: linear-gradient(135deg, #042f2e 0%, #0f766e 55%, #042f2e 100%);">
+
+    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
+        style="background: radial-gradient(circle, #99f6e4, transparent);"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
+        style="background: radial-gradient(circle, #2dd4bf, transparent);"></div>
+    </div>
+
+    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center bg-teal-100 text-teal-600">
+          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+          </svg>
+        </div>
+        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 bg-teal-100 text-teal-800">
+          Week 3 &middot; Activity 1
+        </div>
+        <h1 class="text-2xl font-black text-gray-900 tracking-tight">Prompt <span class="text-teal-600">Comparison</span></h1>
+        <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">Enter your full name to start the prompt exploration activity.</p>
+      </div>
+
+      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
+        <div class="space-y-4 mb-6">
+          <div>
+            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Full Name</label>
+            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Jane Smith"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name to proceed.</p>
+          </div>
+          <div>
+            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
+            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. jane@school.edu"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
+          </div>
+        </div>
+        <button id="reg-submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700">
+          <span id="reg-btn-label">Begin Activity &#8594;</span>
+        </button>
+      </form>
+      <p class="text-center text-[10px] text-gray-400 font-medium mt-5">Saved to the Intro to AI student roster.</p>
+    </div>
+  </div>
+
+  <!-- ══ MAIN CONTENT ══ -->
+  <div id="main-content" class="max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <!-- Header -->
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+      <div>
+        <a href="index.html"
+          class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-teal-600 mb-3 hover:text-teal-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">
+          Prompt <span class="text-teal-500">Comparison</span>
+        </h1>
+        <p class="text-gray-500 font-medium italic mt-1">Activity 1 &middot; Prompt Engineering &middot; Week 3</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-teal-50 border border-teal-200 text-teal-800 shadow-sm self-start md:self-auto">
+        Week 3
+      </div>
+    </header>
+
+    <!-- Activity Brief -->
+    <div class="rounded-3xl p-6 mb-8 border bg-gradient-to-r from-teal-50 to-cyan-50 border-teal-100 shadow-sm">
+      <div class="flex gap-4">
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 bg-teal-500 text-white shadow-md">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-lg font-black text-teal-950 mb-1">Activity Goal</h2>
+          <p class="text-sm text-teal-900 leading-relaxed mb-3">
+            Discover how small changes to a prompt can produce dramatically different AI images. Run each prompt pair, observe the differences, then unleash your creativity in the Freestyle round.
+          </p>
+          <ul class="text-xs text-teal-800 space-y-1 bg-white/70 backdrop-blur-sm p-4 rounded-xl border border-teal-100/50">
+            <li>&#9312; <strong>Style Change</strong> &mdash; run both robot prompts, compare cartoon vs. photorealistic.</li>
+            <li>&#9313; <strong>Detail Change</strong> &mdash; run both castle prompts, compare vague vs. richly detailed.</li>
+            <li>&#9314; <strong>Freestyle</strong> &mdash; write your own prompt combining Subject + Style + Detail.</li>
+            <li>&#9315; Record your observations and be ready to share one surprising result!</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <form id="comparison-form" onsubmit="submitExercise(event)" novalidate>
+
+      <!-- ══ PART 1: STYLE CHANGE ══ -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-teal-500">1</div>
+          <h2 class="text-base font-black text-gray-900">Style Change</h2>
+        </div>
+        <p class="text-xs text-gray-500 mb-5 ml-11">Run both prompts below in your AI image tool, then record what you notice.</p>
+
+        <!-- Prompt pills -->
+        <div class="prompt-pair mb-5">
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[10px] font-black uppercase tracking-widest text-teal-600">Prompt A</span>
+              <button type="button" class="copy-btn text-[10px] font-bold text-gray-400 hover:text-teal-600 px-2 py-0.5 rounded-md border border-gray-200 hover:border-teal-200 transition-colors"
+                onclick="copyText('Robot reading a book, cartoon style', this)">Copy</button>
+            </div>
+            <div class="prompt-pill prompt-a">Robot reading a book, cartoon style</div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[10px] font-black uppercase tracking-widest text-violet-600">Prompt B</span>
+              <button type="button" class="copy-btn text-[10px] font-bold text-gray-400 hover:text-violet-600 px-2 py-0.5 rounded-md border border-gray-200 hover:border-violet-200 transition-colors"
+                onclick="copyText('Robot reading a book, photorealistic style', this)">Copy</button>
+            </div>
+            <div class="prompt-pill prompt-b">Robot reading a book, photorealistic style</div>
+          </div>
+        </div>
+
+        <!-- Which tool -->
+        <div class="mb-4">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">AI tool used</label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="style-tool-picker">
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('style', 'ChatGPT/DALL-E', this)">&#129302; ChatGPT</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('style', 'Gemini', this)">&#10024; Gemini</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('style', 'Adobe Firefly', this)">&#128293; Firefly</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('style', 'Other', this)">&#128172; Other</button>
+          </div>
+        </div>
+
+        <!-- Observations -->
+        <div class="mb-4">
+          <label for="style-obs" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            What differences did you notice? <span class="text-red-500">*</span>
+          </label>
+          <textarea id="style-obs" rows="3"
+            placeholder="e.g. The cartoon version had bold outlines and bright colours, while the photorealistic one looked like a real metal robot in a library..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"></textarea>
+          <p id="style-obs-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe what you noticed.</p>
+        </div>
+
+        <!-- Rating -->
+        <div>
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Which result was more interesting?</label>
+          <div class="flex gap-3">
+            <button type="button" id="style-pick-a"
+              onclick="setFave('style', 'A')"
+              class="flex-1 py-2.5 rounded-xl border border-gray-200 font-bold text-xs text-gray-600 bg-gray-50 hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700 transition-all">
+              &#127912; Prompt A (Cartoon)
+            </button>
+            <button type="button" id="style-pick-b"
+              onclick="setFave('style', 'B')"
+              class="flex-1 py-2.5 rounded-xl border border-gray-200 font-bold text-xs text-gray-600 bg-gray-50 hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700 transition-all">
+              &#128247; Prompt B (Photorealistic)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PART 2: DETAIL CHANGE ══ -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-teal-500">2</div>
+          <h2 class="text-base font-black text-gray-900">Detail Change</h2>
+        </div>
+        <p class="text-xs text-gray-500 mb-5 ml-11">Run both prompts below. Notice how adding rich detail transforms the output.</p>
+
+        <!-- Prompt pills -->
+        <div class="prompt-pair mb-5">
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[10px] font-black uppercase tracking-widest text-teal-600">Prompt A &mdash; Vague</span>
+              <button type="button" class="copy-btn text-[10px] font-bold text-gray-400 hover:text-teal-600 px-2 py-0.5 rounded-md border border-gray-200 hover:border-teal-200 transition-colors"
+                onclick="copyText('Castle in the clouds', this)">Copy</button>
+            </div>
+            <div class="prompt-pill prompt-a">Castle in the clouds</div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[10px] font-black uppercase tracking-widest text-violet-600">Prompt B &mdash; Detailed</span>
+              <button type="button" class="copy-btn text-[10px] font-bold text-gray-400 hover:text-violet-600 px-2 py-0.5 rounded-md border border-gray-200 hover:border-violet-200 transition-colors"
+                onclick="copyText('Floating medieval castle made of crystal in swirling purple clouds at twilight', this)">Copy</button>
+            </div>
+            <div class="prompt-pill prompt-b">Floating medieval castle made of crystal in swirling purple clouds at twilight</div>
+          </div>
+        </div>
+
+        <!-- Which tool -->
+        <div class="mb-4">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">AI tool used</label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="detail-tool-picker">
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('detail', 'ChatGPT/DALL-E', this)">&#129302; ChatGPT</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('detail', 'Gemini', this)">&#10024; Gemini</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('detail', 'Adobe Firefly', this)">&#128293; Firefly</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('detail', 'Other', this)">&#128172; Other</button>
+          </div>
+        </div>
+
+        <!-- Observations -->
+        <div class="mb-4">
+          <label for="detail-obs" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            How did the extra detail change the image? <span class="text-red-500">*</span>
+          </label>
+          <textarea id="detail-obs" rows="3"
+            placeholder="e.g. The vague prompt gave a generic white fluffy castle, but Prompt B had glowing crystal spires, purple dramatic lighting and looked like a fantasy movie..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"></textarea>
+          <p id="detail-obs-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe what you noticed.</p>
+        </div>
+
+        <!-- Fave -->
+        <div>
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Which result was more impressive?</label>
+          <div class="flex gap-3">
+            <button type="button" id="detail-pick-a"
+              onclick="setFave('detail', 'A')"
+              class="flex-1 py-2.5 rounded-xl border border-gray-200 font-bold text-xs text-gray-600 bg-gray-50 hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700 transition-all">
+              &#9729;&#65039; Prompt A (Vague)
+            </button>
+            <button type="button" id="detail-pick-b"
+              onclick="setFave('detail', 'B')"
+              class="flex-1 py-2.5 rounded-xl border border-gray-200 font-bold text-xs text-gray-600 bg-gray-50 hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700 transition-all">
+              &#128142; Prompt B (Detailed)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PART 3: FREESTYLE ══ -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-teal-500">3</div>
+          <h2 class="text-base font-black text-gray-900">Freestyle</h2>
+        </div>
+        <p class="text-xs text-gray-500 mb-5 ml-11">
+          Now it's your turn! Combine <strong>Subject + Style + Detail</strong> to craft your own unique image prompt.
+        </p>
+
+        <!-- Builder hint -->
+        <div class="grid grid-cols-3 gap-3 mb-5">
+          <div class="rounded-xl p-3 bg-teal-50 border border-teal-100 text-center">
+            <div class="text-lg mb-0.5">&#127775;</div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-teal-700 mb-1">Subject</p>
+            <p class="text-[11px] text-teal-800 leading-snug">Who or what is in the image?</p>
+          </div>
+          <div class="rounded-xl p-3 bg-violet-50 border border-violet-100 text-center">
+            <div class="text-lg mb-0.5">&#127912;</div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-violet-700 mb-1">Style</p>
+            <p class="text-[11px] text-violet-800 leading-snug">Cartoon, oil painting, pixel art&hellip;</p>
+          </div>
+          <div class="rounded-xl p-3 bg-amber-50 border border-amber-100 text-center">
+            <div class="text-lg mb-0.5">&#128269;</div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-amber-700 mb-1">Detail</p>
+            <p class="text-[11px] text-amber-800 leading-snug">Lighting, mood, setting, colours&hellip;</p>
+          </div>
+        </div>
+
+        <!-- Freestyle prompt -->
+        <div class="mb-4">
+          <label for="freestyle-prompt" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            Your Freestyle Prompt <span class="text-red-500">*</span>
+          </label>
+          <textarea id="freestyle-prompt" rows="3"
+            placeholder="e.g. A fluffy golden retriever astronaut floating in space, watercolor style, pastel colours, soft dreamy lighting, whimsical mood..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"></textarea>
+          <p id="freestyle-prompt-error" class="hidden text-xs text-red-500 font-medium mt-1">Please write your freestyle prompt.</p>
+        </div>
+
+        <!-- Which tool -->
+        <div class="mb-4">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">AI tool used</label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="freestyle-tool-picker">
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('freestyle', 'ChatGPT/DALL-E', this)">&#129302; ChatGPT</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('freestyle', 'Gemini', this)">&#10024; Gemini</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('freestyle', 'Adobe Firefly', this)">&#128293; Firefly</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('freestyle', 'Other', this)">&#128172; Other</button>
+          </div>
+        </div>
+
+        <!-- Freestyle result -->
+        <div class="mb-4">
+          <label for="freestyle-result" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            Describe your result <span class="text-red-500">*</span>
+          </label>
+          <textarea id="freestyle-result" rows="3"
+            placeholder="e.g. The AI nailed the watercolor look — the dog's suit had realistic folds and the background had a beautiful pastel galaxy. Really surprised by the detail!"
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"></textarea>
+          <p id="freestyle-result-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe your freestyle result.</p>
+        </div>
+
+        <!-- Share highlight -->
+        <div>
+          <label for="share-highlight" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            One interesting thing you'd share with the class <span class="text-gray-300">(optional)</span>
+          </label>
+          <textarea id="share-highlight" rows="2"
+            placeholder="e.g. I learned that adding the word 'cinematic' totally changed the lighting in the image!"
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"></textarea>
+        </div>
+      </div>
+
+      <!-- ══ OVERALL REFLECTION ══ -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-8">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-teal-500">4</div>
+          <h2 class="text-base font-black text-gray-900">Big Takeaway</h2>
+        </div>
+        <p class="text-xs text-gray-500 mb-4">After all three tasks, what is the single biggest thing you learned about writing AI image prompts?</p>
+
+        <div class="mb-5">
+          <textarea id="big-takeaway" rows="2"
+            placeholder="e.g. The more specific I am, the more the AI understands exactly what I want..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"></textarea>
+          <p id="big-takeaway-error" class="hidden text-xs text-red-500 font-medium mt-1">Please share your big takeaway.</p>
+        </div>
+
+        <!-- Enjoyment rating -->
+        <div>
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">How much did you enjoy this activity?</label>
+          <div class="flex gap-1" id="enjoyment-stars" role="group" aria-label="Enjoyment rating">
+            <button type="button" class="star-btn" data-val="1" onclick="setRating(1)" aria-label="1 star">&#11088;</button>
+            <button type="button" class="star-btn" data-val="2" onclick="setRating(2)" aria-label="2 stars">&#11088;</button>
+            <button type="button" class="star-btn" data-val="3" onclick="setRating(3)" aria-label="3 stars">&#11088;</button>
+            <button type="button" class="star-btn" data-val="4" onclick="setRating(4)" aria-label="4 stars">&#11088;</button>
+            <button type="button" class="star-btn" data-val="5" onclick="setRating(5)" aria-label="5 stars">&#11088;</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-12">
+        <p id="form-error" class="hidden text-sm font-medium text-red-500 mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+          <span id="form-error-text">Please complete all required fields.</span>
+        </p>
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700">
+          <span id="submit-label">Submit My Results &#8594;</span>
+        </button>
+        <p class="text-center text-xs text-gray-400 font-medium mt-3">Results will be loaded to the teacher dashboard.</p>
+      </div>
+
+    </form>
+
+    <!-- ══ TIPS PANEL ══ -->
+    <section class="border-t border-gray-200 pt-8">
+      <div class="text-center mb-6">
+        <h3 class="text-lg font-black text-gray-900">Prompt Writing Tips</h3>
+        <p class="text-xs text-gray-500">Keep these in mind as you experiment today</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="flex gap-3 p-4 bg-white border border-gray-200 rounded-xl">
+          <span class="text-2xl">&#127775;</span>
+          <div>
+            <p class="text-xs font-black text-gray-900">Be Specific</p>
+            <p class="text-[11px] text-gray-500 leading-relaxed">Vague prompts give generic results. Add colours, materials, time of day, and emotions.</p>
+          </div>
+        </div>
+        <div class="flex gap-3 p-4 bg-white border border-gray-200 rounded-xl">
+          <span class="text-2xl">&#127912;</span>
+          <div>
+            <p class="text-xs font-black text-gray-900">Name the Style</p>
+            <p class="text-[11px] text-gray-500 leading-relaxed">Words like "oil painting", "pixel art", "Pixar 3D", or "photorealistic" dramatically change the look.</p>
+          </div>
+        </div>
+        <div class="flex gap-3 p-4 bg-white border border-gray-200 rounded-xl">
+          <span class="text-2xl">&#128161;</span>
+          <div>
+            <p class="text-xs font-black text-gray-900">Set the Mood</p>
+            <p class="text-[11px] text-gray-500 leading-relaxed">Try adding "cinematic", "eerie", "joyful", "dramatic lighting" or "golden hour" to shift the feel.</p>
+          </div>
+        </div>
+        <div class="flex gap-3 p-4 bg-white border border-gray-200 rounded-xl">
+          <span class="text-2xl">&#128257;</span>
+          <div>
+            <p class="text-xs font-black text-gray-900">Iterate &amp; Refine</p>
+            <p class="text-[11px] text-gray-500 leading-relaxed">Don't stop at the first result. Tweak one element at a time and compare — that's how pros do it!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ══ SUCCESS SCREEN ══ -->
+  <div id="success-screen"
+    class="hidden fixed inset-0 z-[90] bg-[#F9FAFB] flex items-center justify-center p-4">
+    <div class="text-center max-w-md bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+      <div class="w-20 h-20 mx-auto rounded-2xl mb-6 flex items-center justify-center bg-teal-100 text-teal-600 shadow-sm">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <div class="inline-block px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 bg-teal-50 text-teal-800">
+        Results Saved!
+      </div>
+      <h2 class="text-3xl font-black text-gray-900 mb-3 tracking-tight">
+        Nice work, <span id="success-name" class="text-teal-600"></span>!
+      </h2>
+      <p class="text-gray-500 mb-8 leading-relaxed text-sm">
+        Your prompt comparisons and freestyle results have been stored. Your teacher will review everyone&rsquo;s observations on the dashboard.
+      </p>
+      <a href="index.html"
+        class="inline-flex items-center gap-2 text-white font-black py-3.5 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm bg-gradient-to-r from-teal-500 to-cyan-600">
+        Return to Course Hub
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    /* ══ SUPABASE ══ */
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+    const TABLE = 'introai_week03_prompt_comparison';
+
+    /* ══ STATE ══ */
+    let studentName = '', studentEmail = '';
+    let tools = { style: '', detail: '', freestyle: '' };
+    let faves = { style: '', detail: '' };
+    let enjoymentRating = 0;
+
+    /* ══ SUPABASE INSERT ══ */
+    async function supabaseInsert(payload) {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!resp.ok) { const t = await resp.text(); throw new Error(`HTTP ${resp.status}: ${t}`); }
+    }
+
+    /* ══ REGISTRATION ══ */
+    function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+    async function handleRegistration(ev) {
+      ev.preventDefault();
+      const nameEl  = document.getElementById('reg-name');
+      const emailEl = document.getElementById('reg-email');
+      const nameErr = document.getElementById('reg-name-error');
+      const emailErr = document.getElementById('reg-email-error');
+      let ok = true;
+
+      nameEl.classList.remove('error');  nameErr.classList.add('hidden');
+      emailEl.classList.remove('error'); emailErr.classList.add('hidden');
+
+      if (!nameEl.value.trim()) { nameEl.classList.add('error'); nameErr.classList.remove('hidden'); ok = false; }
+      if (!emailEl.value.trim() || !validateEmail(emailEl.value.trim())) { emailEl.classList.add('error'); emailErr.classList.remove('hidden'); ok = false; }
+      if (!ok) return;
+
+      const btn = document.getElementById('reg-submit-btn');
+      btn.disabled = true;
+      document.getElementById('reg-btn-label').innerHTML = '<span class="spinner"></span> Starting\u2026';
+
+      studentName  = nameEl.value.trim();
+      studentEmail = emailEl.value.trim();
+      sessionStorage.setItem('introai_w03_pc_name',  studentName);
+      sessionStorage.setItem('introai_w03_pc_email', studentEmail);
+
+      const overlay = document.getElementById('registration-overlay');
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.remove(), 450);
+    }
+
+    (function restoreSession() {
+      const n = sessionStorage.getItem('introai_w03_pc_name');
+      const e = sessionStorage.getItem('introai_w03_pc_email');
+      if (n && e) {
+        studentName = n; studentEmail = e;
+        document.getElementById('registration-overlay').remove();
+      }
+    })();
+
+    /* ══ COPY PROMPT ══ */
+    function copyText(text, btn) {
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = '\u2713 Copied!';
+        btn.style.color = '#0d9488';
+        setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1500);
+      }).catch(() => {
+        // Fallback for older browsers
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        btn.textContent = '\u2713 Copied!';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+      });
+    }
+
+    /* ══ TOOL PICKERS ══ */
+    const PICKER_IDS = { style: 'style-tool-picker', detail: 'detail-tool-picker', freestyle: 'freestyle-tool-picker' };
+
+    function setTool(section, val, btn) {
+      tools[section] = val;
+      document.querySelectorAll(`#${PICKER_IDS[section]} .opt-btn`).forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    }
+
+    /* ══ FAVOURITE PICKERS ══ */
+    const FAVE_STYLE = 'background:#f0fdfa;border-color:#0d9488;color:#134e4a;font-weight:700;';
+    const FAVE_VIOLET = 'background:#faf5ff;border-color:#7c3aed;color:#3b0764;font-weight:700;';
+
+    function setFave(section, pick) {
+      faves[section] = pick;
+      const a = document.getElementById(`${section}-pick-a`);
+      const b = document.getElementById(`${section}-pick-b`);
+      a.style.cssText = pick === 'A' ? FAVE_STYLE : '';
+      b.style.cssText = pick === 'B' ? FAVE_VIOLET : '';
+    }
+
+    /* ══ STAR RATING ══ */
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#enjoyment-stars .star-btn').forEach(btn => {
+        btn.classList.toggle('lit', parseInt(btn.dataset.val) <= val);
+      });
+    }
+
+    /* ══ SUBMIT ══ */
+    async function submitExercise(ev) {
+      ev.preventDefault();
+      let ok = true;
+
+      const required = [
+        ['style-obs',          'style-obs-error'],
+        ['detail-obs',         'detail-obs-error'],
+        ['freestyle-prompt',   'freestyle-prompt-error'],
+        ['freestyle-result',   'freestyle-result-error'],
+        ['big-takeaway',       'big-takeaway-error'],
+      ];
+
+      required.forEach(([id, errId]) => {
+        const val = document.getElementById(id).value.trim();
+        document.getElementById(errId).classList.toggle('hidden', !!val);
+        if (!val) ok = false;
+      });
+
+      if (!ok) {
+        document.getElementById('form-error').classList.remove('hidden');
+        document.querySelector('[id$="-error"]:not(.hidden)')
+          ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      document.getElementById('form-error').classList.add('hidden');
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting\u2026';
+
+      const payload = {
+        student_name:         studentName,
+        student_email:        studentEmail,
+        /* Style Change */
+        style_tool:           tools.style   || null,
+        style_fave_prompt:    faves.style   || null,
+        style_observations:   document.getElementById('style-obs').value.trim(),
+        /* Detail Change */
+        detail_tool:          tools.detail  || null,
+        detail_fave_prompt:   faves.detail  || null,
+        detail_observations:  document.getElementById('detail-obs').value.trim(),
+        /* Freestyle */
+        freestyle_tool:       tools.freestyle || null,
+        freestyle_prompt:     document.getElementById('freestyle-prompt').value.trim(),
+        freestyle_result:     document.getElementById('freestyle-result').value.trim(),
+        share_highlight:      document.getElementById('share-highlight').value.trim() || null,
+        /* Reflection */
+        big_takeaway:         document.getElementById('big-takeaway').value.trim(),
+        enjoyment_rating:     enjoymentRating || null,
+        submitted_at:         new Date().toISOString()
+      };
+
+      try {
+        await supabaseInsert(payload);
+      } catch (err) {
+        console.error('[Week 3 PC] Supabase error:', err.message);
+        btn.disabled = false;
+        document.getElementById('submit-label').textContent = 'Submit My Results \u2192';
+        document.getElementById('form-error-text').textContent = '\u26A0 Network error. Please try again or notify your teacher.';
+        document.getElementById('form-error').classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('success-name').textContent = studentName.split(' ')[0];
+      document.getElementById('success-screen').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+
+</body>
+
+</html>
