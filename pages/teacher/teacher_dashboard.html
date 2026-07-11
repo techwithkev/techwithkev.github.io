@@ -1441,6 +1441,19 @@
             </svg>
             W2 Ex3: Story
           </button>
+          <div class="nav-section-label" style="margin-top:20px">Week 3 — Images</div>
+          <button class="nav-item" onclick="showPage('introai-ai-pictionary')">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M2 11l3-3a1 1 0 011.4 0L8 9.6m0 0l2-2a1 1 0 011.4 0L14 11M2 14h12a1 1 0 001-1V3a1 1 0 00-1-1H2a1 1 0 00-1 1v10a1 1 0 001 1zm7-9.5h.01" stroke-linecap="round" />
+            </svg>
+            W3 Ex1: Pictionary
+          </button>
+          <button class="nav-item" onclick="showPage('introai-prompt-comparison')">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M3 12V8a2 2 0 012-2h0m4 6V6a2 2 0 012-2h0M7 14V4a2 2 0 012-2h0" stroke-linecap="round" />
+            </svg>
+            W3 Ex2: Prompts
+          </button>
         </div>
 
         <div class="sidebar-footer">
@@ -2235,6 +2248,142 @@
           </div>
         </div>
 
+        <!-- ══ INTRO TO AI: AI PICTIONARY (W3 Ex 1) ══ -->
+        <div class="page" id="page-introai-ai-pictionary">
+          <div class="page-header">
+            <div>
+              <div class="page-title">AI Pictionary — Week 3 Ex 1</div>
+              <div class="page-subtitle">AI-generated clich&eacute; drawings &amp; guessing game results</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('ap')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card">
+              <div class="stat-label">Total Submissions</div>
+              <div class="stat-value" id="ap-stat-count">—</div>
+              <div class="stat-sub">Students submitted</div>
+            </div>
+            <div class="stat-card teal">
+              <div class="stat-label">Guessed Correctly</div>
+              <div class="stat-value" id="ap-stat-guessed">—</div>
+              <div class="stat-sub">Out of total submissions</div>
+            </div>
+            <div class="stat-card gold">
+              <div class="stat-label">Success Rate</div>
+              <div class="stat-value" id="ap-stat-rate">—</div>
+              <div class="stat-sub">% correctly guessed</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Most Used Tool</div>
+              <div class="stat-value" style="font-size:16px;padding-top:6px" id="ap-stat-tool">—</div>
+              <div class="stat-sub">AI image generator</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Tool:</label>
+              <select class="filter-select" id="ap-filter-tool" onchange="renderAPTable()">
+                <option value="">All</option>
+                <option>ChatGPT/DALL-E</option><option>Gemini</option>
+                <option>Adobe Firefly</option><option>Midjourney</option><option>Other</option>
+              </select>
+              <label>Outcome:</label>
+              <select class="filter-select" id="ap-filter-guessed" onchange="renderAPTable()">
+                <option value="">All</option>
+                <option value="true">Guessed</option>
+                <option value="false">Not Guessed</option>
+              </select>
+              <label>Search:</label>
+              <input class="search-input" id="ap-search" type="text" placeholder="Student or clich&eacute;&hellip;"
+                oninput="renderAPTable()" />
+              <span class="text-small text-muted" id="ap-count"></span>
+            </div>
+            <div id="ap-table-wrap">
+              <div class="loading"><div class="spinner"></div><br>Loading AI Pictionary data&hellip;</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ INTRO TO AI: PROMPT COMPARISON (W3 Ex 2) ══ -->
+        <div class="page" id="page-introai-prompt-comparison">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Prompt Comparison — Week 3 Ex 2</div>
+              <div class="page-subtitle">Style vs. detail prompt comparisons &amp; freestyle image results</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('pc')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card">
+              <div class="stat-label">Total Submissions</div>
+              <div class="stat-value" id="pc-stat-count">—</div>
+              <div class="stat-sub">Students submitted</div>
+            </div>
+            <div class="stat-card teal">
+              <div class="stat-label">Avg Enjoyment</div>
+              <div class="stat-value" id="pc-stat-enjoy">—</div>
+              <div class="stat-sub">Out of 5 stars</div>
+            </div>
+            <div class="stat-card gold">
+              <div class="stat-label">Freestyle Prompts</div>
+              <div class="stat-value" id="pc-stat-freestyle">—</div>
+              <div class="stat-sub">Unique prompts written</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Most Used Tool</div>
+              <div class="stat-value" style="font-size:16px;padding-top:6px" id="pc-stat-tool">—</div>
+              <div class="stat-sub">AI image generator</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Tool:</label>
+              <select class="filter-select" id="pc-filter-tool" onchange="renderPCTable()">
+                <option value="">All</option>
+                <option>ChatGPT/DALL-E</option><option>Gemini</option>
+                <option>Adobe Firefly</option><option>Other</option>
+              </select>
+              <label>Search:</label>
+              <input class="search-input" id="pc-search" type="text" placeholder="Student or prompt&hellip;"
+                oninput="renderPCTable()" />
+              <span class="text-small text-muted" id="pc-count"></span>
+            </div>
+            <div id="pc-table-wrap">
+              <div class="loading"><div class="spinner"></div><br>Loading Prompt Comparison data&hellip;</div>
+            </div>
+          </div>
+        </div>
+
       </main>
     </div>
   </div>
@@ -2344,7 +2493,7 @@
     async function loadAll() {
       document.getElementById('last-refresh').textContent = 'Refreshing…';
       try {
-        const [hw, exam, codes, sa, sh, cb, cp, pd, ws] = await Promise.all([
+        const [hw, exam, codes, sa, sh, cb, cp, pd, ws, ap, pc] = await Promise.all([
           sb.from('homework_submissions').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('caio_final_exam_results').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('access_codes').select('*').order('created_at', { ascending: false }).limit(10000),
@@ -2353,7 +2502,9 @@
           sb.from('introai_week01_chatbots').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('introai_week02_creative_prompting').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('introai_week02_persona_detective').select('*').order('submitted_at', { ascending: false }).limit(10000),
-          sb.from('introai_week02_co_writer_story').select('*').order('sequence_order', { ascending: true }).limit(10000)
+          sb.from('introai_week02_co_writer_story').select('*').order('sequence_order', { ascending: true }).limit(10000),
+          sb.from('introai_week03_ai_pictionary').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('introai_week03_prompt_comparison').select('*').order('submitted_at', { ascending: false }).limit(10000)
         ]);
 
         if (hw.error)   { console.error('hw error:', hw.error);       toast('⚠ Homework load error: '       + hw.error.message); }
@@ -2364,7 +2515,9 @@
         if (cb.error)   { console.error('cb error:', cb.error);       toast('⚠ Chatbots error: '           + cb.error.message); }
         if (cp.error)   { console.error('cp error:', cp.error);       toast('⚠ Creative prompting error: ' + cp.error.message); }
         if (pd.error)   { console.error('pd error:', pd.error);       toast('⚠ Persona detective error: '  + pd.error.message); }
-        if (ws.error)   { console.error('ws error:', ws.error);       toast('⚠ Co-writer story error: '     + ws.error.message); }
+        if (ws.error)   { console.error('ws error:', ws.error);       toast('\u26A0 Co-writer story error: '     + ws.error.message); }
+        if (ap.error)   { console.error('ap error:', ap.error);       toast('\u26A0 AI Pictionary error: '        + ap.error.message); }
+        if (pc.error)   { console.error('pc error:', pc.error);       toast('\u26A0 Prompt comparison error: '    + pc.error.message); }
 
         hwData    = hw.data    || [];
         examData  = exam.data  || [];
@@ -2375,8 +2528,10 @@
         cpData    = cp.data    || [];
         pdData    = pd.data    || [];
         wsData    = ws.data    || [];
+        apData    = ap.data    || [];
+        pcData    = pc.data    || [];
 
-        console.log(`Loaded: ${hwData.length} hw, ${examData.length} exam, ${codesData.length} codes, ${saData.length} SA, ${shData.length} SH, ${cbData.length} CB, ${cpData.length} CP, ${pdData.length} PD, ${wsData.length} WS rows`);
+        console.log(`Loaded: ${hwData.length} hw, ${examData.length} exam, ${codesData.length} codes, ${saData.length} SA, ${shData.length} SH, ${cbData.length} CB, ${cpData.length} CP, ${pdData.length} PD, ${wsData.length} WS, ${apData.length} AP, ${pcData.length} PC rows`);
 
         populateFilters();
         renderOverview();
@@ -2391,6 +2546,8 @@
         renderCPPage();
         renderPDPage();
         renderWSPage();
+        renderAPPage();
+        renderPCPage();
 
         const now = new Date();
         document.getElementById('last-refresh').textContent = 'Updated ' + now.toLocaleTimeString();
@@ -2928,6 +3085,14 @@
         rows = [['student_name', 'student_email', 'class_number', 'prompt_used', 'story_text', 'sequence_order', 'is_visible', 'submitted_at']];
         wsData.forEach(r => rows.push([r.student_name, r.student_email, r.class_number, r.prompt_used, r.story_text, r.sequence_order, r.is_visible, r.submitted_at]));
         filename = 'introai_week02_co_writer_story.csv';
+      } else if (type === 'ap') {
+        rows = [['student_name', 'student_email', 'secret_cliche', 'art_style', 'lighting', 'setting', 'mood', 'prompt_used', 'ai_tool_used', 'result_notes', 'generated_image_url', 'was_guessed', 'reflection', 'submitted_at']];
+        apData.forEach(r => rows.push([r.student_name, r.student_email, r.secret_cliche, r.art_style, r.lighting, r.setting, r.mood, r.prompt_used, r.ai_tool_used, r.result_notes, r.generated_image_url, r.was_guessed, r.reflection, r.submitted_at]));
+        filename = 'introai_week03_ai_pictionary.csv';
+      } else if (type === 'pc') {
+        rows = [['student_name', 'student_email', 'style_tool', 'style_fave_prompt', 'style_observations', 'style_image_url', 'detail_tool', 'detail_fave_prompt', 'detail_observations', 'detail_image_url', 'freestyle_tool', 'freestyle_prompt', 'freestyle_result', 'freestyle_image_url', 'share_highlight', 'big_takeaway', 'enjoyment_rating', 'submitted_at']];
+        pcData.forEach(r => rows.push([r.student_name, r.student_email, r.style_tool, r.style_fave_prompt, r.style_observations, r.style_image_url, r.detail_tool, r.detail_fave_prompt, r.detail_observations, r.detail_image_url, r.freestyle_tool, r.freestyle_prompt, r.freestyle_result, r.freestyle_image_url, r.share_highlight, r.big_takeaway, r.enjoyment_rating, r.submitted_at]));
+        filename = 'introai_week03_prompt_comparison.csv';
       } else {
         rows = [['code', 'cohort', 'class_number', 'is_active', 'uses_count', 'max_uses', 'created_at']];
         codesData.forEach(r => rows.push([r.code, r.cohort, r.class_number, r.is_active, r.uses_count, r.max_uses, r.created_at]));
