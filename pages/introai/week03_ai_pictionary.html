@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Pictionary — Intro to AI · Week 3</title>
+  <meta name="description"
+    content="Activity 2: AI Pictionary. Craft a detailed image-generation prompt for a cliché or idiom using art style, lighting, setting, and mood — then see if your classmates can guess it!">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    /* Registration gate */
+    #registration-overlay { transition: opacity 0.4s ease; }
+    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
+    #registration-overlay .reg-card {
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
+    }
+    #registration-overlay.hiding .reg-card {
+      transform: scale(0.95) translateY(-10px); opacity: 0;
+    }
+
+    .reg-input:focus {
+      outline: none; border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+    }
+    .reg-input.error {
+      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+    }
+
+    .form-input:focus {
+      outline: none; border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+    }
+    .form-input.error { border-color: #ef4444; }
+
+    .cliche-card {
+      transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+    }
+    .cliche-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(99,102,241,0.08);
+    }
+
+    .opt-btn {
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .opt-btn:hover { transform: translateY(-1px); }
+    .opt-btn.selected {
+      border-color: #6366f1 !important;
+      background: #eef2ff !important;
+      color: #3730a3 !important;
+      font-weight: 700;
+    }
+
+    .secret-box {
+      background: repeating-linear-gradient(
+        45deg,
+        #c7d2fe,
+        #c7d2fe 10px,
+        #818cf8 10px,
+        #818cf8 20px
+      );
+    }
+
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .prompt-tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 9999px;
+      font-size: 11px; font-weight: 700;
+    }
+  </style>
+</head>
+
+<body class="bg-[#F9FAFB] text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- REGISTRATION GATE -->
+  <div id="registration-overlay"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+    style="background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 55%, #1e1b4b 100%);">
+
+    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
+        style="background: radial-gradient(circle, #a5b4fc, transparent);"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
+        style="background: radial-gradient(circle, #6366f1, transparent);"></div>
+    </div>
+
+    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center bg-indigo-100 text-indigo-600">
+          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 bg-indigo-100 text-indigo-800">
+          Week 3 · Activity 2
+        </div>
+        <h1 class="text-2xl font-black text-gray-900 tracking-tight">AI <span class="text-indigo-600">Pictionary</span></h1>
+        <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">Enter your full name to start the image-prompt challenge.</p>
+      </div>
+
+      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
+        <div class="space-y-4 mb-6">
+          <div>
+            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Full Name</label>
+            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Jane Smith"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name to proceed.</p>
+          </div>
+          <div>
+            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
+            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. jane@school.edu"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
+          </div>
+        </div>
+        <button id="reg-submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700">
+          <span id="reg-btn-label">Begin Activity &#8594;</span>
+        </button>
+      </form>
+      <p class="text-center text-[10px] text-gray-400 font-medium mt-5">Saved to the Intro to AI student roster.</p>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main-content" class="max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <!-- Header -->
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+      <div>
+        <a href="index.html"
+          class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-indigo-600 mb-3 hover:text-indigo-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">
+          AI <span class="text-indigo-500">Pictionary</span>
+        </h1>
+        <p class="text-gray-500 font-medium italic mt-1">Activity 2 &middot; Prompt Engineering &middot; Week 3</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-indigo-50 border border-indigo-200 text-indigo-800 shadow-sm self-start md:self-auto">
+        Week 3
+      </div>
+    </header>
+
+    <!-- Game Brief Card -->
+    <div class="rounded-3xl p-6 mb-8 border bg-gradient-to-r from-indigo-50 to-violet-50 border-indigo-100 shadow-sm">
+      <div class="flex gap-4">
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 bg-indigo-500 text-white shadow-md">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-lg font-black text-indigo-950 mb-1">Challenge Goal &amp; Gameplay</h2>
+          <p class="text-sm text-indigo-900 leading-relaxed mb-3">
+            Master image-generation prompting! Each team draws a secret clich&eacute; or idiom and crafts a detailed prompt to generate an image of it &mdash; including art style, lighting, setting, and mood. Can classmates guess your phrase from the AI-generated image?
+          </p>
+          <ul class="text-xs text-indigo-800 space-y-1 bg-white/70 backdrop-blur-sm p-4 rounded-xl border border-indigo-100/50">
+            <li>1. Click below to draw your <strong>Secret Clich&eacute; / Idiom</strong>. Keep it hidden!</li>
+            <li>2. Build your image-generation prompt using the form &mdash; include Art Style, Lighting, Setting &amp; Mood.</li>
+            <li>3. Paste the prompt into your AI image tool and share the generated image with the class.</li>
+            <li>4. Record whether classmates correctly guessed the clich&eacute; from the image!</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECRET CLICHE DRAW -->
+    <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+      <h3 class="text-xs font-black uppercase tracking-widest text-gray-400 mb-4">Step 1: Draw Your Clich&eacute; / Idiom</h3>
+
+      <div id="draw-panel" class="flex flex-col items-center justify-center p-6 border-2 border-dashed border-indigo-100 rounded-2xl bg-indigo-50/20">
+        <button type="button" onclick="drawSecretCliche()"
+          class="px-6 py-3.5 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 text-white font-black rounded-xl text-sm shadow-md active:scale-95 transition-all">
+          &#127912; Draw Secret Clich&eacute;
+        </button>
+        <p class="text-[11px] text-gray-400 mt-2.5">Click to draw from the official clich&eacute; list</p>
+      </div>
+
+      <div id="secret-display" class="hidden flex flex-col items-center justify-center p-5 border border-indigo-200 rounded-2xl bg-white shadow-sm">
+        <span class="text-xs font-black uppercase tracking-widest text-indigo-500 mb-2">Your Secret Clich&eacute;</span>
+
+        <div id="secret-card" class="secret-box w-full max-w-xs h-24 rounded-xl flex items-center justify-center cursor-pointer transition-all border border-indigo-300 shadow-sm relative overflow-hidden" onclick="revealCliche()">
+          <span id="reveal-tap-hint" class="font-black text-xs text-white uppercase tracking-widest drop-shadow-md select-none">Click to Reveal &#128065;</span>
+
+          <div id="secret-content" class="hidden flex flex-col items-center justify-center px-4 text-center">
+            <span id="secret-emoji" class="text-4xl mb-1">&#127914;</span>
+            <span id="secret-title" class="font-black text-base text-indigo-950">Break a leg</span>
+          </div>
+        </div>
+
+        <div class="flex gap-2.5 mt-4">
+          <button type="button" onclick="hideCliche()" class="px-4 py-2 border border-gray-200 text-xs font-bold text-gray-500 rounded-lg hover:bg-gray-50">
+            &#128584; Hide Again
+          </button>
+          <button type="button" onclick="drawSecretCliche()" class="px-4 py-2 border border-indigo-200 text-xs font-bold text-indigo-600 rounded-lg hover:bg-indigo-50">
+            &#128260; Re-draw
+          </button>
+        </div>
+      </div>
+      <p id="cliche-error" class="hidden text-xs text-red-500 font-medium mt-2 text-center">Please draw a secret clich&eacute; first.</p>
+    </div>
+
+    <!-- MAIN FORM -->
+    <form id="pictionary-form" onsubmit="submitExercise(event)" novalidate>
+
+      <!-- STEP 2: Build Your Prompt -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-indigo-500">2</div>
+          <h2 class="text-base font-black text-gray-900">Build Your Image Prompt</h2>
+        </div>
+
+        <p class="text-xs text-gray-500 mb-5 leading-relaxed">
+          Your prompt <strong>must include</strong> all four elements below. Select your choices, then write your final prompt in the text box.
+        </p>
+
+        <!-- Art Style -->
+        <div class="mb-5">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            &#127912; Art Style <span class="text-red-500">*</span>
+          </label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="artstyle-picker">
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('artStyle', 'Cartoon', this)">&#127904; Cartoon</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('artStyle', 'Pixar', this)">&#10024; Pixar</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('artStyle', 'Watercolor', this)">&#128396; Watercolor</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('artStyle', 'Comic Book', this)">&#128165; Comic Book</button>
+          </div>
+          <p id="artstyle-error" class="hidden text-xs text-red-500 font-medium mt-1.5">Please choose an art style.</p>
+        </div>
+
+        <!-- Lighting -->
+        <div class="mb-5">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            &#128161; Lighting <span class="text-red-500">*</span>
+          </label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="lighting-picker">
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('lighting', 'Sunset', this)">&#127749; Sunset</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('lighting', 'Dramatic Lighting', this)">&#127902; Dramatic</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('lighting', 'Bright Classroom', this)">&#127979; Bright Classroom</button>
+          </div>
+          <p id="lighting-error" class="hidden text-xs text-red-500 font-medium mt-1.5">Please choose a lighting option.</p>
+        </div>
+
+        <!-- Setting -->
+        <div class="mb-5">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            &#127750; Setting <span class="text-red-500">*</span>
+          </label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="setting-picker">
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('setting', 'City', this)">&#127750; City</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('setting', 'Forest', this)">&#127794; Forest</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('setting', 'Classroom', this)">&#128218; Classroom</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('setting', 'Space Station', this)">&#128640; Space Station</button>
+          </div>
+          <p id="setting-error" class="hidden text-xs text-red-500 font-medium mt-1.5">Please choose a setting.</p>
+        </div>
+
+        <!-- Mood -->
+        <div class="mb-6">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            &#128512; Mood <span class="text-red-500">*</span>
+          </label>
+          <div class="grid grid-cols-3 gap-2" id="mood-picker">
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('mood', 'Funny', this)">&#128516; Funny</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('mood', 'Dramatic', this)">&#127917; Dramatic</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('mood', 'Magical', this)">&#129668; Magical</button>
+          </div>
+          <p id="mood-error" class="hidden text-xs text-red-500 font-medium mt-1.5">Please choose a mood.</p>
+        </div>
+
+        <!-- Prompt Preview -->
+        <div id="prompt-preview-box" class="hidden mb-5 p-3 rounded-xl bg-indigo-50 border border-indigo-100">
+          <p class="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-2">Prompt Elements Selected</p>
+          <div id="prompt-preview-tags" class="flex flex-wrap gap-1.5"></div>
+        </div>
+
+        <!-- Final Prompt -->
+        <div>
+          <label for="prompt-used" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            Your Final Prompt <span class="text-red-500">*</span>
+          </label>
+          <textarea id="prompt-used" rows="4"
+            placeholder="e.g. A Pixar-style image of a sky filled with cats and dogs falling like rain, set in a city at sunset, with a dramatic and funny mood..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"></textarea>
+          <p id="prompt-error" class="hidden text-xs text-red-500 font-medium mt-1">Please write your final image prompt.</p>
+        </div>
+      </div>
+
+      <!-- STEP 3: AI Tool & Result -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-indigo-500">3</div>
+          <h2 class="text-base font-black text-gray-900">AI Image Tool &amp; Result</h2>
+        </div>
+
+        <div class="mb-5">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2.5">Which AI image tool did you use?</label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="aitool-picker">
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="setAITool('ChatGPT/DALL-E')">&#129302; ChatGPT</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="setAITool('Gemini')">&#10024; Gemini</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="setAITool('Adobe Firefly')">&#128293; Adobe Firefly</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="setAITool('Midjourney')">&#128444; Midjourney</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="setAITool('Other')">&#128172; Other</button>
+          </div>
+          <p id="aitool-error" class="hidden text-xs text-red-500 font-medium mt-2">Please choose an AI image tool.</p>
+        </div>
+
+        <div>
+          <label for="result-notes" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            What did the image look like? Any surprises? <span class="text-gray-300">(optional)</span>
+          </label>
+          <textarea id="result-notes" rows="3"
+            placeholder="e.g. The image showed literal cats and dogs falling from the sky, but the cats looked more like lions!"
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"></textarea>
+        </div>
+      </div>
+
+      <!-- STEP 4: Did They Guess It? -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-8">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-indigo-500">4</div>
+          <h2 class="text-base font-black text-gray-900">Did They Guess It?</h2>
+        </div>
+        <p class="text-xs text-gray-500 mb-4">
+          After showing the image to your class, record whether classmates correctly guessed the clich&eacute; or idiom.
+        </p>
+
+        <div class="flex gap-3 mb-4">
+          <button type="button" id="outcome-yes" onclick="setGuessed(true)"
+            class="flex-1 py-3 rounded-xl border border-gray-200 font-bold text-sm text-gray-600 bg-gray-50 hover:border-indigo-400 hover:text-indigo-700 hover:bg-indigo-50 transition-all">
+            &#127919; Yes, they guessed it!
+          </button>
+          <button type="button" id="outcome-no" onclick="setGuessed(false)"
+            class="flex-1 py-3 rounded-xl border border-gray-200 font-bold text-sm text-gray-600 bg-gray-50 hover:border-indigo-400 hover:text-indigo-700 hover:bg-indigo-50 transition-all">
+            &#129300; No, stumped them!
+          </button>
+        </div>
+        <p id="guessed-error" class="hidden text-xs text-red-500 font-medium mb-3">Please record the game outcome.</p>
+
+        <div id="reflection-container" class="hidden">
+          <label for="reflection" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            Quick reflection &mdash; what would you change about the prompt? <span class="text-gray-300">(optional)</span>
+          </label>
+          <textarea id="reflection" rows="2"
+            placeholder="e.g. I'd add more detail about the character's expression to make the mood clearer..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"></textarea>
+        </div>
+      </div>
+
+      <!-- Submit Section -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-12">
+        <p id="form-error" class="hidden text-sm font-medium text-red-500 mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+          <span id="form-error-text">Please complete all required fields.</span>
+        </p>
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700">
+          <span id="submit-label">Submit Pictionary Entry &#8594;</span>
+        </button>
+        <p class="text-center text-xs text-gray-400 font-medium mt-3">Results will be loaded to the teacher dashboard.</p>
+      </div>
+
+    </form>
+
+    <!-- OFFICIAL CLICHE LIST -->
+    <section class="border-t border-gray-200 pt-8">
+      <div class="text-center mb-6">
+        <h3 class="text-lg font-black text-gray-900">Guessing List &mdash; Official Clich&eacute;s &amp; Idioms</h3>
+        <p class="text-xs text-gray-500">Classmates can scan this list while viewing the AI-generated image</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="official-cliches-list">
+        <!-- Rendered dynamically by JS -->
+      </div>
+    </section>
+
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div id="success-screen"
+    class="hidden fixed inset-0 z-[90] bg-[#F9FAFB] flex items-center justify-center p-4">
+    <div class="text-center max-w-md bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+      <div class="w-20 h-20 mx-auto rounded-2xl mb-6 flex items-center justify-center bg-indigo-100 text-indigo-600 shadow-sm">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <div class="inline-block px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 bg-indigo-50 text-indigo-800">
+        Entry Saved!
+      </div>
+      <h2 class="text-3xl font-black text-gray-900 mb-3 tracking-tight">
+        Great work, <span id="success-name" class="text-indigo-600"></span>!
+      </h2>
+      <p class="text-gray-500 mb-8 leading-relaxed text-sm">
+        Your image prompt and results have been stored. Your teacher dashboard will show how well your prompt captured the clich&eacute;!
+      </p>
+      <a href="index.html"
+        class="inline-flex items-center gap-2 text-white font-black py-3.5 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm bg-gradient-to-r from-indigo-500 to-violet-600">
+        Return to Course Hub
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    /* SUPABASE CONFIG */
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+    const TABLE = 'introai_week03_ai_pictionary';
+
+    /* Cliches Roster */
+    const CLICHES = [
+      { emoji: '\u{1F327}\uFE0F', name: "It's raining cats and dogs", desc: 'Heavy rain described with falling pets.' },
+      { emoji: '\u{1F98B}', name: 'Break a leg', desc: 'Wishing someone good luck.' },
+      { emoji: '\u{1F526}', name: 'Bite the bullet', desc: 'Endure a painful or difficult situation.' },
+      { emoji: '\u{1F528}', name: 'Hit the nail on the head', desc: 'Exactly right or accurate.' },
+      { emoji: '\u{1F9B5}', name: 'Put your foot in your mouth', desc: 'Say something embarrassing or wrong.' },
+      { emoji: '\u{1F41D}', name: 'Have a bee in your bonnet', desc: 'Being obsessed with one particular thing.' },
+      { emoji: '\u{1F944}', name: 'Born with a silver spoon', desc: 'Born into wealth and privilege.' },
+      { emoji: '\u2615', name: 'Spill the beans', desc: 'Reveal a secret or surprise.' },
+      { emoji: '\u{1F431}', name: 'Let the cat out of the bag', desc: 'Accidentally reveal a secret.' },
+      { emoji: '\u{1F4B8}', name: 'Cost an arm and a leg', desc: 'Something very expensive.' },
+      { emoji: '\u{1F324}\uFE0F', name: 'Every cloud has a silver lining', desc: 'Every bad situation has a positive side.' },
+      { emoji: '\u{1F418}', name: 'Elephant in the room', desc: 'An obvious problem everyone is avoiding.' },
+    ];
+
+    /* State */
+    let studentName = '', studentEmail = '';
+    let selectedAITool = '';
+    let secretClicheDrawn = null;
+    let guessedOutcome = null;
+    let selections = { artStyle: '', lighting: '', setting: '', mood: '' };
+
+    /* INIT: DRAW CLICHES LIST */
+    (function initList() {
+      const el = document.getElementById('official-cliches-list');
+      el.innerHTML = CLICHES.map(c => `
+        <div class="cliche-card flex gap-3 p-3 bg-white border border-gray-200 rounded-xl">
+          <span class="text-2xl">${c.emoji}</span>
+          <div>
+            <p class="text-xs font-black text-gray-900">${esc(c.name)}</p>
+            <p class="text-[10px] text-gray-500">${esc(c.desc)}</p>
+          </div>
+        </div>
+      `).join('');
+    })();
+
+    /* SUPABASE */
+    async function supabaseInsert(payload) {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!resp.ok) { const t = await resp.text(); throw new Error(`HTTP ${resp.status}: ${t}`); }
+    }
+
+    /* REGISTRATION GATE */
+    function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+    async function handleRegistration(ev) {
+      ev.preventDefault();
+      const nameEl = document.getElementById('reg-name');
+      const emailEl = document.getElementById('reg-email');
+      const nameErr = document.getElementById('reg-name-error');
+      const emailErr = document.getElementById('reg-email-error');
+      let ok = true;
+
+      nameEl.classList.remove('error'); nameErr.classList.add('hidden');
+      emailEl.classList.remove('error'); emailErr.classList.add('hidden');
+
+      if (!nameEl.value.trim()) { nameEl.classList.add('error'); nameErr.classList.remove('hidden'); ok = false; }
+      if (!emailEl.value.trim() || !validateEmail(emailEl.value.trim())) { emailEl.classList.add('error'); emailErr.classList.remove('hidden'); ok = false; }
+      if (!ok) return;
+
+      const btn = document.getElementById('reg-submit-btn');
+      btn.disabled = true;
+      document.getElementById('reg-btn-label').innerHTML = '<span class="spinner"></span> Starting\u2026';
+
+      studentName = nameEl.value.trim();
+      studentEmail = emailEl.value.trim();
+      sessionStorage.setItem('introai_w03_ap_name', studentName);
+      sessionStorage.setItem('introai_w03_ap_email', studentEmail);
+
+      const overlay = document.getElementById('registration-overlay');
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.remove(), 450);
+    }
+
+    (function restoreSession() {
+      const n = sessionStorage.getItem('introai_w03_ap_name');
+      const e = sessionStorage.getItem('introai_w03_ap_email');
+      if (n && e) {
+        studentName = n;
+        studentEmail = e;
+        document.getElementById('registration-overlay').remove();
+      }
+    })();
+
+    /* DRAW SECRET CLICHE */
+    function drawSecretCliche() {
+      const idx = Math.floor(Math.random() * CLICHES.length);
+      secretClicheDrawn = CLICHES[idx];
+
+      document.getElementById('draw-panel').classList.add('hidden');
+      document.getElementById('secret-display').classList.remove('hidden');
+
+      document.getElementById('secret-emoji').textContent = secretClicheDrawn.emoji;
+      document.getElementById('secret-title').textContent = secretClicheDrawn.name;
+      hideCliche();
+      document.getElementById('cliche-error').classList.add('hidden');
+    }
+
+    function revealCliche() {
+      const card = document.getElementById('secret-card');
+      card.classList.remove('secret-box');
+      card.style.background = '#e0e7ff';
+      document.getElementById('reveal-tap-hint').classList.add('hidden');
+      document.getElementById('secret-content').classList.remove('hidden');
+    }
+
+    function hideCliche() {
+      const card = document.getElementById('secret-card');
+      card.className = 'secret-box w-full max-w-xs h-24 rounded-xl flex items-center justify-center cursor-pointer transition-all border border-indigo-300 shadow-sm relative overflow-hidden';
+      card.style.background = '';
+      document.getElementById('reveal-tap-hint').classList.remove('hidden');
+      document.getElementById('secret-content').classList.add('hidden');
+    }
+
+    /* OPTION SELECTORS */
+    const PICKER_MAP = {
+      artStyle: 'artstyle-picker',
+      lighting: 'lighting-picker',
+      setting:  'setting-picker',
+      mood:     'mood-picker'
+    };
+    const ERROR_MAP = {
+      artStyle: 'artstyle-error',
+      lighting: 'lighting-error',
+      setting:  'setting-error',
+      mood:     'mood-error'
+    };
+    const TAG_COLORS = {
+      artStyle: 'bg-indigo-100 text-indigo-800',
+      lighting: 'bg-amber-100 text-amber-800',
+      setting:  'bg-emerald-100 text-emerald-800',
+      mood:     'bg-rose-100 text-rose-800'
+    };
+    const TAG_LABELS = { artStyle: '\u{1F3A8}', lighting: '\u{1F4A1}', setting: '\u{1F3D9}', mood: '\u{1F600}' };
+
+    function setOption(field, value, btn) {
+      selections[field] = value;
+      document.querySelectorAll(`#${PICKER_MAP[field]} .opt-btn`).forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById(ERROR_MAP[field]).classList.add('hidden');
+      updatePromptPreview();
+    }
+
+    function updatePromptPreview() {
+      const box = document.getElementById('prompt-preview-box');
+      const tags = document.getElementById('prompt-preview-tags');
+      const filled = Object.values(selections).filter(Boolean);
+      if (filled.length === 0) { box.classList.add('hidden'); return; }
+      box.classList.remove('hidden');
+      tags.innerHTML = Object.entries(selections)
+        .filter(([, v]) => v)
+        .map(([k, v]) => `<span class="prompt-tag ${TAG_COLORS[k]}">${TAG_LABELS[k]} ${esc(v)}</span>`)
+        .join('');
+    }
+
+    function setAITool(val) {
+      selectedAITool = val;
+      document.querySelectorAll('#aitool-picker .opt-btn').forEach(b => {
+        b.classList.toggle('selected', b.textContent.trim().toLowerCase().includes(val.split('/')[0].toLowerCase()));
+      });
+      document.getElementById('aitool-error').classList.add('hidden');
+    }
+
+    function setGuessed(val) {
+      guessedOutcome = val;
+      document.getElementById('outcome-yes').style.cssText = val === true ? 'background:#eef2ff;border-color:#6366f1;color:#3730a3;font-weight:700;' : '';
+      document.getElementById('outcome-no').style.cssText = val === false ? 'background:#eef2ff;border-color:#6366f1;color:#3730a3;font-weight:700;' : '';
+      document.getElementById('reflection-container').classList.toggle('hidden', val !== false);
+      document.getElementById('guessed-error').classList.add('hidden');
+    }
+
+    /* SUBMIT EXERCISE */
+    async function submitExercise(ev) {
+      ev.preventDefault();
+      let ok = true;
+
+      if (!secretClicheDrawn) {
+        document.getElementById('cliche-error').classList.remove('hidden');
+        document.getElementById('draw-panel').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      Object.keys(selections).forEach(f => {
+        const hasVal = !!selections[f];
+        document.getElementById(ERROR_MAP[f]).classList.toggle('hidden', hasVal);
+        if (!hasVal) ok = false;
+      });
+
+      const pVal = document.getElementById('prompt-used').value.trim();
+      document.getElementById('prompt-error').classList.toggle('hidden', !!pVal);
+      if (!pVal) ok = false;
+
+      if (!selectedAITool) {
+        document.getElementById('aitool-error').classList.remove('hidden');
+        ok = false;
+      }
+
+      if (guessedOutcome === null) {
+        document.getElementById('guessed-error').classList.remove('hidden');
+        ok = false;
+      }
+
+      if (!ok) {
+        document.getElementById('form-error').classList.remove('hidden');
+        document.querySelector('[id$="-error"]:not(.hidden)')
+          ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      document.getElementById('form-error').classList.add('hidden');
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting\u2026';
+
+      const payload = {
+        student_name:  studentName,
+        student_email: studentEmail,
+        secret_cliche: secretClicheDrawn.name,
+        art_style:     selections.artStyle,
+        lighting:      selections.lighting,
+        setting:       selections.setting,
+        mood:          selections.mood,
+        prompt_used:   pVal,
+        ai_tool_used:  selectedAITool,
+        result_notes:  document.getElementById('result-notes').value.trim() || null,
+        was_guessed:   guessedOutcome,
+        reflection:    document.getElementById('reflection').value.trim() || null,
+        submitted_at:  new Date().toISOString()
+      };
+
+      try {
+        await supabaseInsert(payload);
+      } catch (err) {
+        console.error('[Week 3 AP] Supabase error:', err.message);
+        btn.disabled = false;
+        document.getElementById('submit-label').textContent = 'Submit Pictionary Entry \u2192';
+        document.getElementById('form-error-text').textContent = '\u26A0 Network error. Please try again or notify your teacher.';
+        document.getElementById('form-error').classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('success-name').textContent = studentName.split(' ')[0];
+      document.getElementById('success-screen').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function esc(str) {
+      return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+
+</body>
+
+</html>
