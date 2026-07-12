@@ -601,6 +601,10 @@
       background: var(--sky) !important;
     }
 
+    .clickable-row {
+      cursor: pointer;
+    }
+
     /* ── BADGES ───────────────────────────────────────────────────────────────── */
     .badge {
       display: inline-block;
@@ -1273,8 +1277,15 @@
     }
 
     @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.4;
+      }
     }
 
     /* ── CURRICULUM SELECTOR (segmented control) ── */
@@ -1282,7 +1293,7 @@
       padding: 12px 16px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
-    
+
     .curriculum-label {
       font-size: 9px;
       font-weight: 700;
@@ -1359,11 +1370,6 @@
       <button class="login-btn" id="login-btn" onclick="doLogin()">Sign In</button>
       <div class="login-error" id="login-error"></div>
 
-      <div class="config-note">
-        <strong>⚙ Setup required before first use</strong>
-        Replace <code>YOUR_SUPABASE_URL</code> and <code>YOUR_ANON_KEY</code> at the top of this file's script with your
-        project credentials.
-      </div>
     </div>
   </div>
 
@@ -1404,8 +1410,10 @@
         <div class="curriculum-picker">
           <span class="curriculum-label">Curriculum</span>
           <div class="curriculum-control">
-            <button type="button" id="curr-btn-comp" class="curr-btn active" onclick="switchCurriculum('comp-jr')">Comp Jr</button>
-            <button type="button" id="curr-btn-intro" class="curr-btn" onclick="switchCurriculum('intro-ai')">Intro to AI</button>
+            <button type="button" id="curr-btn-comp" class="curr-btn active" onclick="switchCurriculum('comp-jr')">Comp
+              Jr</button>
+            <button type="button" id="curr-btn-intro" class="curr-btn" onclick="switchCurriculum('intro-ai')">Intro to
+              AI</button>
           </div>
         </div>
 
@@ -1478,7 +1486,9 @@
             </button>
             <button class="nav-item" onclick="showPage('introai-creative-prompting')">
               <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-linecap="round" />
+                <path
+                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                  stroke-linecap="round" />
               </svg>
               W2 Ex1: Prompting
             </button>
@@ -1491,7 +1501,8 @@
             </button>
             <button class="nav-item" onclick="showPage('introai-co-writer-story')">
               <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                <path
+                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
               W2 Ex3: Story
             </button>
@@ -1505,7 +1516,9 @@
             </button>
             <button class="nav-item" onclick="showPage('introai-ai-pictionary')">
               <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M2 11l3-3a1 1 0 011.4 0L8 9.6m0 0l2-2a1 1 0 011.4 0L14 11M2 14h12a1 1 0 001-1V3a1 1 0 00-1-1H2a1 1 0 00-1 1v10a1 1 0 001 1zm7-9.5h.01" stroke-linecap="round" />
+                <path
+                  d="M2 11l3-3a1 1 0 011.4 0L8 9.6m0 0l2-2a1 1 0 011.4 0L14 11M2 14h12a1 1 0 001-1V3a1 1 0 00-1-1H2a1 1 0 00-1 1v10a1 1 0 001 1zm7-9.5h.01"
+                  stroke-linecap="round" />
               </svg>
               W3 Ex2: Pictionary
             </button>
@@ -1513,7 +1526,8 @@
             <div class="nav-section-label" style="margin-top:20px">Week 4 — Audio</div>
             <button class="nav-item" onclick="showPage('introai-music-generation')">
               <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                <path
+                  d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
               </svg>
               W4 Ex1: Music
             </button>
@@ -1668,7 +1682,8 @@
             <div class="header-actions">
               <button class="btn btn-secondary" onclick="loadAll()">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
                 </svg>
                 Refresh
               </button>
@@ -1711,7 +1726,8 @@
             <div class="header-actions">
               <button class="btn btn-secondary" onclick="loadAll()">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
                 </svg>
                 Refresh
               </button>
@@ -1747,7 +1763,8 @@
             <div class="header-actions">
               <button class="btn btn-secondary" onclick="loadAll()">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
                 </svg>
                 Refresh
               </button>
@@ -1804,7 +1821,8 @@
             <div class="header-actions">
               <button class="btn btn-secondary" onclick="loadAll()">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
                 </svg>
                 Refresh
               </button>
@@ -1842,7 +1860,8 @@
             <div class="header-actions">
               <button class="btn btn-secondary" onclick="loadAll()">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
                 </svg>
                 Refresh
               </button>
@@ -1889,7 +1908,8 @@
             <div class="header-actions">
               <button class="btn btn-secondary" onclick="loadAll()">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
                 </svg>
                 Refresh
               </button>
@@ -1938,7 +1958,9 @@
               </div>
             </div>
             <div id="sa-section-bars" style="padding:20px 20px 8px">
-              <div class="loading"><div class="spinner"></div><br>Loading…</div>
+              <div class="loading">
+                <div class="spinner"></div><br>Loading…
+              </div>
             </div>
           </div>
 
@@ -1951,7 +1973,9 @@
               <span class="text-small text-muted" id="sa-count"></span>
             </div>
             <div id="sa-table-wrap">
-              <div class="loading"><div class="spinner"></div><br>Loading self-assessment data…</div>
+              <div class="loading">
+                <div class="spinner"></div><br>Loading self-assessment data…
+              </div>
             </div>
           </div>
         </div>
@@ -1966,13 +1990,15 @@
             <div class="header-actions">
               <button class="btn btn-secondary" onclick="loadAll()">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
                 </svg>
                 Refresh
               </button>
               <button class="btn btn-mint" onclick="exportCSV('sh')">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
                 </svg>
                 Export CSV
               </button>
@@ -2010,7 +2036,9 @@
               <span class="text-small text-muted" id="sh-count"></span>
             </div>
             <div id="sh-table-wrap">
-              <div class="loading"><div class="spinner"></div><br>Loading scavenger hunt data…</div>
+              <div class="loading">
+                <div class="spinner"></div><br>Loading scavenger hunt data…
+              </div>
             </div>
           </div>
         </div>
@@ -2025,13 +2053,15 @@
             <div class="header-actions">
               <button class="btn btn-secondary" onclick="loadAll()">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
                 </svg>
                 Refresh
               </button>
               <button class="btn btn-mint" onclick="exportCSV('cb')">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
                 </svg>
                 Export CSV
               </button>
@@ -2072,7 +2102,9 @@
               </div>
             </div>
             <div id="cb-breakdown" style="padding:20px 20px 8px">
-              <div class="loading"><div class="spinner"></div><br>Loading…</div>
+              <div class="loading">
+                <div class="spinner"></div><br>Loading…
+              </div>
             </div>
           </div>
 
@@ -2081,8 +2113,12 @@
               <label>Chatbot:</label>
               <select class="filter-select" id="cb-filter-bot" onchange="renderCBTable()">
                 <option value="">All</option>
-                <option>ChatGPT</option><option>Gemini</option><option>Claude</option>
-                <option>Copilot</option><option>Perplexity</option><option>Other</option>
+                <option>ChatGPT</option>
+                <option>Gemini</option>
+                <option>Claude</option>
+                <option>Copilot</option>
+                <option>Perplexity</option>
+                <option>Other</option>
               </select>
               <label>Accuracy:</label>
               <select class="filter-select" id="cb-filter-acc" onchange="renderCBTable()">
@@ -2097,7 +2133,9 @@
               <span class="text-small text-muted" id="cb-count"></span>
             </div>
             <div id="cb-table-wrap">
-              <div class="loading"><div class="spinner"></div><br>Loading chatbot data…</div>
+              <div class="loading">
+                <div class="spinner"></div><br>Loading chatbot data…
+              </div>
             </div>
           </div>
         </div>
@@ -2112,13 +2150,15 @@
             <div class="header-actions">
               <button class="btn btn-secondary" onclick="loadAll()">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
                 </svg>
                 Refresh
               </button>
               <button class="btn btn-mint" onclick="exportCSV('cp')">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
                 </svg>
                 Export CSV
               </button>
@@ -2159,7 +2199,9 @@
               </div>
             </div>
             <div id="cp-constraint-bars" style="padding:20px 20px 8px">
-              <div class="loading"><div class="spinner"></div><br>Loading…</div>
+              <div class="loading">
+                <div class="spinner"></div><br>Loading…
+              </div>
             </div>
           </div>
 
@@ -2168,8 +2210,11 @@
               <label>Chatbot:</label>
               <select class="filter-select" id="cp-filter-bot" onchange="renderCPTable()">
                 <option value="">All</option>
-                <option>ChatGPT</option><option>Gemini</option><option>Claude</option>
-                <option>Copilot</option><option>Other</option>
+                <option>ChatGPT</option>
+                <option>Gemini</option>
+                <option>Claude</option>
+                <option>Copilot</option>
+                <option>Other</option>
               </select>
               <label>Failed Constraints?</label>
               <select class="filter-select" id="cp-filter-failed" onchange="renderCPTable()">
@@ -2183,7 +2228,9 @@
               <span class="text-small text-muted" id="cp-count"></span>
             </div>
             <div id="cp-table-wrap">
-              <div class="loading"><div class="spinner"></div><br>Loading creative prompting data…</div>
+              <div class="loading">
+                <div class="spinner"></div><br>Loading creative prompting data…
+              </div>
             </div>
           </div>
         </div>
@@ -2198,13 +2245,15 @@
             <div class="header-actions">
               <button class="btn btn-secondary" onclick="loadAll()">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
                 </svg>
                 Refresh
               </button>
               <button class="btn btn-mint" onclick="exportCSV('pd')">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
                 </svg>
                 Export CSV
               </button>
@@ -2245,7 +2294,9 @@
               </div>
             </div>
             <div id="pd-persona-bars" style="padding:20px 20px 8px">
-              <div class="loading"><div class="spinner"></div><br>Loading…</div>
+              <div class="loading">
+                <div class="spinner"></div><br>Loading…
+              </div>
             </div>
           </div>
 
@@ -2254,8 +2305,11 @@
               <label>Chatbot:</label>
               <select class="filter-select" id="pd-filter-bot" onchange="renderPDTable()">
                 <option value="">All</option>
-                <option>ChatGPT</option><option>Gemini</option><option>Claude</option>
-                <option>Copilot</option><option>Other</option>
+                <option>ChatGPT</option>
+                <option>Gemini</option>
+                <option>Claude</option>
+                <option>Copilot</option>
+                <option>Other</option>
               </select>
               <label>Outcome:</label>
               <select class="filter-select" id="pd-filter-guessed" onchange="renderPDTable()">
@@ -2269,7 +2323,9 @@
               <span class="text-small text-muted" id="pd-count"></span>
             </div>
             <div id="pd-table-wrap">
-              <div class="loading"><div class="spinner"></div><br>Loading persona detective data…</div>
+              <div class="loading">
+                <div class="spinner"></div><br>Loading persona detective data…
+              </div>
             </div>
           </div>
         </div>
@@ -2284,13 +2340,15 @@
             <div class="header-actions">
               <button class="btn btn-secondary" onclick="loadAll()">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
                 </svg>
                 Refresh
               </button>
               <button class="btn btn-mint" onclick="exportCSV('ws')">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
                 </svg>
                 Export CSV
               </button>
@@ -2317,14 +2375,16 @@
                 <option value="">— Loading classes… —</option>
               </select>
             </div>
-            
+
             <div class="panel-header" style="margin-top:20px;border-top:1px solid var(--border);padding-top:20px">
               <div class="panel-title">
                 📖 Story Editor &amp; Reorder Management
               </div>
             </div>
             <div id="ws-story-editor-wrap" style="padding-top:15px">
-              <div class="loading"><div class="spinner"></div><br>Select a class to manage its storybook…</div>
+              <div class="loading">
+                <div class="spinner"></div><br>Select a class to manage its storybook…
+              </div>
             </div>
           </div>
         </div>
@@ -2339,13 +2399,15 @@
             <div class="header-actions">
               <button class="btn btn-secondary" onclick="loadAll()">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
                 </svg>
                 Refresh
               </button>
               <button class="btn btn-mint" onclick="exportCSV('pc')">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
                 </svg>
                 Export CSV
               </button>
@@ -2380,8 +2442,10 @@
               <label>Tool:</label>
               <select class="filter-select" id="pc-filter-tool" onchange="renderPCTable()">
                 <option value="">All</option>
-                <option>ChatGPT/DALL-E</option><option>Gemini</option>
-                <option>Adobe Firefly</option><option>Other</option>
+                <option>ChatGPT/DALL-E</option>
+                <option>Gemini</option>
+                <option>Adobe Firefly</option>
+                <option>Other</option>
               </select>
               <label>Search:</label>
               <input class="search-input" id="pc-search" type="text" placeholder="Student or prompt&hellip;"
@@ -2389,7 +2453,9 @@
               <span class="text-small text-muted" id="pc-count"></span>
             </div>
             <div id="pc-table-wrap">
-              <div class="loading"><div class="spinner"></div><br>Loading Prompt Comparison data&hellip;</div>
+              <div class="loading">
+                <div class="spinner"></div><br>Loading Prompt Comparison data&hellip;
+              </div>
             </div>
           </div>
         </div>
@@ -2404,13 +2470,15 @@
             <div class="header-actions">
               <button class="btn btn-secondary" onclick="loadAll()">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
                 </svg>
                 Refresh
               </button>
               <button class="btn btn-mint" onclick="exportCSV('ap')">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
                 </svg>
                 Export CSV
               </button>
@@ -2445,8 +2513,11 @@
               <label>Tool:</label>
               <select class="filter-select" id="ap-filter-tool" onchange="renderAPTable()">
                 <option value="">All</option>
-                <option>ChatGPT/DALL-E</option><option>Gemini</option>
-                <option>Adobe Firefly</option><option>Midjourney</option><option>Other</option>
+                <option>ChatGPT/DALL-E</option>
+                <option>Gemini</option>
+                <option>Adobe Firefly</option>
+                <option>Midjourney</option>
+                <option>Other</option>
               </select>
               <label>Outcome:</label>
               <select class="filter-select" id="ap-filter-guessed" onchange="renderAPTable()">
@@ -2460,7 +2531,9 @@
               <span class="text-small text-muted" id="ap-count"></span>
             </div>
             <div id="ap-table-wrap">
-              <div class="loading"><div class="spinner"></div><br>Loading AI Pictionary data&hellip;</div>
+              <div class="loading">
+                <div class="spinner"></div><br>Loading AI Pictionary data&hellip;
+              </div>
             </div>
           </div>
         </div>
@@ -2475,13 +2548,15 @@
             <div class="header-actions">
               <button class="btn btn-secondary" onclick="loadAll()">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
                 </svg>
                 Refresh
               </button>
               <button class="btn btn-mint" onclick="exportCSV('mg')">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
                 </svg>
                 Export CSV
               </button>
@@ -2521,7 +2596,9 @@
               <span class="text-small text-muted" id="mg-count"></span>
             </div>
             <div id="mg-table-wrap">
-              <div class="loading"><div class="spinner"></div><br>Loading Music Generation data&hellip;</div>
+              <div class="loading">
+                <div class="spinner"></div><br>Loading Music Generation data&hellip;
+              </div>
             </div>
           </div>
         </div>
@@ -2536,13 +2613,15 @@
             <div class="header-actions">
               <button class="btn btn-secondary" onclick="loadAll()">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
                 </svg>
                 Refresh
               </button>
               <button class="btn btn-mint" onclick="exportCSV('is')">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                  <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
                 </svg>
                 Export CSV
               </button>
@@ -2582,7 +2661,9 @@
               <span class="text-small text-muted" id="is-count"></span>
             </div>
             <div id="is-table-wrap">
-              <div class="loading"><div class="spinner"></div><br>Loading Instrument Swap data&hellip;</div>
+              <div class="loading">
+                <div class="spinner"></div><br>Loading Instrument Swap data&hellip;
+              </div>
             </div>
           </div>
         </div>
@@ -2739,33 +2820,33 @@
           sb.from('introai_week04_instrument_swap').select('*').order('submitted_at', { ascending: false }).limit(10000)
         ]);
 
-        if (hw.error)   { console.error('hw error:', hw.error);       toast('⚠ Homework load error: '       + hw.error.message); }
-        if (exam.error) { console.error('exam error:', exam.error);   toast('⚠ Exam load error: '          + exam.error.message); }
-        if (codes.error){ console.error('codes error:', codes.error); toast('⚠ Codes load error: '         + codes.error.message); }
-        if (sa.error)   { console.error('sa error:', sa.error);       toast('⚠ Self-assessment error: '    + sa.error.message); }
-        if (sh.error)   { console.error('sh error:', sh.error);       toast('⚠ Scavenger hunt error: '     + sh.error.message); }
-        if (cb.error)   { console.error('cb error:', cb.error);       toast('⚠ Chatbots error: '           + cb.error.message); }
-        if (cp.error)   { console.error('cp error:', cp.error);       toast('⚠ Creative prompting error: ' + cp.error.message); }
-        if (pd.error)   { console.error('pd error:', pd.error);       toast('⚠ Persona detective error: '  + pd.error.message); }
-        if (ws.error)   { console.error('ws error:', ws.error);       toast('\u26A0 Co-writer story error: '     + ws.error.message); }
-        if (ap.error)   { console.error('ap error:', ap.error);       toast('\u26A0 AI Pictionary error: '        + ap.error.message); }
-        if (pc.error)   { console.error('pc error:', pc.error);       toast('\u26A0 Prompt comparison error: '    + pc.error.message); }
-        if (mg.error)   { console.error('mg error:', mg.error);       toast('\u26A0 Music generation error: '    + mg.error.message); }
-        if (isSwap.error) { console.error('isSwap error:', isSwap.error); toast('\u26A0 Instrument swap error: '    + isSwap.error.message); }
+        if (hw.error) { console.error('hw error:', hw.error); toast('⚠ Homework load error: ' + hw.error.message); }
+        if (exam.error) { console.error('exam error:', exam.error); toast('⚠ Exam load error: ' + exam.error.message); }
+        if (codes.error) { console.error('codes error:', codes.error); toast('⚠ Codes load error: ' + codes.error.message); }
+        if (sa.error) { console.error('sa error:', sa.error); toast('⚠ Self-assessment error: ' + sa.error.message); }
+        if (sh.error) { console.error('sh error:', sh.error); toast('⚠ Scavenger hunt error: ' + sh.error.message); }
+        if (cb.error) { console.error('cb error:', cb.error); toast('⚠ Chatbots error: ' + cb.error.message); }
+        if (cp.error) { console.error('cp error:', cp.error); toast('⚠ Creative prompting error: ' + cp.error.message); }
+        if (pd.error) { console.error('pd error:', pd.error); toast('⚠ Persona detective error: ' + pd.error.message); }
+        if (ws.error) { console.error('ws error:', ws.error); toast('\u26A0 Co-writer story error: ' + ws.error.message); }
+        if (ap.error) { console.error('ap error:', ap.error); toast('\u26A0 AI Pictionary error: ' + ap.error.message); }
+        if (pc.error) { console.error('pc error:', pc.error); toast('\u26A0 Prompt comparison error: ' + pc.error.message); }
+        if (mg.error) { console.error('mg error:', mg.error); toast('\u26A0 Music generation error: ' + mg.error.message); }
+        if (isSwap.error) { console.error('isSwap error:', isSwap.error); toast('\u26A0 Instrument swap error: ' + isSwap.error.message); }
 
-        hwData    = hw.data    || [];
-        examData  = exam.data  || [];
+        hwData = hw.data || [];
+        examData = exam.data || [];
         codesData = codes.data || [];
-        saData    = sa.data    || [];
-        shData    = sh.data    || [];
-        cbData    = cb.data    || [];
-        cpData    = cp.data    || [];
-        pdData    = pd.data    || [];
-        wsData    = ws.data    || [];
-        apData    = ap.data    || [];
-        pcData    = pc.data    || [];
-        mgData    = mg.data    || [];
-        isData    = isSwap.data || [];
+        saData = sa.data || [];
+        shData = sh.data || [];
+        cbData = cb.data || [];
+        cpData = cp.data || [];
+        pdData = pd.data || [];
+        wsData = ws.data || [];
+        apData = ap.data || [];
+        pcData = pc.data || [];
+        mgData = mg.data || [];
+        isData = isSwap.data || [];
 
         console.log(`Loaded: ${hwData.length} hw, ${examData.length} exam, ${codesData.length} codes, ${saData.length} SA, ${shData.length} SH, ${cbData.length} CB, ${cpData.length} CP, ${pdData.length} PD, ${wsData.length} WS, ${apData.length} AP, ${pcData.length} PC, ${mgData.length} MG, ${isData.length} IS rows`);
 
@@ -2976,7 +3057,7 @@
       <th>Submitted</th><th>Access Code</th>
     </tr></thead>
     <tbody>
-      ${rows.map(r => `<tr>
+      ${rows.map(r => `<tr class="clickable-row" onclick="showSubmissionDetail('hw', ${r.id})">
         <td><strong>${esc(r.student_name)}</strong></td>
         <td><span class="badge badge-gray">${esc(r.cohort || '—')}</span></td>
         <td><span class="badge badge-teal">Class ${r.class_number}</span></td>
@@ -3073,14 +3154,14 @@
         <th>Performance</th><th>Submitted</th><th>Detail</th>
       </tr></thead>
       <tbody>
-        ${rows.map(r => `<tr>
+        ${rows.map(r => `<tr class="clickable-row" onclick="openExamModal('${r.id}')">
           <td><strong>${esc(r.student_name)}</strong></td>
           <td>${scoreBadge(r.auto_score)}</td>
           <td class="text-mono">${r.mcq_score ?? '—'}</td>
           <td class="text-mono">${r.blank_score ?? '—'}</td>
           <td>${scoreBar(r.auto_score)}</td>
           <td class="text-small text-muted text-mono">${fmtDate(r.submitted_at)}</td>
-          <td><button class="btn btn-secondary" style="padding:5px 10px;font-size:11px" onclick="openExamModal('${r.id}')">View</button></td>
+          <td><button class="btn btn-secondary" style="padding:5px 10px;font-size:11px" onclick="event.stopPropagation();openExamModal('${r.id}')">View</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -3290,6 +3371,105 @@
       }
     }
 
+    function showSubmissionDetail(type, id) {
+      let r;
+      let title = "";
+      if (type === 'hw') {
+        r = hwData.find(x => x.id === id);
+        title = "Homework Submission Detail";
+      } else if (type === 'exam') {
+        r = examData.find(x => x.id === id);
+        title = "Exam Result Detail";
+      } else if (type === 'sa') {
+        r = saData.find(x => x.id === id);
+        title = "Self-Assessment Detail";
+      } else if (type === 'sh') {
+        r = shData.find(x => x.id === id);
+        title = "Scavenger Hunt Detail";
+      } else if (type === 'cb') {
+        r = cbData.find(x => x.id === id);
+        title = "Chatbot Exercise Detail";
+      } else if (type === 'cp') {
+        r = cpData.find(x => x.id === id);
+        title = "Creative Prompting Detail";
+      } else if (type === 'pd') {
+        r = pdData.find(x => x.id === id);
+        title = "Persona Detective Detail";
+      } else if (type === 'ws') {
+        r = wsData.find(x => x.id === id);
+        title = "Co-Writer Story Detail";
+      } else if (type === 'ap') {
+        r = apData.find(x => x.id === id);
+        title = "AI Pictionary Detail";
+      } else if (type === 'pc') {
+        r = pcData.find(x => x.id === id);
+        title = "Prompt Comparison Detail";
+      } else if (type === 'mg') {
+        r = mgData.find(x => x.id === id);
+        title = "Music Generation Detail";
+      } else if (type === 'is') {
+        r = isData.find(x => x.id === id);
+        title = "Instrument Swap Detail";
+      }
+
+      if (!r) return;
+
+      document.getElementById('modal-title').textContent = esc(r.student_name || "Detail View") + " — " + title;
+
+      const keys = Object.keys(r);
+      const filtered = keys.filter(k => k !== 'id');
+
+      let bodyHtml = `<div style="padding: 20px;">
+        <table class="data-table" style="width: 100%; border-collapse: collapse; border: 1px solid var(--border);">
+          <thead>
+            <tr>
+              <th style="width: 30%; background:var(--navy); color:#fff; font-size:11px; padding:10px 14px;">Field</th>
+              <th style="background:var(--navy); color:#fff; font-size:11px; padding:10px 14px;">Value</th>
+            </tr>
+          </thead>
+          <tbody>`;
+
+      filtered.forEach(k => {
+        let val = r[k];
+        let displayVal = "";
+        
+        if (val === null || val === undefined) {
+          displayVal = `<span style="color:var(--gray)">—</span>`;
+        } else if (typeof val === 'boolean') {
+          displayVal = val ? `<span class="badge badge-green">True</span>` : `<span class="badge badge-red">False</span>`;
+        } else if (typeof val === 'number') {
+          displayVal = esc(val.toString());
+        } else if (typeof val === 'string' && (val.startsWith('http://') || val.startsWith('https://'))) {
+          const lowerVal = val.toLowerCase();
+          const isImg = lowerVal.endsWith('.png') || lowerVal.endsWith('.jpg') || lowerVal.endsWith('.jpeg') || lowerVal.endsWith('.webp') || lowerVal.endsWith('.gif') || lowerVal.includes('supabase.co/storage/v1/object/public/introai-uploads/');
+          
+          if (isImg) {
+            displayVal = `<a href="${esc(val)}" target="_blank" style="display:inline-block; margin-bottom:8px;"><img src="${esc(val)}" style="max-width:240px; max-height:160px; border-radius:8px; border:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,0.1);" /></a><br><a href="${esc(val)}" target="_blank" style="color:var(--teal); font-weight:600; font-size:11px;">View Full Image ↗</a>`;
+          } else {
+            displayVal = `<a href="${esc(val)}" target="_blank" style="color:var(--teal); font-weight:600; font-size:11px;">${esc(val)} ↗</a>`;
+          }
+        } else {
+          displayVal = `<div style="white-space: pre-wrap; font-size:13px; line-height:1.5; color:#1e293b">${esc(String(val))}</div>`;
+        }
+
+        const label = k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+        bodyHtml += `
+          <tr style="border-bottom: 1px solid var(--border);">
+            <td style="padding: 10px 14px; font-weight: 600; font-size: 11px; text-transform: uppercase; color: var(--gray); letter-spacing: 0.5px; vertical-align: top;">${esc(label)}</td>
+            <td style="padding: 10px 14px; vertical-align: top;">${displayVal}</td>
+          </tr>`;
+      });
+
+      bodyHtml += `
+          </tbody>
+        </table>
+      </div>`;
+
+      document.getElementById('modal-body').innerHTML = bodyHtml;
+      document.getElementById('modal-overlay').classList.add('open');
+    }
+
     // ════════════════════════════════════════════════════════════════════════════
     // CSV EXPORT
     // ════════════════════════════════════════════════════════════════════════════
@@ -3370,19 +3550,19 @@
     // INTRO TO AI — SELF-ASSESSMENT
     // ════════════════════════════════════════════════════════════════════════════
     const SA_SECTIONS = [
-      { key: 'avg_section_a', label: 'A — What is AI?',            color: '#6366f1' },
-      { key: 'avg_section_b', label: 'B — ML & Data',              color: '#7c3aed' },
-      { key: 'avg_section_c', label: 'C — Responsible AI',         color: '#059669' },
-      { key: 'avg_section_d', label: 'D — Working with AI Tools',  color: '#d97706' },
-      { key: 'avg_section_e', label: 'E — AI & Society',           color: '#e11d48' },
+      { key: 'avg_section_a', label: 'A — What is AI?', color: '#6366f1' },
+      { key: 'avg_section_b', label: 'B — ML & Data', color: '#7c3aed' },
+      { key: 'avg_section_c', label: 'C — Responsible AI', color: '#059669' },
+      { key: 'avg_section_d', label: 'D — Working with AI Tools', color: '#d97706' },
+      { key: 'avg_section_e', label: 'E — AI & Society', color: '#e11d48' },
     ];
 
     function renderSAPage() {
       if (!saData.length) {
         document.getElementById('sa-stat-count').textContent = '0';
-        document.getElementById('sa-stat-avg').textContent   = '—';
-        document.getElementById('sa-stat-best').textContent  = '—';
-        document.getElementById('sa-stat-weak').textContent  = '—';
+        document.getElementById('sa-stat-avg').textContent = '—';
+        document.getElementById('sa-stat-best').textContent = '—';
+        document.getElementById('sa-stat-weak').textContent = '—';
         document.getElementById('sa-section-bars').innerHTML = '<p style="color:var(--gray);font-size:13px;padding:4px 0">No submissions yet.</p>';
         renderSATable();
         return;
@@ -3465,7 +3645,7 @@
       </thead>
       <tbody>
         ${rows.map(r => `
-        <tr>
+        <tr class="clickable-row" onclick="showSubmissionDetail('sa', ${r.id})">
           <td>${esc(r.student_name)}</td>
           <td style="font-size:11px;color:var(--gray)">${esc(r.student_email)}</td>
           <td>${ratingBadge(r.avg_section_a)}</td>
@@ -3482,7 +3662,7 @@
 
     function exportSelfAssessmentCSV() {
       if (!saData.length) { toast('No data to export'); return; }
-      const headers = ['student_name','student_email','q1','q2','q3','q4','q5','q6','q7','q8','q9','q10','q11','q12','q13','q14','q15','avg_a','avg_b','avg_c','avg_d','avg_e','overall_avg','submitted_at'];
+      const headers = ['student_name', 'student_email', 'q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8', 'q9', 'q10', 'q11', 'q12', 'q13', 'q14', 'q15', 'avg_a', 'avg_b', 'avg_c', 'avg_d', 'avg_e', 'overall_avg', 'submitted_at'];
       const rows = saData.map(r => [
         r.student_name, r.student_email,
         r.q1_explain_ai, r.q2_rule_vs_ai, r.q3_real_world_apps,
@@ -3504,14 +3684,14 @@
     // INTRO TO AI — SCAVENGER HUNT (Ex 1)
     // ════════════════════════════════════════════════════════════════════════════
     const CAT_LABELS = {
-      social_media:'Social Media', streaming:'Streaming', search:'Search',
-      navigation:'Navigation', shopping:'Shopping', messaging:'Messaging',
-      gaming:'Gaming', productivity:'Productivity', health_fitness:'Health & Fitness', other:'Other'
+      social_media: 'Social Media', streaming: 'Streaming', search: 'Search',
+      navigation: 'Navigation', shopping: 'Shopping', messaging: 'Messaging',
+      gaming: 'Gaming', productivity: 'Productivity', health_fitness: 'Health & Fitness', other: 'Other'
     };
 
     function renderSHPage() {
       if (!shData.length) {
-        ['sh-stat-count','sh-stat-avg-instances','sh-stat-top-cat','sh-stat-surprised'].forEach(id => {
+        ['sh-stat-count', 'sh-stat-avg-instances', 'sh-stat-top-cat', 'sh-stat-surprised'].forEach(id => {
           document.getElementById(id).textContent = '0';
         });
         renderSHTable();
@@ -3525,7 +3705,7 @@
       // Most common category
       const catCounts = {};
       shData.forEach(r => { if (r.tool_category) catCounts[r.tool_category] = (catCounts[r.tool_category] || 0) + 1; });
-      const topCat = Object.entries(catCounts).sort((a,b) => b[1]-a[1])[0];
+      const topCat = Object.entries(catCounts).sort((a, b) => b[1] - a[1])[0];
       document.getElementById('sh-stat-top-cat').textContent = topCat ? (CAT_LABELS[topCat[0]] || topCat[0]) : '—';
 
       const surprised = shData.filter(r => r.surprised === 'yes').length;
@@ -3550,7 +3730,7 @@
 
       function surprisedBadge(v) {
         if (!v) return '<span style="color:var(--gray)">—</span>';
-        const map = { yes:'#d1fae5:#065f46:😲 Yes', somewhat:'#fef9c3:#713f12:🤔 Somewhat', no:'#f3f4f6:#374151:😐 No' };
+        const map = { yes: '#d1fae5:#065f46:😲 Yes', somewhat: '#fef9c3:#713f12:🤔 Somewhat', no: '#f3f4f6:#374151:😐 No' };
         const parts = (map[v] || '#f3f4f6:#374151:' + v).split(':');
         return `<span style="padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;background:${parts[0]};color:${parts[1]}">${parts[2]}</span>`;
       }
@@ -3564,7 +3744,7 @@
       </thead>
       <tbody>
         ${rows.map(r => `
-        <tr>
+        <tr class="clickable-row" onclick="showSubmissionDetail('sh', ${r.id})">
           <td>${esc(r.student_name)}</td>
           <td><strong>${esc(r.tool_name)}</strong></td>
           <td style="font-size:11px;color:var(--gray)">${esc(CAT_LABELS[r.tool_category] || r.tool_category || '—')}</td>
@@ -3572,11 +3752,11 @@
           <td>${surprisedBadge(r.surprised)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
         </tr>
-        <tr style="background:#fafafa;border-top:none">
+        <tr class="clickable-row" onclick="showSubmissionDetail('sh', ${r.id})" style="background:#fafafa;border-top:none">
           <td colspan="6" style="padding:8px 16px 12px;font-size:11px;color:#64748b;line-height:1.6">
-            ${[1,2,3,4,5].filter(i => r['ai_instance_'+i]).map((i,idx) =>
-              `<span style="font-weight:600;color:#475569">${idx+1}.</span> ${esc(r['ai_instance_'+i])}`
-            ).join(' &nbsp;·&nbsp; ')}
+            ${[1, 2, 3, 4, 5].filter(i => r['ai_instance_' + i]).map((i, idx) =>
+        `<span style="font-weight:600;color:#475569">${idx + 1}.</span> ${esc(r['ai_instance_' + i])}`
+      ).join(' &nbsp;·&nbsp; ')}
           </td>
         </tr>`).join('')}
       </tbody>
@@ -3588,7 +3768,7 @@
     // ════════════════════════════════════════════════════════════════════════════
     function renderCBPage() {
       if (!cbData.length) {
-        ['cb-stat-count','cb-stat-top-bot','cb-stat-impression','cb-stat-accurate'].forEach(id =>
+        ['cb-stat-count', 'cb-stat-top-bot', 'cb-stat-impression', 'cb-stat-accurate'].forEach(id =>
           document.getElementById(id).textContent = '0');
         document.getElementById('cb-breakdown').innerHTML = '<p style="color:var(--gray);font-size:13px">No submissions yet.</p>';
         renderCBTable();
@@ -3599,12 +3779,12 @@
       // Most used chatbot
       const botCounts = {};
       cbData.forEach(r => { botCounts[r.chatbot_used] = (botCounts[r.chatbot_used] || 0) + 1; });
-      const topBot = Object.entries(botCounts).sort((a,b) => b[1]-a[1])[0];
+      const topBot = Object.entries(botCounts).sort((a, b) => b[1] - a[1])[0];
       document.getElementById('cb-stat-top-bot').textContent = topBot ? topBot[0] : '—';
 
       // Avg impression
       const withImp = cbData.filter(r => r.overall_impression);
-      const avgImp = withImp.length ? (withImp.reduce((s,r) => s + r.overall_impression, 0) / withImp.length).toFixed(2) : '—';
+      const avgImp = withImp.length ? (withImp.reduce((s, r) => s + r.overall_impression, 0) / withImp.length).toFixed(2) : '—';
       document.getElementById('cb-stat-impression').textContent = avgImp;
 
       // Accurate count
@@ -3612,12 +3792,12 @@
       document.getElementById('cb-stat-accurate').textContent = accurate + ' / ' + cbData.length;
 
       // Breakdown bars
-      const bots = ['ChatGPT','Gemini','Claude','Copilot','Perplexity','Other'];
-      const botColors = { ChatGPT:'#10b981', Gemini:'#6366f1', Claude:'#f59e0b', Copilot:'#3b82f6', Perplexity:'#8b5cf6', Other:'#94a3b8' };
+      const bots = ['ChatGPT', 'Gemini', 'Claude', 'Copilot', 'Perplexity', 'Other'];
+      const botColors = { ChatGPT: '#10b981', Gemini: '#6366f1', Claude: '#f59e0b', Copilot: '#3b82f6', Perplexity: '#8b5cf6', Other: '#94a3b8' };
       const breakdownEl = document.getElementById('cb-breakdown');
       if (Object.keys(botCounts).length) {
         const max = Math.max(...Object.values(botCounts));
-        breakdownEl.innerHTML = Object.entries(botCounts).sort((a,b) => b[1]-a[1]).map(([bot, count]) => {
+        breakdownEl.innerHTML = Object.entries(botCounts).sort((a, b) => b[1] - a[1]).map(([bot, count]) => {
           const pct = (count / max) * 100;
           const color = botColors[bot] || '#94a3b8';
           const accCount = cbData.filter(r => r.chatbot_used === bot && r.t2_accuracy === 'accurate').length;
@@ -3625,7 +3805,7 @@
           return `<div style="margin-bottom:14px">
             <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px">
               <span style="font-size:12px;font-weight:600;color:var(--navy)">${esc(bot)}</span>
-              <span style="font-size:11px;color:var(--gray)">${count} student${count!==1?'s':''} · ✅ ${accCount} accurate · 🟡 ${partCount} partial</span>
+              <span style="font-size:11px;color:var(--gray)">${count} student${count !== 1 ? 's' : ''} · ✅ ${accCount} accurate · 🟡 ${partCount} partial</span>
             </div>
             <div style="height:8px;background:var(--border);border-radius:99px;overflow:hidden">
               <div style="height:100%;width:${pct.toFixed(1)}%;background:${color};border-radius:99px;transition:width 0.5s ease"></div>
@@ -3640,12 +3820,12 @@
     }
 
     function renderCBTable() {
-      const search  = (document.getElementById('cb-search')?.value || '').toLowerCase();
+      const search = (document.getElementById('cb-search')?.value || '').toLowerCase();
       const botFilt = document.getElementById('cb-filter-bot')?.value || '';
       const accFilt = document.getElementById('cb-filter-acc')?.value || '';
 
       const rows = cbData.filter(r =>
-        (!search  || (r.student_name || '').toLowerCase().includes(search)) &&
+        (!search || (r.student_name || '').toLowerCase().includes(search)) &&
         (!botFilt || r.chatbot_used === botFilt) &&
         (!accFilt || r.t2_accuracy === accFilt)
       );
@@ -3659,9 +3839,9 @@
       function accBadge(v) {
         if (!v) return '<span style="color:var(--gray)">—</span>';
         const map = {
-          accurate:'#d1fae5:#065f46:✅ Accurate',
-          partially_accurate:'#fef9c3:#713f12:🟡 Partial',
-          inaccurate:'#fee2e2:#991b1b:❌ Wrong'
+          accurate: '#d1fae5:#065f46:✅ Accurate',
+          partially_accurate: '#fef9c3:#713f12:🟡 Partial',
+          inaccurate: '#fee2e2:#991b1b:❌ Wrong'
         };
         const parts = (map[v] || '#f3f4f6:#374151:' + v).split(':');
         return `<span style="padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;background:${parts[0]};color:${parts[1]}">${parts[2]}</span>`;
@@ -3669,7 +3849,7 @@
 
       function impBadge(v) {
         if (!v) return '<span style="color:var(--gray)">—</span>';
-        const colors = ['','#fee2e2:#991b1b','#fef9c3:#713f12','#fef9c3:#713f12','#d1fae5:#065f46','#d1fae5:#065f46'];
+        const colors = ['', '#fee2e2:#991b1b', '#fef9c3:#713f12', '#fef9c3:#713f12', '#d1fae5:#065f46', '#d1fae5:#065f46'];
         const parts = colors[v].split(':');
         return `<span style="padding:2px 8px;border-radius:6px;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;background:${parts[0]};color:${parts[1]}">${v}/5</span>`;
       }
@@ -3686,7 +3866,7 @@
         <tr onclick="showCBDetail(${r.id})" style="cursor:pointer" title="Click to see full responses">
           <td>${esc(r.student_name)}<br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
           <td style="font-weight:600">${esc(r.chatbot_used)}</td>
-          <td style="font-size:11px">${esc(r.t1_comparison?.replace(/_/g,' ') || '—')}</td>
+          <td style="font-size:11px">${esc(r.t1_comparison?.replace(/_/g, ' ') || '—')}</td>
           <td>${accBadge(r.t2_accuracy)}</td>
           <td style="font-size:11px">${esc(r.t3_summary_quality || '—')}</td>
           <td>${impBadge(r.overall_impression)}</td>
@@ -3706,13 +3886,13 @@
           <hr style="margin:12px 0;border-color:var(--border)">
           <p style="font-weight:700;color:var(--navy);margin-bottom:6px">Task 1 — AI/ML Definition</p>
           <p style="background:#f8fafc;padding:10px;border-radius:8px;margin-bottom:6px;white-space:pre-wrap">${esc(r.t1_chatbot_definition || '—')}</p>
-          <p><strong>Comparison:</strong> ${esc(r.t1_comparison?.replace(/_/g,' ') || '—')}</p>
+          <p><strong>Comparison:</strong> ${esc(r.t1_comparison?.replace(/_/g, ' ') || '—')}</p>
           ${r.t1_notes ? `<p><strong>Notes:</strong> ${esc(r.t1_notes)}</p>` : ''}
           <hr style="margin:12px 0;border-color:var(--border)">
           <p style="font-weight:700;color:var(--navy);margin-bottom:6px">Task 2 — Factual Question</p>
           <p><strong>Q:</strong> ${esc(r.t2_question || '—')}</p>
           <p style="background:#f8fafc;padding:10px;border-radius:8px;margin:6px 0;white-space:pre-wrap">${esc(r.t2_chatbot_answer || '—')}</p>
-          <p><strong>Accuracy:</strong> ${esc(r.t2_accuracy?.replace(/_/g,' ') || '—')}</p>
+          <p><strong>Accuracy:</strong> ${esc(r.t2_accuracy?.replace(/_/g, ' ') || '—')}</p>
           <hr style="margin:12px 0;border-color:var(--border)">
           <p style="font-weight:700;color:var(--navy);margin-bottom:6px">Task 3 — Summary</p>
           <p><strong>Original text:</strong></p>
@@ -3734,7 +3914,7 @@
     // ════════════════════════════════════════════════════════════════════════════
     function renderCPPage() {
       if (!cpData.length) {
-        ['cp-stat-count','cp-stat-avg-lines','cp-stat-format-pass','cp-stat-persona-pass'].forEach(id =>
+        ['cp-stat-count', 'cp-stat-avg-lines', 'cp-stat-format-pass', 'cp-stat-persona-pass'].forEach(id =>
           document.getElementById(id).textContent = '0');
         document.getElementById('cp-constraint-bars').innerHTML = '<p style="color:var(--gray);font-size:13px">No submissions yet.</p>';
         renderCPTable();
@@ -3759,10 +3939,10 @@
 
       // Draw constraint pass rates bar chart
       const constraintsList = [
-        { key: 'followed_task',    label: 'Task Met (Wrote toast poem)' },
-        { key: 'followed_tone',    label: 'Tone Met (Funny)' },
+        { key: 'followed_task', label: 'Task Met (Wrote toast poem)' },
+        { key: 'followed_tone', label: 'Tone Met (Funny)' },
         { key: 'followed_persona', label: 'Persona Met (Frustrated robot voice)' },
-        { key: 'followed_format',  label: 'Format Met (Exactly 4-6 lines)' }
+        { key: 'followed_format', label: 'Format Met (Exactly 4-6 lines)' }
       ];
 
       const barsEl = document.getElementById('cp-constraint-bars');
@@ -3785,14 +3965,14 @@
     }
 
     function renderCPTable() {
-      const search  = (document.getElementById('cp-search')?.value || '').toLowerCase();
+      const search = (document.getElementById('cp-search')?.value || '').toLowerCase();
       const botFilt = document.getElementById('cp-filter-bot')?.value || '';
       const failFilt = document.getElementById('cp-filter-failed')?.value || '';
 
       const rows = cpData.filter(r => {
         const matchesSearch = !search || (r.student_name || '').toLowerCase().includes(search);
         const matchesBot = !botFilt || r.chatbot_used === botFilt;
-        
+
         const hasFailedConstraint = !r.followed_task || !r.followed_tone || !r.followed_persona || !r.followed_format;
         const matchesFail = !failFilt || (failFilt === 'yes' ? hasFailedConstraint : !hasFailedConstraint);
 
@@ -3842,7 +4022,7 @@
       const r = cpData.find(x => x.id === id);
       if (!r) return;
       document.getElementById('modal-title').textContent = esc(r.student_name) + ' — Week 2 Creative Prompting';
-      
+
       function statusLine(label, passed) {
         return `<div><strong>${label}:</strong> ${passed ? '<span style="color:#059669;font-weight:700">PASS</span>' : '<span style="color:#dc2626;font-weight:700">FAIL</span>'}</div>`;
       }
@@ -3885,7 +4065,7 @@
     // ════════════════════════════════════════════════════════════════════════════
     function renderPDPage() {
       if (!pdData.length) {
-        ['pd-stat-count','pd-stat-guessed','pd-stat-avg-time','pd-stat-top-bot'].forEach(id =>
+        ['pd-stat-count', 'pd-stat-guessed', 'pd-stat-avg-time', 'pd-stat-top-bot'].forEach(id =>
           document.getElementById(id).textContent = '0');
         document.getElementById('pd-persona-bars').innerHTML = '<p style="color:var(--gray);font-size:13px">No submissions yet.</p>';
         renderPDTable();
@@ -3907,7 +4087,7 @@
       // Most used chatbot
       const botCounts = {};
       pdData.forEach(r => { botCounts[r.chatbot_used] = (botCounts[r.chatbot_used] || 0) + 1; });
-      const topBot = Object.entries(botCounts).sort((a,b) => b[1]-a[1])[0];
+      const topBot = Object.entries(botCounts).sort((a, b) => b[1] - a[1])[0];
       document.getElementById('pd-stat-top-bot').textContent = topBot ? topBot[0] : '—';
 
       // Draw persona guessed success rate breakdown
@@ -3939,7 +4119,7 @@
     }
 
     function renderPDTable() {
-      const search  = (document.getElementById('pd-search')?.value || '').toLowerCase();
+      const search = (document.getElementById('pd-search')?.value || '').toLowerCase();
       const botFilt = document.getElementById('pd-filter-bot')?.value || '';
       const guessedFilt = document.getElementById('pd-filter-guessed')?.value || '';
 
@@ -3947,7 +4127,7 @@
         const matchesSearch = !search ||
           (r.student_name || '').toLowerCase().includes(search) ||
           (r.secret_persona || '').toLowerCase().includes(search);
-        
+
         const matchesBot = !botFilt || r.chatbot_used === botFilt;
         const matchesGuessed = !guessedFilt || (guessedFilt === 'yes' ? r.was_guessed : !r.was_guessed);
 
@@ -3970,7 +4150,7 @@
       </thead>
       <tbody>
         ${rows.map(r => `
-        <tr onclick="showPDDetail(${r.id})" style="cursor:pointer" title="Click to view details">
+        <tr class="clickable-row" onclick="showPDDetail(${r.id})" style="cursor:pointer" title="Click to view details">
           <td>${esc(r.student_name)}<br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
           <td style="font-weight:700">${esc(r.secret_persona)}</td>
           <td>${esc(r.chatbot_used)}</td>
@@ -4013,21 +4193,21 @@
     function renderWSPage() {
       const select = document.getElementById('ws-class-select');
       const prevVal = select ? select.value : '';
-      
+
       const classes = [...new Set(wsData.map(r => r.class_number))].sort();
-      
+
       let optionsHtml = '<option value="">— Select a Class —</option>';
       classes.forEach(c => {
         optionsHtml += `<option value="${esc(c)}" ${c === prevVal ? 'selected' : ''}>Class ${esc(c)}</option>`;
       });
-      
+
       if (select) select.innerHTML = optionsHtml;
-      
+
       // Update global count
       document.getElementById('ws-stat-count').textContent = wsData.length;
       const uniqueAuthors = [...new Set(wsData.map(r => r.student_email))].length;
       document.getElementById('ws-stat-authors').textContent = uniqueAuthors;
-      
+
       const activeClass = select ? select.value : '';
       renderWSPanel(activeClass);
     }
@@ -4040,7 +4220,7 @@
       }
 
       const paragraphs = wsData.filter(r => r.class_number === classNum && r.is_visible).sort((a, b) => a.sequence_order - b.sequence_order);
-      
+
       if (!paragraphs.length) {
         panel.innerHTML = '<div class="empty-state"><p>No paragraphs submitted for this class yet.</p></div>';
         return;
@@ -4112,7 +4292,7 @@
 
       const currentClass = item.class_number;
       const siblingParagraphs = wsData.filter(r => r.class_number === currentClass && r.is_visible).sort((a, b) => a.sequence_order - b.sequence_order);
-      
+
       const currentIdx = siblingParagraphs.findIndex(x => x.id === id);
       if (currentIdx === -1) return;
 
@@ -4128,7 +4308,7 @@
       try {
         const p1 = sb.from('introai_week02_co_writer_story').update({ sequence_order: orderB }).eq('id', id);
         const p2 = sb.from('introai_week02_co_writer_story').update({ sequence_order: orderA }).eq('id', targetItem.id);
-        
+
         const [r1, r2] = await Promise.all([p1, p2]);
         if (r1.error) throw r1.error;
         if (r2.error) throw r2.error;
@@ -4145,7 +4325,7 @@
     // ════════════════════════════════════════════════════════════════════════════
     function renderAPPage() {
       if (!apData.length) {
-        ['ap-stat-count','ap-stat-guessed','ap-stat-rate','ap-stat-tool'].forEach(id => {
+        ['ap-stat-count', 'ap-stat-guessed', 'ap-stat-rate', 'ap-stat-tool'].forEach(id => {
           const el = document.getElementById(id);
           if (el) el.textContent = '0';
         });
@@ -4158,21 +4338,21 @@
       document.getElementById('ap-stat-rate').textContent = Math.round(guessed / apData.length * 100) + '%';
       const toolCounts = {};
       apData.forEach(r => { if (r.ai_tool_used) toolCounts[r.ai_tool_used] = (toolCounts[r.ai_tool_used] || 0) + 1; });
-      const topTool = Object.entries(toolCounts).sort((a,b) => b[1]-a[1])[0];
+      const topTool = Object.entries(toolCounts).sort((a, b) => b[1] - a[1])[0];
       document.getElementById('ap-stat-tool').textContent = topTool ? topTool[0] : '—';
       renderAPTable();
     }
 
     function renderAPTable() {
-      const tool    = document.getElementById('ap-filter-tool')?.value || '';
+      const tool = document.getElementById('ap-filter-tool')?.value || '';
       const guessed = document.getElementById('ap-filter-guessed')?.value || '';
-      const search  = (document.getElementById('ap-search')?.value || '').toLowerCase();
+      const search = (document.getElementById('ap-search')?.value || '').toLowerCase();
 
       const rows = apData.filter(r => {
         if (tool && r.ai_tool_used !== tool) return false;
-        if (guessed === 'true'  && r.was_guessed !== true)  return false;
+        if (guessed === 'true' && r.was_guessed !== true) return false;
         if (guessed === 'false' && r.was_guessed !== false) return false;
-        if (search && !((r.student_name||'').toLowerCase().includes(search) || (r.secret_cliche||'').toLowerCase().includes(search))) return false;
+        if (search && !((r.student_name || '').toLowerCase().includes(search) || (r.secret_cliche || '').toLowerCase().includes(search))) return false;
         return true;
       });
 
@@ -4191,12 +4371,12 @@
       </tr></thead>
       <tbody>
         ${rows.map(r => `
-        <tr>
+        <tr class="clickable-row" onclick="showSubmissionDetail('ap', ${r.id})">
           <td>${esc(r.student_name)}<br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
           <td><strong>${esc(r.secret_cliche)}</strong></td>
           <td><span class="badge badge-teal">${esc(r.ai_tool_used || '—')}</span></td>
-          <td style="max-width:200px;font-size:11px;color:#475569">${esc((r.prompt_used||'').substring(0,120))}${(r.prompt_used||'').length>120?'…':''}</td>
-          <td>${r.generated_image_url ? `<a href="${esc(r.generated_image_url)}" target="_blank" style="color:var(--teal);font-size:11px;font-weight:600">View ↗</a>` : '<span style="color:var(--gray);font-size:11px">—</span>'}</td>
+          <td style="max-width:200px;font-size:11px;color:#475569">${esc((r.prompt_used || '').substring(0, 120))}${(r.prompt_used || '').length > 120 ? '…' : ''}</td>
+          <td>${r.generated_image_url ? `<a href="${esc(r.generated_image_url)}" target="_blank" onclick="event.stopPropagation();" style="color:var(--teal);font-size:11px;font-weight:600">View ↗</a>` : '<span style="color:var(--gray);font-size:11px">—</span>'}</td>
           <td>${r.was_guessed === true ? '<span class="badge badge-green">✓ Yes</span>' : r.was_guessed === false ? '<span class="badge badge-red">✗ No</span>' : '<span class="badge badge-gray">—</span>'}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
         </tr>`).join('')}
@@ -4209,7 +4389,7 @@
     // ════════════════════════════════════════════════════════════════════════════
     function renderPCPage() {
       if (!pcData.length) {
-        ['pc-stat-count','pc-stat-enjoy','pc-stat-freestyle','pc-stat-tool'].forEach(id => {
+        ['pc-stat-count', 'pc-stat-enjoy', 'pc-stat-freestyle', 'pc-stat-tool'].forEach(id => {
           const el = document.getElementById(id);
           if (el) el.textContent = '0';
         });
@@ -4219,7 +4399,7 @@
       document.getElementById('pc-stat-count').textContent = pcData.length;
       const withRating = pcData.filter(r => r.enjoyment_rating);
       const avgEnjoy = withRating.length
-        ? (withRating.reduce((s,r) => s + r.enjoyment_rating, 0) / withRating.length).toFixed(2)
+        ? (withRating.reduce((s, r) => s + r.enjoyment_rating, 0) / withRating.length).toFixed(2)
         : '—';
       document.getElementById('pc-stat-enjoy').textContent = avgEnjoy;
       const freestyleCount = pcData.filter(r => r.freestyle_prompt).length;
@@ -4227,18 +4407,18 @@
       // Most used freestyle tool
       const toolCounts = {};
       pcData.forEach(r => { const t = r.freestyle_tool || r.style_tool; if (t) toolCounts[t] = (toolCounts[t] || 0) + 1; });
-      const topTool = Object.entries(toolCounts).sort((a,b) => b[1]-a[1])[0];
+      const topTool = Object.entries(toolCounts).sort((a, b) => b[1] - a[1])[0];
       document.getElementById('pc-stat-tool').textContent = topTool ? topTool[0] : '—';
       renderPCTable();
     }
 
     function renderPCTable() {
-      const tool   = document.getElementById('pc-filter-tool')?.value || '';
+      const tool = document.getElementById('pc-filter-tool')?.value || '';
       const search = (document.getElementById('pc-search')?.value || '').toLowerCase();
 
       const rows = pcData.filter(r => {
         if (tool && r.freestyle_tool !== tool && r.style_tool !== tool && r.detail_tool !== tool) return false;
-        if (search && !((r.student_name||'').toLowerCase().includes(search) || (r.freestyle_prompt||'').toLowerCase().includes(search) || (r.big_takeaway||'').toLowerCase().includes(search))) return false;
+        if (search && !((r.student_name || '').toLowerCase().includes(search) || (r.freestyle_prompt || '').toLowerCase().includes(search) || (r.big_takeaway || '').toLowerCase().includes(search))) return false;
         return true;
       });
 
@@ -4273,7 +4453,7 @@
       </tr></thead>
       <tbody>
         ${rows.map(r => `
-        <tr>
+        <tr class="clickable-row" onclick="showSubmissionDetail('pc', ${r.id})">
           <td>${esc(r.student_name)}<br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
           <td>
             <span class="badge badge-teal">${esc(r.style_tool || '—')}</span><br>
@@ -4293,7 +4473,7 @@
             <span style="font-size:11px;font-weight:600">Result:</span> <span style="font-size:11px;color:#475569">${esc(r.freestyle_result || '—')}</span><br>
             ${imageLink(r.freestyle_image_url)}
           </td>
-          <td style="max-width:180px;font-size:11px;color:#475569" title="${esc(r.big_takeaway)}">${esc((r.big_takeaway||'').substring(0,80))}${(r.big_takeaway||'').length>80?'…':''}</td>
+          <td style="max-width:180px;font-size:11px;color:#475569" title="${esc(r.big_takeaway)}">${esc((r.big_takeaway || '').substring(0, 80))}${(r.big_takeaway || '').length > 80 ? '…' : ''}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
         </tr>`).join('')}
@@ -4306,7 +4486,7 @@
     // ════════════════════════════════════════════════════════════════════════════
     function renderMGPage() {
       if (!mgData.length) {
-        ['mg-stat-count','mg-stat-enjoy','mg-stat-tool'].forEach(id => {
+        ['mg-stat-count', 'mg-stat-enjoy', 'mg-stat-tool'].forEach(id => {
           const el = document.getElementById(id);
           if (el) el.textContent = '0';
         });
@@ -4316,7 +4496,7 @@
       document.getElementById('mg-stat-count').textContent = mgData.length;
       const withRating = mgData.filter(r => r.enjoyment_rating);
       const avgEnjoy = withRating.length
-        ? (withRating.reduce((s,r) => s + r.enjoyment_rating, 0) / withRating.length).toFixed(2)
+        ? (withRating.reduce((s, r) => s + r.enjoyment_rating, 0) / withRating.length).toFixed(2)
         : '—';
       document.getElementById('mg-stat-enjoy').textContent = avgEnjoy;
 
@@ -4327,18 +4507,18 @@
           if (t) toolCounts[t] = (toolCounts[t] || 0) + 1;
         });
       });
-      const topTool = Object.entries(toolCounts).sort((a,b) => b[1]-a[1])[0];
+      const topTool = Object.entries(toolCounts).sort((a, b) => b[1] - a[1])[0];
       document.getElementById('mg-stat-tool').textContent = topTool ? topTool[0] : '—';
       renderMGTable();
     }
 
     function renderMGTable() {
-      const tool   = document.getElementById('mg-filter-tool')?.value || '';
+      const tool = document.getElementById('mg-filter-tool')?.value || '';
       const search = (document.getElementById('mg-search')?.value || '').toLowerCase();
 
       const rows = mgData.filter(r => {
         if (tool && r.study_tool !== tool && r.edm_tool !== tool && r.pop_tool !== tool) return false;
-        if (search && !((r.student_name||'').toLowerCase().includes(search) || (r.study_link||'').toLowerCase().includes(search) || (r.edm_link||'').toLowerCase().includes(search) || (r.pop_link||'').toLowerCase().includes(search))) return false;
+        if (search && !((r.student_name || '').toLowerCase().includes(search) || (r.study_link || '').toLowerCase().includes(search) || (r.edm_link || '').toLowerCase().includes(search) || (r.pop_link || '').toLowerCase().includes(search))) return false;
         return true;
       });
 
@@ -4373,12 +4553,12 @@
       </tr></thead>
       <tbody>
         ${rows.map(r => `
-        <tr>
+        <tr class="clickable-row" onclick="showSubmissionDetail('mg', ${r.id})">
           <td>${esc(r.student_name)}<br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
           <td><span class="badge badge-teal">${esc(r.study_tool || '—')}</span><br>${playLink(r.study_link)}</td>
           <td><span class="badge badge-gold">${esc(r.edm_tool || '—')}</span><br>${playLink(r.edm_link)}</td>
           <td><span class="badge badge-green">${esc(r.pop_tool || '—')}</span><br>${playLink(r.pop_link)}</td>
-          <td style="max-width:180px;font-size:11px;color:#475569" title="${esc(r.big_takeaway)}">${esc((r.big_takeaway||'').substring(0,80))}${(r.big_takeaway||'').length>80?'…':''}</td>
+          <td style="max-width:180px;font-size:11px;color:#475569" title="${esc(r.big_takeaway)}">${esc((r.big_takeaway || '').substring(0, 80))}${(r.big_takeaway || '').length > 80 ? '…' : ''}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
         </tr>`).join('')}
@@ -4391,7 +4571,7 @@
     // ════════════════════════════════════════════════════════════════════════════
     function renderISPage() {
       if (!isData.length) {
-        ['is-stat-count','is-stat-enjoy','is-stat-tool'].forEach(id => {
+        ['is-stat-count', 'is-stat-enjoy', 'is-stat-tool'].forEach(id => {
           const el = document.getElementById(id);
           if (el) el.textContent = '0';
         });
@@ -4401,24 +4581,24 @@
       document.getElementById('is-stat-count').textContent = isData.length;
       const withRating = isData.filter(r => r.enjoyment_rating);
       const avgEnjoy = withRating.length
-        ? (withRating.reduce((s,r) => s + r.enjoyment_rating, 0) / withRating.length).toFixed(2)
+        ? (withRating.reduce((s, r) => s + r.enjoyment_rating, 0) / withRating.length).toFixed(2)
         : '—';
       document.getElementById('is-stat-enjoy').textContent = avgEnjoy;
 
       const toolCounts = {};
       isData.forEach(r => { if (r.ai_tool_used) toolCounts[r.ai_tool_used] = (toolCounts[r.ai_tool_used] || 0) + 1; });
-      const topTool = Object.entries(toolCounts).sort((a,b) => b[1]-a[1])[0];
+      const topTool = Object.entries(toolCounts).sort((a, b) => b[1] - a[1])[0];
       document.getElementById('is-stat-tool').textContent = topTool ? topTool[0] : '—';
       renderISTable();
     }
 
     function renderISTable() {
-      const tool   = document.getElementById('is-filter-tool')?.value || '';
+      const tool = document.getElementById('is-filter-tool')?.value || '';
       const search = (document.getElementById('is-search')?.value || '').toLowerCase();
 
       const rows = isData.filter(r => {
         if (tool && r.ai_tool_used !== tool) return false;
-        if (search && !((r.student_name||'').toLowerCase().includes(search) || (r.prompt_used||'').toLowerCase().includes(search) || (r.scenario_chosen||'').toLowerCase().includes(search))) return false;
+        if (search && !((r.student_name || '').toLowerCase().includes(search) || (r.prompt_used || '').toLowerCase().includes(search) || (r.scenario_chosen || '').toLowerCase().includes(search))) return false;
         return true;
       });
 
@@ -4454,13 +4634,13 @@
       </tr></thead>
       <tbody>
         ${rows.map(r => `
-        <tr>
+        <tr class="clickable-row" onclick="showSubmissionDetail('is', ${r.id})">
           <td>${esc(r.student_name)}<br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
           <td><span class="badge badge-gray">${esc(r.scenario_chosen)}</span></td>
           <td><span class="badge badge-teal">${esc(r.ai_tool_used || '—')}</span></td>
-          <td style="max-width:180px;font-size:11px;color:#475569" title="${esc(r.prompt_used)}">${esc((r.prompt_used||'').substring(0,80))}${(r.prompt_used||'').length>80?'…':''}</td>
+          <td style="max-width:180px;font-size:11px;color:#475569" title="${esc(r.prompt_used)}">${esc((r.prompt_used || '').substring(0, 80))}${(r.prompt_used || '').length > 80 ? '…' : ''}</td>
           <td>${playLink(r.music_link)}</td>
-          <td style="max-width:180px;font-size:11px;color:#475569" title="${esc(r.observations)}">${esc((r.observations||'').substring(0,80))}${(r.observations||'').length>80?'…':''}</td>
+          <td style="max-width:180px;font-size:11px;color:#475569" title="${esc(r.observations)}">${esc((r.observations || '').substring(0, 80))}${(r.observations || '').length > 80 ? '…' : ''}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
         </tr>`).join('')}
