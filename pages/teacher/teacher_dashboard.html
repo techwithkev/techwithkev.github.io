@@ -1276,6 +1276,55 @@
       0%, 100% { opacity: 1; }
       50% { opacity: 0.4; }
     }
+
+    /* ── CURRICULUM SELECTOR (segmented control) ── */
+    .curriculum-picker {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .curriculum-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.35);
+      margin-bottom: 7px;
+      display: block;
+    }
+
+    .curriculum-control {
+      display: flex;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 3px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .curr-btn {
+      flex: 1;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 4px;
+      border-radius: 6px;
+      color: rgba(255, 255, 255, 0.45);
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .curr-btn:hover {
+      color: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .curr-btn.active {
+      background: rgba(2, 168, 158, 0.2);
+      color: var(--mint);
+      font-weight: 700;
+    }
   </style>
 </head>
 
@@ -1351,123 +1400,140 @@
           </div>
         </div>
 
+        <!-- CURRICULUM SELECTOR -->
+        <div class="curriculum-picker">
+          <span class="curriculum-label">Curriculum</span>
+          <div class="curriculum-control">
+            <button type="button" id="curr-btn-comp" class="curr-btn active" onclick="switchCurriculum('comp-jr')">Comp Jr</button>
+            <button type="button" id="curr-btn-intro" class="curr-btn" onclick="switchCurriculum('intro-ai')">Intro to AI</button>
+          </div>
+        </div>
+
         <div class="sidebar-nav">
-          <div class="nav-section-label">Overview</div>
-          <button class="nav-item active" onclick="showPage('overview')">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-              <rect x="1" y="1" width="6" height="6" rx="1.5" />
-              <rect x="9" y="1" width="6" height="6" rx="1.5" />
-              <rect x="1" y="9" width="6" height="6" rx="1.5" />
-              <rect x="9" y="9" width="6" height="6" rx="1.5" />
-            </svg>
-            Overview
-          </button>
+          <!-- Group 1: AI Competition Jr Sections -->
+          <div id="nav-group-comp-jr">
+            <div class="nav-section-label">Overview</div>
+            <button class="nav-item active" onclick="showPage('overview')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <rect x="1" y="1" width="6" height="6" rx="1.5" />
+                <rect x="9" y="1" width="6" height="6" rx="1.5" />
+                <rect x="1" y="9" width="6" height="6" rx="1.5" />
+                <rect x="9" y="9" width="6" height="6" rx="1.5" />
+              </svg>
+              Overview
+            </button>
 
-          <div class="nav-section-label">Homework</div>
-          <button class="nav-item" onclick="showPage('hw-results')">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path d="M3 4h10M3 8h10M3 12h6" />
-            </svg>
-            All Submissions
-          </button>
-          <button class="nav-item" onclick="showPage('hw-by-class')">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-              <rect x="2" y="2" width="12" height="12" rx="2" />
-              <path d="M6 6h4M6 10h2" />
-            </svg>
-            By Class
-          </button>
+            <div class="nav-section-label">Homework</div>
+            <button class="nav-item" onclick="showPage('hw-results')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M3 4h10M3 8h10M3 12h6" />
+              </svg>
+              All Submissions
+            </button>
+            <button class="nav-item" onclick="showPage('hw-by-class')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <rect x="2" y="2" width="12" height="12" rx="2" />
+                <path d="M6 6h4M6 10h2" />
+              </svg>
+              By Class
+            </button>
 
-          <div class="nav-section-label">Final Exam</div>
-          <button class="nav-item" onclick="showPage('exam-results')">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path d="M8 1l2 4 4.5.5-3 3 .5 4.5L8 11l-4 2.5.5-4.5-3-3L6 5z" />
-            </svg>
-            Exam Results
-          </button>
-          <button class="nav-item" onclick="showPage('exam-detail')">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-              <circle cx="8" cy="8" r="6" />
-              <path d="M8 5v4l2.5 1.5" />
-            </svg>
-            Student Detail
-          </button>
+            <div class="nav-section-label">Final Exam</div>
+            <button class="nav-item" onclick="showPage('exam-results')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M8 1l2 4 4.5.5-3 3 .5 4.5L8 11l-4 2.5.5-4.5-3-3L6 5z" />
+              </svg>
+              Exam Results
+            </button>
+            <button class="nav-item" onclick="showPage('exam-detail')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <circle cx="8" cy="8" r="6" />
+                <path d="M8 5v4l2.5 1.5" />
+              </svg>
+              Student Detail
+            </button>
+          </div>
 
-          <div class="nav-section-label">Access</div>
+          <!-- Group 2: Intro to AI Sections -->
+          <div id="nav-group-intro-ai" style="display: none;">
+            <div class="nav-section-label">Intro to AI</div>
+            <button class="nav-item" onclick="showPage('introai-self-assessment')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M8 1l2 4 4.5.5-3 3 .5 4.5L8 11l-4 2.5.5-4.5-3-3L6 5z" />
+              </svg>
+              Self-Assessment
+            </button>
+            <button class="nav-item" onclick="showPage('introai-scavenger-hunt')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <circle cx="7" cy="7" r="4.5" />
+                <path d="M10.5 10.5L14 14" stroke-linecap="round" />
+              </svg>
+              Ex1: Scavenger Hunt
+            </button>
+            <button class="nav-item" onclick="showPage('introai-chatbots')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M2 3h12a1 1 0 011 1v6a1 1 0 01-1 1H5l-3 3V4a1 1 0 011-1z" />
+              </svg>
+              Ex2: Chatbots
+            </button>
+            <button class="nav-item" onclick="showPage('introai-creative-prompting')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-linecap="round" />
+              </svg>
+              W2 Ex1: Prompting
+            </button>
+            <button class="nav-item" onclick="showPage('introai-persona-detective')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" />
+                <path d="M10 7v3m0 0v3m0-3h3m-3 0H7" stroke-linecap="round" />
+              </svg>
+              W2 Ex2: Detective
+            </button>
+            <button class="nav-item" onclick="showPage('introai-co-writer-story')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              W2 Ex3: Story
+            </button>
+
+            <div class="nav-section-label" style="margin-top:20px">Week 3 — Images</div>
+            <button class="nav-item" onclick="showPage('introai-prompt-comparison')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M3 12V8a2 2 0 012-2h0m4 6V6a2 2 0 012-2h0M7 14V4a2 2 0 012-2h0" stroke-linecap="round" />
+              </svg>
+              W3 Ex1: Prompts
+            </button>
+            <button class="nav-item" onclick="showPage('introai-ai-pictionary')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M2 11l3-3a1 1 0 011.4 0L8 9.6m0 0l2-2a1 1 0 011.4 0L14 11M2 14h12a1 1 0 001-1V3a1 1 0 00-1-1H2a1 1 0 00-1 1v10a1 1 0 001 1zm7-9.5h.01" stroke-linecap="round" />
+              </svg>
+              W3 Ex2: Pictionary
+            </button>
+
+            <div class="nav-section-label" style="margin-top:20px">Week 4 — Audio</div>
+            <button class="nav-item" onclick="showPage('introai-music-generation')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+              </svg>
+              W4 Ex1: Music
+            </button>
+            <button class="nav-item" onclick="showPage('introai-instrument-swap')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <circle cx="6" cy="18" r="3" />
+                <path d="M9 19V6l12-3v13" stroke-linecap="round" />
+              </svg>
+              W4 Ex2: Swap
+            </button>
+          </div>
+
+          <!-- Common Section -->
+          <div class="nav-section-label" style="margin-top:20px">Access</div>
           <button class="nav-item" onclick="showPage('codes')">
             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
               <rect x="3" y="7" width="10" height="8" rx="1.5" />
               <path d="M5 7V5a3 3 0 016 0v2" />
             </svg>
             Access Codes
-          </button>
-
-          <div class="nav-section-label">Intro to AI</div>
-          <button class="nav-item" onclick="showPage('introai-self-assessment')">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path d="M8 1l2 4 4.5.5-3 3 .5 4.5L8 11l-4 2.5.5-4.5-3-3L6 5z" />
-            </svg>
-            Self-Assessment
-          </button>
-          <button class="nav-item" onclick="showPage('introai-scavenger-hunt')">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-              <circle cx="7" cy="7" r="4.5" />
-              <path d="M10.5 10.5L14 14" stroke-linecap="round" />
-            </svg>
-            Ex1: Scavenger Hunt
-          </button>
-          <button class="nav-item" onclick="showPage('introai-chatbots')">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path d="M2 3h12a1 1 0 011 1v6a1 1 0 01-1 1H5l-3 3V4a1 1 0 011-1z" />
-            </svg>
-            Ex2: Chatbots
-          </button>
-          <button class="nav-item" onclick="showPage('introai-creative-prompting')">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-linecap="round" />
-            </svg>
-            W2 Ex1: Prompting
-          </button>
-          <button class="nav-item" onclick="showPage('introai-persona-detective')">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" />
-              <path d="M10 7v3m0 0v3m0-3h3m-3 0H7" stroke-linecap="round" />
-            </svg>
-            W2 Ex2: Detective
-          </button>
-          <button class="nav-item" onclick="showPage('introai-co-writer-story')">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-            </svg>
-            W2 Ex3: Story
-          </button>
-          <div class="nav-section-label" style="margin-top:20px">Week 3 — Images</div>
-          <button class="nav-item" onclick="showPage('introai-prompt-comparison')">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path d="M3 12V8a2 2 0 012-2h0m4 6V6a2 2 0 012-2h0M7 14V4a2 2 0 012-2h0" stroke-linecap="round" />
-            </svg>
-            W3 Ex1: Prompts
-          </button>
-          <button class="nav-item" onclick="showPage('introai-ai-pictionary')">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path d="M2 11l3-3a1 1 0 011.4 0L8 9.6m0 0l2-2a1 1 0 011.4 0L14 11M2 14h12a1 1 0 001-1V3a1 1 0 00-1-1H2a1 1 0 00-1 1v10a1 1 0 001 1zm7-9.5h.01" stroke-linecap="round" />
-            </svg>
-            W3 Ex2: Pictionary
-          </button>
-
-          <div class="nav-section-label" style="margin-top:20px">Week 4 — Audio</div>
-          <button class="nav-item" onclick="showPage('introai-music-generation')">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-            </svg>
-            W4 Ex1: Music
-          </button>
-          <button class="nav-item" onclick="showPage('introai-instrument-swap')">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-              <circle cx="6" cy="18" r="3" />
-              <path d="M9 19V6l12-3v13" stroke-linecap="round" />
-            </svg>
-            W4 Ex2: Swap
           </button>
         </div>
 
@@ -2454,6 +2520,9 @@
                 oninput="renderMGTable()" />
               <span class="text-small text-muted" id="mg-count"></span>
             </div>
+            <div id="mg-table-wrap">
+              <div class="loading"><div class="spinner"></div><br>Loading Music Generation data&hellip;</div>
+            </div>
           </div>
         </div>
 
@@ -2623,6 +2692,29 @@
       document.querySelectorAll('.nav-item').forEach(n => {
         if (n.getAttribute('onclick') && n.getAttribute('onclick').includes("'" + id + "'")) n.classList.add('active');
       });
+
+      // Synchronize curriculum selector based on page ID prefix
+      if (id !== 'codes') {
+        const isIntro = id.startsWith('introai-');
+        document.querySelectorAll('.curr-btn').forEach(btn => btn.classList.remove('active'));
+        if (isIntro) {
+          document.getElementById('curr-btn-intro').classList.add('active');
+          document.getElementById('nav-group-comp-jr').style.display = 'none';
+          document.getElementById('nav-group-intro-ai').style.display = 'block';
+        } else {
+          document.getElementById('curr-btn-comp').classList.add('active');
+          document.getElementById('nav-group-comp-jr').style.display = 'block';
+          document.getElementById('nav-group-intro-ai').style.display = 'none';
+        }
+      }
+    }
+
+    function switchCurriculum(curr) {
+      if (curr === 'comp-jr') {
+        showPage('overview');
+      } else {
+        showPage('introai-self-assessment');
+      }
     }
 
     // ════════════════════════════════════════════════════════════════════════════
@@ -4138,6 +4230,75 @@
       const topTool = Object.entries(toolCounts).sort((a,b) => b[1]-a[1])[0];
       document.getElementById('pc-stat-tool').textContent = topTool ? topTool[0] : '—';
       renderPCTable();
+    }
+
+    function renderPCTable() {
+      const tool   = document.getElementById('pc-filter-tool')?.value || '';
+      const search = (document.getElementById('pc-search')?.value || '').toLowerCase();
+
+      const rows = pcData.filter(r => {
+        if (tool && r.freestyle_tool !== tool && r.style_tool !== tool && r.detail_tool !== tool) return false;
+        if (search && !((r.student_name||'').toLowerCase().includes(search) || (r.freestyle_prompt||'').toLowerCase().includes(search) || (r.big_takeaway||'').toLowerCase().includes(search))) return false;
+        return true;
+      });
+
+      document.getElementById('pc-count').textContent = rows.length + ' submission' + (rows.length !== 1 ? 's' : '');
+
+      if (!rows.length) {
+        document.getElementById('pc-table-wrap').innerHTML = '<div class="empty-state"><p>No matching submissions.</p></div>';
+        return;
+      }
+
+      function starRating(v) {
+        if (!v) return '<span style="color:var(--gray)">—</span>';
+        const stars = '★'.repeat(v) + '☆'.repeat(5 - v);
+        const col = v >= 4 ? '#059669' : v >= 3 ? '#d97706' : '#dc2626';
+        return `<span style="color:${col};font-size:14px">${stars}</span>`;
+      }
+
+      function imageLink(url) {
+        return url ? `<a href="${esc(url)}" target="_blank" style="color:var(--teal);font-size:11px;font-weight:600">View Image ↗</a>` : '<span style="color:var(--gray);font-size:11px">—</span>';
+      }
+
+      document.getElementById('pc-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student</th>
+        <th>Style Experiment</th>
+        <th>Detail Experiment</th>
+        <th>Freestyle Prompt</th>
+        <th>Takeaway</th>
+        <th>Enjoyment</th>
+        <th>Submitted</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr>
+          <td>${esc(r.student_name)}<br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
+          <td>
+            <span class="badge badge-teal">${esc(r.style_tool || '—')}</span><br>
+            <span style="font-size:11px;font-weight:600">Prompt Chosen:</span> <span style="font-size:11px;color:#475569">${esc(r.style_fave_prompt || '—')}</span><br>
+            <span style="font-size:11px;font-weight:600">Obs:</span> <span style="font-size:11px;color:#475569">${esc(r.style_observations || '—')}</span><br>
+            ${imageLink(r.style_image_url)}
+          </td>
+          <td>
+            <span class="badge badge-gold">${esc(r.detail_tool || '—')}</span><br>
+            <span style="font-size:11px;font-weight:600">Prompt Chosen:</span> <span style="font-size:11px;color:#475569">${esc(r.detail_fave_prompt || '—')}</span><br>
+            <span style="font-size:11px;font-weight:600">Obs:</span> <span style="font-size:11px;color:#475569">${esc(r.detail_observations || '—')}</span><br>
+            ${imageLink(r.detail_image_url)}
+          </td>
+          <td>
+            <span class="badge badge-green">${esc(r.freestyle_tool || '—')}</span><br>
+            <span style="font-size:11px;font-weight:600">Prompt:</span> <span style="font-size:11px;color:#475569">${esc(r.freestyle_prompt || '—')}</span><br>
+            <span style="font-size:11px;font-weight:600">Result:</span> <span style="font-size:11px;color:#475569">${esc(r.freestyle_result || '—')}</span><br>
+            ${imageLink(r.freestyle_image_url)}
+          </td>
+          <td style="max-width:180px;font-size:11px;color:#475569" title="${esc(r.big_takeaway)}">${esc((r.big_takeaway||'').substring(0,80))}${(r.big_takeaway||'').length>80?'…':''}</td>
+          <td>${starRating(r.enjoyment_rating)}</td>
+          <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
     }
 
     // ════════════════════════════════════════════════════════════════════════════
