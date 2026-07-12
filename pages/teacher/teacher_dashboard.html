@@ -1454,6 +1454,20 @@
             </svg>
             W3 Ex2: Pictionary
           </button>
+
+          <div class="nav-section-label" style="margin-top:20px">Week 4 — Audio</div>
+          <button class="nav-item" onclick="showPage('introai-music-generation')">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+            </svg>
+            W4 Ex1: Music
+          </button>
+          <button class="nav-item" onclick="showPage('introai-instrument-swap')">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="6" cy="18" r="3" />
+              <path d="M9 19V6l12-3v13" stroke-linecap="round" />
+            </svg>
+            W4 Ex2: Swap
           </button>
         </div>
 
@@ -2385,6 +2399,125 @@
           </div>
         </div>
 
+        <!-- ══ INTRO TO AI: MUSIC GENERATION (W4 Ex 1) ══ -->
+        <div class="page" id="page-introai-music-generation">
+          <div class="page-header">
+            <div>
+              <div class="page-title">AI Music Generation — Week 4 Ex 1</div>
+              <div class="page-subtitle">Suno/Udio generated audio tracks and students' reflections</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('mg')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card">
+              <div class="stat-label">Total Submissions</div>
+              <div class="stat-value" id="mg-stat-count">—</div>
+              <div class="stat-sub">Students submitted</div>
+            </div>
+            <div class="stat-card teal">
+              <div class="stat-label">Avg Enjoyment</div>
+              <div class="stat-value" id="mg-stat-enjoy">—</div>
+              <div class="stat-sub">Out of 5 stars</div>
+            </div>
+            <div class="stat-card gold">
+              <div class="stat-label">Top Platform</div>
+              <div class="stat-value" style="font-size:16px;padding-top:6px" id="mg-stat-tool">—</div>
+              <div class="stat-sub">Most selected tool</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Tool:</label>
+              <select class="filter-select" id="mg-filter-tool" onchange="renderMGTable()">
+                <option value="">All</option>
+                <option>Suno</option>
+                <option>Udio</option>
+                <option>Other</option>
+              </select>
+              <label>Search:</label>
+              <input class="search-input" id="mg-search" type="text" placeholder="Student or link&hellip;"
+                oninput="renderMGTable()" />
+              <span class="text-small text-muted" id="mg-count"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ INTRO TO AI: INSTRUMENT SWAP (W4 Ex 2) ══ -->
+        <div class="page" id="page-introai-instrument-swap">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Instrument Swap — Week 4 Ex 2</div>
+              <div class="page-subtitle">AI-generated tracks with swapped/contrasting instruments and reflections</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" /><path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('is')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" /><path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card">
+              <div class="stat-label">Total Submissions</div>
+              <div class="stat-value" id="is-stat-count">—</div>
+              <div class="stat-sub">Students submitted</div>
+            </div>
+            <div class="stat-card teal">
+              <div class="stat-label">Avg Enjoyment</div>
+              <div class="stat-value" id="is-stat-enjoy">—</div>
+              <div class="stat-sub">Out of 5 stars</div>
+            </div>
+            <div class="stat-card gold">
+              <div class="stat-label">Top Platform</div>
+              <div class="stat-value" style="font-size:16px;padding-top:6px" id="is-stat-tool">—</div>
+              <div class="stat-sub">Most selected tool</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Tool:</label>
+              <select class="filter-select" id="is-filter-tool" onchange="renderISTable()">
+                <option value="">All</option>
+                <option>Suno</option>
+                <option>Udio</option>
+                <option>Other</option>
+              </select>
+              <label>Search:</label>
+              <input class="search-input" id="is-search" type="text" placeholder="Student or prompt&hellip;"
+                oninput="renderISTable()" />
+              <span class="text-small text-muted" id="is-count"></span>
+            </div>
+            <div id="is-table-wrap">
+              <div class="loading"><div class="spinner"></div><br>Loading Instrument Swap data&hellip;</div>
+            </div>
+          </div>
+        </div>
+
       </main>
     </div>
   </div>
@@ -2427,7 +2560,11 @@
     let cpData = [];     // introai_week02_creative_prompting rows
     let pdData = [];     // introai_week02_persona_detective rows
     let wsData = [];     // introai_week02_co_writer_story rows
-    let activeCohort = ''; // global cohort filter (’’ = all)
+    let apData = [];     // introai_week03_ai_pictionary rows
+    let pcData = [];     // introai_week03_prompt_comparison rows
+    let mgData = [];     // introai_week04_music_generation rows
+    let isData = [];     // introai_week04_instrument_swap rows
+    let activeCohort = ''; // global cohort filter ('' = all)
 
     // ════════════════════════════════════════════════════════════════════════════
     // SUPABASE INIT & AUTH
@@ -2494,7 +2631,7 @@
     async function loadAll() {
       document.getElementById('last-refresh').textContent = 'Refreshing…';
       try {
-        const [hw, exam, codes, sa, sh, cb, cp, pd, ws, ap, pc] = await Promise.all([
+        const [hw, exam, codes, sa, sh, cb, cp, pd, ws, ap, pc, mg, isSwap] = await Promise.all([
           sb.from('homework_submissions').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('caio_final_exam_results').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('access_codes').select('*').order('created_at', { ascending: false }).limit(10000),
@@ -2505,7 +2642,9 @@
           sb.from('introai_week02_persona_detective').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('introai_week02_co_writer_story').select('*').order('sequence_order', { ascending: true }).limit(10000),
           sb.from('introai_week03_ai_pictionary').select('*').order('submitted_at', { ascending: false }).limit(10000),
-          sb.from('introai_week03_prompt_comparison').select('*').order('submitted_at', { ascending: false }).limit(10000)
+          sb.from('introai_week03_prompt_comparison').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('introai_week04_music_generation').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('introai_week04_instrument_swap').select('*').order('submitted_at', { ascending: false }).limit(10000)
         ]);
 
         if (hw.error)   { console.error('hw error:', hw.error);       toast('⚠ Homework load error: '       + hw.error.message); }
@@ -2519,6 +2658,8 @@
         if (ws.error)   { console.error('ws error:', ws.error);       toast('\u26A0 Co-writer story error: '     + ws.error.message); }
         if (ap.error)   { console.error('ap error:', ap.error);       toast('\u26A0 AI Pictionary error: '        + ap.error.message); }
         if (pc.error)   { console.error('pc error:', pc.error);       toast('\u26A0 Prompt comparison error: '    + pc.error.message); }
+        if (mg.error)   { console.error('mg error:', mg.error);       toast('\u26A0 Music generation error: '    + mg.error.message); }
+        if (isSwap.error) { console.error('isSwap error:', isSwap.error); toast('\u26A0 Instrument swap error: '    + isSwap.error.message); }
 
         hwData    = hw.data    || [];
         examData  = exam.data  || [];
@@ -2531,8 +2672,10 @@
         wsData    = ws.data    || [];
         apData    = ap.data    || [];
         pcData    = pc.data    || [];
+        mgData    = mg.data    || [];
+        isData    = isSwap.data || [];
 
-        console.log(`Loaded: ${hwData.length} hw, ${examData.length} exam, ${codesData.length} codes, ${saData.length} SA, ${shData.length} SH, ${cbData.length} CB, ${cpData.length} CP, ${pdData.length} PD, ${wsData.length} WS, ${apData.length} AP, ${pcData.length} PC rows`);
+        console.log(`Loaded: ${hwData.length} hw, ${examData.length} exam, ${codesData.length} codes, ${saData.length} SA, ${shData.length} SH, ${cbData.length} CB, ${cpData.length} CP, ${pdData.length} PD, ${wsData.length} WS, ${apData.length} AP, ${pcData.length} PC, ${mgData.length} MG, ${isData.length} IS rows`);
 
         populateFilters();
         renderOverview();
@@ -2549,6 +2692,8 @@
         renderWSPage();
         renderAPPage();
         renderPCPage();
+        renderMGPage();
+        renderISPage();
 
         const now = new Date();
         document.getElementById('last-refresh').textContent = 'Updated ' + now.toLocaleTimeString();
@@ -3094,6 +3239,14 @@
         rows = [['student_name', 'student_email', 'style_tool', 'style_fave_prompt', 'style_observations', 'style_image_url', 'detail_tool', 'detail_fave_prompt', 'detail_observations', 'detail_image_url', 'freestyle_tool', 'freestyle_prompt', 'freestyle_result', 'freestyle_image_url', 'share_highlight', 'big_takeaway', 'enjoyment_rating', 'submitted_at']];
         pcData.forEach(r => rows.push([r.student_name, r.student_email, r.style_tool, r.style_fave_prompt, r.style_observations, r.style_image_url, r.detail_tool, r.detail_fave_prompt, r.detail_observations, r.detail_image_url, r.freestyle_tool, r.freestyle_prompt, r.freestyle_result, r.freestyle_image_url, r.share_highlight, r.big_takeaway, r.enjoyment_rating, r.submitted_at]));
         filename = 'introai_week03_prompt_comparison.csv';
+      } else if (type === 'mg') {
+        rows = [['student_name', 'student_email', 'study_tool', 'study_link', 'study_observations', 'edm_tool', 'edm_link', 'edm_observations', 'pop_tool', 'pop_link', 'pop_observations', 'big_takeaway', 'enjoyment_rating', 'submitted_at']];
+        mgData.forEach(r => rows.push([r.student_name, r.student_email, r.study_tool, r.study_link, r.study_observations, r.edm_tool, r.edm_link, r.edm_observations, r.pop_tool, r.pop_link, r.pop_observations, r.big_takeaway, r.enjoyment_rating, r.submitted_at]));
+        filename = 'introai_week04_music_generation.csv';
+      } else if (type === 'is') {
+        rows = [['student_name', 'student_email', 'scenario_chosen', 'ai_tool_used', 'prompt_used', 'music_link', 'observations', 'big_takeaway', 'enjoyment_rating', 'submitted_at']];
+        isData.forEach(r => rows.push([r.student_name, r.student_email, r.scenario_chosen, r.ai_tool_used, r.prompt_used, r.music_link, r.observations, r.big_takeaway, r.enjoyment_rating, r.submitted_at]));
+        filename = 'introai_week04_instrument_swap.csv';
       } else {
         rows = [['code', 'cohort', 'class_number', 'is_active', 'uses_count', 'max_uses', 'created_at']];
         codesData.forEach(r => rows.push([r.code, r.cohort, r.class_number, r.is_active, r.uses_count, r.max_uses, r.created_at]));
@@ -3987,20 +4140,51 @@
       renderPCTable();
     }
 
-    function renderPCTable() {
-      const tool   = document.getElementById('pc-filter-tool')?.value || '';
-      const search = (document.getElementById('pc-search')?.value || '').toLowerCase();
+    // ════════════════════════════════════════════════════════════════════════════
+    // INTRO TO AI — MUSIC GENERATION (W4 Ex 1)
+    // ════════════════════════════════════════════════════════════════════════════
+    function renderMGPage() {
+      if (!mgData.length) {
+        ['mg-stat-count','mg-stat-enjoy','mg-stat-tool'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = '0';
+        });
+        renderMGTable();
+        return;
+      }
+      document.getElementById('mg-stat-count').textContent = mgData.length;
+      const withRating = mgData.filter(r => r.enjoyment_rating);
+      const avgEnjoy = withRating.length
+        ? (withRating.reduce((s,r) => s + r.enjoyment_rating, 0) / withRating.length).toFixed(2)
+        : '—';
+      document.getElementById('mg-stat-enjoy').textContent = avgEnjoy;
 
-      const rows = pcData.filter(r => {
-        if (tool && r.freestyle_tool !== tool && r.style_tool !== tool && r.detail_tool !== tool) return false;
-        if (search && !((r.student_name||'').toLowerCase().includes(search) || (r.freestyle_prompt||'').toLowerCase().includes(search))) return false;
+      const toolCounts = {};
+      mgData.forEach(r => {
+        ['study_tool', 'edm_tool', 'pop_tool'].forEach(col => {
+          const t = r[col];
+          if (t) toolCounts[t] = (toolCounts[t] || 0) + 1;
+        });
+      });
+      const topTool = Object.entries(toolCounts).sort((a,b) => b[1]-a[1])[0];
+      document.getElementById('mg-stat-tool').textContent = topTool ? topTool[0] : '—';
+      renderMGTable();
+    }
+
+    function renderMGTable() {
+      const tool   = document.getElementById('mg-filter-tool')?.value || '';
+      const search = (document.getElementById('mg-search')?.value || '').toLowerCase();
+
+      const rows = mgData.filter(r => {
+        if (tool && r.study_tool !== tool && r.edm_tool !== tool && r.pop_tool !== tool) return false;
+        if (search && !((r.student_name||'').toLowerCase().includes(search) || (r.study_link||'').toLowerCase().includes(search) || (r.edm_link||'').toLowerCase().includes(search) || (r.pop_link||'').toLowerCase().includes(search))) return false;
         return true;
       });
 
-      document.getElementById('pc-count').textContent = rows.length + ' submission' + (rows.length !== 1 ? 's' : '');
+      document.getElementById('mg-count').textContent = rows.length + ' submission' + (rows.length !== 1 ? 's' : '');
 
       if (!rows.length) {
-        document.getElementById('pc-table-wrap').innerHTML = '<div class="empty-state"><p>No matching submissions.</p></div>';
+        document.getElementById('mg-table-wrap').innerHTML = '<div class="empty-state"><p>No matching submissions.</p></div>';
         return;
       }
 
@@ -4011,28 +4195,111 @@
         return `<span style="color:${col};font-size:14px">${stars}</span>`;
       }
 
-      function imgLink(url) {
-        return url ? `<a href="${esc(url)}" target="_blank" style="color:var(--teal);font-size:11px;font-weight:600">View ↗</a>` : '<span style="color:var(--gray);font-size:11px">—</span>';
+      function playLink(url) {
+        return url ? `<a href="${esc(url)}" target="_blank" style="color:var(--teal);font-size:11px;font-weight:600">Listen ↗</a>` : '<span style="color:var(--gray);font-size:11px">—</span>';
       }
 
-      document.getElementById('pc-table-wrap').innerHTML = `
+      document.getElementById('mg-table-wrap').innerHTML = `
     <table class="data-table">
       <thead><tr>
-        <th>Student</th><th>Style Fave</th><th>Style Img</th>
-        <th>Detail Fave</th><th>Detail Img</th>
-        <th>Freestyle Prompt</th><th>Freestyle Img</th>
-        <th>Enjoyment</th><th>Submitted</th>
+        <th>Student</th>
+        <th>Study Track</th>
+        <th>EDM Beat</th>
+        <th>Pop Song</th>
+        <th>Takeaway</th>
+        <th>Enjoyment</th>
+        <th>Submitted</th>
       </tr></thead>
       <tbody>
         ${rows.map(r => `
         <tr>
           <td>${esc(r.student_name)}<br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
-          <td><span class="badge ${r.style_fave_prompt === 'A' ? 'badge-teal' : r.style_fave_prompt === 'B' ? 'badge-gold' : 'badge-gray'}">${r.style_fave_prompt || '—'}</span></td>
-          <td>${imgLink(r.style_image_url)}</td>
-          <td><span class="badge ${r.detail_fave_prompt === 'A' ? 'badge-teal' : r.detail_fave_prompt === 'B' ? 'badge-gold' : 'badge-gray'}">${r.detail_fave_prompt || '—'}</span></td>
-          <td>${imgLink(r.detail_image_url)}</td>
-          <td style="max-width:180px;font-size:11px;color:#475569">${esc((r.freestyle_prompt||'').substring(0,100))}${(r.freestyle_prompt||'').length>100?'…':''}</td>
-          <td>${imgLink(r.freestyle_image_url)}</td>
+          <td><span class="badge badge-teal">${esc(r.study_tool || '—')}</span><br>${playLink(r.study_link)}</td>
+          <td><span class="badge badge-gold">${esc(r.edm_tool || '—')}</span><br>${playLink(r.edm_link)}</td>
+          <td><span class="badge badge-green">${esc(r.pop_tool || '—')}</span><br>${playLink(r.pop_link)}</td>
+          <td style="max-width:180px;font-size:11px;color:#475569" title="${esc(r.big_takeaway)}">${esc((r.big_takeaway||'').substring(0,80))}${(r.big_takeaway||'').length>80?'…':''}</td>
+          <td>${starRating(r.enjoyment_rating)}</td>
+          <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+    }
+
+    // ════════════════════════════════════════════════════════════════════════════
+    // INTRO TO AI — INSTRUMENT SWAP (W4 Ex 2)
+    // ════════════════════════════════════════════════════════════════════════════
+    function renderISPage() {
+      if (!isData.length) {
+        ['is-stat-count','is-stat-enjoy','is-stat-tool'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = '0';
+        });
+        renderISTable();
+        return;
+      }
+      document.getElementById('is-stat-count').textContent = isData.length;
+      const withRating = isData.filter(r => r.enjoyment_rating);
+      const avgEnjoy = withRating.length
+        ? (withRating.reduce((s,r) => s + r.enjoyment_rating, 0) / withRating.length).toFixed(2)
+        : '—';
+      document.getElementById('is-stat-enjoy').textContent = avgEnjoy;
+
+      const toolCounts = {};
+      isData.forEach(r => { if (r.ai_tool_used) toolCounts[r.ai_tool_used] = (toolCounts[r.ai_tool_used] || 0) + 1; });
+      const topTool = Object.entries(toolCounts).sort((a,b) => b[1]-a[1])[0];
+      document.getElementById('is-stat-tool').textContent = topTool ? topTool[0] : '—';
+      renderISTable();
+    }
+
+    function renderISTable() {
+      const tool   = document.getElementById('is-filter-tool')?.value || '';
+      const search = (document.getElementById('is-search')?.value || '').toLowerCase();
+
+      const rows = isData.filter(r => {
+        if (tool && r.ai_tool_used !== tool) return false;
+        if (search && !((r.student_name||'').toLowerCase().includes(search) || (r.prompt_used||'').toLowerCase().includes(search) || (r.scenario_chosen||'').toLowerCase().includes(search))) return false;
+        return true;
+      });
+
+      document.getElementById('is-count').textContent = rows.length + ' submission' + (rows.length !== 1 ? 's' : '');
+
+      if (!rows.length) {
+        document.getElementById('is-table-wrap').innerHTML = '<div class="empty-state"><p>No matching submissions.</p></div>';
+        return;
+      }
+
+      function starRating(v) {
+        if (!v) return '<span style="color:var(--gray)">—</span>';
+        const stars = '★'.repeat(v) + '☆'.repeat(5 - v);
+        const col = v >= 4 ? '#059669' : v >= 3 ? '#d97706' : '#dc2626';
+        return `<span style="color:${col};font-size:14px">${stars}</span>`;
+      }
+
+      function playLink(url) {
+        return url ? `<a href="${esc(url)}" target="_blank" style="color:var(--teal);font-size:11px;font-weight:600">Listen ↗</a>` : '<span style="color:var(--gray);font-size:11px">—</span>';
+      }
+
+      document.getElementById('is-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student</th>
+        <th>Scenario</th>
+        <th>AI Tool</th>
+        <th>Prompt Used</th>
+        <th>Track Link</th>
+        <th>Observations</th>
+        <th>Enjoyment</th>
+        <th>Submitted</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr>
+          <td>${esc(r.student_name)}<br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
+          <td><span class="badge badge-gray">${esc(r.scenario_chosen)}</span></td>
+          <td><span class="badge badge-teal">${esc(r.ai_tool_used || '—')}</span></td>
+          <td style="max-width:180px;font-size:11px;color:#475569" title="${esc(r.prompt_used)}">${esc((r.prompt_used||'').substring(0,80))}${(r.prompt_used||'').length>80?'…':''}</td>
+          <td>${playLink(r.music_link)}</td>
+          <td style="max-width:180px;font-size:11px;color:#475569" title="${esc(r.observations)}">${esc((r.observations||'').substring(0,80))}${(r.observations||'').length>80?'…':''}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
         </tr>`).join('')}
