@@ -1538,6 +1538,15 @@
               </svg>
               W4 Ex2: Swap
             </button>
+
+            <div class="nav-section-label" style="margin-top:20px">Week 5 — Models</div>
+            <button class="nav-item" onclick="showPage('introai-train-model')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <rect x="2" y="2" width="12" height="12" rx="2" stroke-linecap="round" />
+                <path d="M6 6h4M6 10h4" stroke-linecap="round" />
+              </svg>
+              W5: Train Model
+            </button>
           </div>
 
           <!-- Common Section -->
@@ -2668,6 +2677,71 @@
           </div>
         </div>
 
+        <!-- ══ INTRO TO AI: TRAIN YOUR MODEL (W5 Ex 1) ══ -->
+        <div class="page" id="page-introai-train-model">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Train Your Own Model — Week 5</div>
+              <div class="page-subtitle">Teachable Machine model URLs, training specs, and reflections</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('tm')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card">
+              <div class="stat-label">Total Submissions</div>
+              <div class="stat-value" id="tm-stat-count">—</div>
+              <div class="stat-sub">Students submitted</div>
+            </div>
+            <div class="stat-card teal">
+              <div class="stat-label">Avg Enjoyment</div>
+              <div class="stat-value" id="tm-stat-enjoy">—</div>
+              <div class="stat-sub">Out of 5 stars</div>
+            </div>
+            <div class="stat-card gold">
+              <div class="stat-label">Top Project Type</div>
+              <div class="stat-value" style="font-size:16px;padding-top:6px" id="tm-stat-type">—</div>
+              <div class="stat-sub">Most trained category</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Project Type:</label>
+              <select class="filter-select" id="tm-filter-type" onchange="renderTMTable()">
+                <option value="">All</option>
+                <option>Image</option>
+                <option>Audio</option>
+                <option>Pose</option>
+              </select>
+              <label>Search:</label>
+              <input class="search-input" id="tm-search" type="text" placeholder="Student, title, classes..."
+                oninput="renderTMTable()" />
+              <span class="text-small text-muted" id="tm-count"></span>
+            </div>
+            <div id="tm-table-wrap">
+              <div class="loading">
+                <div class="spinner"></div><br>Loading Teachable Machine data&hellip;
+              </div>
+            </div>
+          </div>
+        </div>
+
       </main>
     </div>
   </div>
@@ -2714,6 +2788,7 @@
     let pcData = [];     // introai_week03_prompt_comparison rows
     let mgData = [];     // introai_week04_music_generation rows
     let isData = [];     // introai_week04_instrument_swap rows
+    let tmData = [];     // introai_week05_train_your_model rows
     let activeCohort = ''; // global cohort filter ('' = all)
 
     // ════════════════════════════════════════════════════════════════════════════
@@ -2804,7 +2879,7 @@
     async function loadAll() {
       document.getElementById('last-refresh').textContent = 'Refreshing…';
       try {
-        const [hw, exam, codes, sa, sh, cb, cp, pd, ws, ap, pc, mg, isSwap] = await Promise.all([
+        const [hw, exam, codes, sa, sh, cb, cp, pd, ws, ap, pc, mg, isSwap, tm] = await Promise.all([
           sb.from('homework_submissions').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('caio_final_exam_results').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('access_codes').select('*').order('created_at', { ascending: false }).limit(10000),
@@ -2817,7 +2892,8 @@
           sb.from('introai_week03_ai_pictionary').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('introai_week03_prompt_comparison').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('introai_week04_music_generation').select('*').order('submitted_at', { ascending: false }).limit(10000),
-          sb.from('introai_week04_instrument_swap').select('*').order('submitted_at', { ascending: false }).limit(10000)
+          sb.from('introai_week04_instrument_swap').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('introai_week05_train_your_model').select('*').order('submitted_at', { ascending: false }).limit(10000)
         ]);
 
         if (hw.error) { console.error('hw error:', hw.error); toast('⚠ Homework load error: ' + hw.error.message); }
@@ -2833,6 +2909,7 @@
         if (pc.error) { console.error('pc error:', pc.error); toast('\u26A0 Prompt comparison error: ' + pc.error.message); }
         if (mg.error) { console.error('mg error:', mg.error); toast('\u26A0 Music generation error: ' + mg.error.message); }
         if (isSwap.error) { console.error('isSwap error:', isSwap.error); toast('\u26A0 Instrument swap error: ' + isSwap.error.message); }
+        if (tm.error) { console.error('tm error:', tm.error); toast('⚠ Train your model error: ' + tm.error.message); }
 
         hwData = hw.data || [];
         examData = exam.data || [];
@@ -2847,8 +2924,9 @@
         pcData = pc.data || [];
         mgData = mg.data || [];
         isData = isSwap.data || [];
+        tmData = tm.data || [];
 
-        console.log(`Loaded: ${hwData.length} hw, ${examData.length} exam, ${codesData.length} codes, ${saData.length} SA, ${shData.length} SH, ${cbData.length} CB, ${cpData.length} CP, ${pdData.length} PD, ${wsData.length} WS, ${apData.length} AP, ${pcData.length} PC, ${mgData.length} MG, ${isData.length} IS rows`);
+        console.log(`Loaded: ${hwData.length} hw, ${examData.length} exam, ${codesData.length} codes, ${saData.length} SA, ${shData.length} SH, ${cbData.length} CB, ${cpData.length} CP, ${pdData.length} PD, ${wsData.length} WS, ${apData.length} AP, ${pcData.length} PC, ${mgData.length} MG, ${isData.length} IS, ${tmData.length} TM rows`);
 
         populateFilters();
         renderOverview();
@@ -2867,6 +2945,7 @@
         renderPCPage();
         renderMGPage();
         renderISPage();
+        renderTMPage();
 
         const now = new Date();
         document.getElementById('last-refresh').textContent = 'Updated ' + now.toLocaleTimeString();
@@ -3410,6 +3489,9 @@
       } else if (type === 'is') {
         r = isData.find(x => x.id === id);
         title = "Instrument Swap Detail";
+      } else if (type === 'tm') {
+        r = tmData.find(x => x.id === id);
+        title = "Teachable Machine Model Detail";
       }
 
       if (!r) return;
@@ -3519,6 +3601,10 @@
         rows = [['student_name', 'student_email', 'scenario_chosen', 'ai_tool_used', 'prompt_used', 'music_link', 'observations', 'big_takeaway', 'enjoyment_rating', 'submitted_at']];
         isData.forEach(r => rows.push([r.student_name, r.student_email, r.scenario_chosen, r.ai_tool_used, r.prompt_used, r.music_link, r.observations, r.big_takeaway, r.enjoyment_rating, r.submitted_at]));
         filename = 'introai_week04_instrument_swap.csv';
+      } else if (type === 'tm') {
+        rows = [['student_name', 'student_email', 'project_type', 'project_title', 'classes_trained', 'examples_per_class', 'model_url', 'accuracy_rating', 'challenges_reflections', 'improvement_ideas', 'enjoyment_rating', 'submitted_at']];
+        tmData.forEach(r => rows.push([r.student_name, r.student_email, r.project_type, r.project_title, r.classes_trained, r.examples_per_class, r.model_url, r.accuracy_rating, r.challenges_reflections, r.improvement_ideas, r.enjoyment_rating, r.submitted_at]));
+        filename = 'introai_week05_train_your_model.csv';
       } else {
         rows = [['code', 'cohort', 'class_number', 'is_active', 'uses_count', 'max_uses', 'created_at']];
         codesData.forEach(r => rows.push([r.code, r.cohort, r.class_number, r.is_active, r.uses_count, r.max_uses, r.created_at]));
@@ -4641,6 +4727,89 @@
           <td style="max-width:180px;font-size:11px;color:#475569" title="${esc(r.prompt_used)}">${esc((r.prompt_used || '').substring(0, 80))}${(r.prompt_used || '').length > 80 ? '…' : ''}</td>
           <td>${playLink(r.music_link)}</td>
           <td style="max-width:180px;font-size:11px;color:#475569" title="${esc(r.observations)}">${esc((r.observations || '').substring(0, 80))}${(r.observations || '').length > 80 ? '…' : ''}</td>
+          <td>${starRating(r.enjoyment_rating)}</td>
+          <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+    }
+
+    // ════════════════════════════════════════════════════════════════════════════
+    // INTRO TO AI — TRAIN YOUR MODEL (W5 Ex 1)
+    // ════════════════════════════════════════════════════════════════════════════
+    function renderTMPage() {
+      if (!tmData.length) {
+        ['tm-stat-count', 'tm-stat-enjoy', 'tm-stat-type'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = '0';
+        });
+        renderTMTable();
+        return;
+      }
+      document.getElementById('tm-stat-count').textContent = tmData.length;
+      const withRating = tmData.filter(r => r.enjoyment_rating);
+      const avgEnjoy = withRating.length
+        ? (withRating.reduce((s, r) => s + r.enjoyment_rating, 0) / withRating.length).toFixed(2)
+        : '—';
+      document.getElementById('tm-stat-enjoy').textContent = avgEnjoy;
+
+      const typeCounts = {};
+      tmData.forEach(r => { if (r.project_type) typeCounts[r.project_type] = (typeCounts[r.project_type] || 0) + 1; });
+      const topType = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])[0];
+      document.getElementById('tm-stat-type').textContent = topType ? topType[0] : '—';
+      renderTMTable();
+    }
+
+    function renderTMTable() {
+      const type = document.getElementById('tm-filter-type')?.value || '';
+      const search = (document.getElementById('tm-search')?.value || '').toLowerCase();
+
+      const rows = tmData.filter(r => {
+        if (type && r.project_type !== type) return false;
+        if (search && !(
+          (r.student_name || '').toLowerCase().includes(search) || 
+          (r.project_title || '').toLowerCase().includes(search) ||
+          (r.classes_trained || '').toLowerCase().includes(search) ||
+          (r.accuracy_rating || '').toLowerCase().includes(search)
+        )) return false;
+        return true;
+      });
+
+      document.getElementById('tm-count').textContent = rows.length + ' submission' + (rows.length !== 1 ? 's' : '');
+
+      if (!rows.length) {
+        document.getElementById('tm-table-wrap').innerHTML = '<div class="empty-state"><p>No matching submissions.</p></div>';
+        return;
+      }
+
+      function starRating(v) {
+        if (!v) return '<span style="color:var(--gray)">—</span>';
+        const stars = '★'.repeat(v) + '☆'.repeat(5 - v);
+        const col = v >= 4 ? '#059669' : v >= 3 ? '#d97706' : '#dc2626';
+        return `<span style="color:${col};font-size:14px">${stars}</span>`;
+      }
+
+      document.getElementById('tm-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student</th>
+        <th>Project Title</th>
+        <th>Type</th>
+        <th>Classes Trained</th>
+        <th>Accuracy</th>
+        <th>Model Link</th>
+        <th>Enjoyment</th>
+        <th>Submitted</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr class="clickable-row" onclick="showSubmissionDetail('tm', ${r.id})">
+          <td>${esc(r.student_name)}<br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
+          <td><strong>${esc(r.project_title)}</strong></td>
+          <td><span class="badge ${r.project_type === 'Image' ? 'badge-teal' : r.project_type === 'Audio' ? 'badge-gold' : 'badge-gray'}">${esc(r.project_type)}</span></td>
+          <td style="font-size:11px;color:#475569;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.classes_trained)}">${esc((r.classes_trained || ''))}</td>
+          <td><span class="badge ${r.accuracy_rating.includes('Flawless') || r.accuracy_rating.includes('Very') ? 'badge-green' : r.accuracy_rating.includes('Sometimes') ? 'badge-gold' : 'badge-red'}">${esc(r.accuracy_rating.split(' ')[0])}</span></td>
+          <td>${r.model_url ? `<a href="${esc(r.model_url)}" target="_blank" onclick="event.stopPropagation();" style="color:var(--teal);font-size:11px;font-weight:600">Model ↗</a>` : '<span style="color:var(--gray);font-size:11px">—</span>'}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
         </tr>`).join('')}

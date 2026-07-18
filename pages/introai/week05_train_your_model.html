@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Train Your Own Model — Intro to AI · Week 5</title>
+  <meta name="description"
+    content="Activity: Train Your OWN Image Model. Learn the fundamentals of gathering data, training image classification models, and testing predictions using Google Teachable Machine.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    /* Registration gate */
+    #registration-overlay { transition: opacity 0.4s ease; }
+    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
+    #registration-overlay .reg-card {
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
+    }
+    #registration-overlay.hiding .reg-card {
+      transform: scale(0.95) translateY(-10px); opacity: 0;
+    }
+
+    .reg-input:focus {
+      outline: none; border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
+    }
+    .reg-input.error {
+      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+    }
+
+    .form-input:focus {
+      outline: none; border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16,185,129,0.1);
+    }
+    .form-input.error { border-color: #ef4444; }
+
+    .opt-btn {
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .opt-btn:hover { transform: translateY(-1px); }
+    .opt-btn.selected {
+      border-color: #10b981 !important;
+      background: #ecfdf5 !important;
+      color: #065f46 !important;
+      font-weight: 700;
+    }
+
+    .star-btn {
+      font-size: 24px;
+      cursor: pointer;
+      filter: grayscale(100%);
+      transition: filter 0.15s ease, transform 0.1s ease;
+    }
+    .star-btn:hover {
+      transform: scale(1.15);
+    }
+    .star-btn.active {
+      filter: grayscale(0%);
+    }
+
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Prediction confidence bar */
+    .confidence-bar-bg {
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+    .confidence-bar-fill {
+      height: 100%;
+      background: #10b981;
+      border-radius: 9999px;
+      width: 0%;
+      transition: width 0.1s ease-out;
+    }
+  </style>
+</head>
+
+<body class="bg-[#F9FAFB] text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- REGISTRATION GATE -->
+  <div id="registration-overlay"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+    style="background: linear-gradient(135deg, #064e3b 0%, #047857 55%, #064e3b 100%);">
+
+    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
+        style="background: radial-gradient(circle, #a7f3d0, transparent);"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
+        style="background: radial-gradient(circle, #10b981, transparent);"></div>
+    </div>
+
+    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center bg-emerald-100 text-emerald-600">
+          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+          </svg>
+        </div>
+        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 bg-emerald-100 text-emerald-800">
+          Week 5 · Activity
+        </div>
+        <h1 class="text-2xl font-black text-gray-900 tracking-tight">Train Your <span class="text-emerald-600">OWN Model</span></h1>
+        <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">Enter your full name to start the training exercise.</p>
+      </div>
+
+      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
+        <div class="space-y-4 mb-6">
+          <div>
+            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Full Name</label>
+            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Jane Smith"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name to proceed.</p>
+          </div>
+          <div>
+            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
+            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. jane@school.edu"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
+          </div>
+        </div>
+        <button id="reg-submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700">
+          <span id="reg-btn-label">Begin Activity &#8594;</span>
+        </button>
+      </form>
+      <p class="text-center text-[10px] text-gray-400 font-medium mt-5">Saved to the Intro to AI student roster.</p>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main-content" class="max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <!-- Header -->
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+      <div>
+        <a href="index.html"
+          class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-emerald-600 mb-3 hover:text-emerald-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">
+          Train Your <span class="text-emerald-500">OWN Model</span>
+        </h1>
+        <p class="text-gray-500 font-medium italic mt-1">Machine Learning · Teachable Machines &middot; Week 5</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-emerald-50 border border-emerald-200 text-emerald-800 shadow-sm self-start md:self-auto">
+        Week 5
+      </div>
+    </header>
+
+    <!-- Brief Card -->
+    <div class="rounded-3xl p-6 mb-8 border bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-100 shadow-sm">
+      <div class="flex gap-4">
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 bg-emerald-500 text-white shadow-md">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-lg font-black text-emerald-950 mb-1">Image Classifier Training</h2>
+          <p class="text-sm text-emerald-900 leading-relaxed mb-3">
+            Build and test your own image classifier! Use Google's <strong>Teachable Machine</strong> to train a model to recognize different classes of images (e.g. Rock/Paper/Scissors, Happy/Sad faces, or other objects).
+          </p>
+          <ul class="text-xs text-emerald-800 space-y-1 bg-white/70 backdrop-blur-sm p-4 rounded-xl border border-emerald-100/50">
+            <li>1. Open <a href="https://teachablemachine.withgoogle.com/" target="_blank" class="underline font-bold hover:text-emerald-900">Teachable Machine</a> &amp; click <strong>Get Started</strong>.</li>
+            <li>2. Choose <strong>Image Project</strong> &rarr; <strong>Standard Image Model</strong>.</li>
+            <li>3. Define clear classes (e.g., "Rock", "Paper") and collect <strong>15-20+ varied examples</strong> per class using your webcam or uploads!</li>
+            <li>4. Click <strong>Train Model</strong>.</li>
+            <li>5. Export the model and upload it to get your shareable link (follow the detailed steps below in Step 2).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN FORM -->
+    <form id="train-form" onsubmit="submitExercise(event)" novalidate>
+
+      <!-- STEP 1: Project Details -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-emerald-500">1</div>
+          <h2 class="text-base font-black text-gray-900">Project Details</h2>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label for="project-title" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+              Project Theme / Title <span class="text-red-500">*</span>
+            </label>
+            <input id="project-title" type="text" placeholder="e.g. Rock-Paper-Scissors Game"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="title-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a project theme or title.</p>
+          </div>
+
+          <div>
+            <label for="classes-trained" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+              What classes did you train? <span class="text-red-500">*</span>
+            </label>
+            <input id="classes-trained" type="text" placeholder="e.g. Rock, Paper, Scissors"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="classes-error" class="hidden text-xs text-red-500 font-medium mt-1">Please list the classes you trained (comma-separated).</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+              Average Examples Collected Per Class <span class="text-red-500">*</span>
+            </label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="examples-picker">
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setExamples('Under 15', this)">Under 15</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setExamples('15-30', this)">15-30</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setExamples('30-60', this)">30-60</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setExamples('60+', this)">60+</button>
+            </div>
+            <p id="examples-error" class="hidden text-xs text-red-500 font-medium mt-1.5">Please choose the average count of training examples.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: Export Instructions & Link -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-emerald-500">2</div>
+          <h2 class="text-base font-black text-gray-900">Export &amp; Link Your Model</h2>
+        </div>
+
+        <!-- Export instructions panel -->
+        <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-700 mb-5">
+          <h3 class="font-black uppercase tracking-wider text-slate-800 mb-2 flex items-center gap-1.5">
+            📋 How to get your shareable link:
+          </h3>
+          <ol class="space-y-2 list-decimal list-inside leading-relaxed text-slate-600">
+            <li>In the <strong>Preview</strong> panel on Teachable Machine, click the blue <strong>Export Model</strong> button.</li>
+            <li>In the modal that opens, ensure the <strong>Tensorflow.js</strong> tab is active.</li>
+            <li>Click the blue <strong>Upload my model</strong> button (this makes it a public shareable URL).</li>
+            <li>Once uploaded, copy the link under <strong>Your shareable link:</strong> (it looks like <code class="font-mono bg-white px-1 py-0.5 border rounded">https://teachablemachine.withgoogle.com/models/xxxxxx/</code>).</li>
+            <li>Paste it below to test and submit!</li>
+          </ol>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label for="model-url" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+              Teachable Machine Exported Link <span class="text-red-500">*</span>
+            </label>
+            <div class="flex flex-col sm:flex-row gap-2">
+              <input id="model-url" type="url" placeholder="https://teachablemachine.withgoogle.com/models/tJ9D2sPq_/"
+                class="form-input flex-grow px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required
+                oninput="onUrlInput()" />
+              <button type="button" id="btn-load-model" onclick="handleLoadModel()"
+                class="px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-xl text-xs shadow-md active:scale-95 transition-all whitespace-nowrap">
+                ⚡ Load &amp; Test Live
+              </button>
+            </div>
+            <p id="model-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your Teachable Machine shareable link (should start with https://teachablemachine.withgoogle.com/models/).</p>
+          </div>
+
+          <!-- Loading state indicators -->
+          <div id="model-status" class="hidden p-4 rounded-xl border text-xs font-bold transition-all"></div>
+
+          <!-- Interactive Testing Sandbox -->
+          <div id="sandbox-container" class="hidden border border-emerald-100 rounded-2xl bg-emerald-50/20 p-5 mt-4">
+            <div class="flex items-center justify-between mb-4 border-b border-emerald-100/50 pb-3">
+              <div>
+                <h3 class="text-xs font-black uppercase tracking-widest text-emerald-800">Live Model Sandbox</h3>
+                <p class="text-[10px] text-emerald-600 mt-0.5">Loaded successfully. Turn on webcam to see predictions update below.</p>
+              </div>
+              <div class="px-2.5 py-1 rounded bg-emerald-100 text-emerald-950 font-mono text-[10px] font-bold" id="model-classes-count"></div>
+            </div>
+
+            <!-- Webcam Sandbox (Image) -->
+            <div id="webcam-sandbox" class="flex flex-col items-center justify-center gap-3">
+              <video id="webcam-video" autoplay playsinline muted width="320" height="240" class="hidden"></video>
+              <canvas id="webcam-canvas" width="320" height="240" class="rounded-xl border border-emerald-200 bg-black aspect-video w-full max-w-xs shadow-inner"></canvas>
+              <button type="button" id="btn-webcam-toggle" onclick="toggleWebcam()"
+                class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg text-xs shadow-sm transition-all">
+                Start Webcam 🎥
+              </button>
+            </div>
+
+            <!-- Real-time Predictions Bars -->
+            <div class="mt-5 space-y-3" id="predictions-box">
+              <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">Class Probabilities</p>
+              <div class="space-y-2.5" id="prediction-bars">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: Reflections & Testing -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-emerald-500">3</div>
+          <h2 class="text-base font-black text-gray-900">Testing &amp; Reflections</h2>
+        </div>
+
+        <div class="space-y-5">
+          <div>
+            <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+              How accurate is your model in testing? <span class="text-red-500">*</span>
+            </label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="accuracy-picker">
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setAccuracy('Always Wrong (0-25%)', this)">Always Wrong</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setAccuracy('Sometimes Right (25-70%)', this)">Sometimes Right</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setAccuracy('Very Accurate (70-95%)', this)">Very Accurate</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setAccuracy('Flawless (95-100%)', this)">Flawless</button>
+            </div>
+            <p id="accuracy-error" class="hidden text-xs text-red-500 font-medium mt-1.5">Please evaluate the testing accuracy.</p>
+          </div>
+
+          <div>
+            <label for="reflections" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+              Why do you think it is accurate or inaccurate? Any specific issues/challenges? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="reflections" rows="3"
+              placeholder="e.g. It gets confused if I rotate my hand too much because all of my training pictures were upright. Or, the background lighting changed so it started guessing 'rock' for everything..."
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="reflections-error" class="hidden text-xs text-red-500 font-medium mt-1">Please answer this reflection question.</p>
+          </div>
+
+          <div>
+            <label for="improvement" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+              What would you change/improve to make the model better if you did it again? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="improvement" rows="3"
+              placeholder="e.g. I would stand in front of a solid background and make sure to capture hands at different angles and distances from the camera..."
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="improvement-error" class="hidden text-xs text-red-500 font-medium mt-1">Please write your improvement ideas.</p>
+          </div>
+
+          <!-- Enjoyment stars -->
+          <div>
+            <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">How much did you enjoy training your model?</label>
+            <div class="flex gap-1" id="enjoyment-stars" role="group" aria-label="Enjoyment rating">
+              <button type="button" class="star-btn" data-val="1" onclick="setRating(1)" aria-label="1 star">⭐</button>
+              <button type="button" class="star-btn" data-val="2" onclick="setRating(2)" aria-label="2 stars">⭐</button>
+              <button type="button" class="star-btn" data-val="3" onclick="setRating(3)" aria-label="3 stars">⭐</button>
+              <button type="button" class="star-btn" data-val="4" onclick="setRating(4)" aria-label="4 stars">⭐</button>
+              <button type="button" class="star-btn" data-val="5" onclick="setRating(5)" aria-label="5 stars">⭐</button>
+            </div>
+            <p id="rating-error" class="hidden text-xs text-red-500 font-medium mt-1">Please select an enjoyment rating.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Section -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-12">
+        <p id="form-error" class="hidden text-sm font-medium text-red-500 mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+          <span id="form-error-text">Please complete all required fields.</span>
+        </p>
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700">
+          <span id="submit-label">Submit Model &amp; Reflections &#8594;</span>
+        </button>
+        <p class="text-center text-xs text-gray-400 font-medium mt-3">Results will load to the teacher dashboard.</p>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div id="success-screen"
+    class="hidden fixed inset-0 z-[90] bg-[#F9FAFB] flex items-center justify-center p-4">
+    <div class="text-center max-w-md bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+      <div class="w-20 h-20 mx-auto rounded-2xl mb-6 flex items-center justify-center bg-emerald-100 text-emerald-600 shadow-sm">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <div class="inline-block px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 bg-emerald-50 text-emerald-800">
+        Model Submitted!
+      </div>
+      <h2 class="text-3xl font-black text-gray-900 mb-3 tracking-tight">
+        Fantastic work, <span id="success-name" class="text-emerald-600"></span>!
+      </h2>
+      <p class="text-gray-500 mb-8 leading-relaxed text-sm">
+        Your Teachable Machine model URL, testing details, and reflections have been recorded.
+      </p>
+      <a href="index.html"
+        class="inline-flex items-center gap-2 text-white font-black py-3.5 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm bg-gradient-to-r from-emerald-50 to-teal-600">
+        Return to Course Hub
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    /* SUPABASE CONFIG */
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+    const TABLE = 'introai_week05_train_your_model';
+
+    /* State */
+    let studentName = '', studentEmail = '';
+    const selectedProjectType = 'Image'; // Restricted strictly to Image Project
+    let selectedExamplesCount = '';
+    let selectedAccuracy = '';
+    let enjoymentRating = 0;
+    let activeModel = null;
+    let isModelLoading = false;
+
+    // Sandbox active state variables
+    let tfjsLoaded = false;
+    let webcamActive = false;
+    let webcamStream = null;
+    let animationFrameId = null;
+
+    /* REGISTRATION GATE */
+    function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+    async function handleRegistration(ev) {
+      ev.preventDefault();
+      const nameEl = document.getElementById('reg-name');
+      const emailEl = document.getElementById('reg-email');
+      const nameErr = document.getElementById('reg-name-error');
+      const emailErr = document.getElementById('reg-email-error');
+      let ok = true;
+
+      nameEl.classList.remove('error'); nameErr.classList.add('hidden');
+      emailEl.classList.remove('error'); emailErr.classList.add('hidden');
+
+      if (!nameEl.value.trim()) { nameEl.classList.add('error'); nameErr.classList.remove('hidden'); ok = false; }
+      if (!emailEl.value.trim() || !validateEmail(emailEl.value.trim())) { emailEl.classList.add('error'); emailErr.classList.remove('hidden'); ok = false; }
+      if (!ok) return;
+
+      const btn = document.getElementById('reg-submit-btn');
+      btn.disabled = true;
+      document.getElementById('reg-btn-label').innerHTML = '<span class="spinner"></span> Starting\u2026';
+
+      studentName = nameEl.value.trim();
+      studentEmail = emailEl.value.trim();
+      sessionStorage.setItem('introai_w05_tm_name', studentName);
+      sessionStorage.setItem('introai_w05_tm_email', studentEmail);
+
+      const overlay = document.getElementById('registration-overlay');
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.remove(), 450);
+    }
+
+    (function restoreSession() {
+      const n = sessionStorage.getItem('introai_w05_tm_name');
+      const e = sessionStorage.getItem('introai_w05_tm_email');
+      if (n && e) {
+        studentName = n;
+        studentEmail = e;
+        document.getElementById('registration-overlay').remove();
+      }
+    })();
+
+    /* FIELD SETTERS */
+    function setExamples(val, btn) {
+      selectedExamplesCount = val;
+      document.querySelectorAll('#examples-picker .opt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById('examples-error').classList.add('hidden');
+    }
+
+    function setAccuracy(val, btn) {
+      selectedAccuracy = val;
+      document.querySelectorAll('#accuracy-picker .opt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById('accuracy-error').classList.add('hidden');
+    }
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#enjoyment-stars .star-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx < val);
+      });
+      document.getElementById('rating-error').classList.add('hidden');
+    }
+
+    function onUrlInput() {
+      document.getElementById('model-error').classList.add('hidden');
+      document.getElementById('model-status').className = 'hidden';
+      document.getElementById('sandbox-container').classList.add('hidden');
+      resetSandbox();
+    }
+
+    /* DYNAMIC RESOURCE LOADING */
+    async function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+
+    async function ensureLibrariesLoaded() {
+      if (!tfjsLoaded) {
+        showStatus('Loading TensorFlow.js core libraries...', 'bg-blue-50 border-blue-200 text-blue-800');
+        await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js");
+        tfjsLoaded = true;
+      }
+
+      showStatus(`Loading Teachable Machine Image library...`, 'bg-blue-50 border-blue-200 text-blue-800');
+      if (typeof tmImage === 'undefined') {
+        await loadScript("https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js");
+      }
+    }
+
+    function showStatus(text, classes) {
+      const el = document.getElementById('model-status');
+      el.className = `p-4 rounded-xl border text-xs font-bold transition-all ${classes}`;
+      el.innerHTML = text;
+    }
+
+    /* LOAD MODEL */
+    async function handleLoadModel() {
+      if (isModelLoading) return;
+      
+      let urlVal = document.getElementById('model-url').value.trim();
+      if (!urlVal || !urlVal.startsWith('https://teachablemachine.withgoogle.com/models/')) {
+        document.getElementById('model-error').classList.remove('hidden');
+        return;
+      }
+
+      // Format URL with trailing slash
+      if (!urlVal.endsWith('/')) {
+        urlVal += '/';
+        document.getElementById('model-url').value = urlVal;
+      }
+
+      isModelLoading = true;
+      const loadBtn = document.getElementById('btn-load-model');
+      loadBtn.disabled = true;
+      loadBtn.innerHTML = '<span class="spinner"></span> Loading...';
+
+      try {
+        resetSandbox();
+        await ensureLibrariesLoaded();
+
+        showStatus('Connecting to Google Cloud and fetching model weights...', 'bg-amber-50 border-amber-200 text-amber-800');
+
+        const modelURL = urlVal + "model.json";
+        const metadataURL = urlVal + "metadata.json";
+
+        activeModel = await tmImage.load(modelURL, metadataURL);
+
+        // Successfully loaded!
+        const classes = activeModel.getClassLabels();
+        
+        showStatus('✓ Image model loaded successfully!', 'bg-emerald-50 border-emerald-200 text-emerald-800');
+        
+        // Populate Sandbox
+        document.getElementById('model-classes-count').textContent = `${classes.length} Classes`;
+        document.getElementById('sandbox-container').classList.remove('hidden');
+
+        // Set up prediction bars UI
+        const barsBox = document.getElementById('prediction-bars');
+        barsBox.innerHTML = classes.map((cls, idx) => `
+          <div class="space-y-1">
+            <div class="flex justify-between items-center text-[11px] font-bold text-gray-700">
+              <span>${esc(cls)}</span>
+              <span id="score-val-${idx}">0%</span>
+            </div>
+            <div class="confidence-bar-bg">
+              <div class="confidence-bar-fill" id="score-bar-${idx}"></div>
+            </div>
+          </div>
+        `).join('');
+
+      } catch (err) {
+        console.error(err);
+        showStatus(`❌ Error loading model: ${err.message}<br><span class="font-normal mt-1 block">Check that your URL is correct and is uploaded/published publicly on Teachable Machine.</span>`, 'bg-red-50 border-red-200 text-red-800');
+      } finally {
+        isModelLoading = false;
+        loadBtn.disabled = false;
+        loadBtn.innerHTML = '⚡ Load &amp; Test Live';
+      }
+    }
+
+    /* WEBCAM PREDICTIONS LOOP */
+    async function toggleWebcam() {
+      if (webcamActive) {
+        stopWebcam();
+      } else {
+        await startWebcam();
+      }
+    }
+
+    async function startWebcam() {
+      if (webcamActive) return;
+      try {
+        const toggleBtn = document.getElementById('btn-webcam-toggle');
+        toggleBtn.disabled = true;
+        toggleBtn.textContent = "Setting up webcam...";
+
+        webcamStream = await navigator.mediaDevices.getUserMedia({
+          video: { width: 320, height: 240, facingMode: 'user' },
+          audio: false
+        });
+        
+        const video = document.getElementById('webcam-video');
+        video.srcObject = webcamStream;
+        await new Promise((resolve) => video.onloadedmetadata = resolve);
+        video.play();
+        
+        webcamActive = true;
+        toggleBtn.disabled = false;
+        toggleBtn.textContent = "Stop Webcam 🛑";
+        toggleBtn.className = "px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg text-xs shadow-sm transition-all";
+
+        predictLoop();
+      } catch (err) {
+        alert("Webcam permission denied or unavailable: " + err.message);
+        stopWebcam();
+      }
+    }
+
+    function stopWebcam() {
+      const toggleBtn = document.getElementById('btn-webcam-toggle');
+      if (toggleBtn) {
+        toggleBtn.textContent = "Start Webcam 🎥";
+        toggleBtn.className = "px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg text-xs shadow-sm transition-all";
+        toggleBtn.disabled = false;
+      }
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+      if (webcamStream) {
+        webcamStream.getTracks().forEach(track => track.stop());
+        webcamStream = null;
+      }
+      webcamActive = false;
+      
+      const canvas = document.getElementById('webcam-canvas');
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    async function predictLoop() {
+      if (!webcamActive || !activeModel) return;
+
+      const video = document.getElementById('webcam-video');
+      const canvas = document.getElementById('webcam-canvas');
+      if (!video || !canvas) return;
+
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      try {
+        const predictions = await activeModel.predict(canvas);
+        updatePredictionUI(predictions);
+      } catch (err) {
+        console.error("Prediction error:", err);
+      }
+
+      animationFrameId = requestAnimationFrame(predictLoop);
+    }
+
+    function updatePredictionUI(predictions) {
+      predictions.forEach((pred, idx) => {
+        const percent = Math.round(pred.probability * 100);
+        const scoreVal = document.getElementById(`score-val-${idx}`);
+        const scoreBar = document.getElementById(`score-bar-${idx}`);
+        
+        if (scoreVal) scoreVal.textContent = `${percent}%`;
+        if (scoreBar) scoreBar.style.width = `${percent}%`;
+      });
+    }
+
+    function resetSandbox() {
+      stopWebcam();
+      activeModel = null;
+      document.getElementById('sandbox-container').classList.add('hidden');
+    }
+
+    /* SUBMIT EXERCISE */
+    async function supabaseInsert(payload) {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!resp.ok) { const t = await resp.text(); throw new Error(`HTTP ${resp.status}: ${t}`); }
+    }
+
+    async function submitExercise(ev) {
+      ev.preventDefault();
+      let ok = true;
+
+      // Title
+      const titleVal = document.getElementById('project-title').value.trim();
+      document.getElementById('title-error').classList.toggle('hidden', !!titleVal);
+      if (!titleVal) ok = false;
+
+      // Classes
+      const classesVal = document.getElementById('classes-trained').value.trim();
+      document.getElementById('classes-error').classList.toggle('hidden', !!classesVal);
+      if (!classesVal) ok = false;
+
+      // Examples count selection
+      document.getElementById('examples-error').classList.toggle('hidden', !!selectedExamplesCount);
+      if (!selectedExamplesCount) ok = false;
+
+      // Model URL
+      const urlVal = document.getElementById('model-url').value.trim();
+      const validUrl = urlVal && urlVal.startsWith('https://teachablemachine.withgoogle.com/models/');
+      document.getElementById('model-error').classList.toggle('hidden', validUrl);
+      if (!validUrl) ok = false;
+
+      // Accuracy selection
+      document.getElementById('accuracy-error').classList.toggle('hidden', !!selectedAccuracy);
+      if (!selectedAccuracy) ok = false;
+
+      // Reflections
+      const refVal = document.getElementById('reflections').value.trim();
+      document.getElementById('reflections-error').classList.toggle('hidden', !!refVal);
+      if (!refVal) ok = false;
+
+      // Improvement
+      const impVal = document.getElementById('improvement').value.trim();
+      document.getElementById('improvement-error').classList.toggle('hidden', !!impVal);
+      if (!impVal) ok = false;
+
+      // Enjoyment Rating
+      if (enjoymentRating === 0) {
+        document.getElementById('rating-error').classList.remove('hidden');
+        ok = false;
+      }
+
+      if (!ok) {
+        document.getElementById('form-error').classList.remove('hidden');
+        document.querySelector('[id$="-error"]:not(.hidden)')
+          ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      document.getElementById('form-error').classList.add('hidden');
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting…';
+
+      const payload = {
+        student_name:          studentName,
+        student_email:         studentEmail,
+        project_type:          selectedProjectType,
+        project_title:         titleVal,
+        classes_trained:       classesVal,
+        examples_per_class:    selectedExamplesCount,
+        model_url:             urlVal,
+        accuracy_rating:       selectedAccuracy,
+        challenges_reflections: refVal,
+        improvement_ideas:     impVal,
+        enjoyment_rating:      enjoymentRating,
+        submitted_at:          new Date().toISOString()
+      };
+
+      try {
+        await supabaseInsert(payload);
+        
+        // Stop webcam streams
+        resetSandbox();
+
+        document.getElementById('success-name').textContent = studentName.split(' ')[0];
+        document.getElementById('success-screen').classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        console.error('[Week 5 TM] Supabase error:', err.message);
+        btn.disabled = false;
+        document.getElementById('submit-label').textContent = 'Submit Model & Reflections \u2192';
+        document.getElementById('form-error-text').textContent = '⚠️ Network error. Please check your internet or notify your teacher.';
+        document.getElementById('form-error').classList.remove('hidden');
+      }
+    }
+
+    function esc(str) {
+      return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+
+</body>
+
+</html>
