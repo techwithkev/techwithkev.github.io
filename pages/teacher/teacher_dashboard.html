@@ -3446,6 +3446,8 @@
     // ════════════════════════════════════════════════════════════════════════════
     function closeModal(e) {
       if (!e || e.target === document.getElementById('modal-overlay') || !e.target) {
+        if (typeof stopDashboardWebcam === 'function') stopDashboardWebcam();
+        if (typeof stopDashboardAudio === 'function') stopDashboardAudio();
         document.getElementById('modal-overlay').classList.remove('open');
       }
     }
@@ -3547,6 +3549,48 @@
           </tbody>
         </table>
       </div>`;
+
+      if (type === 'tm') {
+        bodyHtml += `
+          <div style="margin-top: 24px; padding: 20px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 12px;">
+            <h3 style="margin-top:0; margin-bottom:8px; font-weight:800; font-size:14px; color:#065f46; text-transform:uppercase; letter-spacing:0.5px;">🧪 Live Sandbox Test (${esc(r.project_type)})</h3>
+            <p style="margin-top:0; margin-bottom:16px; font-size:12px; color:#047857;">Load and verify this student's model live inside the dashboard using your ${r.project_type === 'Audio' ? 'microphone' : 'webcam'}.</p>
+            
+            <div id="dashboard-sandbox-status" style="padding: 10px; border-radius: 8px; border: 1px solid #c7d2fe; background: #f5f3ff; color: #4338ca; font-size: 11px; font-weight: bold; margin-bottom: 12px; border-left: 4px solid #6366f1;">
+              Ready to load model.
+            </div>
+
+            <div style="display:flex; flex-direction:column; align-items:center; gap:12px;">
+              <!-- Webcam Sandbox (Image/Pose) -->
+              <div id="db-webcam-sandbox" style="display:none; flex-direction:column; align-items:center; gap:8px;">
+                <video id="dashboard-webcam-video" autoplay playsinline muted width="320" height="240" style="display:none;"></video>
+                <canvas id="dashboard-webcam-canvas" width="320" height="240" style="background:#000; border-radius:10px; border:1px solid #10b981; max-width:240px; aspect-ratio:4/3;"></canvas>
+                <button type="button" id="btn-dashboard-webcam" onclick="toggleDashboardWebcam()" disabled style="padding: 8px 16px; background:#6b7280; border:none; border-radius:6px; color:#fff; font-weight:bold; font-size:12px; cursor:not-allowed;">
+                  Start Webcam 🎥
+                </button>
+              </div>
+
+              <!-- Audio Sandbox (Audio) -->
+              <div id="db-audio-sandbox" style="display:none; flex-direction:column; align-items:center; gap:8px; padding: 16px; background:#fff; border:1px solid #a7f3d0; border-radius:10px; width:100%; max-width:240px; text-align:center;">
+                <div id="db-mic-indicator" style="font-size:32px;">🎙️</div>
+                <p id="db-audio-status-label" style="margin: 4px 0; font-size:11px; font-weight:bold; color:#6b7280;">Microphone is offline</p>
+                <button type="button" id="btn-dashboard-audio" onclick="toggleDashboardAudio()" disabled style="padding: 8px 16px; background:#6b7280; border:none; border-radius:6px; color:#fff; font-weight:bold; font-size:12px; cursor:not-allowed;">
+                  Start Listening 🎙️
+                </button>
+              </div>
+
+              <button type="button" onclick="loadDashboardModel('${esc(r.model_url)}', '${esc(r.project_type)}')" style="padding: 8px 16px; background:#10b981; border:none; border-radius:6px; color:#fff; font-weight:bold; font-size:12px; cursor:pointer;">
+                Load Model ⚡
+              </button>
+            </div>
+
+            <div style="margin-top: 16px; display:none;" id="dashboard-predictions-container">
+              <p style="margin-top:0; margin-bottom:8px; font-size:10px; font-weight:bold; text-transform:uppercase; color:#047857; letter-spacing:0.5px;">Live Probabilities</p>
+              <div id="dashboard-prediction-bars" style="display:flex; flex-direction:column; gap:10px;"></div>
+            </div>
+          </div>
+        `;
+      }
 
       document.getElementById('modal-body').innerHTML = bodyHtml;
       document.getElementById('modal-overlay').classList.add('open');
@@ -4815,6 +4859,339 @@
         </tr>`).join('')}
       </tbody>
     </table>`;
+    }
+
+    // ════════════════════════════════════════════════════════════════════════════
+    // TEACHER DASHBOARD — LIVE MODEL SANDBOX TESTING
+    // ════════════════════════════════════════════════════════════════════════════
+    let dbWebcamActive = false;
+    let dbWebcamStream = null;
+    let dbAnimationFrameId = null;
+    let dbActiveModel = null;
+    let dbTfjsLoaded = false;
+    let dbActiveProjectType = '';
+    let dbAudioActive = false;
+
+    async function loadDashboardScript(src) {
+      return new Promise((resolve, reject) => {
+        if (document.querySelector(`script[src="${src}"]`)) {
+          resolve(); return;
+        }
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+
+    async function ensureDashboardLibrariesLoaded(type) {
+      if (!dbTfjsLoaded) {
+        updateDbStatus('Loading TensorFlow.js core...', '#4338ca', '#f5f3ff', '#c7d2fe');
+        await loadDashboardScript("https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js");
+        dbTfjsLoaded = true;
+      }
+      updateDbStatus(`Loading Teachable Machine ${type} SDK...`, '#4338ca', '#f5f3ff', '#c7d2fe');
+      if (type === 'Image' && typeof tmImage === 'undefined') {
+        await loadDashboardScript("https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js");
+      } else if (type === 'Pose' && typeof tmPose === 'undefined') {
+        await loadDashboardScript("https://cdn.jsdelivr.net/npm/@teachablemachine/pose@0.8/dist/teachablemachine-pose.min.js");
+      } else if (type === 'Audio' && typeof speechCommands === 'undefined') {
+        await loadDashboardScript("https://cdn.jsdelivr.net/npm/@tensorflow-models/speech-commands@0.4.0/dist/speech-commands.min.js");
+      }
+    }
+
+    function updateDbStatus(text, color, bg, border) {
+      const el = document.getElementById('dashboard-sandbox-status');
+      if (el) {
+        el.innerHTML = text;
+        el.style.color = color;
+        el.style.background = bg;
+        el.style.borderColor = border;
+      }
+    }
+
+    async function loadDashboardModel(urlVal, projectType) {
+      const loadBtn = event.currentTarget;
+      loadBtn.disabled = true;
+      loadBtn.textContent = "Loading...";
+      dbActiveProjectType = projectType;
+
+      try {
+        stopDashboardWebcam();
+        stopDashboardAudio();
+        dbActiveModel = null;
+        document.getElementById('dashboard-predictions-container').style.display = 'none';
+
+        if (!urlVal.endsWith('/')) {
+          urlVal += '/';
+        }
+
+        await ensureDashboardLibrariesLoaded(projectType);
+        updateDbStatus('Connecting to model weights hosting...', '#d97706', '#fffbeb', '#fef3c7');
+
+        const modelURL = urlVal + "model.json";
+        const metadataURL = urlVal + "metadata.json";
+
+        if (projectType === 'Image') {
+          dbActiveModel = await tmImage.load(modelURL, metadataURL);
+        } else if (projectType === 'Pose') {
+          dbActiveModel = await tmPose.load(modelURL, metadataURL);
+        } else if (projectType === 'Audio') {
+          dbActiveModel = speechCommands.create("BROWSER_FFT", undefined, modelURL, metadataURL);
+          await dbActiveModel.ensureModelLoaded();
+        }
+
+        const classes = projectType === 'Audio' ? dbActiveModel.wordLabels() : dbActiveModel.getClassLabels();
+        updateDbStatus(`✓ ${projectType} model loaded! ${classes.length} classes detected.`, '#059669', '#ecfdf5', '#a7f3d0');
+
+        // Populate prediction bars
+        const barsBox = document.getElementById('dashboard-prediction-bars');
+        barsBox.innerHTML = classes.map((cls, idx) => `
+          <div style="font-size:11px; display:flex; flex-direction:column; gap:4px;">
+            <div style="display:flex; justify-content:space-between; font-weight:bold; color:#1e293b;">
+              <span>${esc(cls)}</span>
+              <span id="db-score-val-${idx}">0%</span>
+            </div>
+            <div style="height:6px; background:#e2e8f0; border-radius:999px; overflow:hidden;">
+              <div id="db-score-bar-${idx}" style="height:100%; width:0%; background:#10b981; border-radius:999px; transition:width 0.1s ease-out;"></div>
+            </div>
+          </div>
+        `).join('');
+
+        document.getElementById('dashboard-predictions-container').style.display = 'block';
+        
+        // Show correct sandbox elements
+        if (projectType === 'Image' || projectType === 'Pose') {
+          document.getElementById('db-webcam-sandbox').style.display = 'flex';
+          document.getElementById('db-audio-sandbox').style.display = 'none';
+
+          const webcamBtn = document.getElementById('btn-dashboard-webcam');
+          webcamBtn.disabled = false;
+          webcamBtn.style.background = "#10b981";
+          webcamBtn.style.cursor = "pointer";
+        } else {
+          document.getElementById('db-webcam-sandbox').style.display = 'none';
+          document.getElementById('db-audio-sandbox').style.display = 'flex';
+
+          const audioBtn = document.getElementById('btn-dashboard-audio');
+          audioBtn.disabled = false;
+          audioBtn.style.background = "#10b981";
+          audioBtn.style.cursor = "pointer";
+        }
+
+      } catch (err) {
+        console.error(err);
+        updateDbStatus(`❌ Load failed: ${err.message}`, '#dc2626', '#fef2f2', '#fca5a5');
+      } finally {
+        loadBtn.disabled = false;
+        loadBtn.textContent = "Load Model ⚡";
+      }
+    }
+
+    async function toggleDashboardWebcam() {
+      if (dbWebcamActive) {
+        stopDashboardWebcam();
+      } else {
+        await startDashboardWebcam();
+      }
+    }
+
+    async function startDashboardWebcam() {
+      if (dbWebcamActive) return;
+      const toggleBtn = document.getElementById('btn-dashboard-webcam');
+      try {
+        toggleBtn.disabled = true;
+        toggleBtn.textContent = "Accessing webcam...";
+
+        dbWebcamStream = await navigator.mediaDevices.getUserMedia({
+          video: { width: 320, height: 240, facingMode: 'user' },
+          audio: false
+        });
+
+        const video = document.getElementById('dashboard-webcam-video');
+        video.srcObject = dbWebcamStream;
+        await new Promise((resolve) => video.onloadedmetadata = resolve);
+        video.play();
+
+        dbWebcamActive = true;
+        toggleBtn.disabled = false;
+        toggleBtn.textContent = "Stop Webcam 🛑";
+        toggleBtn.style.background = "#ef4444";
+
+        predictDashboardLoop();
+      } catch (err) {
+        alert("Webcam access error: " + err.message);
+        stopDashboardWebcam();
+      }
+    }
+
+    function stopDashboardWebcam() {
+      const toggleBtn = document.getElementById('btn-dashboard-webcam');
+      if (toggleBtn) {
+        toggleBtn.textContent = "Start Webcam 🎥";
+        toggleBtn.style.background = "#10b981";
+        toggleBtn.disabled = !dbActiveModel;
+        if (toggleBtn.disabled) {
+          toggleBtn.style.background = "#6b7280";
+          toggleBtn.style.cursor = "not-allowed";
+        } else {
+          toggleBtn.style.cursor = "pointer";
+        }
+      }
+      if (dbAnimationFrameId) {
+        cancelAnimationFrame(dbAnimationFrameId);
+        dbAnimationFrameId = null;
+      }
+      if (dbWebcamStream) {
+        dbWebcamStream.getTracks().forEach(track => track.stop());
+        dbWebcamStream = null;
+      }
+      dbWebcamActive = false;
+      
+      const canvas = document.getElementById('dashboard-webcam-canvas');
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    async function predictDashboardLoop() {
+      if (!dbWebcamActive || !dbActiveModel) return;
+
+      const video = document.getElementById('dashboard-webcam-video');
+      const canvas = document.getElementById('dashboard-webcam-canvas');
+      if (!video || !canvas) return;
+
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      try {
+        let predictions = [];
+        if (dbActiveProjectType === 'Image') {
+          predictions = await dbActiveModel.predict(canvas);
+        } else if (dbActiveProjectType === 'Pose') {
+          const { pose, posenetOutput } = await dbActiveModel.estimatePose(canvas);
+          predictions = await dbActiveModel.predict(posenetOutput);
+          
+          if (pose) {
+            // Draw skeleton lines
+            const adjacentKeypoints = tmPose.getAdjacentKeypoints(pose.keypoints, 0.5);
+            ctx.strokeStyle = '#10b981';
+            ctx.lineWidth = 3;
+            adjacentKeypoints.forEach((keypoints) => {
+              ctx.beginPath();
+              ctx.moveTo(keypoints[0].position.x, keypoints[0].position.y);
+              ctx.lineTo(keypoints[1].position.x, keypoints[1].position.y);
+              ctx.stroke();
+            });
+
+            // Draw keypoints
+            pose.keypoints.forEach((kp) => {
+              if (kp.score > 0.5) {
+                ctx.beginPath();
+                ctx.arc(kp.position.x, kp.position.y, 6, 0, 2 * Math.PI);
+                ctx.fillStyle = '#f59e0b';
+                ctx.fill();
+              }
+            });
+          }
+        }
+        updateDashboardPredictions(predictions);
+      } catch (err) {
+        console.error("Dashboard prediction loop error:", err);
+      }
+
+      dbAnimationFrameId = requestAnimationFrame(predictDashboardLoop);
+    }
+
+    async function toggleDashboardAudio() {
+      if (dbAudioActive) {
+        stopDashboardAudio();
+      } else {
+        await startDashboardAudio();
+      }
+    }
+
+    async function startDashboardAudio() {
+      if (dbAudioActive || !dbActiveModel) return;
+      const toggleBtn = document.getElementById('btn-dashboard-audio');
+      try {
+        toggleBtn.disabled = true;
+        toggleBtn.textContent = "Accessing Mic...";
+
+        dbAudioActive = true;
+        document.getElementById('db-mic-indicator').style.animation = 'bounce 1s infinite';
+        document.getElementById('db-audio-status-label').innerHTML = '🔴 Listening live...';
+        document.getElementById('db-audio-status-label').style.color = '#ef4444';
+
+        toggleBtn.disabled = false;
+        toggleBtn.textContent = "Stop Listening 🛑";
+        toggleBtn.style.background = "#ef4444";
+
+        const classes = dbActiveModel.wordLabels();
+        await dbActiveModel.listen(result => {
+          const predictions = classes.map((label, idx) => ({
+            className: label,
+            probability: result.scores[idx]
+          }));
+          updateDashboardPredictions(predictions);
+        }, {
+          includeSpectrogram: false,
+          probabilityThreshold: 0.65,
+          overlapFactor: 0.5
+        });
+      } catch (err) {
+        alert("Microphone permission denied or unavailable: " + err.message);
+        stopDashboardAudio();
+      }
+    }
+
+    function stopDashboardAudio() {
+      const toggleBtn = document.getElementById('btn-dashboard-audio');
+      if (toggleBtn) {
+        toggleBtn.textContent = "Start Listening 🎙️";
+        toggleBtn.style.background = "#10b981";
+        toggleBtn.disabled = !dbActiveModel;
+        if (toggleBtn.disabled) {
+          toggleBtn.style.background = "#6b7280";
+          toggleBtn.style.cursor = "not-allowed";
+        } else {
+          toggleBtn.style.cursor = "pointer";
+        }
+      }
+      
+      const mic = document.getElementById('db-mic-indicator');
+      if (mic) mic.style.animation = '';
+      
+      const label = document.getElementById('db-audio-status-label');
+      if (label) {
+        label.innerHTML = 'Microphone is offline';
+        label.style.color = '#6b7280';
+      }
+
+      if (dbActiveModel && dbAudioActive) {
+        dbActiveModel.stopListening();
+      }
+      dbAudioActive = false;
+
+      // Clear bar values
+      if (dbActiveModel) {
+        const classes = dbActiveModel.wordLabels();
+        const dummy = classes.map(c => ({ className: c, probability: 0 }));
+        updateDashboardPredictions(dummy);
+      }
+    }
+
+    function updateDashboardPredictions(predictions) {
+      predictions.forEach((pred, idx) => {
+        const percent = Math.round(pred.probability * 100);
+        const scoreVal = document.getElementById(`db-score-val-${idx}`);
+        const scoreBar = document.getElementById(`db-score-bar-${idx}`);
+        
+        if (scoreVal) scoreVal.textContent = `${percent}%`;
+        if (scoreBar) scoreBar.style.width = `${percent}%`;
+      });
     }
 
     // ── Extended exportCSV to handle sh, cb, cp, and pd ──────────────────────

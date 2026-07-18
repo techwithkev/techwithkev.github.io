@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Train Your Own Model — Intro to AI · Week 5</title>
   <meta name="description"
-    content="Activity: Train Your OWN Image Model. Learn the fundamentals of gathering data, training image classification models, and testing predictions using Google Teachable Machine.">
+    content="Activity: Train Your OWN Model. Learn the fundamentals of gathering data, training classification models, and testing predictions using Google Teachable Machine.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
@@ -183,16 +183,16 @@
           </svg>
         </div>
         <div>
-          <h2 class="text-lg font-black text-emerald-950 mb-1">Image Classifier Training</h2>
+          <h2 class="text-lg font-black text-emerald-950 mb-1">Interactive ML Training</h2>
           <p class="text-sm text-emerald-900 leading-relaxed mb-3">
-            Build and test your own image classifier! Use Google's <strong>Teachable Machine</strong> to train a model to recognize different classes of images (e.g. Rock/Paper/Scissors, Happy/Sad faces, or other objects).
+            Build and test your own machine learning classifier! Use Google's <strong>Teachable Machine</strong> to train a model based on Images, Audio, or Poses.
           </p>
           <ul class="text-xs text-emerald-800 space-y-1 bg-white/70 backdrop-blur-sm p-4 rounded-xl border border-emerald-100/50">
             <li>1. Open <a href="https://teachablemachine.withgoogle.com/" target="_blank" class="underline font-bold hover:text-emerald-900">Teachable Machine</a> &amp; click <strong>Get Started</strong>.</li>
-            <li>2. Choose <strong>Image Project</strong> &rarr; <strong>Standard Image Model</strong>.</li>
-            <li>3. Define clear classes (e.g., "Rock", "Paper") and collect <strong>15-20+ varied examples</strong> per class using your webcam or uploads!</li>
+            <li>2. Choose your project style: <strong>Image</strong>, <strong>Audio</strong>, or <strong>Pose</strong>.</li>
+            <li>3. Define clear classes and collect <strong>15-20+ varied examples</strong> per class!</li>
             <li>4. Click <strong>Train Model</strong>.</li>
-            <li>5. Export the model and upload it to get your shareable link (follow the detailed steps below in Step 2).</li>
+            <li>5. Export the model and upload it to get your shareable link (follow the detailed steps below in Step 3).</li>
           </ul>
         </div>
       </div>
@@ -201,10 +201,43 @@
     <!-- MAIN FORM -->
     <form id="train-form" onsubmit="submitExercise(event)" novalidate>
 
-      <!-- STEP 1: Project Details -->
+      <!-- STEP 1: Choose Project Type -->
       <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
         <div class="flex items-center gap-3 mb-5">
           <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-emerald-500">1</div>
+          <h2 class="text-base font-black text-gray-900">Choose Your Project Type</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="projecttype-picker">
+          <button type="button" class="opt-btn border border-gray-200 rounded-2xl p-4 text-center flex flex-col items-center gap-2 bg-gray-50" onclick="setProjectType('Image', this)">
+            <span class="text-3xl">📷</span>
+            <div>
+              <p class="text-sm font-black text-gray-900">Image Project</p>
+              <p class="text-[10px] text-gray-500 mt-0.5">Rock/Paper/Scissors, Happy/Sad, Objects</p>
+            </div>
+          </button>
+          <button type="button" class="opt-btn border border-gray-200 rounded-2xl p-4 text-center flex flex-col items-center gap-2 bg-gray-50" onclick="setProjectType('Audio', this)">
+            <span class="text-3xl">🎵</span>
+            <div>
+              <p class="text-sm font-black text-gray-900">Audio Project</p>
+              <p class="text-[10px] text-gray-500 mt-0.5">Clap/Snap/Whistle, Yes/No, Sound effects</p>
+            </div>
+          </button>
+          <button type="button" class="opt-btn border border-gray-200 rounded-2xl p-4 text-center flex flex-col items-center gap-2 bg-gray-50" onclick="setProjectType('Pose', this)">
+            <span class="text-3xl">🧍</span>
+            <div>
+              <p class="text-sm font-black text-gray-900">Pose Project</p>
+              <p class="text-[10px] text-gray-500 mt-0.5">Standing/Sitting, Arms Up/Down, Left/Right</p>
+            </div>
+          </button>
+        </div>
+        <p id="projecttype-error" class="hidden text-xs text-red-500 font-medium mt-2">Please choose a project type.</p>
+      </div>
+
+      <!-- STEP 2: Project Specifications -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-emerald-500">2</div>
           <h2 class="text-base font-black text-gray-900">Project Details</h2>
         </div>
 
@@ -242,11 +275,11 @@
         </div>
       </div>
 
-      <!-- STEP 2: Export Instructions & Link -->
+      <!-- STEP 3: Link Teachable Machine Model & Live Test -->
       <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
         <div class="flex items-center gap-3 mb-5">
-          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-emerald-500">2</div>
-          <h2 class="text-base font-black text-gray-900">Export &amp; Link Your Model</h2>
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-emerald-500">3</div>
+          <h2 class="text-base font-black text-gray-900">Link &amp; Test Your Model</h2>
         </div>
 
         <!-- Export instructions panel -->
@@ -288,18 +321,28 @@
             <div class="flex items-center justify-between mb-4 border-b border-emerald-100/50 pb-3">
               <div>
                 <h3 class="text-xs font-black uppercase tracking-widest text-emerald-800">Live Model Sandbox</h3>
-                <p class="text-[10px] text-emerald-600 mt-0.5">Loaded successfully. Turn on webcam to see predictions update below.</p>
+                <p class="text-[10px] text-emerald-600 mt-0.5">Loaded successfully. Interact and see predictions update below.</p>
               </div>
               <div class="px-2.5 py-1 rounded bg-emerald-100 text-emerald-950 font-mono text-[10px] font-bold" id="model-classes-count"></div>
             </div>
 
-            <!-- Webcam Sandbox (Image) -->
-            <div id="webcam-sandbox" class="flex flex-col items-center justify-center gap-3">
+            <!-- Webcam Sandbox (Image/Pose) -->
+            <div id="webcam-sandbox" class="hidden flex flex-col items-center justify-center gap-3">
               <video id="webcam-video" autoplay playsinline muted width="320" height="240" class="hidden"></video>
               <canvas id="webcam-canvas" width="320" height="240" class="rounded-xl border border-emerald-200 bg-black aspect-video w-full max-w-xs shadow-inner"></canvas>
               <button type="button" id="btn-webcam-toggle" onclick="toggleWebcam()"
                 class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg text-xs shadow-sm transition-all">
                 Start Webcam 🎥
+              </button>
+            </div>
+
+            <!-- Audio Sandbox -->
+            <div id="audio-sandbox" class="hidden flex flex-col items-center justify-center gap-3 py-6 bg-white border border-emerald-100 rounded-xl max-w-xs mx-auto shadow-sm">
+              <div class="text-4xl animate-pulse" id="mic-indicator">🎙️</div>
+              <p class="text-[11px] font-bold text-gray-500" id="audio-status-label">Microphone is offline</p>
+              <button type="button" id="btn-audio-toggle" onclick="toggleAudio()"
+                class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg text-xs shadow-sm transition-all">
+                Start Listening 🎙️
               </button>
             </div>
 
@@ -314,10 +357,10 @@
         </div>
       </div>
 
-      <!-- STEP 3: Reflections & Testing -->
+      <!-- STEP 4: Reflections & Testing -->
       <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
         <div class="flex items-center gap-3 mb-5">
-          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-emerald-500">3</div>
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-emerald-500">4</div>
           <h2 class="text-base font-black text-gray-900">Testing &amp; Reflections</h2>
         </div>
 
@@ -424,7 +467,7 @@
 
     /* State */
     let studentName = '', studentEmail = '';
-    const selectedProjectType = 'Image'; // Restricted strictly to Image Project
+    let selectedProjectType = '';
     let selectedExamplesCount = '';
     let selectedAccuracy = '';
     let enjoymentRating = 0;
@@ -436,6 +479,7 @@
     let webcamActive = false;
     let webcamStream = null;
     let animationFrameId = null;
+    let audioActive = false;
 
     /* REGISTRATION GATE */
     function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
@@ -480,6 +524,18 @@
     })();
 
     /* FIELD SETTERS */
+    function setProjectType(type, btn) {
+      selectedProjectType = type;
+      document.querySelectorAll('#projecttype-picker .opt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById('projecttype-error').classList.add('hidden');
+      
+      // Reset sandbox UI if type changes
+      resetSandbox();
+      document.getElementById('model-url').value = '';
+      onUrlInput();
+    }
+
     function setExamples(val, btn) {
       selectedExamplesCount = val;
       document.querySelectorAll('#examples-picker .opt-btn').forEach(b => b.classList.remove('selected'));
@@ -520,16 +576,21 @@
       });
     }
 
-    async function ensureLibrariesLoaded() {
+    async function ensureLibrariesLoaded(type) {
       if (!tfjsLoaded) {
         showStatus('Loading TensorFlow.js core libraries...', 'bg-blue-50 border-blue-200 text-blue-800');
+        // Load TF.js first
         await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js");
         tfjsLoaded = true;
       }
 
-      showStatus(`Loading Teachable Machine Image library...`, 'bg-blue-50 border-blue-200 text-blue-800');
-      if (typeof tmImage === 'undefined') {
+      showStatus(`Loading Teachable Machine ${type} library...`, 'bg-blue-50 border-blue-200 text-blue-800');
+      if (type === 'Image' && typeof tmImage === 'undefined') {
         await loadScript("https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js");
+      } else if (type === 'Pose' && typeof tmPose === 'undefined') {
+        await loadScript("https://cdn.jsdelivr.net/npm/@teachablemachine/pose@0.8/dist/teachablemachine-pose.min.js");
+      } else if (type === 'Audio' && typeof speechCommands === 'undefined') {
+        await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow-models/speech-commands@0.4.0/dist/speech-commands.min.js");
       }
     }
 
@@ -543,6 +604,12 @@
     async function handleLoadModel() {
       if (isModelLoading) return;
       
+      if (!selectedProjectType) {
+        document.getElementById('projecttype-error').classList.remove('hidden');
+        document.getElementById('projecttype-picker').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
       let urlVal = document.getElementById('model-url').value.trim();
       if (!urlVal || !urlVal.startsWith('https://teachablemachine.withgoogle.com/models/')) {
         document.getElementById('model-error').classList.remove('hidden');
@@ -562,19 +629,26 @@
 
       try {
         resetSandbox();
-        await ensureLibrariesLoaded();
+        await ensureLibrariesLoaded(selectedProjectType);
 
         showStatus('Connecting to Google Cloud and fetching model weights...', 'bg-amber-50 border-amber-200 text-amber-800');
 
         const modelURL = urlVal + "model.json";
         const metadataURL = urlVal + "metadata.json";
 
-        activeModel = await tmImage.load(modelURL, metadataURL);
+        if (selectedProjectType === 'Image') {
+          activeModel = await tmImage.load(modelURL, metadataURL);
+        } else if (selectedProjectType === 'Pose') {
+          activeModel = await tmPose.load(modelURL, metadataURL);
+        } else if (selectedProjectType === 'Audio') {
+          activeModel = speechCommands.create("BROWSER_FFT", undefined, modelURL, metadataURL);
+          await activeModel.ensureModelLoaded();
+        }
 
         // Successfully loaded!
-        const classes = activeModel.getClassLabels();
+        const classes = selectedProjectType === 'Audio' ? activeModel.wordLabels() : activeModel.getClassLabels();
         
-        showStatus('✓ Image model loaded successfully!', 'bg-emerald-50 border-emerald-200 text-emerald-800');
+        showStatus(`✓ ${selectedProjectType} model loaded successfully!`, 'bg-emerald-50 border-emerald-200 text-emerald-800');
         
         // Populate Sandbox
         document.getElementById('model-classes-count').textContent = `${classes.length} Classes`;
@@ -594,9 +668,18 @@
           </div>
         `).join('');
 
+        // Switch container view
+        if (selectedProjectType === 'Image' || selectedProjectType === 'Pose') {
+          document.getElementById('webcam-sandbox').classList.remove('hidden');
+          document.getElementById('audio-sandbox').classList.add('hidden');
+        } else {
+          document.getElementById('webcam-sandbox').classList.add('hidden');
+          document.getElementById('audio-sandbox').classList.remove('hidden');
+        }
+
       } catch (err) {
         console.error(err);
-        showStatus(`❌ Error loading model: ${err.message}<br><span class="font-normal mt-1 block">Check that your URL is correct and is uploaded/published publicly on Teachable Machine.</span>`, 'bg-red-50 border-red-200 text-red-800');
+        showStatus(`❌ Error loading model: ${err.message}<br><span class="font-normal mt-1 block">Check that your URL matches your selected project type and is published publicly on Teachable Machine.</span>`, 'bg-red-50 border-red-200 text-red-800');
       } finally {
         isModelLoading = false;
         loadBtn.disabled = false;
@@ -677,13 +760,112 @@
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
       try {
-        const predictions = await activeModel.predict(canvas);
+        let predictions = [];
+        if (selectedProjectType === 'Image') {
+          predictions = await activeModel.predict(canvas);
+        } else if (selectedProjectType === 'Pose') {
+          const { pose, posenetOutput } = await activeModel.estimatePose(canvas);
+          predictions = await activeModel.predict(posenetOutput);
+          
+          if (pose) {
+            drawPoseKeypoints(pose, ctx);
+          }
+        }
         updatePredictionUI(predictions);
       } catch (err) {
         console.error("Prediction error:", err);
       }
 
       animationFrameId = requestAnimationFrame(predictLoop);
+    }
+
+    function drawPoseKeypoints(pose, ctx) {
+      // Draw skeleton lines
+      const adjacentKeypoints = tmPose.getAdjacentKeypoints(pose.keypoints, 0.5);
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 3;
+      adjacentKeypoints.forEach((keypoints) => {
+        ctx.beginPath();
+        ctx.moveTo(keypoints[0].position.x, keypoints[0].position.y);
+        ctx.lineTo(keypoints[1].position.x, keypoints[1].position.y);
+        ctx.stroke();
+      });
+
+      // Draw keypoints
+      pose.keypoints.forEach((kp) => {
+        if (kp.score > 0.5) {
+          ctx.beginPath();
+          ctx.arc(kp.position.x, kp.position.y, 6, 0, 2 * Math.PI);
+          ctx.fillStyle = '#f59e0b';
+          ctx.fill();
+        }
+      });
+    }
+
+    /* AUDIO PREDICTIONS LOOP */
+    async function toggleAudio() {
+      if (audioActive) {
+        stopAudio();
+      } else {
+        await startAudio();
+      }
+    }
+
+    async function startAudio() {
+      if (audioActive || !activeModel) return;
+      try {
+        const toggleBtn = document.getElementById('btn-audio-toggle');
+        toggleBtn.disabled = true;
+        toggleBtn.textContent = "Accessing Mic...";
+
+        audioActive = true;
+        document.getElementById('mic-indicator').classList.add('animate-bounce');
+        document.getElementById('audio-status-label').innerHTML = '🔴 Listening live...';
+        document.getElementById('audio-status-label').className = 'text-[11px] font-black text-red-500';
+
+        toggleBtn.disabled = false;
+        toggleBtn.textContent = "Stop Listening 🛑";
+        toggleBtn.className = "px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg text-xs shadow-sm transition-all";
+
+        const classes = activeModel.wordLabels();
+        await activeModel.listen(result => {
+          const predictions = classes.map((label, idx) => ({
+            className: label,
+            probability: result.scores[idx]
+          }));
+          updatePredictionUI(predictions);
+        }, {
+          includeSpectrogram: false,
+          probabilityThreshold: 0.65,
+          overlapFactor: 0.5
+        });
+      } catch (err) {
+        alert("Microphone permission denied or unavailable: " + err.message);
+        stopAudio();
+      }
+    }
+
+    function stopAudio() {
+      const toggleBtn = document.getElementById('btn-audio-toggle');
+      if (toggleBtn) {
+        toggleBtn.textContent = "Start Listening 🎙️";
+        toggleBtn.className = "px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg text-xs shadow-sm transition-all";
+        toggleBtn.disabled = false;
+      }
+      
+      document.getElementById('mic-indicator').classList.remove('animate-bounce');
+      document.getElementById('audio-status-label').innerHTML = 'Microphone is offline';
+      document.getElementById('audio-status-label').className = 'text-[11px] font-bold text-gray-500';
+
+      if (activeModel && audioActive) {
+        activeModel.stopListening();
+      }
+      audioActive = false;
+
+      // Clear probability display
+      const classes = activeModel ? activeModel.wordLabels() : [];
+      const dummyPredictions = classes.map(c => ({ className: c, probability: 0 }));
+      updatePredictionUI(dummyPredictions);
     }
 
     function updatePredictionUI(predictions) {
@@ -699,8 +881,11 @@
 
     function resetSandbox() {
       stopWebcam();
+      stopAudio();
       activeModel = null;
       document.getElementById('sandbox-container').classList.add('hidden');
+      document.getElementById('webcam-sandbox').classList.add('hidden');
+      document.getElementById('audio-sandbox').classList.add('hidden');
     }
 
     /* SUBMIT EXERCISE */
@@ -721,6 +906,12 @@
     async function submitExercise(ev) {
       ev.preventDefault();
       let ok = true;
+
+      // Validate Project Type
+      if (!selectedProjectType) {
+        document.getElementById('projecttype-error').classList.remove('hidden');
+        ok = false;
+      }
 
       // Title
       const titleVal = document.getElementById('project-title').value.trim();
@@ -792,7 +983,7 @@
       try {
         await supabaseInsert(payload);
         
-        // Stop webcam streams
+        // Stop any running media streams
         resetSandbox();
 
         document.getElementById('success-name').textContent = studentName.split(' ')[0];
