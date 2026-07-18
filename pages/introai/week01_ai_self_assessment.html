@@ -748,7 +748,11 @@
         btn.disabled = false;
         label.innerHTML = 'Submit Self-Assessment →';
         const msgEl = document.getElementById('submit-validation-msg');
-        msgEl.textContent = '⚠ Could not save. Please try again or let your teacher know.';
+        if (err.message.includes('409') || err.message.includes('duplicate key')) {
+          msgEl.textContent = '⚠️ You have already submitted this activity!';
+        } else {
+          msgEl.textContent = '⚠ Could not save. Please try again or let your teacher know.';
+        }
         msgEl.classList.remove('hidden');
         return;
       }

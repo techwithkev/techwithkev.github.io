@@ -878,7 +878,11 @@
         console.error('[Week 3 PC] Supabase error:', err.message);
         btn.disabled = false;
         document.getElementById('submit-label').textContent = 'Submit My Results \u2192';
-        document.getElementById('form-error-text').textContent = '\u26A0 Network error. Please try again or notify your teacher.';
+        if (err.message.includes('409') || err.message.includes('duplicate key')) {
+          document.getElementById('form-error-text').textContent = '⚠️ You have already submitted this activity!';
+        } else {
+          document.getElementById('form-error-text').textContent = '\u26A0 Network error. Please try again or notify your teacher.';
+        }
         document.getElementById('form-error').classList.remove('hidden');
         return;
       }

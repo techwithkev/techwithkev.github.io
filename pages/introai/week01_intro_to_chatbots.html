@@ -714,7 +714,11 @@
         console.error('[Chatbots] Supabase error:', err.message);
         btn.disabled = false;
         document.getElementById('submit-label').innerHTML = 'Submit Exercise →';
-        errTxt.textContent = '⚠ Could not save. Please try again or let your teacher know.';
+        if (err.message.includes('409') || err.message.includes('duplicate key')) {
+          errTxt.textContent = '⚠️ You have already submitted this activity!';
+        } else {
+          errTxt.textContent = '⚠ Could not save. Please try again or let your teacher know.';
+        }
         errEl.classList.remove('hidden');
         return;
       }

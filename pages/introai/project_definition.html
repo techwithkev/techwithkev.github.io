@@ -557,7 +557,11 @@
 
         setStatus('✓ Final project definition saved successfully!', 'success');
       } catch (e) {
-        setStatus('✗ ' + e.message, 'error');
+        if (e.message.includes('409') || e.message.includes('duplicate key')) {
+          setStatus('⚠ You have already submitted your project definition!', 'error');
+        } else {
+          setStatus('✗ ' + e.message, 'error');
+        }
       } finally {
         document.getElementById('submit-btn').disabled = false;
       }

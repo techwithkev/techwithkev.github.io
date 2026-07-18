@@ -596,7 +596,11 @@
         btn.disabled = false;
         document.getElementById('submit-label').innerHTML = 'Submit Exercise →';
         const formErrTxt = document.getElementById('form-error-text');
-        formErrTxt.textContent = '⚠ Network error. Please try again or notify your teacher.';
+        if (err.message.includes('409') || err.message.includes('duplicate key')) {
+          formErrTxt.textContent = '⚠️ You have already submitted this activity!';
+        } else {
+          formErrTxt.textContent = '⚠ Network error. Please try again or notify your teacher.';
+        }
         document.getElementById('form-error').classList.remove('hidden');
         return;
       }

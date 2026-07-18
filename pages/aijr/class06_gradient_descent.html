@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gradient Descent - AI Competition Jr</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .mode-btn.active {
+            background-color: #059669;
+            color: #ffffff;
+            border-color: #047857;
+        }
+        .interactive-canvas {
+            cursor: pointer;
+        }
+        .log-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        .log-container::-webkit-scrollbar-thumb {
+            background-color: #34d399;
+            border-radius: 999px;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans p-4 md:p-8 pb-16">
+
+    <div class="max-w-6xl mx-auto">
+
+        <!-- Navigation -->
+        <nav class="mb-6 pt-2 no-print">
+            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-emerald-600 transition-colors font-mono" style="text-decoration: none;">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Course Hub
+            </a>
+        </nav>
+
+        <!-- Header -->
+        <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+            <div>
+                <h1 class="text-4xl font-black tracking-tight text-gray-900 uppercase font-mono">Gradient <span class="text-emerald-600">Descent</span></h1>
+                <p class="text-gray-500 font-medium italic">Watch a ball roll down the loss curve to find the best-fitting line. Control the learning rate to see how step sizes affect optimization.</p>
+            </div>
+            <div id="status-badge" class="px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest border bg-emerald-50 border-emerald-200 text-emerald-800 shadow-sm transition-all duration-300">
+                Class 06 Visualizer
+            </div>
+        </header>
+
+        <!-- Main Layout Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
+
+            <!-- Left Controls Panel (Lg: 5 cols) -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+
+                <!-- Parameter controls -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-5">
+                    <div>
+                        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-100 pb-2">1. Hyperparameters</h2>
+                        
+                        <div class="space-y-6">
+                            <!-- Learning Rate Slider -->
+                            <div>
+                                <div class="flex justify-between items-end mb-2">
+                                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Learning Rate (α) - Step Size</label>
+                                    <span id="lr-display" class="text-xs font-mono font-black bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full">0.04</span>
+                                </div>
+                                <input type="range" id="lr-slider" min="0.01" max="0.20" step="0.01" value="0.04" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                                <div class="flex justify-between text-[9px] font-bold text-gray-400 mt-2 uppercase tracking-tighter">
+                                    <span id="lr-status-label" class="text-emerald-600 font-black">Optimal learning rate ⚡</span>
+                                </div>
+                            </div>
+
+                            <!-- Initial Slope Slider -->
+                            <div>
+                                <div class="flex justify-between items-end mb-2">
+                                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Model Weight (w) - Line Slope</label>
+                                    <span id="w-display" class="text-xs font-mono font-black bg-gray-100 text-gray-700 border border-gray-200 px-3 py-1 rounded-full">2.00</span>
+                                </div>
+                                <input type="range" id="w-slider" min="-1.5" max="2.5" step="0.05" value="2.00" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                                <div class="flex justify-between text-[9px] font-bold text-gray-400 mt-2 uppercase tracking-tighter">
+                                    <span>Negative Slope</span>
+                                    <span>Optimal (w = 0.5)</span>
+                                    <span>Positive Slope</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step Controls Toggles -->
+                    <div>
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">2. Execution Controls</h3>
+                        <div class="grid grid-cols-2 gap-2 mb-3">
+                            <button id="btn-step" onclick="takeDescentStep()" class="px-3 py-3 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black uppercase rounded-lg border border-emerald-600 transition-all active:scale-95 shadow-sm">
+                                ⚡ Take 1 Step
+                            </button>
+                            <button id="btn-play" onclick="togglePlay()" class="px-3 py-3 bg-slate-900 hover:bg-slate-800 text-white text-xs font-black uppercase rounded-lg border border-slate-950 transition-all active:scale-95 shadow-sm">
+                                ▶️ Play Descent
+                            </button>
+                        </div>
+                        <button onclick="resetDescent()" class="w-full px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-black uppercase rounded-lg border border-rose-200 transition-colors">
+                            🔄 Reset Ball
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loss metrics Summary cards -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-900 border border-slate-800 text-white rounded-2xl p-4 flex flex-col justify-center items-center text-center shadow-sm">
+                        <span class="text-[9px] uppercase tracking-wider text-emerald-400 font-black mb-1">Current Loss J(w)</span>
+                        <span id="metric-loss" class="text-2xl font-mono font-black text-emerald-300">16.88</span>
+                        <span class="text-[8px] font-mono text-slate-400 font-bold uppercase mt-0.5">Mean Squared Error</span>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-800 text-white rounded-2xl p-4 flex flex-col justify-center items-center text-center shadow-sm">
+                        <span class="text-[9px] uppercase tracking-wider text-emerald-400 font-black mb-1">Slope of Curve J'(w)</span>
+                        <span id="metric-gradient" class="text-2xl font-mono font-black text-emerald-300">22.50</span>
+                        <span class="text-[8px] font-mono text-slate-400 font-bold uppercase mt-0.5">Gradient Value</span>
+                    </div>
+                </div>
+
+                <!-- Steps Log Table -->
+                <div class="bg-white border border-gray-200 p-5 rounded-2xl shadow-sm flex flex-col">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 border-b border-gray-100 pb-2">3. Steps History Log</h3>
+                    <div class="max-h-[140px] overflow-y-auto log-container pr-1" id="history-log">
+                        <div class="text-center py-6 text-xs text-gray-400 font-medium italic">No steps taken yet. Slide parameters or click play!</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Visual Stage & Code Panel (Lg: 7 cols) -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
+
+                <!-- 2D Canvases visual panels -->
+                <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm flex flex-col gap-4">
+                    <div>
+                        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest">4. Optimization Visualization</h2>
+                        <p class="text-[11px] text-gray-400">See how minimizing the Loss Curve (top) directly aligns the Regression Fit line (bottom).</p>
+                    </div>
+
+                    <!-- Canvas 1: Loss Curve -->
+                    <div class="relative w-full h-[220px] bg-slate-950 border border-slate-900 shadow-inner rounded-xl overflow-hidden">
+                        <canvas id="loss-canvas" class="w-full h-full absolute inset-0"></canvas>
+                        <div class="absolute top-3 left-3 bg-slate-900/80 px-2.5 py-1 rounded text-[9px] uppercase font-bold text-slate-300 border border-slate-800 tracking-wide select-none pointer-events-none">
+                            📈 Loss Curve Surface: J(w)
+                        </div>
+                    </div>
+
+                    <!-- Canvas 2: Regression Fit -->
+                    <div class="relative w-full h-[200px] bg-slate-950 border border-slate-900 shadow-inner rounded-xl overflow-hidden">
+                        <canvas id="regression-canvas" class="w-full h-full absolute inset-0"></canvas>
+                        <div class="absolute top-3 left-3 bg-slate-900/80 px-2.5 py-1 rounded text-[9px] uppercase font-bold text-slate-300 border border-slate-800 tracking-wide select-none pointer-events-none">
+                            📊 Model Prediction Fit: y = w * x
+                        </div>
+                    </div>
+                </div>
+
+                <!-- scikit-learn Code view -->
+                <div class="bg-slate-900 border-2 border-slate-800 p-6 rounded-2xl shadow-inner flex flex-col gap-4 text-white">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <div>
+                            <h2 class="text-xs font-black uppercase tracking-wider text-emerald-400 font-mono">Weight Update Formula</h2>
+                            <p class="text-[10px] text-slate-400">Live updating Gradient Descent equation parameters</p>
+                        </div>
+                        <div class="flex bg-slate-950 p-0.5 rounded-lg border border-slate-800 shadow-inner font-mono text-[9px] text-slate-300 uppercase tracking-widest px-2.5 py-1">
+                            w = w - alpha * grad
+                        </div>
+                    </div>
+
+                    <!-- Code block -->
+                    <div class="bg-slate-950/80 rounded-xl border border-slate-800/80 p-4 font-mono text-[10px] text-slate-300 overflow-x-auto shadow-inner leading-relaxed">
+                        <pre id="math-formula" class="whitespace-pre"></pre>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- 3-Column Educational Context Footer -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <!-- Explain Gradient -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-xl flex items-center justify-center font-bold mb-4 font-mono text-xs">01</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">What is the "Gradient"?</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    Think of the gradient as the <strong>steepness of the hill</strong> at the ball's location. If the hill is steep, the gradient is large. A positive gradient means the hill slopes upwards to the right, so we must go left (subtract) to head down the valley.
+                </p>
+            </div>
+
+            <!-- Learning Rate -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-xl flex items-center justify-center font-bold mb-4 font-mono text-xs">02</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">The Learning Rate (α)</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    The learning rate determines <strong>step size</strong>. If it's too small, the ball takes forever to reach the bottom (slow training). If it's too large, the ball overshoots the valley and can bounce higher and higher on the other side (divergence).
+                </p>
+            </div>
+
+            <!-- AI Connection -->
+            <div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div class="w-10 h-10 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-xl flex items-center justify-center font-bold mb-4 border border-emerald-200 font-mono text-xs">03</div>
+                <h3 class="text-sm font-black uppercase text-gray-900 tracking-wider mb-2">How AI Uses This</h3>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    Large AI models (like ChatGPT or image generators) have billions of weights instead of just one. They calculate the gradient across a massive multi-dimensional valley and use this exact formula (called backpropagation) to learn!
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Interactive script logic -->
+    <script>
+        const lossCanvas = document.getElementById('loss-canvas');
+        const lossCtx = lossCanvas.getContext('2d');
+        const regCanvas = document.getElementById('regression-canvas');
+        const regCtx = regCanvas.getContext('2d');
+
+        const lrSlider = document.getElementById('lr-slider');
+        const lrDisplay = document.getElementById('lr-display');
+        const lrStatus = document.getElementById('lr-status-label');
+        const wSlider = document.getElementById('w-slider');
+        const wDisplay = document.getElementById('w-display');
+
+        const metricLoss = document.getElementById('metric-loss');
+        const metricGradient = document.getElementById('metric-gradient');
+        const historyLog = document.getElementById('history-log');
+        const mathFormula = document.getElementById('math-formula');
+
+        // Linear Data points (slope = 0.5, intercept = 0)
+        const dataPoints = [
+            { x: 1.0, y: 0.5 },
+            { x: 2.0, y: 1.0 },
+            { x: 3.0, y: 1.5 },
+            { x: 4.0, y: 2.0 }
+        ];
+
+        // State Variables
+        let currentW = 2.00;
+        let learningRate = 0.04;
+        let stepsHistory = []; // { w: val, loss: val }
+        let isPlaying = false;
+        let playInterval = null;
+
+        function getLoss(w) {
+            // J(w) = sum(w*xi - yi)^2 / N
+            // J(w) = 7.5 * (w - 0.5)^2
+            return 7.5 * Math.pow(w - 0.5, 2);
+        }
+
+        function getGradient(w) {
+            // dJ/dw = 15 * (w - 0.5)
+            return 15.0 * (w - 0.5);
+        }
+
+        function resizeCanvases() {
+            lossCanvas.width = lossCanvas.parentElement.clientWidth;
+            lossCanvas.height = lossCanvas.parentElement.clientHeight;
+            regCanvas.width = regCanvas.parentElement.clientWidth;
+            regCanvas.height = regCanvas.parentElement.clientHeight;
+            renderAll();
+        }
+
+        function renderAll() {
+            learningRate = parseFloat(lrSlider.value);
+            lrDisplay.textContent = learningRate.toFixed(2);
+            updateLrLabel();
+
+            wDisplay.textContent = currentW.toFixed(2);
+
+            const currentLoss = getLoss(currentW);
+            const currentGrad = getGradient(currentW);
+
+            metricLoss.textContent = currentLoss.toFixed(2);
+            metricGradient.textContent = currentGrad.toFixed(2);
+
+            // Draw canvasses
+            drawLossSurface();
+            drawRegressionFit();
+
+            // Update Update update code formula display
+            const nextW = currentW - learningRate * currentGrad;
+            mathFormula.innerHTML = `// Gradient Descent Step Calculation\n` +
+                `const w = ${currentW.toFixed(2)};\n` +
+                `const alpha = ${learningRate.toFixed(2)};\n` +
+                `const gradient = ${currentGrad.toFixed(2)};\n\n` +
+                `// Math: w_new = w - alpha * gradient\n` +
+                `const w_new = ${currentW.toFixed(2)} - ${learningRate.toFixed(2)} * (${currentGrad.toFixed(2)})\n` +
+                `            = ${currentW.toFixed(2)} - ${(learningRate * currentGrad).toFixed(2)}\n` +
+                `            = ${nextW.toFixed(2)};`;
+
+            // Draw steps log
+            drawStepsLog();
+        }
+
+        function updateLrLabel() {
+            if (learningRate <= 0.03) {
+                lrStatus.textContent = "Slow convergence (under-shooting) ⏳";
+                lrStatus.className = "text-amber-600 font-black";
+            } else if (learningRate <= 0.08) {
+                lrStatus.textContent = "Optimal learning rate ⚡";
+                lrStatus.className = "text-emerald-600 font-black";
+            } else if (learningRate <= 0.12) {
+                lrStatus.textContent = "Overshooting (oscillating) ⚠️";
+                lrStatus.className = "text-orange-500 font-black";
+            } else {
+                lrStatus.textContent = "Divergent (exploding error) 💥";
+                lrStatus.className = "text-red-500 font-black";
+            }
+        }
+
+        function drawLossSurface() {
+            lossCtx.clearRect(0, 0, lossCanvas.width, lossCanvas.height);
+            const w = lossCanvas.width;
+            const h = lossCanvas.height;
+
+            // Draw grids
+            lossCtx.strokeStyle = '#1e293b';
+            lossCtx.lineWidth = 0.5;
+            for (let x = 0; x < w; x += 40) {
+                lossCtx.beginPath(); lossCtx.moveTo(x, 0); lossCtx.lineTo(x, h); lossCtx.stroke();
+            }
+            for (let y = 0; y < h; y += 40) {
+                lossCtx.beginPath(); lossCtx.moveTo(0, y); lossCtx.lineTo(w, y); lossCtx.stroke();
+            }
+
+            // Convert w-parameter [-1.5, 2.5] to canvas space
+            function mapWToX(weightVal) {
+                const pct = (weightVal + 1.5) / 4.0;
+                return 40 + pct * (w - 80);
+            }
+
+            function mapLossToY(lossVal) {
+                const pct = Math.min(lossVal, 30) / 30.0;
+                return (h - 40) - pct * (h - 80);
+            }
+
+            // Draw Axis
+            lossCtx.strokeStyle = '#475569';
+            lossCtx.lineWidth = 1;
+            lossCtx.beginPath();
+            lossCtx.moveTo(40, h - 30); lossCtx.lineTo(w - 40, h - 30); // X Axis
+            lossCtx.stroke();
+
+            // Draw Parabolas
+            lossCtx.strokeStyle = '#10b981';
+            lossCtx.lineWidth = 3;
+            lossCtx.beginPath();
+            for (let wx = -1.5; wx <= 2.5; wx += 0.05) {
+                const cx = mapWToX(wx);
+                const cy = mapLossToY(getLoss(wx));
+                if (wx === -1.5) lossCtx.moveTo(cx, cy);
+                else lossCtx.lineTo(cx, cy);
+            }
+            lossCtx.stroke();
+
+            // Draw historical step lines
+            if (stepsHistory.length > 0) {
+                lossCtx.strokeStyle = '#f59e0b';
+                lossCtx.lineWidth = 1.5;
+                lossCtx.setLineDash([3, 3]);
+                lossCtx.beginPath();
+                stepsHistory.forEach((step, idx) => {
+                    const cx = mapWToX(step.w);
+                    const cy = mapLossToY(step.loss);
+                    if (idx === 0) lossCtx.moveTo(cx, cy);
+                    else lossCtx.lineTo(cx, cy);
+                });
+                lossCtx.stroke();
+                lossCtx.setLineDash([]);
+
+                // Draw history points
+                stepsHistory.forEach((step, idx) => {
+                    lossCtx.fillStyle = '#d97706';
+                    lossCtx.beginPath();
+                    lossCtx.arc(mapWToX(step.w), mapLossToY(step.loss), 4, 0, 2 * Math.PI);
+                    lossCtx.fill();
+                });
+            }
+
+            // Draw Tangent line (gradient indicator) at current w
+            const cwX = mapWToX(currentW);
+            const cwY = mapLossToY(getLoss(currentW));
+            const grad = getGradient(currentW);
+
+            lossCtx.strokeStyle = '#ef4444';
+            lossCtx.lineWidth = 1.5;
+            lossCtx.beginPath();
+            
+            const dx = 30;
+            const dy = grad * 3.5; 
+            
+            lossCtx.moveTo(cwX - dx, cwY + dy);
+            lossCtx.lineTo(cwX + dx, cwY - dy);
+            lossCtx.stroke();
+
+            // Draw current ball
+            lossCtx.fillStyle = '#f59e0b';
+            lossCtx.strokeStyle = '#fff';
+            lossCtx.lineWidth = 2;
+            lossCtx.beginPath();
+            lossCtx.arc(cwX, cwY, 8, 0, 2 * Math.PI);
+            lossCtx.fill();
+            lossCtx.stroke();
+
+            // Label key points
+            lossCtx.fillStyle = '#94a3b8';
+            lossCtx.font = '9px monospace';
+            lossCtx.fillText('Optimal w=0.5', mapWToX(0.5) - 30, h - 15);
+            
+            // Draw optimal vertical line
+            lossCtx.strokeStyle = '#334155';
+            lossCtx.lineWidth = 0.5;
+            lossCtx.setLineDash([2, 4]);
+            lossCtx.beginPath();
+            lossCtx.moveTo(mapWToX(0.5), 20);
+            lossCtx.lineTo(mapWToX(0.5), h - 30);
+            lossCtx.stroke();
+            lossCtx.setLineDash([]);
+        }
+
+        function drawRegressionFit() {
+            regCtx.clearRect(0, 0, regCanvas.width, regCanvas.height);
+            const w = regCanvas.width;
+            const h = regCanvas.height;
+
+            function mapXToPixel(xVal) {
+                return 40 + (xVal / 5.0) * (w - 80);
+            }
+
+            function mapYToPixel(yVal) {
+                return (h - 30) - (yVal / 3.0) * (h - 60);
+            }
+
+            // Draw grids
+            regCtx.strokeStyle = '#1e293b';
+            regCtx.lineWidth = 0.5;
+            for (let x = 0; x <= 5; x += 1) {
+                regCtx.beginPath(); regCtx.moveTo(mapXToPixel(x), 0); regCtx.lineTo(mapXToPixel(x), h); regCtx.stroke();
+            }
+            for (let y = 0; y <= 3; y += 0.5) {
+                regCtx.beginPath(); regCtx.moveTo(0, mapYToPixel(y)); regCtx.lineTo(w, mapYToPixel(y)); regCtx.stroke();
+            }
+
+            // Draw Axes
+            regCtx.strokeStyle = '#475569';
+            regCtx.lineWidth = 1;
+            regCtx.beginPath();
+            regCtx.moveTo(40, h - 30); regCtx.lineTo(w - 40, h - 30); // X Axis
+            regCtx.moveTo(40, 20); regCtx.lineTo(40, h - 30);       // Y Axis
+            regCtx.stroke();
+
+            // Draw residuals (vertical error lines)
+            regCtx.strokeStyle = '#ef4444';
+            regCtx.lineWidth = 1.5;
+            dataPoints.forEach(pt => {
+                const predY = currentW * pt.x;
+                regCtx.beginPath();
+                regCtx.moveTo(mapXToPixel(pt.x), mapYToPixel(pt.y));
+                regCtx.lineTo(mapXToPixel(pt.x), mapYToPixel(predY));
+                regCtx.stroke();
+            });
+
+            // Draw Line of best fit y = w * x
+            regCtx.strokeStyle = '#10b981';
+            regCtx.lineWidth = 3;
+            regCtx.beginPath();
+            regCtx.moveTo(mapXToPixel(0), mapYToPixel(0));
+            regCtx.lineTo(mapXToPixel(5), mapYToPixel(currentW * 5));
+            regCtx.stroke();
+
+            // Draw data points
+            dataPoints.forEach(pt => {
+                regCtx.fillStyle = '#3b82f6';
+                regCtx.strokeStyle = '#fff';
+                regCtx.lineWidth = 1.5;
+                regCtx.beginPath();
+                regCtx.arc(mapXToPixel(pt.x), mapYToPixel(pt.y), 6, 0, 2 * Math.PI);
+                regCtx.fill();
+                regCtx.stroke();
+            });
+        }
+
+        function drawStepsLog() {
+            if (stepsHistory.length === 0) {
+                historyLog.innerHTML = `<div class="text-center py-6 text-xs text-gray-400 font-medium italic">No steps taken yet. Click Step or Play!</div>`;
+                return;
+            }
+
+            historyLog.innerHTML = `
+                <table class="w-full text-left text-xs text-gray-600 font-mono">
+                    <thead>
+                        <tr class="border-b border-gray-100 text-gray-400 text-[10px]">
+                            <th class="py-1">Step</th>
+                            <th class="py-1">Weight (w)</th>
+                            <th class="py-1">Loss J(w)</th>
+                            <th class="py-1">Gradient</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${stepsHistory.map((step, idx) => `
+                            <tr class="border-b border-gray-50/50 hover:bg-gray-50/50">
+                                <td class="py-1.5 font-bold text-gray-900">#${idx}</td>
+                                <td class="py-1.5 text-slate-800">${step.w.toFixed(3)}</td>
+                                <td class="py-1.5 font-bold text-emerald-600">${step.loss.toFixed(3)}</td>
+                                <td class="py-1.5 text-red-500">${step.grad.toFixed(3)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            historyLog.scrollTop = historyLog.scrollHeight;
+        }
+
+        // STEP ACTIONS
+        function takeDescentStep() {
+            if (stepsHistory.length === 0) {
+                stepsHistory.push({
+                    w: currentW,
+                    loss: getLoss(currentW),
+                    grad: getGradient(currentW)
+                });
+            }
+
+            const currentGrad = getGradient(currentW);
+            
+            if (Math.abs(currentW) > 10.0) {
+                togglePlay(true);
+                alert("💥 Divergence detected! The learning rate is too large, causing steps to bounce outward. Reset the visualizer to try again.");
+                return;
+            }
+
+            currentW = currentW - learningRate * currentGrad;
+            wSlider.value = currentW;
+
+            stepsHistory.push({
+                w: currentW,
+                loss: getLoss(currentW),
+                grad: getGradient(currentW)
+            });
+
+            if (Math.abs(currentGrad) < 0.005) {
+                togglePlay(true);
+            }
+
+            renderAll();
+        }
+
+        function resetDescent() {
+            togglePlay(true);
+            currentW = 2.00;
+            wSlider.value = currentW;
+            stepsHistory = [];
+            renderAll();
+        }
+
+        function togglePlay(forceStop = false) {
+            const btnPlay = document.getElementById('btn-play');
+            if (isPlaying || forceStop) {
+                clearInterval(playInterval);
+                playInterval = null;
+                isPlaying = false;
+                btnPlay.textContent = "▶️ Play Descent";
+                btnPlay.className = "px-3 py-3 bg-slate-900 hover:bg-slate-800 text-white text-xs font-black uppercase rounded-lg border border-slate-950 transition-all active:scale-95 shadow-sm";
+            } else {
+                if (Math.abs(getGradient(currentW)) < 0.01) {
+                    resetDescent();
+                }
+                isPlaying = true;
+                btnPlay.textContent = "⏸️ Pause Descent";
+                btnPlay.className = "px-3 py-3 bg-amber-500 hover:bg-emerald-600 text-white text-xs font-black uppercase rounded-lg border border-emerald-600 transition-all active:scale-95 shadow-sm";
+                playInterval = setInterval(() => {
+                    takeDescentStep();
+                }, 300);
+            }
+        }
+
+        wSlider.addEventListener('input', (e) => {
+            togglePlay(true);
+            currentW = parseFloat(e.target.value);
+            stepsHistory = [];
+            renderAll();
+        });
+
+        lrSlider.addEventListener('input', (e) => {
+            learningRate = parseFloat(e.target.value);
+            stepsHistory = [];
+            renderAll();
+        });
+
+        window.addEventListener('resize', resizeCanvases);
+        setTimeout(resizeCanvases, 0);
+
+        function esc(str) {
+            return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+    </script>
+</body>
+
+</html>

@@ -682,7 +682,11 @@
         console.error('[Scavenger Hunt] Supabase error:', err.message);
         btn.disabled = false;
         label.innerHTML = 'Submit Exercise →';
-        errorTxt.textContent = '⚠ Could not save. Please try again or let your teacher know.';
+        if (err.message.includes('409') || err.message.includes('duplicate key')) {
+          errorTxt.textContent = '⚠️ You have already submitted this activity!';
+        } else {
+          errorTxt.textContent = '⚠ Could not save. Please try again or let your teacher know.';
+        }
         errorEl.classList.remove('hidden');
         return;
       }
