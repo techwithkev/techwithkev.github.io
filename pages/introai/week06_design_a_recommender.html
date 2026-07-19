@@ -176,6 +176,26 @@
       z-index: 20;
     }
 
+    /* Enlarged hit area for ports */
+    .drawflow-node .input::after,
+    .drawflow-node .output::after {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: -8px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: transparent;
+      z-index: 25;
+    }
+
+    /* Disable node content pointer-events while dragging connection line */
+    #drawflow.drawing-connection .drawflow-node .drawflow_content_node,
+    #drawflow.drawing-connection .drawflow-node .drawflow_content_node * {
+      pointer-events: none !important;
+    }
+
     .drawflow-node .input:hover,
     .drawflow-node .output:hover {
       transform: scale(1.3);
@@ -303,8 +323,8 @@
     }
 
     .drawflow-node.decision_node .outputs .output_2 {
-      right: 0 !important;
-      left: auto !important;
+      left: calc(100% - 18px) !important;
+      right: auto !important;
     }
 
     /* Output 1 (LEFT SIDE) -> YES */
@@ -989,6 +1009,55 @@ How long can you play? (Under 30 min / 60+ min)"
 
       editor.on('nodeCreated', updateNodeCounter);
       editor.on('nodeRemoved', updateNodeCounter);
+
+      // Connection drag state handling
+      editor.on('connectionStart', () => {
+        container.classList.add('drawing-connection');
+      });
+      editor.on('connectionCancel', () => {
+        container.classList.remove('drawing-connection');
+      });
+      editor.on('connectionCreated', () => {
+        container.classList.remove('drawing-connection');
+      });
+
+      // Smart connection drop handler (connects when mouse released anywhere over target node)
+      function handleSmartConnectionDrop(e) {
+        if (!editor || !editor.connection) return;
+        const targetNode = e.target.closest ? e.target.closest('.drawflow-node') : null;
+        if (targetNode && editor.connection_selected) {
+          const sourceNodeId = editor.connection_selected.parentElement.parentElement.id.replace('node-', '');
+          const sourceOutputClass = editor.connection_selected.classList[1];
+          const targetNodeId = targetNode.id.replace('node-', '');
+
+          if (sourceNodeId && targetNodeId && sourceNodeId !== targetNodeId) {
+            const hasInput = targetNode.querySelector('.inputs .input');
+            if (hasInput) {
+              const targetInputClass = hasInput.classList[1] || 'input_1';
+              const sourceNodeObj = editor.getNodeFromId(sourceNodeId);
+              const existingConns = (sourceNodeObj && sourceNodeObj.outputs[sourceOutputClass]) ? sourceNodeObj.outputs[sourceOutputClass].connections : [];
+              const alreadyConnected = existingConns.some(c => c.node == targetNodeId && c.output == targetInputClass);
+              if (!alreadyConnected) {
+                try {
+                  editor.addConnection(sourceNodeId, targetNodeId, sourceOutputClass, targetInputClass);
+                } catch(err) {
+                  console.log("Connection setup note:", err);
+                }
+              }
+            }
+          }
+        }
+        container.classList.remove('drawing-connection');
+      }
+
+      container.addEventListener('mouseup', handleSmartConnectionDrop, true);
+      container.addEventListener('touchend', (e) => {
+        if (e.changedTouches && e.changedTouches[0]) {
+          const touch = e.changedTouches[0];
+          const elem = document.elementFromPoint(touch.clientX, touch.clientY);
+          if (elem) handleSmartConnectionDrop({ target: elem });
+        }
+      }, true);
 
       // Keyboard delete listener
       document.addEventListener('keydown', (e) => {
