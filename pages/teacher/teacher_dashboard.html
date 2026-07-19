@@ -4,8 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Junior — Teacher Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.css">
+  <script src="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.js"></script>
   <link
     href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap"
     rel="stylesheet">
@@ -1376,6 +1377,197 @@
       background: rgba(2, 168, 158, 0.2);
       color: var(--mint);
       font-weight: 700;
+    }
+
+    /* ── DRAWFLOW CANVAS STYLING FOR TEACHER DASHBOARD ── */
+    #modal-drawflow-canvas {
+      width: 100%;
+      height: 480px;
+      background-color: #f0fdff;
+      background-image: radial-gradient(circle, #a5f3fc 1.2px, transparent 1.2px);
+      background-size: 24px 24px;
+    }
+
+    .drawflow-node {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 170px;
+      min-height: 56px;
+      background: #ffffff;
+      border: 2px solid #0891b2;
+      border-radius: 14px;
+      color: #1e293b;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    }
+
+    .drawflow-node .input,
+    .drawflow-node .output {
+      width: 18px;
+      height: 18px;
+      background: #ffffff;
+      border: 3px solid #0891b2;
+      border-radius: 50%;
+      position: relative;
+      z-index: 20;
+    }
+
+    .drawflow-node.input_node .inputs,
+    .drawflow-node.process_node .inputs,
+    .drawflow-node.output_node .inputs,
+    .drawflow-node.end_node .inputs {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      z-index: 20;
+    }
+
+    .drawflow-node.input_node .outputs,
+    .drawflow-node.process_node .outputs,
+    .drawflow-node.output_node .outputs,
+    .drawflow-node.end_node .outputs {
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      z-index: 20;
+    }
+
+    .drawflow-node.input_node {
+      background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+      border: 2px solid #0e7490;
+      border-radius: 9999px;
+      color: white;
+    }
+
+    .drawflow-node.decision_node {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      min-width: 220px;
+      min-height: 130px;
+    }
+
+    .drawflow-node.decision_node .drawflow_content_node {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .diamond-shape {
+      width: 170px;
+      height: 110px;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.15));
+    }
+
+    .drawflow-node.decision_node .inputs {
+      position: absolute;
+      top: 2px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+    }
+
+    .drawflow-node.decision_node .outputs {
+      position: absolute !important;
+      top: 0 !important;
+      bottom: 0 !important;
+      left: -10px !important;
+      right: -10px !important;
+      width: calc(100% + 20px) !important;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    .drawflow-node.decision_node .outputs .output {
+      position: absolute !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+      pointer-events: auto;
+      border-color: #d97706;
+    }
+
+    .drawflow-node.decision_node .outputs .output_1 {
+      left: 0 !important;
+      right: auto !important;
+    }
+
+    .drawflow-node.decision_node .outputs .output_2 {
+      right: 0 !important;
+      left: auto !important;
+    }
+
+    .drawflow-node.decision_node .outputs .output_1::before {
+      content: 'YES';
+      position: absolute;
+      left: 22px;
+      top: -2px;
+      font-size: 8.5px;
+      font-weight: 900;
+      color: #ffffff;
+      background: #10b981;
+      padding: 1.5px 5.5px;
+      border-radius: 4px;
+    }
+
+    .drawflow-node.decision_node .outputs .output_2::before {
+      content: 'NO';
+      position: absolute;
+      right: 22px;
+      top: -2px;
+      font-size: 8.5px;
+      font-weight: 900;
+      color: #ffffff;
+      background: #ef4444;
+      padding: 1.5px 5.5px;
+      border-radius: 4px;
+    }
+
+    .drawflow-node.process_node {
+      background: #ffffff;
+      border: 2px solid #38bdf8;
+      color: #0f172a;
+    }
+
+    .drawflow-node.output_node {
+      background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+      border: 2px solid #115e59;
+      border-radius: 14px;
+      color: white;
+    }
+
+    .drawflow-node.end_node {
+      background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+      border: 2px solid #334155;
+      border-radius: 9999px;
+      color: white;
+    }
+
+    .drawflow-node .drawflow_content_node {
+      width: 100%;
+      padding: 8px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .drawflow .connection .main-path {
+      stroke: #0284c7;
+      stroke-width: 3.5px;
     }
   </style>
 </head>
@@ -4028,7 +4220,17 @@
         let val = r[k];
         let displayVal = "";
         
-        if (val === null || val === undefined) {
+        if (k === 'flowchart_json') {
+          displayVal = `
+            <div style="margin-bottom:8px;">
+              <div id="modal-drawflow-canvas" style="width:100%; height:460px; border-radius:12px; border:2px solid #0891b2; background:#f0fdff; position:relative; overflow:hidden;"></div>
+            </div>
+            <details style="margin-top:8px;">
+              <summary style="font-size:11px; font-weight:700; color:var(--teal); cursor:pointer;">Show Raw Flowchart JSON Payload</summary>
+              <pre style="font-size:10px; background:#1e293b; color:#38bdf8; padding:10px; border-radius:8px; overflow-x:auto; margin-top:6px; max-height:180px;">${esc(typeof val === 'object' ? JSON.stringify(val, null, 2) : String(val))}</pre>
+            </details>
+          `;
+        } else if (val === null || val === undefined) {
           displayVal = `<span style="color:var(--gray)">—</span>`;
         } else if (typeof val === 'boolean') {
           displayVal = val ? `<span class="badge badge-green">True</span>` : `<span class="badge badge-red">False</span>`;
@@ -4105,6 +4307,38 @@
 
       document.getElementById('modal-body').innerHTML = bodyHtml;
       document.getElementById('modal-overlay').classList.add('open');
+
+      // ── Render Drawflow Canvas for Flowchart Submissions ──
+      if (document.getElementById('modal-drawflow-canvas') && r.flowchart_json) {
+        setTimeout(() => {
+          const container = document.getElementById('modal-drawflow-canvas');
+          if (container && typeof Drawflow !== 'undefined') {
+            container.innerHTML = '';
+            const modalEditor = new Drawflow(container);
+            modalEditor.reroute = true;
+            modalEditor.editor_mode = 'fixed';
+            modalEditor.start();
+
+            try {
+              let drawflowObj = typeof r.flowchart_json === 'string' ? JSON.parse(r.flowchart_json) : r.flowchart_json;
+              if (drawflowObj && !drawflowObj.drawflow) {
+                drawflowObj = { drawflow: { Home: { data: drawflowObj } } };
+              }
+              modalEditor.import(drawflowObj);
+
+              // Disable input controls and remove close buttons for read-only view
+              container.querySelectorAll('input, select, textarea').forEach(inp => {
+                inp.disabled = true;
+                inp.style.pointerEvents = 'none';
+              });
+              container.querySelectorAll('.node-close-btn').forEach(btn => btn.style.display = 'none');
+            } catch (err) {
+              console.error('Failed to import flowchart JSON into modal canvas:', err);
+              container.innerHTML = `<div style="padding:20px; color:#b91c1c; font-size:12px;">Failed to render flowchart canvas: ${esc(err.message)}</div>`;
+            }
+          }
+        }, 150);
+      }
     }
 
     // ════════════════════════════════════════════════════════════════════════════
