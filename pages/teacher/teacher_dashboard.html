@@ -1614,7 +1614,7 @@
                 </svg></div>
               <div class="stat-label">Avg Homework Score</div>
               <div class="stat-value" id="stat-hw-avg">—</div>
-              <div class="stat-sub">Out of 100</div>
+              <div class="stat-sub">Out of 20</div>
             </div>
             <div class="stat-card red">
               <div class="stat-icon"><svg viewBox="0 0 36 36" fill="currentColor">
@@ -3017,7 +3017,8 @@
       document.getElementById('stat-hw-total').textContent = hw.length;
       document.getElementById('stat-exam-total').textContent = exam.length;
 
-      const hwAvg = hw.length ? Math.round(hw.reduce((s, r) => s + (r.score || 0), 0) / hw.length) : '—';
+      const rawHwAvg = hw.length ? hw.reduce((s, r) => s + (r.score || 0), 0) / hw.length : null;
+      const hwAvg = rawHwAvg !== null ? (Math.round(rawHwAvg * 10) / 10) : '—';
       document.getElementById('stat-hw-avg').textContent = hwAvg;
 
       if (exam.length) {
@@ -3051,18 +3052,18 @@
         }).join('');
       }
 
-      // Score distribution
-      const buckets = { '0–39': 0, '40–59': 0, '60–74': 0, '75–89': 0, '90–100': 0 };
+      // Score distribution (out of 20)
+      const buckets = { '0–7': 0, '8–11': 0, '12–14': 0, '15–17': 0, '18–20': 0 };
       hw.forEach(r => {
-        const s = r.score || 0;
-        if (s < 40) buckets['0–39']++;
-        else if (s < 60) buckets['40–59']++;
-        else if (s < 75) buckets['60–74']++;
-        else if (s < 90) buckets['75–89']++;
-        else buckets['90–100']++;
+        const s = typeof r.score === 'number' ? r.score : 0;
+        if (s < 8) buckets['0–7']++;
+        else if (s < 12) buckets['8–11']++;
+        else if (s < 15) buckets['12–14']++;
+        else if (s < 18) buckets['15–17']++;
+        else buckets['18–20']++;
       });
       const maxBucket = Math.max(...Object.values(buckets), 1);
-      const scoreColors = { '0–39': 'var(--red)', '40–59': '#E07A00', '60–74': 'var(--gold)', '75–89': 'var(--teal)', '90–100': 'var(--mint)' };
+      const scoreColors = { '0–7': 'var(--red)', '8–11': '#E07A00', '12–14': 'var(--gold)', '15–17': 'var(--teal)', '18–20': 'var(--mint)' };
       document.getElementById('score-dist-chart').innerHTML = Object.entries(buckets).map(([label, cnt]) => {
         const pct = Math.round((cnt / maxBucket) * 100);
         const inside = pct > 20;
@@ -3171,11 +3172,12 @@
 
       const maxCount = Math.max(...sorted.map(([, d]) => d.count));
       el.innerHTML = sorted.map(([cls, d]) => {
-        const avg = Math.round(d.total / d.count);
+        const avg = Math.round((d.total / d.count) * 10) / 10;
+        const pct = (avg / 20) * 100;
         const barPct = Math.round((d.count / maxCount) * 100);
-        const avgColor = avg >= 75 ? 'var(--mint)' : avg >= 50 ? 'var(--gold)' : 'var(--red)';
+        const avgColor = pct >= 75 ? 'var(--mint)' : pct >= 50 ? 'var(--gold)' : 'var(--red)';
         return `<div class="class-tile" onclick="showClassDetail(${cls})">
-      <div class="class-tile-avg" style="color:${avgColor}">${avg}</div>
+      <div class="class-tile-avg" style="color:${avgColor}">${avg}<span style="font-size:11px;color:var(--gray)">/20</span></div>
       <div class="class-tile-num">CLASS ${cls}</div>
       <div class="class-tile-count">${d.count}</div>
       <div class="class-tile-label">submission${d.count !== 1 ? 's' : ''}</div>
@@ -3665,15 +3667,18 @@
     // ════════════════════════════════════════════════════════════════════════════
     function scoreBadge(score) {
       if (score == null) return '<span class="badge badge-gray">—</span>';
-      const cls2 = score >= 75 ? 'badge-green' : score >= 50 ? 'badge-gold' : 'badge-red';
-      return `<span class="badge ${cls2}">${score}</span>`;
+      const pct = score <= 20 ? (score / 20) * 100 : score;
+      const cls2 = pct >= 75 ? 'badge-green' : pct >= 50 ? 'badge-gold' : 'badge-red';
+      const label = score <= 20 ? `${score}/20` : `${score}`;
+      return `<span class="badge ${cls2}">${label}</span>`;
     }
 
     function scoreBar(score) {
       if (score == null) return '';
-      const pct = Math.min(score, 100);
+      const pct = Math.min(score <= 20 ? (score / 20) * 100 : score, 100);
       const fillClass = pct >= 75 ? '' : pct >= 50 ? 'mid' : 'low';
-      return `<div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill ${fillClass}" style="width:${pct}%"></div></div><div class="score-num">${score}</div></div>`;
+      const label = score <= 20 ? `${score}/20` : `${score}`;
+      return `<div class="score-bar-wrap"><div class="score-bar-bg"><div class="score-bar-fill ${fillClass}" style="width:${pct}%"></div></div><div class="score-num">${label}</div></div>`;
     }
 
     // ════════════════════════════════════════════════════════════════════════════
