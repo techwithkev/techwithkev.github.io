@@ -1588,6 +1588,26 @@
               </svg>
               W5: Train Model
             </button>
+
+            <div class="nav-section-label" style="margin-top:20px">Week 6 — Recommendations</div>
+            <button class="nav-item" onclick="showPage('introai-be-algorithm')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M4 4h8v8H4zM8 1v3m0 8v3m-7-7h3m8 0h3" stroke-linecap="round" />
+              </svg>
+              W6 Ex1: Be Algorithm
+            </button>
+            <button class="nav-item" onclick="showPage('introai-analyze-feed')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M2 3h12v10H2zM6 6h4M6 9h4" stroke-linecap="round" />
+              </svg>
+              W6 Ex2: Analyze Feed
+            </button>
+            <button class="nav-item" onclick="showPage('introai-design-recommender')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M8 2v4M4 6l4 3 4-3M8 9v5" stroke-linecap="round" />
+              </svg>
+              W6 Ex3: Flowchart
+            </button>
           </div>
 
           <!-- Common Section -->
@@ -2817,6 +2837,180 @@
           </div>
         </div>
 
+        <!-- ══ INTRO TO AI: BE THE ALGORITHM (W6 Ex 1) ══ -->
+        <div class="page" id="page-introai-be-algorithm">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Be the Algorithm! — Week 6 Activity 1</div>
+              <div class="page-subtitle">Movie recommendations for 5 student profiles & reflections</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('bta')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card">
+              <div class="stat-label">Total Submissions</div>
+              <div class="stat-value" id="bta-stat-count">—</div>
+              <div class="stat-sub">Students submitted</div>
+            </div>
+            <div class="stat-card teal">
+              <div class="stat-label">Avg Enjoyment</div>
+              <div class="stat-value" id="bta-stat-enjoy">—</div>
+              <div class="stat-sub">Out of 5 stars</div>
+            </div>
+            <div class="stat-card gold">
+              <div class="stat-label">Profiles Matched</div>
+              <div class="stat-value" style="font-size:16px;padding-top:6px">5 / 5</div>
+              <div class="stat-sub">Profiles per student</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Search:</label>
+              <input class="search-input" id="bta-search" type="text" placeholder="Student name, email..."
+                oninput="renderBTATable()" />
+              <span class="text-small text-muted" id="bta-count"></span>
+            </div>
+            <div id="bta-table-wrap">
+              <div class="loading">
+                <div class="spinner"></div><br>Loading Be the Algorithm data&hellip;
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ INTRO TO AI: ANALYZE YOUR FEED (W6 Ex 2) ══ -->
+        <div class="page" id="page-introai-analyze-feed">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Analyze Your Feed! — Week 6 Activity 2</div>
+              <div class="page-subtitle">Real platform recommendations, weird suggestions & filter bubble reflections</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('ayf')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card">
+              <div class="stat-label">Total Submissions</div>
+              <div class="stat-value" id="ayf-stat-count">—</div>
+              <div class="stat-sub">Students submitted</div>
+            </div>
+            <div class="stat-card teal">
+              <div class="stat-label">Avg Enjoyment</div>
+              <div class="stat-value" id="ayf-stat-enjoy">—</div>
+              <div class="stat-sub">Out of 5 stars</div>
+            </div>
+            <div class="stat-card gold">
+              <div class="stat-label">Bubble Status</div>
+              <div class="stat-value" style="font-size:15px;padding-top:6px" id="ayf-stat-bubble">—</div>
+              <div class="stat-sub">Top filter bubble perception</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Search:</label>
+              <input class="search-input" id="ayf-search" type="text" placeholder="Student name, platform..."
+                oninput="renderAYFTable()" />
+              <span class="text-small text-muted" id="ayf-count"></span>
+            </div>
+            <div id="ayf-table-wrap">
+              <div class="loading">
+                <div class="spinner"></div><br>Loading Analyze Your Feed data&hellip;
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ INTRO TO AI: DESIGN A RECOMMENDER (W6 Ex 3) ══ -->
+        <div class="page" id="page-introai-design-recommender">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Design a Simple Recommender! — Week 6 Activity 3</div>
+              <div class="page-subtitle">Interactive flowcharts, decision rules & board game outputs</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('dsr')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card">
+              <div class="stat-label">Total Submissions</div>
+              <div class="stat-value" id="dsr-stat-count">—</div>
+              <div class="stat-sub">Flowcharts designed</div>
+            </div>
+            <div class="stat-card teal">
+              <div class="stat-label">Avg Enjoyment</div>
+              <div class="stat-value" id="dsr-stat-enjoy">—</div>
+              <div class="stat-sub">Out of 5 stars</div>
+            </div>
+            <div class="stat-card gold">
+              <div class="stat-label">Avg Decision Steps</div>
+              <div class="stat-value" style="font-size:16px;padding-top:6px" id="dsr-stat-steps">—</div>
+              <div class="stat-sub">Questions asked</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Search:</label>
+              <input class="search-input" id="dsr-search" type="text" placeholder="Student name, games..."
+                oninput="renderDSRTable()" />
+              <span class="text-small text-muted" id="dsr-count"></span>
+            </div>
+            <div id="dsr-table-wrap">
+              <div class="loading">
+                <div class="spinner"></div><br>Loading Recommender Flowchart data&hellip;
+              </div>
+            </div>
+          </div>
+        </div>
+
       </main>
     </div>
   </div>
@@ -2864,6 +3058,9 @@
     let mgData = [];     // introai_week04_music_generation rows
     let isData = [];     // introai_week04_instrument_swap rows
     let tmData = [];     // introai_week05_train_your_model rows
+    let btaData = [];    // introai_week06_be_the_algorithm rows
+    let ayfData = [];    // introai_week06_analyze_your_feed rows
+    let dsrData = [];    // introai_week06_design_a_recommender rows
     let activeCohort = ''; // global cohort filter ('' = all)
 
     // ════════════════════════════════════════════════════════════════════════════
@@ -2954,7 +3151,7 @@
     async function loadAll() {
       document.getElementById('last-refresh').textContent = 'Refreshing…';
       try {
-        const [hw, exam, codes, sa, sh, cb, cp, pd, ws, ap, pc, mg, isSwap, tm] = await Promise.all([
+        const [hw, exam, codes, sa, sh, cb, cp, pd, ws, ap, pc, mg, isSwap, tm, bta, ayf, dsr] = await Promise.all([
           sb.from('homework_submissions').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('caio_final_exam_results').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('access_codes').select('*').order('created_at', { ascending: false }).limit(10000),
@@ -2968,7 +3165,10 @@
           sb.from('introai_week03_prompt_comparison').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('introai_week04_music_generation').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('introai_week04_instrument_swap').select('*').order('submitted_at', { ascending: false }).limit(10000),
-          sb.from('introai_week05_train_your_model').select('*').order('submitted_at', { ascending: false }).limit(10000)
+          sb.from('introai_week05_train_your_model').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('introai_week06_be_the_algorithm').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('introai_week06_analyze_your_feed').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('introai_week06_design_a_recommender').select('*').order('submitted_at', { ascending: false }).limit(10000)
         ]);
 
         if (hw.error) { console.error('hw error:', hw.error); toast('⚠ Homework load error: ' + hw.error.message); }
@@ -2985,6 +3185,9 @@
         if (mg.error) { console.error('mg error:', mg.error); toast('\u26A0 Music generation error: ' + mg.error.message); }
         if (isSwap.error) { console.error('isSwap error:', isSwap.error); toast('\u26A0 Instrument swap error: ' + isSwap.error.message); }
         if (tm.error) { console.error('tm error:', tm.error); toast('⚠ Train your model error: ' + tm.error.message); }
+        if (bta.error) { console.error('bta error:', bta.error); toast('⚠ Be the algorithm error: ' + bta.error.message); }
+        if (ayf.error) { console.error('ayf error:', ayf.error); toast('⚠ Analyze feed error: ' + ayf.error.message); }
+        if (dsr.error) { console.error('dsr error:', dsr.error); toast('⚠ Design recommender error: ' + dsr.error.message); }
 
         hwData = hw.data || [];
         examData = exam.data || [];
@@ -3000,8 +3203,11 @@
         mgData = mg.data || [];
         isData = isSwap.data || [];
         tmData = tm.data || [];
+        btaData = bta.data || [];
+        ayfData = ayf.data || [];
+        dsrData = dsr.data || [];
 
-        console.log(`Loaded: ${hwData.length} hw, ${examData.length} exam, ${codesData.length} codes, ${saData.length} SA, ${shData.length} SH, ${cbData.length} CB, ${cpData.length} CP, ${pdData.length} PD, ${wsData.length} WS, ${apData.length} AP, ${pcData.length} PC, ${mgData.length} MG, ${isData.length} IS, ${tmData.length} TM rows`);
+        console.log(`Loaded: ${hwData.length} hw, ${examData.length} exam, ${codesData.length} codes, ${saData.length} SA, ${shData.length} SH, ${cbData.length} CB, ${cpData.length} CP, ${pdData.length} PD, ${wsData.length} WS, ${apData.length} AP, ${pcData.length} PC, ${mgData.length} MG, ${isData.length} IS, ${tmData.length} TM, ${btaData.length} BTA, ${ayfData.length} AYF, ${dsrData.length} DSR rows`);
 
         populateFilters();
         renderOverview();
@@ -3021,6 +3227,9 @@
         renderMGPage();
         renderISPage();
         renderTMPage();
+        renderBTAPage();
+        renderAYFPage();
+        renderDSRPage();
 
         const now = new Date();
         document.getElementById('last-refresh').textContent = 'Updated ' + now.toLocaleTimeString();
@@ -3655,6 +3864,15 @@
       } else if (type === 'tm') {
         r = tmData.find(x => x.id === id);
         title = "Teachable Machine Model Detail";
+      } else if (type === 'bta') {
+        r = btaData.find(x => x.id === id);
+        title = "Be the Algorithm Detail";
+      } else if (type === 'ayf') {
+        r = ayfData.find(x => x.id === id);
+        title = "Analyze Your Feed Detail";
+      } else if (type === 'dsr') {
+        r = dsrData.find(x => x.id === id);
+        title = "Design a Recommender Detail";
       }
 
       if (!r) return;
@@ -3942,6 +4160,18 @@
         rows = [['student_name', 'student_email', 'project_type', 'project_title', 'classes_trained', 'examples_per_class', 'model_url', 'accuracy_rating', 'challenges_reflections', 'improvement_ideas', 'enjoyment_rating', 'submitted_at']];
         tmData.forEach(r => rows.push([r.student_name, r.student_email, r.project_type, r.project_title, r.classes_trained, r.examples_per_class, r.model_url, r.accuracy_rating, r.challenges_reflections, r.improvement_ideas, r.enjoyment_rating, r.submitted_at]));
         filename = 'introai_week05_train_your_model.csv';
+      } else if (type === 'bta') {
+        rows = [['student_name', 'student_email', 'profiles_used', 'profile_a_recommendation', 'profile_b_recommendation', 'profile_c_recommendation', 'profile_d_recommendation', 'profile_e_recommendation', 'profile_a_key_param', 'profile_b_key_param', 'profile_c_key_param', 'profile_d_key_param', 'profile_e_key_param', 'reflection_hardest', 'reflection_rule', 'reflection_agreement', 'reflection_realworld', 'enjoyment_rating', 'submitted_at']];
+        btaData.forEach(r => rows.push([r.student_name, r.student_email, r.profiles_used, r.profile_a_recommendation, r.profile_b_recommendation, r.profile_c_recommendation, r.profile_d_recommendation, r.profile_e_recommendation, r.profile_a_key_param, r.profile_b_key_param, r.profile_c_key_param, r.profile_d_key_param, r.profile_e_key_param, r.reflection_hardest, r.reflection_rule, r.reflection_agreement, r.reflection_realworld, r.enjoyment_rating, r.submitted_at]));
+        filename = 'introai_week06_be_the_algorithm.csv';
+      } else if (type === 'ayf') {
+        rows = [['student_name', 'student_email', 'platforms_used', 'fav_recommendation', 'personalization_rating', 'how_it_knows', 'got_weird_rec', 'weird_example', 'filter_bubble_status', 'bubble_reflection', 'break_bubble_idea', 'ai_ethics_thought', 'enjoyment_rating', 'submitted_at']];
+        ayfData.forEach(r => rows.push([r.student_name, r.student_email, r.platforms_used, r.fav_recommendation, r.personalization_rating, r.how_it_knows, r.got_weird_rec, r.weird_example, r.filter_bubble_status, r.bubble_reflection, r.break_bubble_idea, r.ai_ethics_thought, r.enjoyment_rating, r.submitted_at]));
+        filename = 'introai_week06_analyze_your_feed.csv';
+      } else if (type === 'dsr') {
+        rows = [['student_name', 'student_email', 'input_questions', 'num_decision_steps', 'flowchart_summary', 'output_games', 'hardest_part', 'rule_limitations', 'real_vs_simple', 'enjoyment_rating', 'submitted_at']];
+        dsrData.forEach(r => rows.push([r.student_name, r.student_email, r.input_questions, r.num_decision_steps, r.flowchart_summary, r.output_games, r.hardest_part, r.rule_limitations, r.real_vs_simple, r.enjoyment_rating, r.submitted_at]));
+        filename = 'introai_week06_design_a_recommender.csv';
       } else {
         rows = [['code', 'cohort', 'class_number', 'is_active', 'uses_count', 'max_uses', 'created_at']];
         codesData.forEach(r => rows.push([r.code, r.cohort, r.class_number, r.is_active, r.uses_count, r.max_uses, r.created_at]));
@@ -5614,6 +5844,207 @@
         btn.disabled = false;
         btn.innerHTML = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px;height:14px"><path d="M8 1l1.5 3.5L13 6l-2.5 2.5.5 3.5L8 10.5 5 12l.5-3.5L3 6l3.5-1.5z" /></svg> Regenerate`;
       }
+    }
+
+    // ════════════════════════════════════════════════════════════════════════════
+    // INTRO TO AI — WEEK 6 RENDER FUNCTIONS
+    // ════════════════════════════════════════════════════════════════════════════
+
+    // ── Activity 1: Be the Algorithm! ──
+    function renderBTAPage() {
+      if (!btaData.length) {
+        document.getElementById('bta-stat-count').textContent = '0';
+        document.getElementById('bta-stat-enjoy').textContent = '—';
+        renderBTATable();
+        return;
+      }
+      document.getElementById('bta-stat-count').textContent = btaData.length;
+      const avg = (btaData.reduce((s, r) => s + (parseInt(r.enjoyment_rating) || 0), 0) / btaData.length).toFixed(1);
+      document.getElementById('bta-stat-enjoy').textContent = avg + ' / 5';
+      renderBTATable();
+    }
+
+    function renderBTATable() {
+      const search = (document.getElementById('bta-search')?.value || '').toLowerCase();
+      let rows = btaData.filter(r =>
+        !search || (r.student_name || '').toLowerCase().includes(search) || (r.student_email || '').toLowerCase().includes(search)
+      );
+
+      document.getElementById('bta-count').textContent = rows.length + ' submission' + (rows.length !== 1 ? 's' : '');
+
+      if (!rows.length) {
+        document.getElementById('bta-table-wrap').innerHTML = '<div class="empty-state"><p>No matching submissions.</p></div>';
+        return;
+      }
+
+      function starRating(v) {
+        if (!v) return '<span style="color:var(--gray)">—</span>';
+        const stars = '★'.repeat(v) + '☆'.repeat(5 - v);
+        const col = v >= 4 ? '#059669' : v >= 3 ? '#d97706' : '#dc2626';
+        return `<span style="color:${col};font-size:14px">${stars}</span>`;
+      }
+
+      document.getElementById('bta-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student</th>
+        <th>Profile A Rec</th>
+        <th>Profile B Rec</th>
+        <th>Profile C Rec</th>
+        <th>Key Parameter Used</th>
+        <th>Enjoyment</th>
+        <th>Submitted</th>
+        <th>Detail</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr class="clickable-row" onclick="showSubmissionDetail('bta', ${r.id})">
+          <td><strong>${esc(r.student_name)}</strong><br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
+          <td style="font-size:11px">${esc(r.profile_a_recommendation || '—')}</td>
+          <td style="font-size:11px">${esc(r.profile_b_recommendation || '—')}</td>
+          <td style="font-size:11px">${esc(r.profile_c_recommendation || '—')}</td>
+          <td style="font-size:11px;color:#475569">${esc(r.profile_a_key_param || '—')}</td>
+          <td>${starRating(r.enjoyment_rating)}</td>
+          <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('bta', ${r.id})">View</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+    }
+
+    // ── Activity 2: Analyze Your Feed! ──
+    function renderAYFPage() {
+      if (!ayfData.length) {
+        document.getElementById('ayf-stat-count').textContent = '0';
+        document.getElementById('ayf-stat-enjoy').textContent = '—';
+        document.getElementById('ayf-stat-bubble').textContent = '—';
+        renderAYFTable();
+        return;
+      }
+      document.getElementById('ayf-stat-count').textContent = ayfData.length;
+      const avg = (ayfData.reduce((s, r) => s + (parseInt(r.enjoyment_rating) || 0), 0) / ayfData.length).toFixed(1);
+      document.getElementById('ayf-stat-enjoy').textContent = avg + ' / 5';
+
+      const statusMap = {};
+      ayfData.forEach(r => { if (r.filter_bubble_status) statusMap[r.filter_bubble_status] = (statusMap[r.filter_bubble_status] || 0) + 1; });
+      const topBubble = Object.entries(statusMap).sort((a, b) => b[1] - a[1])[0];
+      document.getElementById('ayf-stat-bubble').textContent = topBubble ? topBubble[0] : '—';
+
+      renderAYFTable();
+    }
+
+    function renderAYFTable() {
+      const search = (document.getElementById('ayf-search')?.value || '').toLowerCase();
+      let rows = ayfData.filter(r =>
+        !search || (r.student_name || '').toLowerCase().includes(search) || (r.platforms_used || '').toLowerCase().includes(search)
+      );
+
+      document.getElementById('ayf-count').textContent = rows.length + ' submission' + (rows.length !== 1 ? 's' : '');
+
+      if (!rows.length) {
+        document.getElementById('ayf-table-wrap').innerHTML = '<div class="empty-state"><p>No matching submissions.</p></div>';
+        return;
+      }
+
+      function starRating(v) {
+        if (!v) return '<span style="color:var(--gray)">—</span>';
+        const stars = '★'.repeat(v) + '☆'.repeat(5 - v);
+        const col = v >= 4 ? '#059669' : v >= 3 ? '#d97706' : '#dc2626';
+        return `<span style="color:${col};font-size:14px">${stars}</span>`;
+      }
+
+      document.getElementById('ayf-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student</th>
+        <th>Platforms Used</th>
+        <th>Personalisation</th>
+        <th>Weird Rec?</th>
+        <th>Filter Bubble</th>
+        <th>Enjoyment</th>
+        <th>Submitted</th>
+        <th>Detail</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr class="clickable-row" onclick="showSubmissionDetail('ayf', ${r.id})">
+          <td><strong>${esc(r.student_name)}</strong><br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
+          <td style="font-size:11px">${esc(r.platforms_used || '—')}</td>
+          <td><span class="badge badge-teal">${esc(r.personalization_rating || '—')}</span></td>
+          <td><span class="badge ${r.got_weird_rec?.includes('Yes') ? 'badge-gold' : 'badge-gray'}">${esc(r.got_weird_rec || '—')}</span></td>
+          <td><span class="badge ${r.filter_bubble_status?.includes('Yes') ? 'badge-red' : 'badge-green'}">${esc(r.filter_bubble_status || '—')}</span></td>
+          <td>${starRating(r.enjoyment_rating)}</td>
+          <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('ayf', ${r.id})">View</button>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+    }
+
+    // ── Activity 3: Design a Simple Recommender! ──
+    function renderDSRPage() {
+      if (!dsrData.length) {
+        document.getElementById('dsr-stat-count').textContent = '0';
+        document.getElementById('dsr-stat-enjoy').textContent = '—';
+        document.getElementById('dsr-stat-steps').textContent = '—';
+        renderDSRTable();
+        return;
+      }
+      document.getElementById('dsr-stat-count').textContent = dsrData.length;
+      const avg = (dsrData.reduce((s, r) => s + (parseInt(r.enjoyment_rating) || 0), 0) / dsrData.length).toFixed(1);
+      document.getElementById('dsr-stat-enjoy').textContent = avg + ' / 5';
+
+      const stepCounts = dsrData.map(r => parseInt(r.num_decision_steps) || 2);
+      const avgSteps = (stepCounts.reduce((a, b) => a + b, 0) / dsrData.length).toFixed(1);
+      document.getElementById('dsr-stat-steps').textContent = avgSteps + ' questions';
+
+      renderDSRTable();
+    }
+
+    function renderDSRTable() {
+      const search = (document.getElementById('dsr-search')?.value || '').toLowerCase();
+      let rows = dsrData.filter(r =>
+        !search || (r.student_name || '').toLowerCase().includes(search) || (r.output_games || '').toLowerCase().includes(search)
+      );
+
+      document.getElementById('dsr-count').textContent = rows.length + ' flowchart' + (rows.length !== 1 ? 's' : '');
+
+      if (!rows.length) {
+        document.getElementById('dsr-table-wrap').innerHTML = '<div class="empty-state"><p>No matching flowcharts.</p></div>';
+        return;
+      }
+
+      function starRating(v) {
+        if (!v) return '<span style="color:var(--gray)">—</span>';
+        const stars = '★'.repeat(v) + '☆'.repeat(5 - v);
+        const col = v >= 4 ? '#059669' : v >= 3 ? '#d97706' : '#dc2626';
+        return `<span style="color:${col};font-size:14px">${stars}</span>`;
+      }
+
+      document.getElementById('dsr-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student</th>
+        <th>Decision Steps</th>
+        <th>Outputs / Board Games</th>
+        <th>Flowchart Summary</th>
+        <th>Enjoyment</th>
+        <th>Submitted</th>
+        <th>Detail</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr class="clickable-row" onclick="showSubmissionDetail('dsr', ${r.id})">
+          <td><strong>${esc(r.student_name)}</strong><br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
+          <td><span class="badge badge-gold">${esc(r.num_decision_steps || '1')} questions</span></td>
+          <td style="font-size:11px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.output_games)}">${esc(r.output_games || '—')}</td>
+          <td style="font-size:11px;font-family:'DM Mono',monospace;color:var(--teal);max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.flowchart_summary)}">${esc(r.flowchart_summary || '—')}</td>
+          <td>${starRating(r.enjoyment_rating)}</td>
+          <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('dsr', ${r.id})">View</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
     }
 
     // ════════════════════════════════════════════════════════════════════════════

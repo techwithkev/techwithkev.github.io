@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analyze Your Feed! — Intro to AI · Week 6</title>
+  <meta name="description"
+    content="Week 6 Activity 2: Analyze Your Feed! Reflect on how YouTube, TikTok, Spotify, and Netflix decide what to show you — and whether you might be stuck in a filter bubble.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    #registration-overlay { transition: opacity 0.4s ease; }
+    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
+    #registration-overlay .reg-card {
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
+    }
+    #registration-overlay.hiding .reg-card {
+      transform: scale(0.95) translateY(-10px); opacity: 0;
+    }
+    .reg-input:focus {
+      outline: none; border-color: #c026d3;
+      box-shadow: 0 0 0 3px rgba(192,38,211,0.15);
+    }
+    .reg-input.error {
+      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+    }
+    .form-input:focus {
+      outline: none; border-color: #c026d3;
+      box-shadow: 0 0 0 3px rgba(192,38,211,0.1);
+    }
+    .form-input.error { border-color: #ef4444; }
+    .opt-btn {
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .opt-btn:hover { transform: translateY(-1px); }
+    .opt-btn.selected {
+      border-color: #c026d3 !important;
+      background: #fdf4ff !important;
+      color: #701a75 !important;
+      font-weight: 700;
+    }
+    .platform-card {
+      transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .platform-card:hover {
+      box-shadow: 0 8px 30px rgba(192,38,211,0.1);
+      transform: translateY(-2px);
+    }
+    .star-btn {
+      font-size: 24px;
+      cursor: pointer;
+      filter: grayscale(100%);
+      transition: filter 0.15s ease, transform 0.1s ease;
+    }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .bubble-tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 9999px;
+      font-size: 11px; font-weight: 700; cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.15s ease;
+    }
+    .bubble-tag:hover { transform: scale(1.05); }
+    .bubble-tag.selected {
+      background: #fdf4ff !important;
+      border-color: #c026d3 !important;
+      color: #701a75 !important;
+    }
+  </style>
+</head>
+
+<body class="bg-[#F9FAFB] text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- REGISTRATION GATE -->
+  <div id="registration-overlay"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+    style="background: linear-gradient(135deg, #4a044e 0%, #a21caf 55%, #4a044e 100%);">
+
+    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
+        style="background: radial-gradient(circle, #f0abfc, transparent);"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
+        style="background: radial-gradient(circle, #e879f9, transparent);"></div>
+    </div>
+
+    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center bg-fuchsia-100 text-fuchsia-600">
+          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M15 10l4.553-2.069A1 1 0 0121 8.845v6.31a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 bg-fuchsia-100 text-fuchsia-800">
+          Week 6 · Activity 2
+        </div>
+        <h1 class="text-2xl font-black text-gray-900 tracking-tight">Analyze Your <span class="text-fuchsia-600">Feed!</span></h1>
+        <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">Enter your full name and email to start the reflection exercise.</p>
+      </div>
+
+      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
+        <div class="space-y-4 mb-6">
+          <div>
+            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Full Name</label>
+            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Jane Smith"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name.</p>
+          </div>
+          <div>
+            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
+            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. jane@school.edu"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
+          </div>
+        </div>
+        <button id="reg-submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-500 to-fuchsia-600 hover:from-fuchsia-600 hover:to-fuchsia-700">
+          <span id="reg-btn-label">Begin Activity &#8594;</span>
+        </button>
+      </form>
+      <p class="text-center text-[10px] text-gray-400 font-medium mt-5">Saved to the Intro to AI student roster.</p>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main-content" class="max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+      <div>
+        <a href="index.html"
+          class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-fuchsia-600 mb-3 hover:text-fuchsia-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">
+          Analyze Your <span class="text-fuchsia-500">Feed!</span>
+        </h1>
+        <p class="text-gray-500 font-medium italic mt-1">Recommendation Systems · Week 6 · Activity 2</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-fuchsia-50 border border-fuchsia-200 text-fuchsia-800 shadow-sm self-start md:self-auto">
+        Week 6
+      </div>
+    </header>
+
+    <!-- Brief Card -->
+    <div class="rounded-3xl p-6 mb-8 border bg-gradient-to-r from-fuchsia-50 to-purple-50 border-fuchsia-100 shadow-sm">
+      <div class="flex gap-4">
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 bg-fuchsia-500 text-white shadow-md text-xl">
+          📱
+        </div>
+        <div>
+          <h2 class="text-lg font-black text-fuchsia-950 mb-1">Your Feed Is Watching You Back</h2>
+          <p class="text-sm text-fuchsia-900 leading-relaxed mb-3">
+            Every time you scroll YouTube, swipe TikTok, or open Spotify — an AI algorithm is deciding what you see.
+            In this activity you'll <strong>inspect your own recommendations</strong> and reflect on how they work, when they fail, and what that might mean for you.
+          </p>
+          <ul class="text-xs text-fuchsia-800 space-y-1 bg-white/70 backdrop-blur-sm p-4 rounded-xl border border-fuchsia-100/50">
+            <li>📺 <strong>Step 1</strong> — Pick the platforms you actually use and describe one recommendation.</li>
+            <li>🤔 <strong>Step 2</strong> — Reflect: Does it feel personalised? How does it know?</li>
+            <li>🚨 <strong>Step 3</strong> — Think of a time you got a weird or wrong recommendation.</li>
+            <li>🫧 <strong>Step 4</strong> — Consider: Could your feed be a "filter bubble"?</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN FORM -->
+    <form id="analyze-your-feed-form" onsubmit="submitExercise(event)" novalidate>
+
+      <!-- STEP 1: Platform picker -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-fuchsia-500">1</div>
+          <h2 class="text-base font-black text-gray-900">Which platforms do you use regularly?</h2>
+        </div>
+        <p class="text-xs text-gray-500 mb-4 ml-11">Select all that apply — these are the feeds we'll analyse together.</p>
+
+        <div class="flex flex-wrap gap-2 mb-5" id="platform-picker">
+          <button type="button" class="bubble-tag bg-red-50 text-red-700 border-red-200"
+            onclick="togglePlatform('YouTube', this)">▶️ YouTube</button>
+          <button type="button" class="bubble-tag bg-gray-900 text-white border-gray-700"
+            onclick="togglePlatform('TikTok', this)">🎵 TikTok</button>
+          <button type="button" class="bubble-tag bg-green-50 text-green-700 border-green-200"
+            onclick="togglePlatform('Spotify', this)">🎧 Spotify</button>
+          <button type="button" class="bubble-tag bg-red-100 text-red-800 border-red-300"
+            onclick="togglePlatform('Netflix', this)">🎬 Netflix</button>
+          <button type="button" class="bubble-tag bg-pink-50 text-pink-700 border-pink-200"
+            onclick="togglePlatform('Instagram', this)">📸 Instagram</button>
+          <button type="button" class="bubble-tag bg-sky-50 text-sky-700 border-sky-200"
+            onclick="togglePlatform('X / Twitter', this)">🐦 X / Twitter</button>
+          <button type="button" class="bubble-tag bg-indigo-50 text-indigo-700 border-indigo-200"
+            onclick="togglePlatform('Apple Music', this)">🎶 Apple Music</button>
+          <button type="button" class="bubble-tag bg-orange-50 text-orange-700 border-orange-200"
+            onclick="togglePlatform('Other', this)">➕ Other</button>
+        </div>
+        <p id="platform-error" class="hidden text-xs text-red-500 font-medium mb-4">Please select at least one platform.</p>
+
+        <label for="fav-recommendation" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+          Describe ONE specific thing a platform recently recommended to you. Was it good? <span class="text-red-500">*</span>
+        </label>
+        <textarea id="fav-recommendation" rows="3"
+          placeholder="e.g. YouTube recommended a cooking video even though I only watch gaming content. It was weird — maybe because my sister used my account…"
+          class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+        <p id="fav-rec-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe a recommendation.</p>
+      </div>
+
+      <!-- STEP 2: Personalisation -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-fuchsia-500">2</div>
+          <h2 class="text-base font-black text-gray-900">Does it feel personalised?</h2>
+        </div>
+        <p class="text-xs text-gray-500 mb-4 ml-11">Your YouTube homepage is different from everyone else's — the AI built a model of <em>you</em> from your data.</p>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+              Overall, how personalised do your recommendations feel? <span class="text-red-500">*</span>
+            </label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="personalization-picker">
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2.5 px-2 text-xs font-bold text-gray-600 bg-gray-50"
+                onclick="setPersonalization('Not at all — very random', this)">
+                🎲 Not at all
+              </button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2.5 px-2 text-xs font-bold text-gray-600 bg-gray-50"
+                onclick="setPersonalization('A little — sometimes feels right', this)">
+                🤷 A little
+              </button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2.5 px-2 text-xs font-bold text-gray-600 bg-gray-50"
+                onclick="setPersonalization('Mostly — usually knows my taste', this)">
+                👍 Mostly
+              </button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2.5 px-2 text-xs font-bold text-gray-600 bg-gray-50"
+                onclick="setPersonalization('Exactly — almost creepy accurate', this)">
+                🎯 Exactly
+              </button>
+            </div>
+            <p id="personalization-error" class="hidden text-xs text-red-500 font-medium mt-1.5">Please select how personalised it feels.</p>
+          </div>
+
+          <div>
+            <label for="how-it-knows" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+              How do you think it knows what to recommend? What data is it using? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="how-it-knows" rows="3"
+              placeholder="e.g. It probably tracks what videos I click, how long I watch them, what I skip, what I search for, and maybe even what time of day I watch…"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="how-knows-error" class="hidden text-xs text-red-500 font-medium mt-1">Please share your thinking.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: Weird/wrong recommendations -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-fuchsia-500">3</div>
+          <h2 class="text-base font-black text-gray-900">Weird or wrong recommendations</h2>
+        </div>
+        <p class="text-xs text-gray-500 mb-4 ml-11">Even the best AI algorithms get it wrong — and understanding <em>why</em> is key to understanding how they work.</p>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+              Have you ever gotten a recommendation that was totally wrong or weird? <span class="text-red-500">*</span>
+            </label>
+            <div class="grid grid-cols-2 gap-2 mb-3" id="got-weird-picker">
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2.5 px-2 text-xs font-bold text-gray-600 bg-gray-50"
+                onclick="setGotWeird('Yes — definitely', this)">✅ Yes — definitely</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2.5 px-2 text-xs font-bold text-gray-600 bg-gray-50"
+                onclick="setGotWeird('Not that I remember', this)">🤔 Not that I remember</button>
+            </div>
+            <p id="got-weird-error" class="hidden text-xs text-red-500 font-medium mb-3">Please answer this question.</p>
+
+            <label for="weird-example" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+              Describe the weird recommendation and why you think it happened <span class="text-red-500">*</span>
+            </label>
+            <textarea id="weird-example" rows="3"
+              placeholder="e.g. Spotify kept recommending hardcore metal music even though I only listen to jazz. I think it might be because I once searched for it as a joke…"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="weird-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe the weird recommendation.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4: Filter Bubble -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-fuchsia-500">4</div>
+          <h2 class="text-base font-black text-gray-900">The Filter Bubble 🫧</h2>
+        </div>
+
+        <!-- Filter bubble explainer -->
+        <div class="ml-11 mb-4 p-4 bg-fuchsia-50 border border-fuchsia-100 rounded-2xl text-xs text-fuchsia-800 leading-relaxed">
+          <p class="font-black text-fuchsia-900 mb-1">What is a filter bubble?</p>
+          <p>When an AI only shows you content you already like or agree with, it can create a
+          <strong>"filter bubble"</strong> — a personalised universe where you never see different viewpoints,
+          genres, cultures, or opinions. This can feel great in the short term (it's all stuff you like!)
+          but it might mean you're missing out on new ideas — or even being kept in an echo chamber.</p>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+              Do you think you might be in a filter bubble on any platform? <span class="text-red-500">*</span>
+            </label>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" id="bubble-picker">
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2.5 px-3 text-xs font-bold text-gray-600 bg-gray-50 text-left"
+                onclick="setFilterBubble('Yes — I mostly see the same types of content', this)">
+                🫧 Yes — same content all the time
+              </button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2.5 px-3 text-xs font-bold text-gray-600 bg-gray-50 text-left"
+                onclick="setFilterBubble('Maybe — I notice some patterns but still get variety', this)">
+                🤷 Maybe — some patterns, some variety
+              </button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2.5 px-3 text-xs font-bold text-gray-600 bg-gray-50 text-left"
+                onclick="setFilterBubble('No — I see very different content all the time', this)">
+                🌍 No — very different content always
+              </button>
+            </div>
+            <p id="bubble-error" class="hidden text-xs text-red-500 font-medium mt-1.5">Please make a selection.</p>
+          </div>
+
+          <div>
+            <label for="bubble-reflection" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+              Do you mostly see things you already like or agree with? Is that a good thing or a bad thing? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="bubble-reflection" rows="3"
+              placeholder="e.g. I mostly see gaming and coding content which I love — but I wonder if I'm missing out on other perspectives. It's comfortable but maybe too comfortable…"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="bubble-ref-error" class="hidden text-xs text-red-500 font-medium mt-1">Please share your reflection.</p>
+          </div>
+
+          <div>
+            <label for="break-bubble" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+              What could you do to "pop" your filter bubble and discover new things?
+            </label>
+            <textarea id="break-bubble" rows="2"
+              placeholder="e.g. I could search for topics I've never explored before, or ask a friend what they recommend, or deliberately click on content that's outside my usual taste…"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5: Overall reflection + enjoyment -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-fuchsia-500">💬</div>
+          <h2 class="text-base font-black text-gray-900">Final Reflection</h2>
+        </div>
+
+        <div class="space-y-5">
+          <div>
+            <label for="ai-ethics-thought" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+              Should AI recommendation systems be allowed to shape what we see and think? Any concerns? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="ai-ethics-thought" rows="3"
+              placeholder="e.g. I think it's fine as long as we know it's happening. The scary part is when people don't realise an algorithm is deciding their reality for them…"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="ethics-error" class="hidden text-xs text-red-500 font-medium mt-1">Please share your thoughts.</p>
+          </div>
+
+          <!-- Enjoyment stars -->
+          <div>
+            <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">How much did you enjoy this activity?</label>
+            <div class="flex gap-1" id="enjoyment-stars" role="group" aria-label="Enjoyment rating">
+              <button type="button" class="star-btn" data-val="1" onclick="setRating(1)" aria-label="1 star">⭐</button>
+              <button type="button" class="star-btn" data-val="2" onclick="setRating(2)" aria-label="2 stars">⭐</button>
+              <button type="button" class="star-btn" data-val="3" onclick="setRating(3)" aria-label="3 stars">⭐</button>
+              <button type="button" class="star-btn" data-val="4" onclick="setRating(4)" aria-label="4 stars">⭐</button>
+              <button type="button" class="star-btn" data-val="5" onclick="setRating(5)" aria-label="5 stars">⭐</button>
+            </div>
+            <p id="rating-error" class="hidden text-xs text-red-500 font-medium mt-1">Please select an enjoyment rating.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-12">
+        <p id="form-error" class="hidden text-sm font-medium text-red-500 mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+          <span id="form-error-text">Please complete all required fields.</span>
+        </p>
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-500 to-fuchsia-600 hover:from-fuchsia-600 hover:to-fuchsia-700">
+          <span id="submit-label">Submit Reflections &#8594;</span>
+        </button>
+        <p class="text-center text-xs text-gray-400 font-medium mt-3">Results will load to the teacher dashboard.</p>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div id="success-screen"
+    class="hidden fixed inset-0 z-[90] bg-[#F9FAFB] flex items-center justify-center p-4">
+    <div class="text-center max-w-md bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+      <div class="w-20 h-20 mx-auto rounded-2xl mb-6 flex items-center justify-center bg-fuchsia-100 text-fuchsia-600 shadow-sm">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <div class="inline-block px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 bg-fuchsia-50 text-fuchsia-800">
+        Feed Analysed!
+      </div>
+      <h2 class="text-3xl font-black text-gray-900 mb-3 tracking-tight">
+        Nice thinking, <span id="success-name" class="text-fuchsia-600"></span>!
+      </h2>
+      <p class="text-gray-500 mb-8 leading-relaxed text-sm">
+        Your feed reflections have been saved. Now compare your thoughts with the class — did everyone see the same patterns?
+      </p>
+      <a href="index.html"
+        class="inline-flex items-center gap-2 text-white font-black py-3.5 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm bg-gradient-to-r from-fuchsia-500 to-fuchsia-600">
+        Return to Course Hub
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+    const TABLE = 'introai_week06_analyze_your_feed';
+
+    let studentName = '', studentEmail = '';
+    let selectedPlatforms = [];
+    let selectedPersonalization = '';
+    let selectedGotWeird = '';
+    let selectedFilterBubble = '';
+    let enjoymentRating = 0;
+
+    function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+    async function handleRegistration(ev) {
+      ev.preventDefault();
+      const nameEl = document.getElementById('reg-name');
+      const emailEl = document.getElementById('reg-email');
+      const nameErr = document.getElementById('reg-name-error');
+      const emailErr = document.getElementById('reg-email-error');
+      let ok = true;
+
+      nameEl.classList.remove('error'); nameErr.classList.add('hidden');
+      emailEl.classList.remove('error'); emailErr.classList.add('hidden');
+
+      if (!nameEl.value.trim()) { nameEl.classList.add('error'); nameErr.classList.remove('hidden'); ok = false; }
+      if (!emailEl.value.trim() || !validateEmail(emailEl.value.trim())) { emailEl.classList.add('error'); emailErr.classList.remove('hidden'); ok = false; }
+      if (!ok) return;
+
+      const btn = document.getElementById('reg-submit-btn');
+      btn.disabled = true;
+      document.getElementById('reg-btn-label').innerHTML = '<span class="spinner"></span> Starting\u2026';
+
+      studentName = nameEl.value.trim();
+      studentEmail = emailEl.value.trim();
+      sessionStorage.setItem('introai_w06_feed_name', studentName);
+      sessionStorage.setItem('introai_w06_feed_email', studentEmail);
+
+      const overlay = document.getElementById('registration-overlay');
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.remove(), 450);
+    }
+
+    (function restoreSession() {
+      const n = sessionStorage.getItem('introai_w06_feed_name');
+      const e = sessionStorage.getItem('introai_w06_feed_email');
+      if (n && e) {
+        studentName = n; studentEmail = e;
+        document.getElementById('registration-overlay').remove();
+      }
+    })();
+
+    function togglePlatform(platform, btn) {
+      const idx = selectedPlatforms.indexOf(platform);
+      if (idx === -1) {
+        selectedPlatforms.push(platform);
+        btn.classList.add('selected');
+      } else {
+        selectedPlatforms.splice(idx, 1);
+        btn.classList.remove('selected');
+      }
+      if (selectedPlatforms.length > 0) {
+        document.getElementById('platform-error').classList.add('hidden');
+      }
+    }
+
+    function setPersonalization(val, btn) {
+      selectedPersonalization = val;
+      document.querySelectorAll('#personalization-picker .opt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById('personalization-error').classList.add('hidden');
+    }
+
+    function setGotWeird(val, btn) {
+      selectedGotWeird = val;
+      document.querySelectorAll('#got-weird-picker .opt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById('got-weird-error').classList.add('hidden');
+    }
+
+    function setFilterBubble(val, btn) {
+      selectedFilterBubble = val;
+      document.querySelectorAll('#bubble-picker .opt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById('bubble-error').classList.add('hidden');
+    }
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#enjoyment-stars .star-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx < val);
+      });
+      document.getElementById('rating-error').classList.add('hidden');
+    }
+
+    async function supabaseInsert(payload) {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!resp.ok) { const t = await resp.text(); throw new Error(`HTTP ${resp.status}: ${t}`); }
+    }
+
+    async function submitExercise(ev) {
+      ev.preventDefault();
+      let ok = true;
+
+      // Platforms
+      if (selectedPlatforms.length === 0) {
+        document.getElementById('platform-error').classList.remove('hidden'); ok = false;
+      }
+
+      // Fav recommendation
+      const favRecVal = document.getElementById('fav-recommendation').value.trim();
+      document.getElementById('fav-recommendation').classList.toggle('error', !favRecVal);
+      document.getElementById('fav-rec-error').classList.toggle('hidden', !!favRecVal);
+      if (!favRecVal) ok = false;
+
+      // Personalization picker
+      if (!selectedPersonalization) {
+        document.getElementById('personalization-error').classList.remove('hidden'); ok = false;
+      }
+
+      // How it knows
+      const howKnowsVal = document.getElementById('how-it-knows').value.trim();
+      document.getElementById('how-it-knows').classList.toggle('error', !howKnowsVal);
+      document.getElementById('how-knows-error').classList.toggle('hidden', !!howKnowsVal);
+      if (!howKnowsVal) ok = false;
+
+      // Got weird
+      if (!selectedGotWeird) {
+        document.getElementById('got-weird-error').classList.remove('hidden'); ok = false;
+      }
+
+      // Weird example
+      const weirdVal = document.getElementById('weird-example').value.trim();
+      document.getElementById('weird-example').classList.toggle('error', !weirdVal);
+      document.getElementById('weird-error').classList.toggle('hidden', !!weirdVal);
+      if (!weirdVal) ok = false;
+
+      // Filter bubble picker
+      if (!selectedFilterBubble) {
+        document.getElementById('bubble-error').classList.remove('hidden'); ok = false;
+      }
+
+      // Bubble reflection
+      const bubbleRefVal = document.getElementById('bubble-reflection').value.trim();
+      document.getElementById('bubble-reflection').classList.toggle('error', !bubbleRefVal);
+      document.getElementById('bubble-ref-error').classList.toggle('hidden', !!bubbleRefVal);
+      if (!bubbleRefVal) ok = false;
+
+      // Ethics
+      const ethicsVal = document.getElementById('ai-ethics-thought').value.trim();
+      document.getElementById('ai-ethics-thought').classList.toggle('error', !ethicsVal);
+      document.getElementById('ethics-error').classList.toggle('hidden', !!ethicsVal);
+      if (!ethicsVal) ok = false;
+
+      // Rating
+      if (enjoymentRating === 0) {
+        document.getElementById('rating-error').classList.remove('hidden'); ok = false;
+      }
+
+      if (!ok) {
+        document.getElementById('form-error').classList.remove('hidden');
+        document.querySelector('[id$="-error"]:not(.hidden)')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      document.getElementById('form-error').classList.add('hidden');
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting\u2026';
+
+      const payload = {
+        student_name:           studentName,
+        student_email:          studentEmail,
+        platforms_used:         selectedPlatforms.join(', '),
+        fav_recommendation:     favRecVal,
+        personalization_rating: selectedPersonalization,
+        how_it_knows:           howKnowsVal,
+        got_weird_rec:          selectedGotWeird,
+        weird_example:          weirdVal,
+        filter_bubble_status:   selectedFilterBubble,
+        bubble_reflection:      bubbleRefVal,
+        break_bubble_idea:      document.getElementById('break-bubble').value.trim() || null,
+        ai_ethics_thought:      ethicsVal,
+        enjoyment_rating:       enjoymentRating,
+        submitted_at:           new Date().toISOString(),
+      };
+
+      try {
+        await supabaseInsert(payload);
+        document.getElementById('success-name').textContent = studentName.split(' ')[0];
+        document.getElementById('success-screen').classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        console.error('[Week 6 Feed] Supabase error:', err.message);
+        btn.disabled = false;
+        document.getElementById('submit-label').textContent = 'Submit Reflections \u2192';
+        if (err.message.includes('409') || err.message.includes('duplicate key')) {
+          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f You have already submitted this activity!';
+        } else {
+          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f Network error. Please check your internet or notify your teacher.';
+        }
+        document.getElementById('form-error').classList.remove('hidden');
+      }
+    }
+  </script>
+
+</body>
+</html>

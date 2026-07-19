@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Be the Algorithm! — Intro to AI · Week 6</title>
+  <meta name="description"
+    content="Week 6 Activity: Be the Algorithm! Act as a recommendation engine — read student profiles with multiple parameters and decide which movie each person would enjoy most.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    #registration-overlay { transition: opacity 0.4s ease; }
+    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
+    #registration-overlay .reg-card {
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
+    }
+    #registration-overlay.hiding .reg-card {
+      transform: scale(0.95) translateY(-10px); opacity: 0;
+    }
+    .reg-input:focus {
+      outline: none; border-color: #8b5cf6;
+      box-shadow: 0 0 0 3px rgba(139,92,246,0.15);
+    }
+    .reg-input.error {
+      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+    }
+    .form-input:focus {
+      outline: none; border-color: #8b5cf6;
+      box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
+    }
+    .form-input.error { border-color: #ef4444; }
+    .opt-btn {
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .opt-btn:hover { transform: translateY(-1px); }
+    .opt-btn.selected {
+      border-color: #8b5cf6 !important;
+      background: #f5f3ff !important;
+      color: #4c1d95 !important;
+      font-weight: 700;
+    }
+    .profile-card {
+      transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .profile-card:hover {
+      box-shadow: 0 8px 30px rgba(139,92,246,0.12);
+      transform: translateY(-2px);
+    }
+    .param-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .star-btn {
+      font-size: 24px;
+      cursor: pointer;
+      filter: grayscale(100%);
+      transition: filter 0.15s ease, transform 0.1s ease;
+    }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .movie-opt {
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: 2px solid transparent;
+    }
+    .movie-opt:hover {
+      border-color: #8b5cf6;
+      background: #f5f3ff;
+    }
+    .movie-opt.selected {
+      border-color: #8b5cf6 !important;
+      background: #f5f3ff !important;
+    }
+    .movie-opt.selected .movie-check {
+      opacity: 1;
+    }
+    .movie-check { opacity: 0; transition: opacity 0.15s; }
+  </style>
+</head>
+
+<body class="bg-[#F9FAFB] text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- REGISTRATION GATE -->
+  <div id="registration-overlay"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+    style="background: linear-gradient(135deg, #2e1065 0%, #5b21b6 55%, #2e1065 100%);">
+
+    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
+        style="background: radial-gradient(circle, #ddd6fe, transparent);"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
+        style="background: radial-gradient(circle, #8b5cf6, transparent);"></div>
+    </div>
+
+    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center bg-violet-100 text-violet-600">
+          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15M14.25 3.104c.251.023.501.05.75.082M19.8 15a2.25 2.25 0 01-.659 1.591l-1.591 1.591M19.8 15l-2.48 2.48m0 0a2.25 2.25 0 01-3.182 0l-3.182-3.182a2.25 2.25 0 010-3.182l3.182-3.182a2.25 2.25 0 013.182 0l2.48 2.48" />
+          </svg>
+        </div>
+        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 bg-violet-100 text-violet-800">
+          Week 6 · Activity
+        </div>
+        <h1 class="text-2xl font-black text-gray-900 tracking-tight">Be the <span class="text-violet-600">Algorithm!</span></h1>
+        <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">Enter your full name and email to start the recommendation challenge.</p>
+      </div>
+
+      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
+        <div class="space-y-4 mb-6">
+          <div>
+            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Full Name</label>
+            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Jane Smith"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name.</p>
+          </div>
+          <div>
+            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
+            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. jane@school.edu"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
+          </div>
+        </div>
+        <button id="reg-submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700">
+          <span id="reg-btn-label">Begin Activity &#8594;</span>
+        </button>
+      </form>
+      <p class="text-center text-[10px] text-gray-400 font-medium mt-5">Saved to the Intro to AI student roster.</p>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main-content" class="max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <!-- Header -->
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+      <div>
+        <a href="index.html"
+          class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-violet-600 mb-3 hover:text-violet-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">
+          Be the <span class="text-violet-500">Algorithm!</span>
+        </h1>
+        <p class="text-gray-500 font-medium italic mt-1">Recommendation Systems · Week 6</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-violet-50 border border-violet-200 text-violet-800 shadow-sm self-start md:self-auto">
+        Week 6
+      </div>
+    </header>
+
+    <!-- Brief Card -->
+    <div class="rounded-3xl p-6 mb-8 border bg-gradient-to-r from-violet-50 to-purple-50 border-violet-100 shadow-sm">
+      <div class="flex gap-4">
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 bg-violet-500 text-white shadow-md">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15M14.25 3.104c.251.023.501.05.75.082" />
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-lg font-black text-violet-950 mb-1">You Are the Recommendation Engine</h2>
+          <p class="text-sm text-violet-900 leading-relaxed mb-3">
+            Below are <strong>5 fictional student profiles</strong> — each with different tastes, habits, and behaviours. Your job: decide which movie to recommend to each student and explain <em>why</em> that data led you to that decision.
+          </p>
+          <ul class="text-xs text-violet-800 space-y-1 bg-white/70 backdrop-blur-sm p-4 rounded-xl border border-violet-100/50">
+            <li>🎯 <strong>Step 1</strong> — Read each student profile carefully. Notice their genre preferences, watch habits, and mood patterns.</li>
+            <li>🎬 <strong>Step 2</strong> — Pick the best movie from the list for each profile. You must choose one!</li>
+            <li>🔍 <strong>Step 3</strong> — Identify the ONE data parameter that influenced your decision most.</li>
+            <li>💬 <strong>Step 4</strong> — Reflect on the whole class game: did everyone agree? What made it hard?</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOVIE CATALOGUE -->
+    <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-violet-500">🎬</div>
+        <h2 class="text-base font-black text-gray-900">The Movie Catalogue</h2>
+      </div>
+      <p class="text-xs text-gray-500 mb-4">These are the 6 films you can recommend. Read the genres and tones before looking at the profiles.</p>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div class="p-3 rounded-xl bg-red-50 border border-red-100">
+          <div class="text-lg mb-1">🦁</div>
+          <div class="text-xs font-black text-red-900">The Lion Code</div>
+          <div class="text-[10px] text-red-600 mt-0.5">Action · Adventure · Intense</div>
+        </div>
+        <div class="p-3 rounded-xl bg-pink-50 border border-pink-100">
+          <div class="text-lg mb-1">💕</div>
+          <div class="text-xs font-black text-pink-900">Stars & Strangers</div>
+          <div class="text-[10px] text-pink-600 mt-0.5">Romance · Drama · Emotional</div>
+        </div>
+        <div class="p-3 rounded-xl bg-blue-50 border border-blue-100">
+          <div class="text-lg mb-1">🚀</div>
+          <div class="text-xs font-black text-blue-900">Orbit Unknown</div>
+          <div class="text-[10px] text-blue-600 mt-0.5">Sci-Fi · Thriller · Suspense</div>
+        </div>
+        <div class="p-3 rounded-xl bg-yellow-50 border border-yellow-100">
+          <div class="text-lg mb-1">😂</div>
+          <div class="text-xs font-black text-yellow-900">Totally Normal Tuesday</div>
+          <div class="text-[10px] text-yellow-600 mt-0.5">Comedy · Lighthearted · Feel-Good</div>
+        </div>
+        <div class="p-3 rounded-xl bg-green-50 border border-green-100">
+          <div class="text-lg mb-1">🌿</div>
+          <div class="text-xs font-black text-green-900">The Quiet Forest</div>
+          <div class="text-[10px] text-green-600 mt-0.5">Documentary · Nature · Calm</div>
+        </div>
+        <div class="p-3 rounded-xl bg-orange-50 border border-orange-100">
+          <div class="text-lg mb-1">👻</div>
+          <div class="text-xs font-black text-orange-900">House of Echoes</div>
+          <div class="text-[10px] text-orange-600 mt-0.5">Horror · Mystery · Scary</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN FORM -->
+    <form id="algo-form" onsubmit="submitExercise(event)" novalidate>
+
+      <!-- PROFILES SECTION -->
+      <div id="profiles-section">
+
+        <!-- Profile A -->
+        <div class="profile-card bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6" id="card-a">
+          <div class="flex items-start justify-between gap-3 mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-2xl text-white font-black flex items-center justify-center flex-shrink-0 text-lg bg-violet-500 shadow">A</div>
+              <div>
+                <div class="text-base font-black text-gray-900">Alex, 14</div>
+                <div class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Student Profile A</div>
+              </div>
+            </div>
+            <div class="text-2xl">🎮</div>
+          </div>
+
+          <!-- Parameters grid -->
+          <div class="grid grid-cols-2 gap-2 mb-4 text-xs">
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Favourite Genres</div>
+              <div class="font-bold text-gray-800">Action, Sci-Fi</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Watch Frequency</div>
+              <div class="font-bold text-gray-800">Daily · 2–3 hrs/day</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Skip Rate</div>
+              <div class="font-bold text-gray-800">High — skips slow scenes</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Rewatch Behaviour</div>
+              <div class="font-bold text-gray-800">Rarely rewatches</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Mood When Watching</div>
+              <div class="font-bold text-gray-800">Energised, competitive</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">What They Dislike</div>
+              <div class="font-bold text-gray-800">Romance, slow drama</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Average Rating Given</div>
+              <div class="font-bold text-gray-800">4.5 ⭐ for action films</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Last 3 Watched</div>
+              <div class="font-bold text-gray-800">Mission X, Iron Force, Hyperspace</div>
+            </div>
+          </div>
+
+          <!-- Recommendation picker -->
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Your Recommendation for Alex <span class="text-red-500">*</span></label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3" id="rec-a-picker">
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('a','The Lion Code',this)">
+              <span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span>
+              <div class="text-base">🦁</div><div class="text-[10px] font-black text-gray-700 mt-0.5">The Lion Code</div>
+            </button>
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('a','Stars & Strangers',this)">
+              <span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span>
+              <div class="text-base">💕</div><div class="text-[10px] font-black text-gray-700 mt-0.5">Stars & Strangers</div>
+            </button>
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('a','Orbit Unknown',this)">
+              <span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span>
+              <div class="text-base">🚀</div><div class="text-[10px] font-black text-gray-700 mt-0.5">Orbit Unknown</div>
+            </button>
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('a','Totally Normal Tuesday',this)">
+              <span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span>
+              <div class="text-base">😂</div><div class="text-[10px] font-black text-gray-700 mt-0.5">Totally Normal Tuesday</div>
+            </button>
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('a','The Quiet Forest',this)">
+              <span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span>
+              <div class="text-base">🌿</div><div class="text-[10px] font-black text-gray-700 mt-0.5">The Quiet Forest</div>
+            </button>
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('a','House of Echoes',this)">
+              <span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span>
+              <div class="text-base">👻</div><div class="text-[10px] font-black text-gray-700 mt-0.5">House of Echoes</div>
+            </button>
+          </div>
+          <p id="rec-a-error" class="hidden text-xs text-red-500 font-medium mb-2">Please pick a movie for Alex.</p>
+
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">Which data point mattered most? <span class="text-red-500">*</span></label>
+          <input id="param-a" type="text" placeholder="e.g. Favourite Genres — Alex loves action and sci-fi"
+            class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+          <p id="param-a-error" class="hidden text-xs text-red-500 font-medium mt-1">Please identify the key parameter.</p>
+        </div>
+
+        <!-- Profile B -->
+        <div class="profile-card bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6" id="card-b">
+          <div class="flex items-start justify-between gap-3 mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-2xl text-white font-black flex items-center justify-center flex-shrink-0 text-lg bg-pink-500 shadow">B</div>
+              <div>
+                <div class="text-base font-black text-gray-900">Priya, 13</div>
+                <div class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Student Profile B</div>
+              </div>
+            </div>
+            <div class="text-2xl">📚</div>
+          </div>
+          <div class="grid grid-cols-2 gap-2 mb-4 text-xs">
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Favourite Genres</div>
+              <div class="font-bold text-gray-800">Romance, Drama</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Watch Frequency</div>
+              <div class="font-bold text-gray-800">Weekends only · 1–2 hrs</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Skip Rate</div>
+              <div class="font-bold text-gray-800">Low — watches everything</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Rewatch Behaviour</div>
+              <div class="font-bold text-gray-800">Rewatches favourites 3×</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Mood When Watching</div>
+              <div class="font-bold text-gray-800">Emotional, thoughtful</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">What They Dislike</div>
+              <div class="font-bold text-gray-800">Violence, horror</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Average Rating Given</div>
+              <div class="font-bold text-gray-800">5 ⭐ for romantic stories</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Last 3 Watched</div>
+              <div class="font-bold text-gray-800">When We Met, The Promise, Bloom</div>
+            </div>
+          </div>
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Your Recommendation for Priya <span class="text-red-500">*</span></label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3" id="rec-b-picker">
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('b','The Lion Code',this)"><span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span><div class="text-base">🦁</div><div class="text-[10px] font-black text-gray-700 mt-0.5">The Lion Code</div></button>
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('b','Stars & Strangers',this)"><span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span><div class="text-base">💕</div><div class="text-[10px] font-black text-gray-700 mt-0.5">Stars & Strangers</div></button>
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('b','Orbit Unknown',this)"><span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span><div class="text-base">🚀</div><div class="text-[10px] font-black text-gray-700 mt-0.5">Orbit Unknown</div></button>
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('b','Totally Normal Tuesday',this)"><span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span><div class="text-base">😂</div><div class="text-[10px] font-black text-gray-700 mt-0.5">Totally Normal Tuesday</div></button>
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('b','The Quiet Forest',this)"><span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span><div class="text-base">🌿</div><div class="text-[10px] font-black text-gray-700 mt-0.5">The Quiet Forest</div></button>
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('b','House of Echoes',this)"><span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span><div class="text-base">👻</div><div class="text-[10px] font-black text-gray-700 mt-0.5">House of Echoes</div></button>
+          </div>
+          <p id="rec-b-error" class="hidden text-xs text-red-500 font-medium mb-2">Please pick a movie for Priya.</p>
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">Which data point mattered most? <span class="text-red-500">*</span></label>
+          <input id="param-b" type="text" placeholder="e.g. Rewatch Behaviour — Priya rewatches emotional favourites"
+            class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+          <p id="param-b-error" class="hidden text-xs text-red-500 font-medium mt-1">Please identify the key parameter.</p>
+        </div>
+
+        <!-- Profile C -->
+        <div class="profile-card bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6" id="card-c">
+          <div class="flex items-start justify-between gap-3 mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-2xl text-white font-black flex items-center justify-center flex-shrink-0 text-lg bg-blue-500 shadow">C</div>
+              <div>
+                <div class="text-base font-black text-gray-900">Jordan, 15</div>
+                <div class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Student Profile C</div>
+              </div>
+            </div>
+            <div class="text-2xl">🧪</div>
+          </div>
+          <div class="grid grid-cols-2 gap-2 mb-4 text-xs">
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Favourite Genres</div>
+              <div class="font-bold text-gray-800">Science, Documentary</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Watch Frequency</div>
+              <div class="font-bold text-gray-800">Every few days · 45 min</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Skip Rate</div>
+              <div class="font-bold text-gray-800">Medium — skips ads only</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Rewatch Behaviour</div>
+              <div class="font-bold text-gray-800">Never — always new content</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Mood When Watching</div>
+              <div class="font-bold text-gray-800">Curious, analytical</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">What They Dislike</div>
+              <div class="font-bold text-gray-800">Romantic clichés, slapstick</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Average Rating Given</div>
+              <div class="font-bold text-gray-800">4 ⭐ for factual content</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Last 3 Watched</div>
+              <div class="font-bold text-gray-800">Deep Ocean, Brain Wires, Stars Explained</div>
+            </div>
+          </div>
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Your Recommendation for Jordan <span class="text-red-500">*</span></label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3" id="rec-c-picker">
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('c','The Lion Code',this)"><span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span><div class="text-base">🦁</div><div class="text-[10px] font-black text-gray-700 mt-0.5">The Lion Code</div></button>
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('c','Stars & Strangers',this)"><span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span><div class="text-base">💕</div><div class="text-[10px] font-black text-gray-700 mt-0.5">Stars & Strangers</div></button>
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('c','Orbit Unknown',this)"><span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span><div class="text-base">🚀</div><div class="text-[10px] font-black text-gray-700 mt-0.5">Orbit Unknown</div></button>
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('c','Totally Normal Tuesday',this)"><span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span><div class="text-base">😂</div><div class="text-[10px] font-black text-gray-700 mt-0.5">Totally Normal Tuesday</div></button>
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('c','The Quiet Forest',this)"><span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span><div class="text-base">🌿</div><div class="text-[10px] font-black text-gray-700 mt-0.5">The Quiet Forest</div></button>
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('c','House of Echoes',this)"><span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span><div class="text-base">👻</div><div class="text-[10px] font-black text-gray-700 mt-0.5">House of Echoes</div></button>
+          </div>
+          <p id="rec-c-error" class="hidden text-xs text-red-500 font-medium mb-2">Please pick a movie for Jordan.</p>
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">Which data point mattered most? <span class="text-red-500">*</span></label>
+          <input id="param-c" type="text" placeholder="e.g. Favourite Genres — Jordan loves science docs"
+            class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+          <p id="param-c-error" class="hidden text-xs text-red-500 font-medium mt-1">Please identify the key parameter.</p>
+        </div>
+
+        <!-- Profile D -->
+        <div class="profile-card bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6" id="card-d">
+          <div class="flex items-start justify-between gap-3 mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-2xl text-white font-black flex items-center justify-center flex-shrink-0 text-lg bg-yellow-500 shadow">D</div>
+              <div>
+                <div class="text-base font-black text-gray-900">Sam, 13</div>
+                <div class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Student Profile D</div>
+              </div>
+            </div>
+            <div class="text-2xl">😂</div>
+          </div>
+          <div class="grid grid-cols-2 gap-2 mb-4 text-xs">
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Favourite Genres</div>
+              <div class="font-bold text-gray-800">Comedy, Animated Films</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Watch Frequency</div>
+              <div class="font-bold text-gray-800">Daily · 30 min clips</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Skip Rate</div>
+              <div class="font-bold text-gray-800">Very high — moves on fast</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Rewatch Behaviour</div>
+              <div class="font-bold text-gray-800">Rewatches funny parts only</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Mood When Watching</div>
+              <div class="font-bold text-gray-800">Relaxed, wants to laugh</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">What They Dislike</div>
+              <div class="font-bold text-gray-800">Long serious films, horror</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Average Rating Given</div>
+              <div class="font-bold text-gray-800">5 ⭐ for anything funny</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Last 3 Watched</div>
+              <div class="font-bold text-gray-800">Joke Patrol, Laugh Track, Party Crashers</div>
+            </div>
+          </div>
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Your Recommendation for Sam <span class="text-red-500">*</span></label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3" id="rec-d-picker">
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('d','The Lion Code',this)"><span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span><div class="text-base">🦁</div><div class="text-[10px] font-black text-gray-700 mt-0.5">The Lion Code</div></button>
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('d','Stars & Strangers',this)"><span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span><div class="text-base">💕</div><div class="text-[10px] font-black text-gray-700 mt-0.5">Stars & Strangers</div></button>
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('d','Orbit Unknown',this)"><span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span><div class="text-base">🚀</div><div class="text-[10px] font-black text-gray-700 mt-0.5">Orbit Unknown</div></button>
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('d','Totally Normal Tuesday',this)"><span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span><div class="text-base">😂</div><div class="text-[10px] font-black text-gray-700 mt-0.5">Totally Normal Tuesday</div></button>
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('d','The Quiet Forest',this)"><span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span><div class="text-base">🌿</div><div class="text-[10px] font-black text-gray-700 mt-0.5">The Quiet Forest</div></button>
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('d','House of Echoes',this)"><span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span><div class="text-base">👻</div><div class="text-[10px] font-black text-gray-700 mt-0.5">House of Echoes</div></button>
+          </div>
+          <p id="rec-d-error" class="hidden text-xs text-red-500 font-medium mb-2">Please pick a movie for Sam.</p>
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">Which data point mattered most? <span class="text-red-500">*</span></label>
+          <input id="param-d" type="text" placeholder="e.g. Mood When Watching — Sam wants to laugh and relax"
+            class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+          <p id="param-d-error" class="hidden text-xs text-red-500 font-medium mt-1">Please identify the key parameter.</p>
+        </div>
+
+        <!-- Profile E -->
+        <div class="profile-card bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6" id="card-e">
+          <div class="flex items-start justify-between gap-3 mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-2xl text-white font-black flex items-center justify-center flex-shrink-0 text-lg bg-orange-500 shadow">E</div>
+              <div>
+                <div class="text-base font-black text-gray-900">Maya, 14</div>
+                <div class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Student Profile E</div>
+              </div>
+            </div>
+            <div class="text-2xl">🌙</div>
+          </div>
+          <div class="grid grid-cols-2 gap-2 mb-4 text-xs">
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Favourite Genres</div>
+              <div class="font-bold text-gray-800">Horror, Mystery, Thriller</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Watch Frequency</div>
+              <div class="font-bold text-gray-800">Late night · 1–2 hrs</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Skip Rate</div>
+              <div class="font-bold text-gray-800">Very low — loves suspense</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Rewatch Behaviour</div>
+              <div class="font-bold text-gray-800">Rewatches to spot clues</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Mood When Watching</div>
+              <div class="font-bold text-gray-800">Thrill-seeking, alert</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">What They Dislike</div>
+              <div class="font-bold text-gray-800">Happy endings, comedy</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Average Rating Given</div>
+              <div class="font-bold text-gray-800">5 ⭐ for scary, mysterious films</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-100">
+              <div class="text-[9px] uppercase tracking-widest text-gray-400 mb-1 font-black">Last 3 Watched</div>
+              <div class="font-bold text-gray-800">The Shadowed Room, Signal 9, Night Creep</div>
+            </div>
+          </div>
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Your Recommendation for Maya <span class="text-red-500">*</span></label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3" id="rec-e-picker">
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('e','The Lion Code',this)"><span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span><div class="text-base">🦁</div><div class="text-[10px] font-black text-gray-700 mt-0.5">The Lion Code</div></button>
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('e','Stars & Strangers',this)"><span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span><div class="text-base">💕</div><div class="text-[10px] font-black text-gray-700 mt-0.5">Stars & Strangers</div></button>
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('e','Orbit Unknown',this)"><span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span><div class="text-base">🚀</div><div class="text-[10px] font-black text-gray-700 mt-0.5">Orbit Unknown</div></button>
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('e','Totally Normal Tuesday',this)"><span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span><div class="text-base">😂</div><div class="text-[10px] font-black text-gray-700 mt-0.5">Totally Normal Tuesday</div></button>
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('e','The Quiet Forest',this)"><span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span><div class="text-base">🌿</div><div class="text-[10px] font-black text-gray-700 mt-0.5">The Quiet Forest</div></button>
+            <button type="button" class="movie-opt rounded-xl p-2.5 text-center bg-gray-50 relative" onclick="setRec('e','House of Echoes',this)"><span class="movie-check absolute top-1.5 right-1.5 text-violet-500 text-xs font-black">✓</span><div class="text-base">👻</div><div class="text-[10px] font-black text-gray-700 mt-0.5">House of Echoes</div></button>
+          </div>
+          <p id="rec-e-error" class="hidden text-xs text-red-500 font-medium mb-2">Please pick a movie for Maya.</p>
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">Which data point mattered most? <span class="text-red-500">*</span></label>
+          <input id="param-e" type="text" placeholder="e.g. Skip Rate — Maya loves suspense and never skips"
+            class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+          <p id="param-e-error" class="hidden text-xs text-red-500 font-medium mt-1">Please identify the key parameter.</p>
+        </div>
+
+      </div><!-- end profiles-section -->
+
+      <!-- STEP: Class Game Reflections -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-violet-500">💬</div>
+          <h2 class="text-base font-black text-gray-900">After the Game: Class Discussion</h2>
+        </div>
+
+        <div class="space-y-5">
+          <div>
+            <label for="hardest-profile" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+              Which profile was hardest to recommend for? Why? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="hardest-profile" rows="2"
+              placeholder="e.g. Profile C (Jordan) was hardest because the genre was very specific — documentary — and none of the movies were a perfect match…"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="hardest-error" class="hidden text-xs text-red-500 font-medium mt-1">Please answer this question.</p>
+          </div>
+
+          <div>
+            <label for="algorithm-strategy" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+              What "rule" or strategy did YOU use to make recommendations? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="algorithm-strategy" rows="2"
+              placeholder="e.g. I always looked at 'What They Dislike' first to eliminate options, then matched the genre. Could you write a rule that always works?"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="strategy-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe your strategy.</p>
+          </div>
+
+          <div>
+            <label for="class-consensus" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+              Did the class agree on all profiles, or did people choose different movies? What does that tell us? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="class-consensus" rows="2"
+              placeholder="e.g. Everyone agreed on Profile A and D, but Profile C split the class — half chose 'The Quiet Forest' and half chose 'Orbit Unknown'…"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="consensus-error" class="hidden text-xs text-red-500 font-medium mt-1">Please answer this question.</p>
+          </div>
+
+          <div>
+            <label for="real-world" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+              How is this game similar to what Netflix, Spotify, or YouTube actually does? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="real-world" rows="2"
+              placeholder="e.g. Netflix looks at what you've watched, how long you watched it, and what you rated. It uses patterns across millions of users to predict what you'd enjoy next…"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="realworld-error" class="hidden text-xs text-red-500 font-medium mt-1">Please make a real-world connection.</p>
+          </div>
+
+          <!-- Enjoyment stars -->
+          <div>
+            <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">How much did you enjoy this activity?</label>
+            <div class="flex gap-1" id="enjoyment-stars" role="group" aria-label="Enjoyment rating">
+              <button type="button" class="star-btn" data-val="1" onclick="setRating(1)" aria-label="1 star">⭐</button>
+              <button type="button" class="star-btn" data-val="2" onclick="setRating(2)" aria-label="2 stars">⭐</button>
+              <button type="button" class="star-btn" data-val="3" onclick="setRating(3)" aria-label="3 stars">⭐</button>
+              <button type="button" class="star-btn" data-val="4" onclick="setRating(4)" aria-label="4 stars">⭐</button>
+              <button type="button" class="star-btn" data-val="5" onclick="setRating(5)" aria-label="5 stars">⭐</button>
+            </div>
+            <p id="rating-error" class="hidden text-xs text-red-500 font-medium mt-1">Please select an enjoyment rating.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-12">
+        <p id="form-error" class="hidden text-sm font-medium text-red-500 mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+          <span id="form-error-text">Please complete all required fields.</span>
+        </p>
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700">
+          <span id="submit-label">Submit Recommendations &#8594;</span>
+        </button>
+        <p class="text-center text-xs text-gray-400 font-medium mt-3">Results will load to the teacher dashboard.</p>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div id="success-screen"
+    class="hidden fixed inset-0 z-[90] bg-[#F9FAFB] flex items-center justify-center p-4">
+    <div class="text-center max-w-md bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+      <div class="w-20 h-20 mx-auto rounded-2xl mb-6 flex items-center justify-center bg-violet-100 text-violet-600 shadow-sm">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <div class="inline-block px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 bg-violet-50 text-violet-800">
+        Recommendations Submitted!
+      </div>
+      <h2 class="text-3xl font-black text-gray-900 mb-3 tracking-tight">
+        Algorithm approved, <span id="success-name" class="text-violet-600"></span>!
+      </h2>
+      <p class="text-gray-500 mb-8 leading-relaxed text-sm">
+        Your movie recommendations and reflections have been saved. Now compare your answers with the class!
+      </p>
+      <a href="index.html"
+        class="inline-flex items-center gap-2 text-white font-black py-3.5 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm bg-gradient-to-r from-violet-500 to-purple-600">
+        Return to Course Hub
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    /* SUPABASE CONFIG */
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+    const TABLE = 'introai_week06_be_the_algorithm';
+
+    let studentName = '', studentEmail = '';
+    let recs = { a: '', b: '', c: '', d: '', e: '' };
+    let enjoymentRating = 0;
+
+    function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+    async function handleRegistration(ev) {
+      ev.preventDefault();
+      const nameEl = document.getElementById('reg-name');
+      const emailEl = document.getElementById('reg-email');
+      const nameErr = document.getElementById('reg-name-error');
+      const emailErr = document.getElementById('reg-email-error');
+      let ok = true;
+
+      nameEl.classList.remove('error'); nameErr.classList.add('hidden');
+      emailEl.classList.remove('error'); emailErr.classList.add('hidden');
+
+      if (!nameEl.value.trim()) { nameEl.classList.add('error'); nameErr.classList.remove('hidden'); ok = false; }
+      if (!emailEl.value.trim() || !validateEmail(emailEl.value.trim())) { emailEl.classList.add('error'); emailErr.classList.remove('hidden'); ok = false; }
+      if (!ok) return;
+
+      const btn = document.getElementById('reg-submit-btn');
+      btn.disabled = true;
+      document.getElementById('reg-btn-label').innerHTML = '<span class="spinner"></span> Starting\u2026';
+
+      studentName = nameEl.value.trim();
+      studentEmail = emailEl.value.trim();
+      sessionStorage.setItem('introai_w06_algo_name', studentName);
+      sessionStorage.setItem('introai_w06_algo_email', studentEmail);
+
+      const overlay = document.getElementById('registration-overlay');
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.remove(), 450);
+    }
+
+    (function restoreSession() {
+      const n = sessionStorage.getItem('introai_w06_algo_name');
+      const e = sessionStorage.getItem('introai_w06_algo_email');
+      if (n && e) {
+        studentName = n; studentEmail = e;
+        document.getElementById('registration-overlay').remove();
+      }
+    })();
+
+    function setRec(profile, movie, btn) {
+      recs[profile] = movie;
+      document.querySelectorAll(`#rec-${profile}-picker .movie-opt`).forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById(`rec-${profile}-error`).classList.add('hidden');
+    }
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#enjoyment-stars .star-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx < val);
+      });
+      document.getElementById('rating-error').classList.add('hidden');
+    }
+
+    async function supabaseInsert(payload) {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!resp.ok) { const t = await resp.text(); throw new Error(`HTTP ${resp.status}: ${t}`); }
+    }
+
+    async function submitExercise(ev) {
+      ev.preventDefault();
+      let ok = true;
+
+      // Validate each recommendation & key param
+      ['a','b','c','d','e'].forEach(p => {
+        if (!recs[p]) { document.getElementById(`rec-${p}-error`).classList.remove('hidden'); ok = false; }
+        const paramEl = document.getElementById(`param-${p}`);
+        const paramErrEl = document.getElementById(`param-${p}-error`);
+        if (!paramEl.value.trim()) { paramEl.classList.add('error'); paramErrEl.classList.remove('hidden'); ok = false; }
+        else { paramEl.classList.remove('error'); paramErrEl.classList.add('hidden'); }
+      });
+
+      // Reflections
+      const fields = [
+        { id: 'hardest-profile', errId: 'hardest-error' },
+        { id: 'algorithm-strategy', errId: 'strategy-error' },
+        { id: 'class-consensus', errId: 'consensus-error' },
+        { id: 'real-world', errId: 'realworld-error' },
+      ];
+      fields.forEach(({ id, errId }) => {
+        const el = document.getElementById(id);
+        const errEl = document.getElementById(errId);
+        if (!el.value.trim()) { el.classList.add('error'); errEl.classList.remove('hidden'); ok = false; }
+        else { el.classList.remove('error'); errEl.classList.add('hidden'); }
+      });
+
+      if (enjoymentRating === 0) { document.getElementById('rating-error').classList.remove('hidden'); ok = false; }
+
+      if (!ok) {
+        document.getElementById('form-error').classList.remove('hidden');
+        document.querySelector('[id$="-error"]:not(.hidden)')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      document.getElementById('form-error').classList.add('hidden');
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting\u2026';
+
+      const payload = {
+        student_name:              studentName,
+        student_email:             studentEmail,
+        profiles_used:             'A, B, C, D, E',
+        profile_a_recommendation:  recs.a,
+        profile_b_recommendation:  recs.b,
+        profile_c_recommendation:  recs.c,
+        profile_d_recommendation:  recs.d,
+        profile_e_recommendation:  recs.e,
+        profile_a_key_param:       document.getElementById('param-a').value.trim(),
+        profile_b_key_param:       document.getElementById('param-b').value.trim(),
+        profile_c_key_param:       document.getElementById('param-c').value.trim(),
+        profile_d_key_param:       document.getElementById('param-d').value.trim(),
+        profile_e_key_param:       document.getElementById('param-e').value.trim(),
+        hardest_profile:           document.getElementById('hardest-profile').value.trim(),
+        algorithm_strategy:        document.getElementById('algorithm-strategy').value.trim(),
+        class_consensus:           document.getElementById('class-consensus').value.trim(),
+        real_world_connection:     document.getElementById('real-world').value.trim(),
+        enjoyment_rating:          enjoymentRating,
+        submitted_at:              new Date().toISOString(),
+      };
+
+      try {
+        await supabaseInsert(payload);
+        document.getElementById('success-name').textContent = studentName.split(' ')[0];
+        document.getElementById('success-screen').classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        console.error('[Week 6 Algo] Supabase error:', err.message);
+        btn.disabled = false;
+        document.getElementById('submit-label').textContent = 'Submit Recommendations \u2192';
+        if (err.message.includes('409') || err.message.includes('duplicate key')) {
+          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f You have already submitted this activity!';
+        } else {
+          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f Network error. Please check your internet or notify your teacher.';
+        }
+        document.getElementById('form-error').classList.remove('hidden');
+      }
+    }
+  </script>
+
+</body>
+</html>
