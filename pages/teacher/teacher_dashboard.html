@@ -559,6 +559,47 @@
       align-items: center;
     }
 
+    /* ── AI Insights Panel ─────────────────────────────────────────────────── */
+    #ai-insights-panel {
+      border: 1px solid transparent;
+      background: linear-gradient(var(--card), var(--card)) padding-box,
+                  linear-gradient(135deg, var(--teal), var(--mint), var(--gold)) border-box;
+    }
+
+    #ai-insights-body {
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    #ai-insights-body.loading-ai {
+      animation: ai-shimmer 1.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes ai-shimmer {
+      from { opacity: 0.5; }
+      to   { opacity: 1; }
+    }
+
+    .ai-summary-text {
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.8;
+      flex: 1;
+    }
+
+    .ai-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      font-size: 11px;
+      color: var(--text-muted);
+      opacity: 0.7;
+    }
+
+    .ai-meta svg { width: 12px; height: 12px; flex-shrink: 0; }
+
+
     /* ── TABLE ────────────────────────────────────────────────────────────────── */
     .data-table {
       width: 100%;
@@ -1679,6 +1720,29 @@
               </div>
             </div>
           </div>
+
+          <!-- AI Insights Panel -->
+          <div class="panel" id="ai-insights-panel">
+            <div class="panel-header">
+              <div class="panel-title">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <circle cx="8" cy="8" r="6" />
+                  <path d="M8 5v3l2 2" stroke-linecap="round" />
+                  <path d="M5 2.5C3.5 3.5 2.5 5.6 2.5 8" stroke-linecap="round" />
+                </svg>
+                ✨ AI Cohort Insights
+              </div>
+              <button class="btn btn-secondary" id="ai-generate-btn" onclick="generateCohortInsights()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px;height:14px">
+                  <path d="M8 1l1.5 3.5L13 6l-2.5 2.5.5 3.5L8 10.5 5 12l.5-3.5L3 6l3.5-1.5z" />
+                </svg>
+                Generate Insights
+              </button>
+            </div>
+            <div id="ai-insights-body" style="padding: 16px 20px; color: var(--text-muted); font-size: 13px; min-height: 60px; display:flex; align-items:center;">
+              <span style="opacity:0.5">Click "Generate Insights" to get an AI-powered summary of your cohort's performance.</span>
+            </div>
+          </div>
         </div>
 
         <!-- ── HW ALL SUBMISSIONS ──────────────────────────────────────────── -->
@@ -1715,6 +1779,17 @@
               <label>Search:</label>
               <input class="search-input" id="hw-search" type="text" placeholder="Student name…"
                 oninput="renderHWTable()" />
+              <label>Sort By:</label>
+              <select class="filter-select" id="hw-sort-by" onchange="onHWSortChange()">
+                <option value="submitted_at_desc">Date (Newest First)</option>
+                <option value="submitted_at_asc">Date (Oldest First)</option>
+                <option value="student_name_asc">Student Name (A → Z)</option>
+                <option value="student_name_desc">Student Name (Z → A)</option>
+                <option value="class_number_asc">Class Number (1 → 16)</option>
+                <option value="class_number_desc">Class Number (16 → 1)</option>
+                <option value="score_desc">Score (Highest First)</option>
+                <option value="score_asc">Score (Lowest First)</option>
+              </select>
               <span class="text-small text-muted" id="hw-count"></span>
             </div>
             <div id="hw-table-wrap">
@@ -3097,7 +3172,7 @@
         topEl.innerHTML = `<table class="data-table">
       <thead><tr><th>#</th><th>Student</th><th>Avg Score</th><th>Submissions</th><th>Classes Attempted</th><th>Performance</th></tr></thead>
       <tbody>
-        ${sorted_students.map((s, i) => `<tr>
+        ${sorted_students.map((s, i) => `<tr class="clickable-row" onclick="filterHWByStudent('${esc(s.name)}')">
           <td class="text-mono">${i + 1}</td>
           <td><strong>${esc(s.name)}</strong></td>
           <td>${scoreBadge(s.avg)}</td>
@@ -3110,9 +3185,55 @@
       }
     }
 
+    function filterHWByStudent(name) {
+      showPage('homework');
+      const searchInput = document.getElementById('hw-search');
+      if (searchInput) {
+        searchInput.value = name;
+        renderHWTable();
+        searchInput.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
     // ════════════════════════════════════════════════════════════════════════════
     // HOMEWORK TABLE
     // ════════════════════════════════════════════════════════════════════════════
+    let hwSortField = 'submitted_at';
+    let hwSortOrder = 'desc';
+
+    function setHWSort(field) {
+      if (hwSortField === field) {
+        hwSortOrder = hwSortOrder === 'asc' ? 'desc' : 'asc';
+      } else {
+        hwSortField = field;
+        hwSortOrder = (field === 'student_name' || field === 'class_number') ? 'asc' : 'desc';
+      }
+      const sortSelect = document.getElementById('hw-sort-by');
+      if (sortSelect) {
+        const val = `${field}_${hwSortOrder}`;
+        if (sortSelect.querySelector(`option[value="${val}"]`)) {
+          sortSelect.value = val;
+        }
+      }
+      renderHWTable();
+    }
+
+    function onHWSortChange() {
+      const val = document.getElementById('hw-sort-by').value;
+      if (!val) return;
+      const parts = val.split('_');
+      hwSortOrder = parts.pop();
+      hwSortField = parts.join('_');
+      renderHWTable();
+    }
+
+    function sortIcon(field) {
+      if (hwSortField !== field) return '<span style="opacity:0.3; margin-left:4px; font-size:10px;">↕</span>';
+      return hwSortOrder === 'asc'
+        ? '<span style="color:var(--teal); margin-left:4px; font-size:10px;">▲</span>'
+        : '<span style="color:var(--teal); margin-left:4px; font-size:10px;">▼</span>';
+    }
+
     function renderHWTable() {
       const cls = document.getElementById('hw-filter-class').value;
       const search = document.getElementById('hw-search').value.toLowerCase();
@@ -3124,6 +3245,39 @@
         return true;
       });
 
+      // Sort rows
+      rows.sort((a, b) => {
+        let valA = a[hwSortField];
+        let valB = b[hwSortField];
+
+        if (hwSortField === 'student_name') {
+          valA = (valA || '').toLowerCase();
+          valB = (valB || '').toLowerCase();
+          const cmp = valA.localeCompare(valB);
+          return hwSortOrder === 'asc' ? cmp : -cmp;
+        }
+
+        if (hwSortField === 'class_number') {
+          valA = Number(valA) || 0;
+          valB = Number(valB) || 0;
+          return hwSortOrder === 'asc' ? valA - valB : valB - valA;
+        }
+
+        if (hwSortField === 'score') {
+          valA = Number(valA) || 0;
+          valB = Number(valB) || 0;
+          return hwSortOrder === 'asc' ? valA - valB : valB - valA;
+        }
+
+        if (hwSortField === 'submitted_at') {
+          valA = new Date(valA || 0).getTime();
+          valB = new Date(valB || 0).getTime();
+          return hwSortOrder === 'asc' ? valA - valB : valB - valA;
+        }
+
+        return 0;
+      });
+
       document.getElementById('hw-count').textContent = rows.length + ' result' + (rows.length !== 1 ? 's' : '');
 
       if (!rows.length) {
@@ -3133,8 +3287,13 @@
 
       document.getElementById('hw-table-wrap').innerHTML = `<table class="data-table">
     <thead><tr>
-      <th>Student</th><th>Cohort</th><th>Class</th><th>Score</th><th>Performance</th>
-      <th>Submitted</th><th>Access Code</th>
+      <th style="cursor:pointer; user-select:none;" onclick="setHWSort('student_name')">Student ${sortIcon('student_name')}</th>
+      <th>Cohort</th>
+      <th style="cursor:pointer; user-select:none;" onclick="setHWSort('class_number')">Class ${sortIcon('class_number')}</th>
+      <th style="cursor:pointer; user-select:none;" onclick="setHWSort('score')">Score ${sortIcon('score')}</th>
+      <th>Performance</th>
+      <th style="cursor:pointer; user-select:none;" onclick="setHWSort('submitted_at')">Submitted ${sortIcon('submitted_at')}</th>
+      <th>Access Code</th>
     </tr></thead>
     <tbody>
       ${rows.map(r => `<tr class="clickable-row" onclick="showSubmissionDetail('hw', ${r.id})">
@@ -3195,7 +3354,7 @@
     <table class="data-table">
       <thead><tr><th>Student</th><th>Score</th><th>Performance</th><th>Submitted</th></tr></thead>
       <tbody>
-        ${rows.map(r => `<tr>
+        ${rows.map(r => `<tr class="clickable-row" onclick="showSubmissionDetail('hw', ${r.id})">
           <td><strong>${esc(r.student_name)}</strong></td>
           <td>${scoreBadge(r.score)}</td>
           <td>${scoreBar(r.score)}</td>
@@ -3499,6 +3658,138 @@
       }
 
       if (!r) return;
+
+      if (type === 'hw') {
+        document.getElementById('modal-title').textContent = esc(r.student_name || "Detail View") + " — Homework Submission Detail";
+
+        let qDetail = r.question_detail;
+        if (typeof qDetail === 'string') {
+          try { qDetail = JSON.parse(qDetail); } catch(e) {}
+        }
+
+        const totalQuestions = r.total || 20;
+        const score = r.score ?? 0;
+        const pct = r.pct ?? Math.round((score / totalQuestions) * 100);
+        const scoreColor = pct >= 75 ? 'var(--mint)' : pct >= 50 ? 'var(--gold)' : 'var(--red)';
+
+        let durationStr = '—';
+        if (r.started_at && r.submitted_at) {
+          const diffMs = new Date(r.submitted_at) - new Date(r.started_at);
+          if (diffMs > 0) {
+            const mins = Math.floor(diffMs / 60000);
+            const secs = Math.floor((diffMs % 60000) / 1000);
+            durationStr = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+          }
+        }
+
+        let questionsHtml = '';
+        if (qDetail && typeof qDetail === 'object' && !Array.isArray(qDetail)) {
+          const qKeys = Object.keys(qDetail).sort((a, b) => {
+            const numA = parseInt(a.replace(/\D/g, '')) || 0;
+            const numB = parseInt(b.replace(/\D/g, '')) || 0;
+            return numA - numB;
+          });
+
+          if (qKeys.length > 0) {
+            questionsHtml = `
+              <div style="margin-top:20px;">
+                <h4 style="margin:0 0 12px 0; font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; color:var(--navy);">Question Breakdown (${qKeys.length} Questions)</h4>
+                <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap:10px;">
+                  ${qKeys.map(k => {
+                    const item = qDetail[k];
+                    const qNum = k.replace(/\D/g, '');
+                    const isCorrect = item && (item.correct === true || item.correct === 'true');
+                    const strikes = item ? (item.strikes_used ?? 0) : 0;
+                    const attempts = item ? (item.attempts ?? (strikes + (isCorrect ? 1 : 0))) : 1;
+
+                    const bg = isCorrect ? '#ecfdf5' : '#fef2f2';
+                    const border = isCorrect ? '#a7f3d0' : '#fecaca';
+                    const txtColor = isCorrect ? '#065f46' : '#991b1b';
+                    const icon = isCorrect ? '✓' : '✗';
+
+                    return `
+                      <div style="background:${bg}; border:1px solid ${border}; border-radius:8px; padding:10px; text-align:center;">
+                        <div style="font-size:11px; font-weight:800; color:var(--gray); text-transform:uppercase; margin-bottom:4px;">Question ${qNum}</div>
+                        <div style="font-size:14px; font-weight:900; color:${txtColor}; margin-bottom:4px;">${icon} ${isCorrect ? 'Correct' : 'Missed'}</div>
+                        <div style="font-size:10px; color:#64748b;">${isCorrect ? (strikes === 0 ? '1st Try ⚡' : `${strikes} strike${strikes > 1 ? 's' : ''}`) : `${attempts} attempt${attempts > 1 ? 's' : ''}`}</div>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+            `;
+          }
+        } else if (Array.isArray(qDetail) && qDetail.length > 0) {
+          questionsHtml = `
+            <div style="margin-top:20px;">
+              <h4 style="margin:0 0 12px 0; font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; color:var(--navy);">Question Breakdown (${qDetail.length} Questions)</h4>
+              <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap:10px;">
+                ${qDetail.map((item, idx) => {
+                  const qNum = item.question_id || (idx + 1);
+                  const isCorrect = item && (item.correct === true || item.correct === 'true');
+                  const strikes = item ? (item.strikes_used ?? 0) : 0;
+                  const attempts = item ? (item.attempts ?? (strikes + (isCorrect ? 1 : 0))) : 1;
+
+                  const bg = isCorrect ? '#ecfdf5' : '#fef2f2';
+                  const border = isCorrect ? '#a7f3d0' : '#fecaca';
+                  const txtColor = isCorrect ? '#065f46' : '#991b1b';
+                  const icon = isCorrect ? '✓' : '✗';
+
+                  return `
+                    <div style="background:${bg}; border:1px solid ${border}; border-radius:8px; padding:10px; text-align:center;">
+                      <div style="font-size:11px; font-weight:800; color:var(--gray); text-transform:uppercase; margin-bottom:4px;">Question ${qNum}</div>
+                      <div style="font-size:14px; font-weight:900; color:${txtColor}; margin-bottom:4px;">${icon} ${isCorrect ? 'Correct' : 'Missed'}</div>
+                      <div style="font-size:10px; color:#64748b;">${isCorrect ? (strikes === 0 ? '1st Try ⚡' : `${strikes} strike${strikes > 1 ? 's' : ''}`) : `${attempts} attempt${attempts > 1 ? 's' : ''}`}</div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        const bodyHtml = `
+          <div style="padding:20px;">
+            <!-- Header Summary Card -->
+            <div style="background:var(--navy); color:#fff; border-radius:12px; padding:20px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+              <div>
+                <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--mint); letter-spacing:0.5px; margin-bottom:4px;">Class ${esc(r.class_number || '—')} Homework</div>
+                <h3 style="margin:0; font-size:18px; font-weight:800;">${esc(r.homework_title || 'Homework Submission')}</h3>
+                <div style="font-size:12px; color:#94a3b8; margin-top:4px;">
+                  Student: <strong style="color:#fff;">${esc(r.student_name)}</strong> · Cohort: <span style="color:#cbd5e1;">${esc(r.cohort || '—')}</span> · Code: <span style="font-family:monospace; color:#cbd5e1;">${esc(r.access_code || '—')}</span>
+                </div>
+              </div>
+              <div style="text-align:right; background:rgba(255,255,255,0.08); padding:12px 20px; border-radius:10px; border:1px solid rgba(255,255,255,0.15);">
+                <div style="font-size:10px; font-weight:800; text-transform:uppercase; color:var(--teal); letter-spacing:0.5px; margin-bottom:2px;">Final Score</div>
+                <div style="font-size:28px; font-weight:900; font-family:monospace; color:${scoreColor};">${score} <span style="font-size:16px; color:#94a3b8;">/ ${totalQuestions}</span></div>
+                <div style="font-size:11px; font-weight:700; color:#cbd5e1;">${pct}% Overall Accuracy</div>
+              </div>
+            </div>
+
+            <!-- Key Info Grid -->
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap:12px; margin-bottom:20px;">
+              <div style="background:#f8fafc; border:1px solid var(--border); padding:12px; border-radius:8px;">
+                <div style="font-size:10px; font-weight:800; text-transform:uppercase; color:var(--gray);">Submitted At</div>
+                <div style="font-size:12px; font-weight:700; color:var(--navy); margin-top:2px;">${fmtDate(r.submitted_at)}</div>
+              </div>
+              <div style="background:#f8fafc; border:1px solid var(--border); padding:12px; border-radius:8px;">
+                <div style="font-size:10px; font-weight:800; text-transform:uppercase; color:var(--gray);">Time Elapsed</div>
+                <div style="font-size:12px; font-weight:700; color:var(--navy); margin-top:2px;">${durationStr}</div>
+              </div>
+              <div style="background:#f8fafc; border:1px solid var(--border); padding:12px; border-radius:8px;">
+                <div style="font-size:10px; font-weight:800; text-transform:uppercase; color:var(--gray);">Access Code</div>
+                <div style="font-size:12px; font-weight:700; font-family:monospace; color:var(--navy); margin-top:2px;">${esc(r.access_code || '—')}</div>
+              </div>
+            </div>
+
+            ${questionsHtml}
+          </div>
+        `;
+
+        document.getElementById('modal-body').innerHTML = bodyHtml;
+        document.getElementById('modal-overlay').classList.add('open');
+        return;
+      }
 
       document.getElementById('modal-title').textContent = esc(r.student_name || "Detail View") + " — " + title;
 
@@ -5220,9 +5511,116 @@
     }
 
     // ════════════════════════════════════════════════════════════════════════════
+    // AI COHORT INSIGHTS
+    // ════════════════════════════════════════════════════════════════════════════
+    async function generateCohortInsights() {
+      const btn = document.getElementById('ai-generate-btn');
+      const body = document.getElementById('ai-insights-body');
+
+      // ── UI: loading state ─────────────────────────────────────────────────
+      btn.disabled = true;
+      btn.innerHTML = `<div class="spinner" style="width:12px;height:12px;border-width:2px;margin:0"></div> Thinking…`;
+      body.classList.add('loading-ai');
+      body.innerHTML = `<span style="opacity:0.6">✨ Analysing your cohort data with Groq…</span>`;
+
+      try {
+        // ── Get session JWT ───────────────────────────────────────────────────
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) {
+          body.innerHTML = `<span style="color:var(--red)">⚠️ Please sign in to use AI Insights.</span>`;
+          return;
+        }
+
+        // ── Compute stats from local data ─────────────────────────────────────
+        const source = activeCohort ? hwData.filter(r => r.cohort === activeCohort) : hwData;
+
+        const studentMap = {};
+        const classCounts = {};
+
+        source.forEach(r => {
+          if (!studentMap[r.student_name]) studentMap[r.student_name] = { scores: [] };
+          studentMap[r.student_name].scores.push(r.score || 0);
+          classCounts[r.class_number] = (classCounts[r.class_number] || 0) + 1;
+        });
+
+        const studentEntries = Object.entries(studentMap)
+          .map(([name, d]) => ({ name, avg: Math.round(d.scores.reduce((a, b) => a + b, 0) / d.scores.length), count: d.scores.length }))
+          .sort((a, b) => b.avg - a.avg);
+
+        const rawAvg = source.length ? source.reduce((s, r) => s + (r.score || 0), 0) / source.length : 0;
+        const scoreDistribution = { '0–7': 0, '8–11': 0, '12–14': 0, '15–17': 0, '18–20': 0 };
+        source.forEach(r => {
+          const s = r.score || 0;
+          if (s < 8) scoreDistribution['0–7']++;
+          else if (s < 12) scoreDistribution['8–11']++;
+          else if (s < 15) scoreDistribution['12–14']++;
+          else if (s < 18) scoreDistribution['15–17']++;
+          else scoreDistribution['18–20']++;
+        });
+
+        const lowestClasses = Object.entries(classCounts)
+          .map(([cls, count]) => ({ class: cls, count }))
+          .sort((a, b) => a.count - b.count);
+
+        const stats = {
+          totalStudents: Object.keys(studentMap).length,
+          totalSubmissions: source.length,
+          avgScore: parseFloat(rawAvg.toFixed(1)),
+          maxScore: 20,
+          scoreDistribution,
+          classCounts,
+          topStudents: studentEntries.slice(0, 5),
+          lowStudents: [...studentEntries].reverse().slice(0, 5),
+          lowestClasses,
+        };
+
+        // ── Call Edge Function ────────────────────────────────────────────────
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/ai-dashboard`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON,
+          },
+          body: JSON.stringify({
+            action: 'cohort_summary',
+            payload: { cohort: activeCohort || 'All Students', stats },
+          }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || data.error) {
+          throw new Error(data.error || `HTTP ${res.status}`);
+        }
+
+        // ── Render result ─────────────────────────────────────────────────────
+        const now = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        body.innerHTML = `
+          <div style="width:100%">
+            <div class="ai-summary-text">${esc(data.summary).replace(/\n/g, '<br>')}</div>
+            <div class="ai-meta">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <circle cx="8" cy="8" r="6" /><path d="M8 5v3l2 2" stroke-linecap="round" />
+              </svg>
+              Generated by Groq · ${activeCohort ? `Cohort: ${activeCohort}` : 'All cohorts'} · ${stats.totalSubmissions} submissions · ${now}
+            </div>
+          </div>`;
+
+      } catch (err) {
+        body.innerHTML = `<span style="color:var(--red)">⚠️ ${esc(err.message || 'Failed to generate insights. Please try again.')}</span>`;
+      } finally {
+        body.classList.remove('loading-ai');
+        btn.disabled = false;
+        btn.innerHTML = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px;height:14px"><path d="M8 1l1.5 3.5L13 6l-2.5 2.5.5 3.5L8 10.5 5 12l.5-3.5L3 6l3.5-1.5z" /></svg> Regenerate`;
+      }
+    }
+
+    // ════════════════════════════════════════════════════════════════════════════
     // INIT — restore existing session if the teacher is already logged in
     // ════════════════════════════════════════════════════════════════════════════
     initSupabase();
+
 
     (async () => {
       const { data: { session } } = await sb.auth.getSession();
