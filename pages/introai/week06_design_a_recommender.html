@@ -1112,8 +1112,14 @@ How long can you play? (Under 30 min / 60+ min)"
       const nodeEl = inputEl.closest('.drawflow-node');
       if (nodeEl) {
         const id = nodeEl.id.replace('node-', '');
-        if (editor.drawflow.drawflow.Home.data[id]) {
-          editor.drawflow.drawflow.Home.data[id].data.label = inputEl.value;
+        const nodeObj = editor.drawflow.drawflow.Home.data[id];
+        if (nodeObj) {
+          nodeObj.data.label = inputEl.value;
+          inputEl.setAttribute('value', inputEl.value);
+          const contentEl = nodeEl.querySelector('.drawflow_content_node');
+          if (contentEl) {
+            nodeObj.html = contentEl.innerHTML;
+          }
         }
       }
     }
