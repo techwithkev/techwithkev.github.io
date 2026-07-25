@@ -27,21 +27,18 @@ COMMENT ON TABLE introai_week07_data_detective
 -- ── Row-Level Security ────────────────────────────────────────────────────────
 ALTER TABLE introai_week07_data_detective ENABLE ROW LEVEL SECURITY;
 
--- Drop existing policies if re-running
 DROP POLICY IF EXISTS "anon_insert_w07_data_detective" ON introai_week07_data_detective;
 DROP POLICY IF EXISTS "auth_select_w07_data_detective" ON introai_week07_data_detective;
-DROP POLICY IF EXISTS "public_insert_w07_data_detective" ON introai_week07_data_detective;
+DROP POLICY IF EXISTS "public_select_w07_data_detective" ON introai_week07_data_detective;
 
--- Allow anonymous & public users (students) to INSERT submissions
+-- Anon & Public can INSERT (student page uses anon key to submit)
 CREATE POLICY "anon_insert_w07_data_detective"
   ON introai_week07_data_detective
-  FOR INSERT
-  TO anon, public
+  FOR INSERT TO anon, public
   WITH CHECK (true);
 
--- Allow authenticated users (teachers) to SELECT records
+-- STRICT SECURITY: ONLY AUTHENTICATED USERS (TEACHERS) CAN SELECT / VIEW RESPONSES
 CREATE POLICY "auth_select_w07_data_detective"
   ON introai_week07_data_detective
-  FOR SELECT
-  TO authenticated
+  FOR SELECT TO authenticated
   USING (true);

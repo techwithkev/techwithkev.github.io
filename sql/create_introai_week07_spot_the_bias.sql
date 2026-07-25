@@ -37,13 +37,17 @@ COMMENT ON TABLE introai_week07_spot_the_bias
 -- ── Row-Level Security ────────────────────────────────────────────────────────
 ALTER TABLE introai_week07_spot_the_bias ENABLE ROW LEVEL SECURITY;
 
--- Anon can INSERT (student page uses anon key)
+DROP POLICY IF EXISTS "anon_insert_w07_spot_the_bias" ON introai_week07_spot_the_bias;
+DROP POLICY IF EXISTS "auth_select_w07_spot_the_bias" ON introai_week07_spot_the_bias;
+DROP POLICY IF EXISTS "public_select_w07_spot_the_bias" ON introai_week07_spot_the_bias;
+
+-- Anon & Public can INSERT (student page uses anon key to submit)
 CREATE POLICY "anon_insert_w07_spot_the_bias"
   ON introai_week07_spot_the_bias
-  FOR INSERT TO anon
+  FOR INSERT TO anon, public
   WITH CHECK (true);
 
--- Authenticated users (teachers) can SELECT
+-- STRICT SECURITY: ONLY AUTHENTICATED USERS (TEACHERS) CAN SELECT / VIEW RESPONSES
 CREATE POLICY "auth_select_w07_spot_the_bias"
   ON introai_week07_spot_the_bias
   FOR SELECT TO authenticated
