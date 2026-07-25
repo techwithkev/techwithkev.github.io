@@ -1717,6 +1717,7 @@
               </svg>
               Ex2: Chatbots
             </button>
+
             <button class="nav-item" onclick="showPage('introai-creative-prompting')">
               <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
                 <path
@@ -1805,6 +1806,32 @@
                 <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" />
               </svg>
               W6 Ex4: Knowledge Quiz
+            </button>
+
+            <div class="nav-section-label" style="margin-top:20px">Week 7 &mdash; Ethics &amp; Data</div>
+            <button class="nav-item" onclick="showPage('introai-spot-bias')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" />
+              </svg>
+              W7 Ex1: Spot Bias
+            </button>
+            <button class="nav-item" onclick="showPage('introai-data-audit')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M2 3h12v10H2zM5 6h6M5 9h4" stroke-linecap="round" />
+              </svg>
+              W7 Ex2: Data Audit
+            </button>
+            <button class="nav-item" onclick="showPage('introai-build-dataset')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s-8-1.79-8-4" stroke-linecap="round" />
+              </svg>
+              W7 Ex3: Build Dataset
+            </button>
+            <button class="nav-item" onclick="showPage('introai-data-detective')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" />
+              </svg>
+              W7 Ex4: Data Detective
             </button>
           </div>
 
@@ -3267,6 +3294,238 @@
           </div>
         </div>
 
+        <!-- ══ INTRO TO AI: SPOT THE BIAS (W7 Ex 1) ══ -->
+        <div class="page" id="page-introai-spot-bias">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Spot the Bias! — Week 7 Activity 1</div>
+              <div class="page-subtitle">AI dataset bias analysis across music, hiring, and disease detection scenarios</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('stb')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card red">
+              <div class="stat-label">Total Submissions</div>
+              <div class="stat-value" id="stb-stat-count">—</div>
+              <div class="stat-sub">Bias analyses submitted</div>
+            </div>
+            <div class="stat-card teal">
+              <div class="stat-label">Avg Enjoyment</div>
+              <div class="stat-value" id="stb-stat-enjoy">—</div>
+              <div class="stat-sub">Out of 5 stars</div>
+            </div>
+            <div class="stat-card gold">
+              <div class="stat-label">Scenarios Audited</div>
+              <div class="stat-value" style="font-size:24px">3 / Student</div>
+              <div class="stat-sub">Music, Hiring, Healthcare</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Search:</label>
+              <input class="search-input" id="stb-search" type="text" placeholder="Student name, reflection..."
+                oninput="renderSTBTable()" />
+              <span class="text-small text-muted" id="stb-count"></span>
+            </div>
+            <div id="stb-table-wrap">
+              <div class="loading">
+                <div class="spinner"></div><br>Loading Spot the Bias data&hellip;
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ INTRO TO AI: YOUR PERSONAL DATA AUDIT (W7 Ex 2) ══ -->
+        <div class="page" id="page-introai-data-audit">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Your Personal Data Audit — Week 7 Activity 2</div>
+              <div class="page-subtitle">Student app audits, data collection tracking & privacy trade-off decisions</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('da')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card teal">
+              <div class="stat-label">Total Submissions</div>
+              <div class="stat-value" id="da-stat-count">—</div>
+              <div class="stat-sub">Data audits completed</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Avg Enjoyment</div>
+              <div class="stat-value" id="da-stat-enjoy">—</div>
+              <div class="stat-sub">Out of 5 stars</div>
+            </div>
+            <div class="stat-card gold">
+              <div class="stat-label">Privacy Challenges</div>
+              <div class="stat-value" style="font-size:24px" id="da-stat-chal">—</div>
+              <div class="stat-sub">Toggles discovered</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Search:</label>
+              <input class="search-input" id="da-search" type="text" placeholder="Student name, app name..."
+                oninput="renderDATable()" />
+              <span class="text-small text-muted" id="da-count"></span>
+            </div>
+            <div id="da-table-wrap">
+              <div class="loading">
+                <div class="spinner"></div><br>Loading Data Audit data&hellip;
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ INTRO TO AI: BUILD YOUR OWN DATASET (W7 Ex 3) ══ -->
+        <div class="page" id="page-introai-build-dataset">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Build Your Own Dataset — Week 7 Activity 3</div>
+              <div class="page-subtitle">Custom AI goals, feature engineering, training data rows & bias audits</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('bd')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card gold">
+              <div class="stat-label">Total Submissions</div>
+              <div class="stat-value" id="bd-stat-count">—</div>
+              <div class="stat-sub">Datasets built</div>
+            </div>
+            <div class="stat-card teal">
+              <div class="stat-label">Avg Enjoyment</div>
+              <div class="stat-value" id="bd-stat-enjoy">—</div>
+              <div class="stat-sub">Out of 5 stars</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Top AI Goal</div>
+              <div class="stat-value" style="font-size:15px;padding-top:6px" id="bd-stat-goal">—</div>
+              <div class="stat-sub">Most chosen goal</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Search:</label>
+              <input class="search-input" id="bd-search" type="text" placeholder="Student name, goal..."
+                oninput="renderBDTable()" />
+              <span class="text-small text-muted" id="bd-count"></span>
+            </div>
+            <div id="bd-table-wrap">
+              <div class="loading">
+                <div class="spinner"></div><br>Loading Build Dataset data&hellip;
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ INTRO TO AI: DATA DETECTIVE (W1 Ex 3) ══ -->
+        <div class="page" id="page-introai-data-detective">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Be a Data Detective — Week 1 Activity 3</div>
+              <div class="page-subtitle">Anonymized dataset exploration, pattern discovery & AI predictions</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('dd')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card green">
+              <div class="stat-label">Total Submissions</div>
+              <div class="stat-value" id="dd-stat-count">—</div>
+              <div class="stat-sub">Data detective reports</div>
+            </div>
+            <div class="stat-card teal">
+              <div class="stat-label">Avg Enjoyment</div>
+              <div class="stat-value" id="dd-stat-enjoy">—</div>
+              <div class="stat-sub">Out of 5 stars</div>
+            </div>
+            <div class="stat-card gold">
+              <div class="stat-label">Popular Dataset</div>
+              <div class="stat-value" style="font-size:14px;padding-top:6px" id="dd-stat-topds">—</div>
+              <div class="stat-sub">Most chosen dataset</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Search:</label>
+              <input class="search-input" id="dd-search" type="text" placeholder="Student name, dataset..."
+                oninput="renderDDTable()" />
+              <span class="text-small text-muted" id="dd-count"></span>
+            </div>
+            <div id="dd-table-wrap">
+              <div class="loading">
+                <div class="spinner"></div><br>Loading Data Detective data&hellip;
+              </div>
+            </div>
+          </div>
+        </div>
+
       </main>
     </div>
   </div>
@@ -3318,6 +3577,10 @@
     let ayfData = [];    // introai_week06_analyze_your_feed rows
     let dsrData = [];    // introai_week06_design_a_recommender rows
     let kcData = [];     // introai_week06_knowledge_check rows
+    let stbData = [];    // introai_week07_spot_the_bias rows
+    let daData = [];     // introai_week07_data_audit rows
+    let bdData = [];     // introai_week07_build_dataset rows
+    let ddData = [];     // introai_week01_data_detective rows
     let activeCohort = ''; // global cohort filter ('' = all)
 
     // ════════════════════════════════════════════════════════════════════════════
@@ -3491,6 +3754,10 @@
         renderAYFPage();
         renderDSRPage();
         renderKCPage();
+        renderSTBPage();
+        renderDAPage();
+        renderBDPage();
+        renderDDPage();
 
         const now = new Date();
         document.getElementById('last-refresh').textContent = 'Updated ' + now.toLocaleTimeString();
@@ -4137,6 +4404,18 @@
       } else if (type === 'kc') {
         r = kcData.find(x => x.id === id);
         title = "Knowledge Check Quiz Detail";
+      } else if (type === 'stb') {
+        r = stbData.find(x => x.id === id);
+        title = "Spot the Bias Detail";
+      } else if (type === 'da') {
+        r = daData.find(x => x.id === id);
+        title = "Data Audit Detail";
+      } else if (type === 'bd') {
+        r = bdData.find(x => x.id === id);
+        title = "Build Your Own Dataset Detail";
+      } else if (type === 'dd') {
+        r = ddData.find(x => x.id === id);
+        title = "Data Detective Detail";
       }
 
       if (!r) return;
@@ -4413,6 +4692,160 @@
           <div class="field-label">Most Surprising Concept Reflection</div>
           <div class="field-value">${esc(r.reflection_surprising || 'None')}</div>
         `;
+      } else if (type === 'stb') {
+        bodyHtml = `
+          <div style="padding:14px; background:#fff1f2; border-radius:12px; border:1px solid #fecdd3; margin-bottom:16px;">
+            <div style="font-size:12px; font-weight:700; color:#9f1239; text-transform:uppercase;">Activity 1: Spot the Bias!</div>
+            <div style="font-size:13px; color:#be123c; margin-top:4px;">Enjoyment Rating: ${r.enjoyment_rating || 0}/5 ⭐</div>
+          </div>
+
+          <div style="margin-bottom:14px; padding:12px; background:#fff; border-radius:10px; border:1px solid #e5e7eb;">
+            <h4 style="font-size:13px; font-weight:800; color:#111827; margin-bottom:6px;">🎵 Scenario A: Music Recommendation AI</h4>
+            <div style="font-size:12px; color:#4b5563; margin-bottom:4px;"><strong>Who left out:</strong> ${esc(r.scenario_a_left_out)}</div>
+            <div style="font-size:12px; color:#4b5563; margin-bottom:4px;"><strong>What could go wrong:</strong> ${esc(r.scenario_a_harm)}</div>
+            <div style="font-size:12px; color:#047857; font-weight:600;"><strong>Fairness fix:</strong> ${esc(r.scenario_a_fix)}</div>
+          </div>
+
+          <div style="margin-bottom:14px; padding:12px; background:#fff; border-radius:10px; border:1px solid #e5e7eb;">
+            <h4 style="font-size:13px; font-weight:800; color:#111827; margin-bottom:6px;">💼 Scenario B: Hiring Shortlist AI</h4>
+            <div style="font-size:12px; color:#4b5563; margin-bottom:4px;"><strong>Who left out:</strong> ${esc(r.scenario_b_left_out)}</div>
+            <div style="font-size:12px; color:#4b5563; margin-bottom:4px;"><strong>What could go wrong:</strong> ${esc(r.scenario_b_harm)}</div>
+            <div style="font-size:12px; color:#047857; font-weight:600;"><strong>Fairness fix:</strong> ${esc(r.scenario_b_fix)}</div>
+          </div>
+
+          <div style="margin-bottom:14px; padding:12px; background:#fff; border-radius:10px; border:1px solid #e5e7eb;">
+            <h4 style="font-size:13px; font-weight:800; color:#111827; margin-bottom:6px;">🩺 Scenario C: Disease Detection AI</h4>
+            <div style="font-size:12px; color:#4b5563; margin-bottom:4px;"><strong>Who left out:</strong> ${esc(r.scenario_c_left_out)}</div>
+            <div style="font-size:12px; color:#4b5563; margin-bottom:4px;"><strong>What could go wrong:</strong> ${esc(r.scenario_c_harm)}</div>
+            <div style="font-size:12px; color:#047857; font-weight:600;"><strong>Fairness fix:</strong> ${esc(r.scenario_c_fix)}</div>
+          </div>
+
+          <div class="field-label" style="margin-top:14px;">#1 Step to Prevent Bias Before Training</div>
+          <div class="field-value">${esc(r.final_reflection)}</div>
+        `;
+      } else if (type === 'da') {
+        let appsHtml = '';
+        for (let i = 1; i <= 4; i++) {
+          const appName = r[`app_${i}_name`];
+          if (!appName) continue;
+          const tradeoff = r[`app_${i}_worth_tradeoff`] || '—';
+          const tfColor = tradeoff === 'Yes' ? '#047857' : tradeoff === 'No' ? '#b91c1c' : '#b45309';
+          appsHtml += `
+            <div style="margin-bottom:12px; padding:12px; background:#fff; border-radius:10px; border:1px solid #e5e7eb;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <span style="font-size:13px; font-weight:800; color:#0e7490;">App #${i}: ${esc(appName)}</span>
+                <span style="font-size:11px; font-weight:800; color:${tfColor}; padding:2px 8px; background:#f0fdfa; border-radius:99px; border:1px solid #ccfbf1;">Worth it: ${esc(tradeoff)}</span>
+              </div>
+              <div style="font-size:12px; color:#4b5563; margin-bottom:4px;"><strong>Data collected:</strong> ${esc(r[`app_${i}_data_collected`])}</div>
+              <div style="font-size:12px; color:#4b5563;"><strong>How used:</strong> ${esc(r[`app_${i}_how_used`])}</div>
+            </div>
+          `;
+        }
+
+        bodyHtml = `
+          <div style="padding:14px; background:#ecfeff; border-radius:12px; border:1px solid #cffafe; margin-bottom:16px;">
+            <div style="font-size:12px; font-weight:700; color:#0e7490; text-transform:uppercase;">Activity 2: Personal Data Audit</div>
+            <div style="font-size:13px; color:#155e75; margin-top:4px;">Enjoyment Rating: ${r.enjoyment_rating || 0}/5 ⭐</div>
+          </div>
+
+          <div style="font-size:12px; font-weight:800; text-transform:uppercase; color:#374151; margin-bottom:8px;">App Audits</div>
+          ${appsHtml}
+
+          <div class="field-label" style="margin-top:14px;">1. Most Surprising App Data Collection</div>
+          <div class="field-value">${esc(r.surprising_app_reflection)}</div>
+
+          <div class="field-label" style="margin-top:12px;">2. Changed Mind on Trade-off?</div>
+          <div class="field-value">${esc(r.opinion_changed_reflection)}</div>
+
+          <div class="field-label" style="margin-top:12px;">3. Will Use Differently?</div>
+          <div class="field-value">${esc(r.behavior_change_reflection)}</div>
+
+          ${r.privacy_challenge ? `
+            <div class="field-label" style="margin-top:12px; color:#b45309;">🌟 Privacy Challenge Toggle Discovered</div>
+            <div class="field-value" style="background:#fffbeb; border-color:#fef3c7; color:#92400e;">${esc(r.privacy_challenge)}</div>
+          ` : ''}
+        `;
+      } else if (type === 'bd') {
+        const goalStr = r.ai_goal_option === 'Option Custom' ? `Custom: ${r.custom_ai_goal || '—'}` : (r.ai_goal_option || '—');
+
+        let rowsHtml = '';
+        for (let rowNum = 1; rowNum <= 5; rowNum++) {
+          rowsHtml += `
+            <tr style="border-bottom:1px solid #e5e7eb;">
+              <td style="padding:6px; font-weight:800; text-align:center; color:#6b7280;">${rowNum}</td>
+              <td style="padding:6px;">${esc(r[`row_${rowNum}_f1`])}</td>
+              <td style="padding:6px;">${esc(r[`row_${rowNum}_f2`])}</td>
+              <td style="padding:6px;">${esc(r[`row_${rowNum}_f3`])}</td>
+              <td style="padding:6px;">${esc(r[`row_${rowNum}_f4`])}</td>
+              <td style="padding:6px; font-weight:700; color:#b45309; background:#fffbeb;">${esc(r[`row_${rowNum}_label`])}</td>
+            </tr>
+          `;
+        }
+
+        bodyHtml = `
+          <div style="padding:14px; background:#fffbeb; border-radius:12px; border:1px solid #fef3c7; margin-bottom:16px;">
+            <div style="font-size:12px; font-weight:700; color:#b45309; text-transform:uppercase;">Activity 3: Build Your Own Dataset</div>
+            <div style="font-size:14px; font-weight:800; color:#78350f; margin-top:4px;">Goal: ${esc(goalStr)}</div>
+            ${r.group_members ? `<div style="font-size:11px; color:#92400e; margin-top:2px;">Group Members: ${esc(r.group_members)}</div>` : ''}
+            <div style="font-size:12px; color:#b45309; margin-top:4px;">Enjoyment Rating: ${r.enjoyment_rating || 0}/5 ⭐</div>
+          </div>
+
+          <div style="font-size:12px; font-weight:800; text-transform:uppercase; color:#374151; margin-bottom:8px;">Training Dataset (5 Samples)</div>
+          <div style="overflow-x:auto; margin-bottom:16px;">
+            <table style="width:100%; border-collapse:collapse; font-size:12px;">
+              <thead>
+                <tr style="background:#f59e0b; color:#fff; font-weight:800;">
+                  <th style="padding:6px; text-align:center;">#</th>
+                  <th style="padding:6px; text-align:left;">${esc(r.feature_1_name)}</th>
+                  <th style="padding:6px; text-align:left;">${esc(r.feature_2_name)}</th>
+                  <th style="padding:6px; text-align:left;">${esc(r.feature_3_name)}</th>
+                  <th style="padding:6px; text-align:left;">${esc(r.feature_4_name)}</th>
+                  <th style="padding:6px; text-align:left; background:#d97706;">${esc(r.target_label_name)}</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rowsHtml}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="field-label">Dataset Bias Audit</div>
+          <div class="field-value">${esc(r.dataset_bias_reflection)}</div>
+
+          <div class="field-label" style="margin-top:12px;">How to Make Dataset Fairer</div>
+          <div class="field-value" style="color:#047857; background:#ecfdf5; border-color:#a7f3d0;">${esc(r.fairness_fix_reflection)}</div>
+        `;
+      } else if (type === 'dd') {
+        bodyHtml = `
+          <div style="padding:14px; background:#ecfdf5; border-radius:12px; border:1px solid #a7f3d0; margin-bottom:16px;">
+            <div style="font-size:12px; font-weight:700; color:#047857; text-transform:uppercase;">Activity 4: Data Detective Report</div>
+            <div style="font-size:14px; font-weight:800; color:#065f46; margin-top:4px;">Dataset: ${esc(r.dataset_chosen)}</div>
+            <div style="font-size:12px; color:#047857; margin-top:4px;">Enjoyment Rating: ${r.enjoyment_rating || 0}/5 ⭐</div>
+          </div>
+
+          <div class="field-label">1. Data Types Identified</div>
+          <div class="field-value">${esc(r.data_types_identified || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">Data Types Explanation</div>
+          <div class="field-value">${esc(r.data_types_explanation || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">2. Pattern / Correlation #1</div>
+          <div class="field-value">${esc(r.pattern_1_description || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">Pattern / Correlation #2</div>
+          <div class="field-value">${esc(r.pattern_2_description || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">3. AI Predictions / Use Case</div>
+          <div class="field-value" style="color:#1e40af; background:#eff6ff; border-color:#bfdbfe;">${esc(r.ai_prediction_usecase || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">AI Pitfalls & Bias Reflection</div>
+          <div class="field-value" style="color:#991b1b; background:#fef2f2; border-color:#fecaca;">${esc(r.ai_pitfalls_reflections || '—')}</div>
+
+          ${r.chart_visualization_idea ? `
+            <div class="field-label" style="margin-top:12px;">4. Chart / Visualization Plan</div>
+            <div class="field-value">${esc(r.chart_visualization_idea)}</div>
+          ` : ''}
+        `;
       }
 
       document.getElementById('modal-body').innerHTML = bodyHtml;
@@ -4536,6 +4969,22 @@
         rows = [['student_name', 'student_email', 'q1_content_filtering', 'q2_collaborative_filtering', 'q3_cold_start', 'q4_filter_bubble', 'q5_user_parameters', 'q6_flowchart_shapes', 'score', 'pct', 'reflection_surprising', 'enjoyment_rating', 'submitted_at']];
         kcData.forEach(r => rows.push([r.student_name, r.student_email, r.q1_content_filtering, r.q2_collaborative_filtering, r.q3_cold_start, r.q4_filter_bubble, r.q5_user_parameters, r.q6_flowchart_shapes, r.score, r.pct, r.reflection_surprising, r.enjoyment_rating, r.submitted_at]));
         filename = 'introai_week06_knowledge_check.csv';
+      } else if (type === 'stb') {
+        rows = [['student_name', 'student_email', 'scenario_a_left_out', 'scenario_a_harm', 'scenario_a_fix', 'scenario_b_left_out', 'scenario_b_harm', 'scenario_b_fix', 'scenario_c_left_out', 'scenario_c_harm', 'scenario_c_fix', 'final_reflection', 'enjoyment_rating', 'submitted_at']];
+        stbData.forEach(r => rows.push([r.student_name, r.student_email, r.scenario_a_left_out, r.scenario_a_harm, r.scenario_a_fix, r.scenario_b_left_out, r.scenario_b_harm, r.scenario_b_fix, r.scenario_c_left_out, r.scenario_c_harm, r.scenario_c_fix, r.final_reflection, r.enjoyment_rating, r.submitted_at]));
+        filename = 'introai_week07_spot_the_bias.csv';
+      } else if (type === 'da') {
+        rows = [['student_name', 'student_email', 'app_1_name', 'app_1_data_collected', 'app_1_how_used', 'app_1_worth_tradeoff', 'app_2_name', 'app_2_data_collected', 'app_2_how_used', 'app_2_worth_tradeoff', 'app_3_name', 'app_3_data_collected', 'app_3_how_used', 'app_3_worth_tradeoff', 'app_4_name', 'app_4_data_collected', 'app_4_how_used', 'app_4_worth_tradeoff', 'surprising_app_reflection', 'opinion_changed_reflection', 'behavior_change_reflection', 'privacy_challenge', 'enjoyment_rating', 'submitted_at']];
+        daData.forEach(r => rows.push([r.student_name, r.student_email, r.app_1_name, r.app_1_data_collected, r.app_1_how_used, r.app_1_worth_tradeoff, r.app_2_name, r.app_2_data_collected, r.app_2_how_used, r.app_2_worth_tradeoff, r.app_3_name, r.app_3_data_collected, r.app_3_how_used, r.app_3_worth_tradeoff, r.app_4_name, r.app_4_data_collected, r.app_4_how_used, r.app_4_worth_tradeoff, r.surprising_app_reflection, r.opinion_changed_reflection, r.behavior_change_reflection, r.privacy_challenge, r.enjoyment_rating, r.submitted_at]));
+        filename = 'introai_week07_data_audit.csv';
+      } else if (type === 'bd') {
+        rows = [['student_name', 'student_email', 'group_members', 'ai_goal_option', 'custom_ai_goal', 'feature_1_name', 'feature_2_name', 'feature_3_name', 'feature_4_name', 'target_label_name', 'row_1_f1', 'row_1_f2', 'row_1_f3', 'row_1_f4', 'row_1_label', 'row_2_f1', 'row_2_f2', 'row_2_f3', 'row_2_f4', 'row_2_label', 'row_3_f1', 'row_3_f2', 'row_3_f3', 'row_3_f4', 'row_3_label', 'row_4_f1', 'row_4_f2', 'row_4_f3', 'row_4_f4', 'row_4_label', 'row_5_f1', 'row_5_f2', 'row_5_f3', 'row_5_f4', 'row_5_label', 'dataset_bias_reflection', 'fairness_fix_reflection', 'enjoyment_rating', 'submitted_at']];
+        bdData.forEach(r => rows.push([r.student_name, r.student_email, r.group_members, r.ai_goal_option, r.custom_ai_goal, r.feature_1_name, r.feature_2_name, r.feature_3_name, r.feature_4_name, r.target_label_name, r.row_1_f1, r.row_1_f2, r.row_1_f3, r.row_1_f4, r.row_1_label, r.row_2_f1, r.row_2_f2, r.row_2_f3, r.row_2_f4, r.row_2_label, r.row_3_f1, r.row_3_f2, r.row_3_f3, r.row_3_f4, r.row_3_label, r.row_4_f1, r.row_4_f2, r.row_4_f3, r.row_4_f4, r.row_4_label, r.row_5_f1, r.row_5_f2, r.row_5_f3, r.row_5_f4, r.row_5_label, r.dataset_bias_reflection, r.fairness_fix_reflection, r.enjoyment_rating, r.submitted_at]));
+        filename = 'introai_week07_build_dataset.csv';
+      } else if (type === 'dd') {
+        rows = [['student_name', 'student_email', 'dataset_chosen', 'data_types_identified', 'data_types_explanation', 'pattern_1_description', 'pattern_2_description', 'ai_prediction_usecase', 'ai_pitfalls_reflections', 'chart_visualization_idea', 'enjoyment_rating', 'submitted_at']];
+        ddData.forEach(r => rows.push([r.student_name, r.student_email, r.dataset_chosen, r.data_types_identified, r.data_types_explanation, r.pattern_1_description, r.pattern_2_description, r.ai_prediction_usecase, r.ai_pitfalls_reflections, r.chart_visualization_idea, r.enjoyment_rating, r.submitted_at]));
+        filename = 'introai_week07_data_detective.csv';
       } else {
         rows = [['code', 'cohort', 'class_number', 'is_active', 'uses_count', 'max_uses', 'created_at']];
         codesData.forEach(r => rows.push([r.code, r.cohort, r.class_number, r.is_active, r.uses_count, r.max_uses, r.created_at]));
@@ -6476,6 +6925,283 @@
             <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('kc', ${r.id})">View</button></td>
           </tr>`;
         }).join('')}
+      </tbody>
+    </table>`;
+    }
+
+    // ── Week 7 Activity 1: Spot the Bias! ──
+    function renderSTBPage() {
+      if (!stbData.length) {
+        document.getElementById('stb-stat-count').textContent = '0';
+        document.getElementById('stb-stat-enjoy').textContent = '—';
+        renderSTBTable();
+        return;
+      }
+      document.getElementById('stb-stat-count').textContent = stbData.length;
+      const avg = (stbData.reduce((s, r) => s + (parseInt(r.enjoyment_rating) || 0), 0) / stbData.length).toFixed(1);
+      document.getElementById('stb-stat-enjoy').textContent = avg + ' / 5';
+
+      renderSTBTable();
+    }
+
+    function renderSTBTable() {
+      const search = (document.getElementById('stb-search')?.value || '').toLowerCase();
+      let rows = stbData.filter(r =>
+        !search || (r.student_name || '').toLowerCase().includes(search) || (r.final_reflection || '').toLowerCase().includes(search)
+      );
+
+      document.getElementById('stb-count').textContent = rows.length + ' analysis' + (rows.length !== 1 ? 'es' : '');
+
+      if (!rows.length) {
+        document.getElementById('stb-table-wrap').innerHTML = '<div class="empty-state"><p>No matching bias analyses.</p></div>';
+        return;
+      }
+
+      function starRating(v) {
+        if (!v) return '<span style="color:var(--gray)">—</span>';
+        const stars = '★'.repeat(v) + '☆'.repeat(5 - v);
+        const col = v >= 4 ? '#059669' : v >= 3 ? '#d97706' : '#dc2626';
+        return `<span style="color:${col};font-size:14px">${stars}</span>`;
+      }
+
+      document.getElementById('stb-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student</th>
+        <th>Scenario A Fix</th>
+        <th>Scenario B Fix</th>
+        <th>Scenario C Fix</th>
+        <th>#1 Step Reflection</th>
+        <th>Enjoyment</th>
+        <th>Submitted</th>
+        <th>Detail</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr class="clickable-row" onclick="showSubmissionDetail('stb', ${r.id})">
+          <td><strong>${esc(r.student_name)}</strong><br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
+          <td style="font-size:11px;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.scenario_a_fix)}">${esc(r.scenario_a_fix || '—')}</td>
+          <td style="font-size:11px;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.scenario_b_fix)}">${esc(r.scenario_b_fix || '—')}</td>
+          <td style="font-size:11px;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.scenario_c_fix)}">${esc(r.scenario_c_fix || '—')}</td>
+          <td style="font-size:11px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.final_reflection)}">${esc(r.final_reflection || '—')}</td>
+          <td>${starRating(r.enjoyment_rating)}</td>
+          <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('stb', ${r.id})">View</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+    }
+
+    // ── Week 7 Activity 2: Your Personal Data Audit ──
+    function renderDAPage() {
+      if (!daData.length) {
+        document.getElementById('da-stat-count').textContent = '0';
+        document.getElementById('da-stat-enjoy').textContent = '—';
+        document.getElementById('da-stat-chal').textContent = '0';
+        renderDATable();
+        return;
+      }
+      document.getElementById('da-stat-count').textContent = daData.length;
+      const avg = (daData.reduce((s, r) => s + (parseInt(r.enjoyment_rating) || 0), 0) / daData.length).toFixed(1);
+      document.getElementById('da-stat-enjoy').textContent = avg + ' / 5';
+
+      const chalCount = daData.filter(r => !!r.privacy_challenge).length;
+      document.getElementById('da-stat-chal').textContent = chalCount + ' shared';
+
+      renderDATable();
+    }
+
+    function renderDATable() {
+      const search = (document.getElementById('da-search')?.value || '').toLowerCase();
+      let rows = daData.filter(r =>
+        !search || (r.student_name || '').toLowerCase().includes(search) || (r.app_1_name || '').toLowerCase().includes(search) || (r.app_2_name || '').toLowerCase().includes(search) || (r.app_3_name || '').toLowerCase().includes(search)
+      );
+
+      document.getElementById('da-count').textContent = rows.length + ' audit' + (rows.length !== 1 ? 's' : '');
+
+      if (!rows.length) {
+        document.getElementById('da-table-wrap').innerHTML = '<div class="empty-state"><p>No matching data audits.</p></div>';
+        return;
+      }
+
+      function starRating(v) {
+        if (!v) return '<span style="color:var(--gray)">—</span>';
+        const stars = '★'.repeat(v) + '☆'.repeat(5 - v);
+        const col = v >= 4 ? '#059669' : v >= 3 ? '#d97706' : '#dc2626';
+        return `<span style="color:${col};font-size:14px">${stars}</span>`;
+      }
+
+      document.getElementById('da-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student</th>
+        <th>App #1 & Tradeoff</th>
+        <th>App #2 & Tradeoff</th>
+        <th>App #3 & Tradeoff</th>
+        <th>Surprising App Reflection</th>
+        <th>Enjoyment</th>
+        <th>Submitted</th>
+        <th>Detail</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr class="clickable-row" onclick="showSubmissionDetail('da', ${r.id})">
+          <td><strong>${esc(r.student_name)}</strong><br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
+          <td style="font-size:11px"><strong>${esc(r.app_1_name || '—')}</strong> <span class="badge ${r.app_1_worth_tradeoff === 'Yes' ? 'badge-green' : r.app_1_worth_tradeoff === 'No' ? 'badge-red' : 'badge-gold'}">${esc(r.app_1_worth_tradeoff || '—')}</span></td>
+          <td style="font-size:11px"><strong>${esc(r.app_2_name || '—')}</strong> <span class="badge ${r.app_2_worth_tradeoff === 'Yes' ? 'badge-green' : r.app_2_worth_tradeoff === 'No' ? 'badge-red' : 'badge-gold'}">${esc(r.app_2_worth_tradeoff || '—')}</span></td>
+          <td style="font-size:11px"><strong>${esc(r.app_3_name || '—')}</strong> <span class="badge ${r.app_3_worth_tradeoff === 'Yes' ? 'badge-green' : r.app_3_worth_tradeoff === 'No' ? 'badge-red' : 'badge-gold'}">${esc(r.app_3_worth_tradeoff || '—')}</span></td>
+          <td style="font-size:11px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.surprising_app_reflection)}">${esc(r.surprising_app_reflection || '—')}</td>
+          <td>${starRating(r.enjoyment_rating)}</td>
+          <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('da', ${r.id})">View</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+    }
+
+    // ── Week 7 Activity 3: Build Your Own Dataset ──
+    function renderBDPage() {
+      if (!bdData.length) {
+        document.getElementById('bd-stat-count').textContent = '0';
+        document.getElementById('bd-stat-enjoy').textContent = '—';
+        document.getElementById('bd-stat-goal').textContent = '—';
+        renderBDTable();
+        return;
+      }
+      document.getElementById('bd-stat-count').textContent = bdData.length;
+      const avg = (bdData.reduce((s, r) => s + (parseInt(r.enjoyment_rating) || 0), 0) / bdData.length).toFixed(1);
+      document.getElementById('bd-stat-enjoy').textContent = avg + ' / 5';
+
+      const goalMap = {};
+      bdData.forEach(r => {
+        const g = r.ai_goal_option === 'Option Custom' ? 'Custom Idea' : r.ai_goal_option;
+        if (g) goalMap[g] = (goalMap[g] || 0) + 1;
+      });
+      const topGoal = Object.entries(goalMap).sort((a, b) => b[1] - a[1])[0];
+      document.getElementById('bd-stat-goal').textContent = topGoal ? topGoal[0] : '—';
+
+      renderBDTable();
+    }
+
+    function renderBDTable() {
+      const search = (document.getElementById('bd-search')?.value || '').toLowerCase();
+      let rows = bdData.filter(r =>
+        !search || (r.student_name || '').toLowerCase().includes(search) || (r.ai_goal_option || '').toLowerCase().includes(search) || (r.custom_ai_goal || '').toLowerCase().includes(search)
+      );
+
+      document.getElementById('bd-count').textContent = rows.length + ' dataset' + (rows.length !== 1 ? 's' : '');
+
+      if (!rows.length) {
+        document.getElementById('bd-table-wrap').innerHTML = '<div class="empty-state"><p>No matching dataset submissions.</p></div>';
+        return;
+      }
+
+      function starRating(v) {
+        if (!v) return '<span style="color:var(--gray)">—</span>';
+        const stars = '★'.repeat(v) + '☆'.repeat(5 - v);
+        const col = v >= 4 ? '#059669' : v >= 3 ? '#d97706' : '#dc2626';
+        return `<span style="color:${col};font-size:14px">${stars}</span>`;
+      }
+
+      document.getElementById('bd-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student / Group</th>
+        <th>AI Goal</th>
+        <th>Target Label</th>
+        <th>Features Designed</th>
+        <th>Bias Reflection</th>
+        <th>Enjoyment</th>
+        <th>Submitted</th>
+        <th>Detail</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => {
+          const goalDisplay = r.ai_goal_option === 'Option Custom' ? `★ ${r.custom_ai_goal || 'Custom Goal'}` : (r.ai_goal_option || '—');
+          const featuresStr = [r.feature_1_name, r.feature_2_name, r.feature_3_name, r.feature_4_name].filter(Boolean).join(', ');
+          return `
+          <tr class="clickable-row" onclick="showSubmissionDetail('bd', ${r.id})">
+            <td><strong>${esc(r.student_name)}</strong>${r.group_members ? `<br><span style="font-size:10px;color:var(--teal)">Grp: ${esc(r.group_members)}</span>` : `<br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span>`}</td>
+            <td style="font-size:11px;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(goalDisplay)}"><span class="badge badge-gold">${esc(goalDisplay)}</span></td>
+            <td><span class="badge badge-teal">${esc(r.target_label_name || '—')}</span></td>
+            <td style="font-size:11px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(featuresStr)}">${esc(featuresStr)}</td>
+            <td style="font-size:11px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.dataset_bias_reflection)}">${esc(r.dataset_bias_reflection || '—')}</td>
+            <td>${starRating(r.enjoyment_rating)}</td>
+            <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+            <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('bd', ${r.id})">View</button></td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+    }
+
+    // ── Week 7 Activity 4: Data Detective ──
+    function renderDDPage() {
+      if (!ddData.length) {
+        document.getElementById('dd-stat-count').textContent = '0';
+        document.getElementById('dd-stat-enjoy').textContent = '—';
+        document.getElementById('dd-stat-topds').textContent = '—';
+        renderDDTable();
+        return;
+      }
+      document.getElementById('dd-stat-count').textContent = ddData.length;
+      const avg = (ddData.reduce((s, r) => s + (parseInt(r.enjoyment_rating) || 0), 0) / ddData.length).toFixed(1);
+      document.getElementById('dd-stat-enjoy').textContent = avg + ' / 5';
+
+      const dsMap = {};
+      ddData.forEach(r => {
+        if (r.dataset_chosen) dsMap[r.dataset_chosen] = (dsMap[r.dataset_chosen] || 0) + 1;
+      });
+      const topDs = Object.entries(dsMap).sort((a, b) => b[1] - a[1])[0];
+      document.getElementById('dd-stat-topds').textContent = topDs ? topDs[0].replace('Dataset ', '') : '—';
+
+      renderDDTable();
+    }
+
+    function renderDDTable() {
+      const search = (document.getElementById('dd-search')?.value || '').toLowerCase();
+      let rows = ddData.filter(r =>
+        !search || (r.student_name || '').toLowerCase().includes(search) || (r.dataset_chosen || '').toLowerCase().includes(search) || (r.pattern_1_description || '').toLowerCase().includes(search)
+      );
+
+      document.getElementById('dd-count').textContent = rows.length + ' report' + (rows.length !== 1 ? 's' : '');
+
+      if (!rows.length) {
+        document.getElementById('dd-table-wrap').innerHTML = '<div class="empty-state"><p>No matching data detective reports.</p></div>';
+        return;
+      }
+
+      function starRating(v) {
+        if (!v) return '<span style="color:var(--gray)">—</span>';
+        const stars = '★'.repeat(v) + '☆'.repeat(5 - v);
+        const col = v >= 4 ? '#059669' : v >= 3 ? '#d97706' : '#dc2626';
+        return `<span style="color:${col};font-size:14px">${stars}</span>`;
+      }
+
+      document.getElementById('dd-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student</th>
+        <th>Dataset Chosen</th>
+        <th>Data Types</th>
+        <th>Pattern #1</th>
+        <th>AI Use Case</th>
+        <th>Enjoyment</th>
+        <th>Submitted</th>
+        <th>Detail</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr class="clickable-row" onclick="showSubmissionDetail('dd', ${r.id})">
+          <td><strong>${esc(r.student_name)}</strong><br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
+          <td style="font-size:11px"><span class="badge badge-green">${esc(r.dataset_chosen || '—')}</span></td>
+          <td style="font-size:11px;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.data_types_identified)}">${esc(r.data_types_identified || '—')}</td>
+          <td style="font-size:11px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.pattern_1_description)}">${esc(r.pattern_1_description || '—')}</td>
+          <td style="font-size:11px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.ai_prediction_usecase)}">${esc(r.ai_prediction_usecase || '—')}</td>
+          <td>${starRating(r.enjoyment_rating)}</td>
+          <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('dd', ${r.id})">View</button></td>
+        </tr>`).join('')}
       </tbody>
     </table>`;
     }

@@ -2,379 +2,854 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Exploration Exercise</title>
-    <style>
-        :root {
-            --primary-color: #2563eb;
-            --primary-hover: #1d4ed8;
-            --bg-color: #f8fafc;
-            --text-main: #0f172a;
-            --border-color: #e2e8f0;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .container {
-            max-width: 1000px;
-            width: 100%;
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        h1 {
-            margin-top: 0;
-            color: var(--text-main);
-        }
-
-        button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            margin-bottom: 2rem;
-        }
-
-        button:hover {
-            background-color: var(--primary-hover);
-        }
-
-        #dataset-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-            color: var(--primary-color);
-        }
-
-        .table-responsive {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-
-        th,
-        td {
-            padding: 0.75rem 1rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        th {
-            background-color: #f1f5f9;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f8fafc;
-        }
-
-        tr:hover {
-            background-color: #f1f5f9;
-        }
-
-        #data-container {
-            display: none;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Be a Data Detective — Intro to AI · Week 7</title>
+  <meta name="description"
+    content="Week 7 Activity: Be a Data Detective! Explore anonymized datasets, identify data types, discover hidden patterns, and analyze what AI could predict.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    #registration-overlay { transition: opacity 0.4s ease; }
+    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
+    #registration-overlay .reg-card {
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
+    }
+    #registration-overlay.hiding .reg-card {
+      transform: scale(0.95) translateY(-10px); opacity: 0;
+    }
+    .reg-input:focus {
+      outline: none; border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
+    }
+    .reg-input.error {
+      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+    }
+    .form-input:focus {
+      outline: none; border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16,185,129,0.1);
+    }
+    .form-input.error { border-color: #ef4444; }
+    .opt-btn {
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .opt-btn:hover { transform: translateY(-1px); }
+    .opt-btn.selected {
+      border-color: #10b981 !important;
+      background: #ecfdf5 !important;
+      color: #065f46 !important;
+      font-weight: 700;
+    }
+    .star-btn {
+      font-size: 26px;
+      cursor: pointer;
+      filter: grayscale(100%);
+      transition: filter 0.15s ease, transform 0.1s ease;
+    }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
 </head>
 
-<body>
+<body class="bg-[#F9FAFB] text-gray-900 min-h-screen font-sans antialiased pb-20">
 
-    <div class="container">
-        <header>
-            <h1>Data Exploration Exercise</h1>
-            <p>Click the button below to load a random dataset. Analyze the data to discover hidden patterns.</p>
-            <button id="generate-btn">Generate Random Dataset</button>
-        </header>
+  <!-- 1. REGISTRATION GATE OVERLAY -->
+  <div id="registration-overlay"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+    style="background: linear-gradient(135deg, #064e3b 0%, #047857 55%, #065f46 100%);">
 
-        <div id="data-container">
-            <div id="dataset-title"></div>
-            <div class="table-responsive">
-                <table id="data-table">
-                    <thead id="table-head"></thead>
-                    <tbody id="table-body"></tbody>
-                </table>
-            </div>
-        </div>
+    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
+        style="background: radial-gradient(circle, #a7f3d0, transparent);"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
+        style="background: radial-gradient(circle, #34d399, transparent);"></div>
     </div>
 
-    <script>
-        const datasets = [
-            {
-                name: "Dataset 1: Student Study Habits & Performance",
-                headers: ["Student_ID", "Hours_Studied_Per_Week", "Average_Sleep_Hours", "Favorite_Subject", "Final_Test_Score"],
-                rows: [
-                    ["S01", "12", "8.0", "Math", "92"],
-                    ["S02", "4", "6.0", "History", "65"],
-                    ["S03", "15", "7.5", "Science", "95"],
-                    ["S04", "2", "5.5", "Art", "58"],
-                    ["S05", "8", "7.0", "Math", "78"],
-                    ["S06", "10", "8.5", "English", "88"],
-                    ["S07", "5", "6.5", "Science", "70"],
-                    ["S08", "14", "8.0", "History", "94"],
-                    ["S09", "3", "5.0", "Art", "60"],
-                    ["S10", "11", "7.5", "English", "85"],
-                    ["S11", "7", "6.5", "Math", "75"],
-                    ["S12", "16", "8.0", "Science", "98"],
-                    ["S13", "1", "4.5", "History", "50"],
-                    ["S14", "9", "7.0", "Art", "80"],
-                    ["S15", "13", "8.5", "Math", "91"]
-                ]
-            },
-            {
-                name: "Dataset 2: Coffee Shop Daily Sales",
-                headers: ["Day_ID", "Temperature_C", "Weather_Condition", "Hot_Coffees_Sold", "Iced_Coffees_Sold"],
-                rows: [
-                    ["D01", "10", "Rainy", "150", "20"],
-                    ["D02", "12", "Cloudy", "145", "25"],
-                    ["D03", "18", "Sunny", "110", "60"],
-                    ["D04", "25", "Sunny", "70", "130"],
-                    ["D05", "30", "Hot", "40", "180"],
-                    ["D06", "28", "Sunny", "50", "160"],
-                    ["D07", "15", "Rainy", "135", "30"],
-                    ["D08", "9", "Snowy", "180", "10"],
-                    ["D09", "11", "Cloudy", "140", "22"],
-                    ["D10", "22", "Sunny", "85", "95"],
-                    ["D11", "32", "Hot", "30", "195"],
-                    ["D12", "26", "Cloudy", "60", "140"],
-                    ["D13", "14", "Rainy", "130", "35"],
-                    ["D14", "8", "Snowy", "175", "5"],
-                    ["D15", "19", "Sunny", "95", "70"]
-                ]
-            },
-            {
-                name: "Dataset 3: Movie Streaming Platform",
-                headers: ["User_ID", "User_Age", "Subscription_Type", "Favorite_Genre", "Avg_Watch_Time_Mins", "Review_Snippet"],
-                rows: [
-                    ["U101", "19", "Basic", "Action", "45", "\"Needs more explosions.\""],
-                    ["U102", "45", "Premium", "Documentary", "120", "\"Very informative and well-researched.\""],
-                    ["U103", "22", "Basic", "Sci-Fi", "50", "\"Cool special effects!\""],
-                    ["U104", "55", "Premium", "Drama", "140", "\"Acting was superb and touching.\""],
-                    ["U105", "16", "Basic", "Action", "40", "\"Fast paced and fun.\""],
-                    ["U106", "62", "Premium", "Documentary", "110", "\"Fascinating look at nature.\""],
-                    ["U107", "25", "Premium", "Sci-Fi", "130", "\"Loved the alien designs.\""],
-                    ["U108", "48", "Basic", "Drama", "60", "\"A bit slow, but good.\""],
-                    ["U109", "20", "Basic", "Action", "55", "\"Awesome fight scenes.\""],
-                    ["U110", "50", "Premium", "Documentary", "115", "\"I learned so much from this.\""],
-                    ["U111", "18", "Basic", "Comedy", "45", "\"Hilarious, laughed out loud.\""],
-                    ["U112", "58", "Premium", "Drama", "135", "\"A masterpiece of storytelling.\""],
-                    ["U113", "21", "Basic", "Sci-Fi", "50", "\"The ending was confusing.\""],
-                    ["U114", "42", "Premium", "Documentary", "125", "\"Great historical footage.\""],
-                    ["U115", "17", "Basic", "Comedy", "40", "\"Pretty funny movie.\""]
-                ]
-            },
-            {
-                name: "Dataset 4: Plant Growth Experiment",
-                headers: ["Plant_ID", "Water_Amount_ml", "Sunlight_Hours", "Fertilizer_Type", "Growth_cm", "Growth_Photo_File"],
-                rows: [
-                    ["P01", "50", "2", "None", "2.1", "plant_01_small.jpg"],
-                    ["P02", "100", "6", "Type_A", "8.5", "plant_02_large.jpg"],
-                    ["P03", "200", "8", "Type_B", "4.2", "plant_03_med.jpg"],
-                    ["P04", "50", "8", "Type_A", "3.5", "plant_04_small.jpg"],
-                    ["P05", "100", "2", "Type_B", "3.0", "plant_05_small.jpg"],
-                    ["P06", "100", "6", "Type_A", "8.8", "plant_06_large.jpg"],
-                    ["P07", "200", "2", "None", "1.5", "plant_07_tiny.jpg"],
-                    ["P08", "100", "6", "Type_A", "8.4", "plant_08_large.jpg"],
-                    ["P09", "50", "4", "Type_B", "2.8", "plant_09_small.jpg"],
-                    ["P10", "200", "6", "None", "3.8", "plant_10_med.jpg"],
-                    ["P11", "100", "6", "Type_A", "8.7", "plant_11_large.jpg"],
-                    ["P12", "50", "8", "None", "2.5", "plant_12_small.jpg"],
-                    ["P13", "200", "8", "Type_A", "5.0", "plant_13_med.jpg"],
-                    ["P14", "100", "4", "Type_B", "4.5", "plant_14_med.jpg"],
-                    ["P15", "100", "6", "Type_A", "8.6", "plant_15_large.jpg"]
-                ]
-            },
-            {
-                name: "Dataset 5: Animal Shelter Adoptions",
-                headers: ["Animal_ID", "Species", "Age_Months", "Weight_kg", "Days_in_Shelter", "Intake_Audio_Recording"],
-                rows: [
-                    ["A01", "Dog", "2", "4.5", "3", "bark_happy.wav"],
-                    ["A02", "Cat", "36", "5.0", "45", "meow_quiet.wav"],
-                    ["A03", "Dog", "60", "22.0", "80", "bark_deep.wav"],
-                    ["A04", "Rabbit", "4", "1.2", "12", "silent.wav"],
-                    ["A05", "Cat", "3", "1.0", "5", "purr_loud.wav"],
-                    ["A06", "Dog", "84", "18.5", "110", "whimper.wav"],
-                    ["A07", "Dog", "4", "6.0", "4", "bark_playful.wav"],
-                    ["A08", "Cat", "48", "6.2", "60", "hiss.wav"],
-                    ["A09", "Rabbit", "24", "2.0", "35", "silent.wav"],
-                    ["A10", "Dog", "12", "15.0", "20", "bark_normal.wav"],
-                    ["A11", "Cat", "2", "0.8", "2", "meow_tiny.wav"],
-                    ["A12", "Dog", "120", "20.0", "150", "snore.wav"],
-                    ["A13", "Cat", "72", "4.5", "90", "meow_raspy.wav"],
-                    ["A14", "Rabbit", "6", "1.5", "15", "silent.wav"],
-                    ["A15", "Dog", "6", "8.0", "7", "panting.wav"]
-                ]
-            },
-            {
-                name: "Dataset 6: Smart Fitness Tracker",
-                headers: ["User_ID", "Daily_Steps", "Active_Minutes", "Avg_Heart_Rate", "Sleep_Quality"],
-                rows: [
-                    ["F01", "12500", "60", "68", "Excellent"],
-                    ["F02", "3200", "10", "82", "Poor"],
-                    ["F03", "15000", "75", "65", "Excellent"],
-                    ["F04", "5400", "20", "78", "Fair"],
-                    ["F05", "9800", "45", "72", "Good"],
-                    ["F06", "11000", "50", "70", "Good"],
-                    ["F07", "2500", "5", "85", "Poor"],
-                    ["F08", "14200", "65", "66", "Excellent"],
-                    ["F09", "6100", "25", "76", "Fair"],
-                    ["F10", "13000", "55", "69", "Excellent"],
-                    ["F11", "4000", "15", "80", "Poor"],
-                    ["F12", "10500", "48", "71", "Good"],
-                    ["F13", "16000", "80", "64", "Excellent"],
-                    ["F14", "4800", "18", "79", "Fair"],
-                    ["F15", "8500", "40", "74", "Good"]
-                ]
-            },
-            {
-                name: "Dataset 7: Online Store Product Reviews",
-                headers: ["Review_ID", "Category", "Price_USD", "Star_Rating", "Review_Text"],
-                rows: [
-                    ["R01", "Electronics", "899", "2", "\"Broke after a week. Not worth the high price.\""],
-                    ["R02", "Clothing", "25", "5", "\"Soft, fits well, great value!\""],
-                    ["R03", "Home", "45", "4", "\"Looks nice in my living room.\""],
-                    ["R04", "Electronics", "1200", "1", "\"Terrible customer service for such an expensive item.\""],
-                    ["R05", "Toys", "15", "5", "\"My kids love this cheap little toy.\""],
-                    ["R06", "Clothing", "30", "4", "\"Good shirt, a bit tight.\""],
-                    ["R07", "Electronics", "950", "2", "\"Glitchy screen. Expected better for the cost.\""],
-                    ["R08", "Home", "50", "5", "\"Perfect lamp for my desk.\""],
-                    ["R09", "Clothing", "20", "5", "\"Bought three of these, amazing price.\""],
-                    ["R10", "Electronics", "1500", "1", "\"Overpriced garbage. Do not buy.\""],
-                    ["R11", "Toys", "12", "4", "\"Simple and fun.\""],
-                    ["R12", "Home", "60", "3", "\"It's okay, nothing special.\""],
-                    ["R13", "Electronics", "850", "2", "\"Battery dies too fast on this premium model.\""],
-                    ["R14", "Clothing", "22", "5", "\"Very comfortable.\""],
-                    ["R15", "Toys", "18", "5", "\"Great birthday gift for the price.\""]
-                ]
-            },
-            {
-                name: "Dataset 8: Multiplayer Video Game Stats",
-                headers: ["Player_Tag", "Level", "In_A_Guild", "Quests_Completed", "Virtual_Gold_Collected"],
-                rows: [
-                    ["P_001", "5", "No", "12", "1500"],
-                    ["P_002", "45", "Yes", "110", "85000"],
-                    ["P_003", "8", "No", "15", "2200"],
-                    ["P_004", "60", "Yes", "155", "120000"],
-                    ["P_005", "12", "No", "25", "4000"],
-                    ["P_006", "55", "Yes", "140", "105000"],
-                    ["P_007", "4", "No", "10", "1200"],
-                    ["P_008", "48", "Yes", "125", "92000"],
-                    ["P_009", "15", "No", "30", "5500"],
-                    ["P_010", "65", "Yes", "170", "150000"],
-                    ["P_011", "9", "No", "20", "3000"],
-                    ["P_012", "50", "Yes", "130", "98000"],
-                    ["P_013", "6", "No", "14", "1800"],
-                    ["P_014", "42", "Yes", "105", "80000"],
-                    ["P_015", "11", "No", "22", "3500"]
-                ]
-            },
-            {
-                name: "Dataset 9: City Commuter Travel Times",
-                headers: ["Trip_ID", "Transport_Mode", "Distance_km", "Traffic_Level", "Travel_Time_Mins"],
-                rows: [
-                    ["C01", "Car", "5.0", "High", "45"],
-                    ["C02", "Bicycle", "5.0", "High", "25"],
-                    ["C03", "Subway", "10.0", "Low", "15"],
-                    ["C04", "Car", "5.0", "Low", "12"],
-                    ["C05", "Bicycle", "5.0", "Low", "20"],
-                    ["C06", "Subway", "10.0", "High", "18"],
-                    ["C07", "Car", "8.0", "High", "65"],
-                    ["C08", "Bicycle", "8.0", "High", "38"],
-                    ["C09", "Subway", "15.0", "Low", "22"],
-                    ["C10", "Car", "8.0", "Low", "18"],
-                    ["C11", "Bicycle", "8.0", "Low", "32"],
-                    ["C12", "Subway", "15.0", "High", "25"],
-                    ["C13", "Car", "3.0", "High", "30"],
-                    ["C14", "Bicycle", "3.0", "High", "15"],
-                    ["C15", "Car", "3.0", "Low", "8"]
-                ]
-            },
-            {
-                name: "Dataset 10: Smart Home Voice Commands",
-                headers: ["Command_ID", "Time_of_Day", "User_Profile", "Spoken_Text", "Audio_File_Name", "Device_Action"],
-                rows: [
-                    ["V01", "07:00", "Adult", "\"Turn on the coffee maker\"", "cmd_883.wav", "Appliance_On"],
-                    ["V02", "15:30", "Child", "\"Play cartoon theme songs\"", "cmd_884.wav", "Music_Play"],
-                    ["V03", "22:00", "Adult", "\"Turn off all the lights\"", "cmd_885.wav", "Lights_Off"],
-                    ["V04", "07:15", "Adult", "\"Read the morning news\"", "cmd_886.wav", "News_Brief"],
-                    ["V05", "16:00", "Child", "\"Tell me a joke\"", "cmd_887.wav", "Voice_Game"],
-                    ["V06", "22:30", "Adult", "\"Set alarm for 6 AM\"", "cmd_888.wav", "Alarm_Set"],
-                    ["V07", "07:30", "Adult", "\"What is the weather today?\"", "cmd_889.wav", "Weather_Check"],
-                    ["V08", "15:45", "Child", "\"Play animal sounds\"", "cmd_890.wav", "Music_Play"],
-                    ["V09", "23:00", "Adult", "\"Lock the front door\"", "cmd_891.wav", "Security_Lock"],
-                    ["V10", "06:45", "Adult", "\"Turn on kitchen lights\"", "cmd_892.wav", "Lights_On"],
-                    ["V11", "16:30", "Child", "\"How do you spell dinosaur?\"", "cmd_893.wav", "Web_Search"],
-                    ["V12", "22:15", "Adult", "\"Turn down the thermostat\"", "cmd_894.wav", "Climate_Control"],
-                    ["V13", "08:00", "Adult", "\"Start the robot vacuum\"", "cmd_895.wav", "Appliance_On"],
-                    ["V14", "17:00", "Child", "\"Play pop music\"", "cmd_896.wav", "Music_Play"],
-                    ["V15", "23:30", "Adult", "\"Turn off the TV\"", "cmd_897.wav", "Appliance_Off"]
-                ]
-            }
-        ];
+    <div class="reg-card relative bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-emerald-100">
+      <div class="text-center mb-6">
+        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 mb-3 shadow-inner">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 uppercase tracking-wider mb-2">
+          Intro to AI · Week 7
+        </span>
+        <h2 class="text-2xl font-extrabold text-gray-900">Be a Data Detective 🔍</h2>
+        <p class="text-xs text-gray-500 mt-1">Please enter your details to start the activity</p>
+      </div>
 
-        document.getElementById('generate-btn').addEventListener('click', () => {
-            // Select a random dataset
-            const randomIndex = Math.floor(Math.random() * datasets.length);
-            const dataset = datasets[randomIndex];
+      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Full Name <span class="text-red-500">*</span></label>
+          <input type="text" id="reg-name" placeholder="e.g. Alex Morgan"
+            class="reg-input w-full px-4 py-3 border border-gray-300 rounded-xl text-sm transition-all text-gray-900 placeholder-gray-400">
+          <p id="reg-name-err" class="text-xs text-red-500 mt-1 hidden">Please enter your full name.</p>
+        </div>
 
-            // Render Title
-            document.getElementById('dataset-title').textContent = dataset.name;
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">School / Student Email <span class="text-red-500">*</span></label>
+          <input type="email" id="reg-email" placeholder="alex@school.edu"
+            class="reg-input w-full px-4 py-3 border border-gray-300 rounded-xl text-sm transition-all text-gray-900 placeholder-gray-400">
+          <p id="reg-email-err" class="text-xs text-red-500 mt-1 hidden">Please enter a valid email address.</p>
+        </div>
 
-            // Render Headers
-            const thead = document.getElementById('table-head');
-            thead.innerHTML = '';
-            const headerRow = document.createElement('tr');
-            dataset.headers.forEach(header => {
-                const th = document.createElement('th');
-                th.textContent = header;
-                headerRow.appendChild(th);
-            });
-            thead.appendChild(headerRow);
+        <button type="submit"
+          class="w-full py-3.5 px-6 rounded-xl text-sm font-bold text-white shadow-lg shadow-emerald-600/30 transition-all hover:bg-emerald-700 active:scale-[0.99] flex items-center justify-center gap-2"
+          style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
+          <span>Start Investigation</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </button>
+      </form>
+    </div>
+  </div>
 
-            // Render Rows
-            const tbody = document.getElementById('table-body');
-            tbody.innerHTML = '';
-            dataset.rows.forEach(rowData => {
-                const tr = document.createElement('tr');
-                rowData.forEach(cellData => {
-                    const td = document.createElement('td');
-                    td.textContent = cellData;
-                    tr.appendChild(td);
-                });
-                tbody.appendChild(tr);
-            });
+  <!-- 2. MAIN CONTENT CONTAINER -->
+  <div id="main-content" class="max-w-3xl mx-auto px-4 pt-8">
 
-            // Show container
-            document.getElementById('data-container').style.display = 'block';
-        });
-    </script>
+    <!-- Header / Nav -->
+    <header class="mb-6">
+      <a href="index.html" class="inline-flex items-center text-xs font-bold text-emerald-600 hover:text-emerald-700 transition-colors mb-3">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Back to Course Hub
+      </a>
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <div class="inline-flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800">Week 7 Activity</span>
+            <span class="text-xs text-gray-500 font-medium">AI Ethics & Data Privacy</span>
+          </div>
+          <h1 class="text-3xl font-black text-gray-900 mt-1 tracking-tight">Be a Data Detective 🕵️‍♂️</h1>
+        </div>
+        <div id="user-badge" class="hidden text-xs bg-emerald-50 border border-emerald-200 text-emerald-800 px-3 py-1.5 rounded-full font-bold"></div>
+      </div>
+    </header>
+
+    <!-- Brief Card -->
+    <div class="bg-gradient-to-br from-emerald-600 to-teal-700 text-white rounded-3xl p-6 shadow-xl mb-8 relative overflow-hidden">
+      <div class="relative z-10">
+        <h2 class="text-lg font-extrabold mb-1">Your Mission</h2>
+        <p class="text-xs text-emerald-100 mb-4 leading-relaxed">
+          Explore a simple, anonymized dataset and uncover the story hidden inside the numbers, categories, and text.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-medium">
+          <div class="bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/20">
+            <span class="font-bold text-emerald-200 block mb-0.5">1. Select Dataset</span>
+            Pick or generate an anonymized dataset to interrogate.
+          </div>
+          <div class="bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/20">
+            <span class="font-bold text-emerald-200 block mb-0.5">2. Find 2 Patterns</span>
+            Identify data types and spot correlations across rows.
+          </div>
+          <div class="bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/20">
+            <span class="font-bold text-emerald-200 block mb-0.5">3. Predict with AI</span>
+            Discuss what AI could predict and potential pitfalls.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN FORM -->
+    <form id="detective-form" onsubmit="submitExercise(event)" novalidate>
+
+      <!-- STEP 1: DATASET SELECTOR & VIEWER -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-emerald-500 text-white font-black flex items-center justify-center text-sm shadow">1</div>
+            <div>
+              <h3 class="text-base font-bold text-gray-900">Choose Your Dataset</h3>
+              <p class="text-xs text-gray-500">Pick a dataset from the dropdown or click generate random</p>
+            </div>
+          </div>
+          <button type="button" onclick="generateRandomDataset()"
+            class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow transition-all flex items-center gap-1.5">
+            <span>🎲 Random Dataset</span>
+          </button>
+        </div>
+
+        <div class="mb-4">
+          <select id="dataset-select" onchange="selectDataset(this.value)"
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm font-bold text-gray-800 bg-gray-50 focus:outline-none focus:border-emerald-500">
+          </select>
+        </div>
+
+        <!-- Data Table Container -->
+        <div id="data-container" class="mt-4 border border-emerald-100 rounded-2xl p-4 bg-emerald-50/40">
+          <div id="dataset-title" class="text-sm font-black text-emerald-900 mb-3 flex items-center gap-2">
+            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+            </svg>
+            <span id="dataset-name-text">Loading dataset...</span>
+          </div>
+
+          <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white max-h-80 overflow-y-auto">
+            <table class="w-full text-left text-xs">
+              <thead id="table-head" class="bg-gray-100 text-gray-700 font-bold sticky top-0 border-b border-gray-200"></thead>
+              <tbody id="table-body" class="divide-y divide-gray-100 text-gray-600 font-mono"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: DATA TYPE IDENTIFICATION -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-full bg-emerald-500 text-white font-black flex items-center justify-center text-sm shadow">2</div>
+          <div>
+            <h3 class="text-base font-bold text-gray-900">Identify Data Types</h3>
+            <p class="text-xs text-gray-500">What kinds of data are present in your chosen dataset?</p>
+          </div>
+        </div>
+
+        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+          Select all data types present in this dataset: <span class="text-red-500">*</span>
+        </label>
+        <div id="data-type-pickers" class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+          <button type="button" class="opt-btn border border-gray-200 rounded-xl p-3 text-xs font-bold text-gray-600 bg-gray-50 text-center"
+            onclick="toggleDataType('Numerical / Quantitative', this)">🔢 Numerical</button>
+          <button type="button" class="opt-btn border border-gray-200 rounded-xl p-3 text-xs font-bold text-gray-600 bg-gray-50 text-center"
+            onclick="toggleDataType('Categorical / Nominal', this)">🏷️ Categorical</button>
+          <button type="button" class="opt-btn border border-gray-200 rounded-xl p-3 text-xs font-bold text-gray-600 bg-gray-50 text-center"
+            onclick="toggleDataType('Text / Open-Ended', this)">💬 Text</button>
+          <button type="button" class="opt-btn border border-gray-200 rounded-xl p-3 text-xs font-bold text-gray-600 bg-gray-50 text-center"
+            onclick="toggleDataType('Multimedia / Audio / File', this)">📁 File / Audio</button>
+        </div>
+        <p id="data-type-err" class="text-xs text-red-500 mb-3 hidden">Please select at least one data type.</p>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+            Which specific columns correspond to these data types? <span class="text-red-500">*</span>
+          </label>
+          <textarea id="data-types-explanation" rows="2" placeholder="e.g. Hours_Studied and Final_Test_Score are Numerical; Favorite_Subject is Categorical..."
+            class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs transition-all text-gray-900 placeholder-gray-400"></textarea>
+          <p id="explanation-err" class="text-xs text-red-500 mt-1 hidden">Please explain which columns match the selected data types.</p>
+        </div>
+      </div>
+
+      <!-- STEP 3: PATTERNS & CORRELATIONS -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-full bg-emerald-500 text-white font-black flex items-center justify-center text-sm shadow">3</div>
+          <div>
+            <h3 class="text-base font-bold text-gray-900">Uncover Patterns & Correlations</h3>
+            <p class="text-xs text-gray-500">Look closely at the rows and list at least two clear patterns</p>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+              Pattern / Correlation #1: <span class="text-red-500">*</span>
+            </label>
+            <textarea id="pattern-1" rows="2" placeholder="e.g. As temperature increases above 25°C, Iced Coffee sales increase while Hot Coffee sales drop."
+              class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs transition-all text-gray-900 placeholder-gray-400"></textarea>
+            <p id="p1-err" class="text-xs text-red-500 mt-1 hidden">Please describe pattern #1.</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+              Pattern / Correlation #2: <span class="text-red-500">*</span>
+            </label>
+            <textarea id="pattern-2" rows="2" placeholder="e.g. Rain and snow trigger high hot coffee sales regardless of the time of day."
+              class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs transition-all text-gray-900 placeholder-gray-400"></textarea>
+            <p id="p2-err" class="text-xs text-red-500 mt-1 hidden">Please describe pattern #2.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4: AI PREDICTIONS & RISKS -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-full bg-emerald-500 text-white font-black flex items-center justify-center text-sm shadow">4</div>
+          <div>
+            <h3 class="text-base font-bold text-gray-900">AI Predictions & Pitfalls</h3>
+            <p class="text-xs text-gray-500">Discuss how an AI algorithm would use this dataset</p>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+              What could an AI model predict or decide based on these patterns? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="ai-prediction" rows="2" placeholder="e.g. An AI inventory bot could predict coffee bean and ice supply orders based on weather forecasts."
+              class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs transition-all text-gray-900 placeholder-gray-400"></textarea>
+            <p id="pred-err" class="text-xs text-red-500 mt-1 hidden">Please explain what an AI model could predict.</p>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+              What could go wrong? (Biases, missing data, incorrect correlation vs causation): <span class="text-red-500">*</span>
+            </label>
+            <textarea id="ai-pitfalls" rows="2" placeholder="e.g. If a holiday or special event happened, the AI might misinterpret sales as solely weather-driven."
+              class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs transition-all text-gray-900 placeholder-gray-400"></textarea>
+            <p id="pitfall-err" class="text-xs text-red-500 mt-1 hidden">Please describe potential risks or pitfalls.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5: OPTIONAL CHARTING / VISUALIZATION IDEA -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 font-black flex items-center justify-center text-sm">5</div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="text-base font-bold text-gray-900">Visualize Your Data</h3>
+              <span class="text-[10px] font-bold uppercase px-2 py-0.5 bg-gray-100 text-gray-600 rounded-md">Optional</span>
+            </div>
+            <p class="text-xs text-gray-500">How would you present your findings visually?</p>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">
+            Chart / Visualization Plan:
+          </label>
+          <textarea id="chart-idea" rows="2" placeholder="e.g. A scatter plot placing 'Hours_Studied' on the X-axis and 'Final_Test_Score' on the Y-axis to show the positive correlation curve."
+            class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs transition-all text-gray-900 placeholder-gray-400"></textarea>
+        </div>
+      </div>
+
+      <!-- STEP 6: RATING & SUBMIT -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-8 text-center">
+        <h3 class="text-sm font-bold text-gray-900 mb-1">Activity Enjoyment Rating</h3>
+        <p class="text-xs text-gray-500 mb-3">How engaging was this Data Detective exercise?</p>
+
+        <div id="star-rating" class="flex justify-center gap-2 mb-4">
+          <button type="button" class="star-btn" onclick="setRating(1)">⭐</button>
+          <button type="button" class="star-btn" onclick="setRating(2)">⭐</button>
+          <button type="button" class="star-btn" onclick="setRating(3)">⭐</button>
+          <button type="button" class="star-btn" onclick="setRating(4)">⭐</button>
+          <button type="button" class="star-btn" onclick="setRating(5)">⭐</button>
+        </div>
+        <p id="rating-err" class="text-xs text-red-500 mb-3 hidden">Please select a star rating.</p>
+
+        <div id="submit-error-banner" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-medium"></div>
+
+        <button type="submit" id="submit-btn"
+          class="w-full py-4 px-8 rounded-2xl text-base font-extrabold text-white shadow-xl transition-all hover:bg-emerald-700 active:scale-[0.99] flex items-center justify-center gap-2"
+          style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
+          <span>Submit Detective Report 🚀</span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- 3. SUCCESS SCREEN -->
+  <div id="success-screen" class="hidden fixed inset-0 z-[120] bg-white flex items-center justify-center p-4">
+    <div class="max-w-md w-full text-center">
+      <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+      <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 mb-2">Case Closed! 🔎</span>
+      <h2 class="text-3xl font-black text-gray-900 mb-2">Great Job, <span id="success-first-name">Detective</span>!</h2>
+      <p class="text-xs text-gray-600 mb-6 leading-relaxed">
+        Your Data Detective report has been successfully recorded in the class database.
+      </p>
+
+      <a href="index.html"
+        class="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-lg transition-all">
+        <span>Back to Course Hub</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- 4. SUPABASE & JAVASCRIPT LOGIC -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let studentName = '';
+    let studentEmail = '';
+    let selectedDataTypes = [];
+    let enjoymentRating = 0;
+    let currentDataset = null;
+
+    const datasets = [
+      {
+        name: "Dataset 1: Student Study Habits & Performance",
+        headers: ["Student_ID", "Hours_Studied_Per_Week", "Average_Sleep_Hours", "Favorite_Subject", "Final_Test_Score"],
+        rows: [
+          ["S01", "12", "8.0", "Math", "92"],
+          ["S02", "4", "6.0", "History", "65"],
+          ["S03", "15", "7.5", "Science", "95"],
+          ["S04", "2", "5.5", "Art", "58"],
+          ["S05", "8", "7.0", "Math", "78"],
+          ["S06", "10", "8.5", "English", "88"],
+          ["S07", "5", "6.5", "Science", "70"],
+          ["S08", "14", "8.0", "History", "94"],
+          ["S09", "3", "5.0", "Art", "60"],
+          ["S10", "11", "7.5", "English", "85"],
+          ["S11", "7", "6.5", "Math", "75"],
+          ["S12", "16", "8.0", "Science", "98"],
+          ["S13", "1", "4.5", "History", "50"],
+          ["S14", "9", "7.0", "Art", "80"],
+          ["S15", "13", "8.5", "Math", "91"]
+        ]
+      },
+      {
+        name: "Dataset 2: Coffee Shop Daily Sales",
+        headers: ["Day_ID", "Temperature_C", "Weather_Condition", "Hot_Coffees_Sold", "Iced_Coffees_Sold"],
+        rows: [
+          ["D01", "10", "Rainy", "150", "20"],
+          ["D02", "12", "Cloudy", "145", "25"],
+          ["D03", "18", "Sunny", "110", "60"],
+          ["D04", "25", "Sunny", "70", "130"],
+          ["D05", "30", "Hot", "40", "180"],
+          ["D06", "28", "Sunny", "50", "160"],
+          ["D07", "15", "Rainy", "135", "30"],
+          ["D08", "9", "Snowy", "180", "10"],
+          ["D09", "11", "Cloudy", "140", "22"],
+          ["D10", "22", "Sunny", "85", "95"],
+          ["D11", "32", "Hot", "30", "195"],
+          ["D12", "26", "Cloudy", "60", "140"],
+          ["D13", "14", "Rainy", "130", "35"],
+          ["D14", "8", "Snowy", "175", "5"],
+          ["D15", "19", "Sunny", "95", "70"]
+        ]
+      },
+      {
+        name: "Dataset 3: Movie Streaming Platform",
+        headers: ["User_ID", "User_Age", "Subscription_Type", "Favorite_Genre", "Avg_Watch_Time_Mins", "Review_Snippet"],
+        rows: [
+          ["U101", "19", "Basic", "Action", "45", "\"Needs more explosions.\""],
+          ["U102", "45", "Premium", "Documentary", "120", "\"Very informative and well-researched.\""],
+          ["U103", "22", "Basic", "Sci-Fi", "50", "\"Cool special effects!\""],
+          ["U104", "55", "Premium", "Drama", "140", "\"Acting was superb and touching.\""],
+          ["U105", "16", "Basic", "Action", "40", "\"Fast paced and fun.\""],
+          ["U106", "62", "Premium", "Documentary", "110", "\"Fascinating look at nature.\""],
+          ["U107", "25", "Premium", "Sci-Fi", "130", "\"Loved the alien designs.\""],
+          ["U108", "48", "Basic", "Drama", "60", "\"A bit slow, but good.\""],
+          ["U109", "20", "Basic", "Action", "55", "\"Awesome fight scenes.\""],
+          ["U110", "50", "Premium", "Documentary", "115", "\"I learned so much from this.\""],
+          ["U111", "18", "Basic", "Comedy", "45", "\"Hilarious, laughed out loud.\""],
+          ["U112", "58", "Premium", "Drama", "135", "\"A masterpiece of storytelling.\""],
+          ["U113", "21", "Basic", "Sci-Fi", "50", "\"The ending was confusing.\""],
+          ["U114", "42", "Premium", "Documentary", "125", "\"Great historical footage.\""],
+          ["U115", "17", "Basic", "Comedy", "40", "\"Pretty funny movie.\""]
+        ]
+      },
+      {
+        name: "Dataset 4: Plant Growth Experiment",
+        headers: ["Plant_ID", "Water_Amount_ml", "Sunlight_Hours", "Fertilizer_Type", "Growth_cm", "Growth_Photo_File"],
+        rows: [
+          ["P01", "50", "2", "None", "2.1", "plant_01_small.jpg"],
+          ["P02", "100", "6", "Type_A", "8.5", "plant_02_large.jpg"],
+          ["P03", "200", "8", "Type_B", "4.2", "plant_03_med.jpg"],
+          ["P04", "50", "8", "Type_A", "3.5", "plant_04_small.jpg"],
+          ["P05", "100", "2", "Type_B", "3.0", "plant_05_small.jpg"],
+          ["P06", "100", "6", "Type_A", "8.8", "plant_06_large.jpg"],
+          ["P07", "200", "2", "None", "1.5", "plant_07_tiny.jpg"],
+          ["P08", "100", "6", "Type_A", "8.4", "plant_08_large.jpg"],
+          ["P09", "50", "4", "Type_B", "2.8", "plant_09_small.jpg"],
+          ["P10", "200", "6", "None", "3.8", "plant_10_med.jpg"],
+          ["P11", "100", "6", "Type_A", "8.7", "plant_11_large.jpg"],
+          ["P12", "50", "8", "None", "2.5", "plant_12_small.jpg"],
+          ["P13", "200", "8", "Type_A", "5.0", "plant_13_med.jpg"],
+          ["P14", "100", "4", "Type_B", "4.5", "plant_14_med.jpg"],
+          ["P15", "100", "6", "Type_A", "8.6", "plant_15_large.jpg"]
+        ]
+      },
+      {
+        name: "Dataset 5: Animal Shelter Adoptions",
+        headers: ["Animal_ID", "Species", "Age_Months", "Weight_kg", "Days_in_Shelter", "Intake_Audio_Recording"],
+        rows: [
+          ["A01", "Dog", "2", "4.5", "3", "bark_happy.wav"],
+          ["A02", "Cat", "36", "5.0", "45", "meow_quiet.wav"],
+          ["A03", "Dog", "60", "22.0", "80", "bark_deep.wav"],
+          ["A04", "Rabbit", "4", "1.2", "12", "silent.wav"],
+          ["A05", "Cat", "3", "1.0", "5", "purr_loud.wav"],
+          ["A06", "Dog", "84", "18.5", "110", "whimper.wav"],
+          ["A07", "Dog", "4", "6.0", "4", "bark_playful.wav"],
+          ["A08", "Cat", "48", "6.2", "60", "hiss.wav"],
+          ["A09", "Rabbit", "24", "2.0", "35", "silent.wav"],
+          ["A10", "Dog", "12", "15.0", "20", "bark_normal.wav"],
+          ["A11", "Cat", "2", "0.8", "2", "meow_tiny.wav"],
+          ["A12", "Dog", "120", "20.0", "150", "snore.wav"],
+          ["A13", "Cat", "72", "4.5", "90", "meow_raspy.wav"],
+          ["A14", "Rabbit", "6", "1.5", "15", "silent.wav"],
+          ["A15", "Dog", "6", "8.0", "7", "panting.wav"]
+        ]
+      },
+      {
+        name: "Dataset 6: Smart Fitness Tracker",
+        headers: ["User_ID", "Daily_Steps", "Active_Minutes", "Avg_Heart_Rate", "Sleep_Quality"],
+        rows: [
+          ["F01", "12500", "60", "68", "Excellent"],
+          ["F02", "3200", "10", "82", "Poor"],
+          ["F03", "15000", "75", "65", "Excellent"],
+          ["F04", "5400", "20", "78", "Fair"],
+          ["F05", "9800", "45", "72", "Good"],
+          ["F06", "11000", "50", "70", "Good"],
+          ["F07", "2500", "5", "85", "Poor"],
+          ["F08", "14200", "65", "66", "Excellent"],
+          ["F09", "6100", "25", "76", "Fair"],
+          ["F10", "13000", "55", "69", "Excellent"],
+          ["F11", "4000", "15", "80", "Poor"],
+          ["F12", "10500", "48", "71", "Good"],
+          ["F13", "16000", "80", "64", "Excellent"],
+          ["F14", "4800", "18", "79", "Fair"],
+          ["F15", "8500", "40", "74", "Good"]
+        ]
+      },
+      {
+        name: "Dataset 7: Online Store Product Reviews",
+        headers: ["Review_ID", "Category", "Price_USD", "Star_Rating", "Review_Text"],
+        rows: [
+          ["R01", "Electronics", "899", "2", "\"Broke after a week. Not worth the high price.\""],
+          ["R02", "Clothing", "25", "5", "\"Soft, fits well, great value!\""],
+          ["R03", "Home", "45", "4", "\"Looks nice in my living room.\""],
+          ["R04", "Electronics", "1200", "1", "\"Terrible customer service for such an expensive item.\""],
+          ["R05", "Toys", "15", "5", "\"My kids love this cheap little toy.\""],
+          ["R06", "Clothing", "30", "4", "\"Good shirt, a bit tight.\""],
+          ["R07", "Electronics", "950", "2", "\"Glitchy screen. Expected better for the cost.\""],
+          ["R08", "Home", "50", "5", "\"Perfect lamp for my desk.\""],
+          ["R09", "Clothing", "20", "5", "\"Bought three of these, amazing price.\""],
+          ["R10", "Electronics", "1500", "1", "\"Overpriced garbage. Do not buy.\""],
+          ["R11", "Toys", "12", "4", "\"Simple and fun.\""],
+          ["R12", "Home", "60", "3", "\"It's okay, nothing special.\""],
+          ["R13", "Electronics", "850", "2", "\"Battery dies too fast on this premium model.\""],
+          ["R14", "Clothing", "22", "5", "\"Very comfortable.\""],
+          ["R15", "Toys", "18", "5", "\"Great birthday gift for the price.\""]
+        ]
+      },
+      {
+        name: "Dataset 8: Multiplayer Video Game Stats",
+        headers: ["Player_Tag", "Level", "In_A_Guild", "Quests_Completed", "Virtual_Gold_Collected"],
+        rows: [
+          ["P_001", "5", "No", "12", "1500"],
+          ["P_002", "45", "Yes", "110", "85000"],
+          ["P_003", "8", "No", "15", "2200"],
+          ["P_004", "60", "Yes", "155", "120000"],
+          ["P_005", "12", "No", "25", "4000"],
+          ["P_006", "55", "Yes", "140", "105000"],
+          ["P_007", "4", "No", "10", "1200"],
+          ["P_008", "48", "Yes", "125", "92000"],
+          ["P_009", "15", "No", "30", "5500"],
+          ["P_010", "65", "Yes", "170", "150000"],
+          ["P_011", "9", "No", "20", "3000"],
+          ["P_012", "50", "Yes", "130", "98000"],
+          ["P_013", "6", "No", "14", "1800"],
+          ["P_014", "42", "Yes", "105", "80000"],
+          ["P_015", "11", "No", "22", "3500"]
+        ]
+      },
+      {
+        name: "Dataset 9: City Commuter Travel Times",
+        headers: ["Trip_ID", "Transport_Mode", "Distance_km", "Traffic_Level", "Travel_Time_Mins"],
+        rows: [
+          ["C01", "Car", "5.0", "High", "45"],
+          ["C02", "Bicycle", "5.0", "High", "25"],
+          ["C03", "Subway", "10.0", "Low", "15"],
+          ["C04", "Car", "5.0", "Low", "12"],
+          ["C05", "Bicycle", "5.0", "Low", "20"],
+          ["C06", "Subway", "10.0", "High", "18"],
+          ["C07", "Car", "8.0", "High", "65"],
+          ["C08", "Bicycle", "8.0", "High", "38"],
+          ["C09", "Subway", "15.0", "Low", "22"],
+          ["C10", "Car", "8.0", "Low", "18"],
+          ["C11", "Bicycle", "8.0", "Low", "32"],
+          ["C12", "Subway", "15.0", "High", "25"],
+          ["C13", "Car", "3.0", "High", "30"],
+          ["C14", "Bicycle", "3.0", "High", "15"],
+          ["C15", "Car", "3.0", "Low", "8"]
+        ]
+      },
+      {
+        name: "Dataset 10: Smart Home Voice Commands",
+        headers: ["Command_ID", "Time_of_Day", "User_Profile", "Spoken_Text", "Audio_File_Name", "Device_Action"],
+        rows: [
+          ["V01", "07:00", "Adult", "\"Turn on the coffee maker\"", "cmd_883.wav", "Appliance_On"],
+          ["V02", "15:30", "Child", "\"Play cartoon theme songs\"", "cmd_884.wav", "Music_Play"],
+          ["V03", "22:00", "Adult", "\"Turn off all the lights\"", "cmd_885.wav", "Lights_Off"],
+          ["V04", "07:15", "Adult", "\"Read the morning news\"", "cmd_886.wav", "News_Brief"],
+          ["V05", "16:00", "Child", "\"Tell me a joke\"", "cmd_887.wav", "Voice_Game"],
+          ["V06", "22:30", "Adult", "\"Set alarm for 6 AM\"", "cmd_888.wav", "Alarm_Set"],
+          ["V07", "07:30", "Adult", "\"What is the weather today?\"", "cmd_889.wav", "Weather_Check"],
+          ["V08", "15:45", "Child", "\"Play animal sounds\"", "cmd_890.wav", "Music_Play"],
+          ["V09", "23:00", "Adult", "\"Lock the front door\"", "cmd_891.wav", "Security_Lock"],
+          ["V10", "06:45", "Adult", "\"Turn on kitchen lights\"", "cmd_892.wav", "Lights_On"],
+          ["V11", "16:30", "Child", "\"How do you spell dinosaur?\"", "cmd_893.wav", "Web_Search"],
+          ["V12", "22:15", "Adult", "\"Turn down the thermostat\"", "cmd_894.wav", "Climate_Control"],
+          ["V13", "08:00", "Adult", "\"Start the robot vacuum\"", "cmd_895.wav", "Appliance_On"],
+          ["V14", "17:00", "Child", "\"Play pop music\"", "cmd_896.wav", "Music_Play"],
+          ["V15", "23:30", "Adult", "\"Turn off the TV\"", "cmd_897.wav", "Appliance_Off"]
+        ]
+      }
+    ];
+
+    // Page Init
+    window.addEventListener('DOMContentLoaded', () => {
+      populateDatasetSelect();
+      selectDataset(0);
+
+      const savedName = sessionStorage.getItem('introai_w07_data_detective_name');
+      const savedEmail = sessionStorage.getItem('introai_w07_data_detective_email');
+      if (savedName && savedEmail) {
+        document.getElementById('reg-name').value = savedName;
+        document.getElementById('reg-email').value = savedEmail;
+        applyRegistration(savedName, savedEmail);
+      }
+    });
+
+    function populateDatasetSelect() {
+      const select = document.getElementById('dataset-select');
+      select.innerHTML = datasets.map((ds, idx) => `
+        <option value="${idx}">${ds.name} (${ds.rows.length} rows)</option>
+      `).join('');
+    }
+
+    function selectDataset(idx) {
+      const index = parseInt(idx) || 0;
+      currentDataset = datasets[index];
+
+      document.getElementById('dataset-select').value = index;
+      document.getElementById('dataset-name-text').textContent = currentDataset.name;
+
+      // Render Headers
+      const thead = document.getElementById('table-head');
+      thead.innerHTML = `<tr>${currentDataset.headers.map(h => `<th class="p-2 border-b border-gray-200">${h}</th>`).join('')}</tr>`;
+
+      // Render Rows
+      const tbody = document.getElementById('table-body');
+      tbody.innerHTML = currentDataset.rows.map(row => `
+        <tr class="hover:bg-gray-50 border-b border-gray-100">${row.map(cell => `<td class="p-2">${cell}</td>`).join('')}</tr>
+      `).join('');
+    }
+
+    function generateRandomDataset() {
+      const randomIndex = Math.floor(Math.random() * datasets.length);
+      selectDataset(randomIndex);
+    }
+
+    // Registration Gate Logic
+    function handleRegistration(ev) {
+      ev.preventDefault();
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      let valid = true;
+
+      if (!name) {
+        document.getElementById('reg-name-err').classList.remove('hidden');
+        document.getElementById('reg-name').classList.add('error');
+        valid = false;
+      } else {
+        document.getElementById('reg-name-err').classList.add('hidden');
+        document.getElementById('reg-name').classList.remove('error');
+      }
+
+      if (!email || !email.includes('@')) {
+        document.getElementById('reg-email-err').classList.remove('hidden');
+        document.getElementById('reg-email').classList.add('error');
+        valid = false;
+      } else {
+        document.getElementById('reg-email-err').classList.add('hidden');
+        document.getElementById('reg-email').classList.remove('error');
+      }
+
+      if (valid) {
+        sessionStorage.setItem('introai_w07_data_detective_name', name);
+        sessionStorage.setItem('introai_w07_data_detective_email', email);
+        applyRegistration(name, email);
+      }
+    }
+
+    function applyRegistration(name, email) {
+      studentName = name;
+      studentEmail = email;
+
+      const overlay = document.getElementById('registration-overlay');
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.classList.add('hidden'), 400);
+
+      const userBadge = document.getElementById('user-badge');
+      userBadge.textContent = `👤 ${name}`;
+      userBadge.classList.remove('hidden');
+    }
+
+    // Data Type Toggle Buttons
+    function toggleDataType(val, btn) {
+      if (selectedDataTypes.includes(val)) {
+        selectedDataTypes = selectedDataTypes.filter(t => t !== val);
+        btn.classList.remove('selected');
+      } else {
+        selectedDataTypes.push(val);
+        btn.classList.add('selected');
+      }
+      document.getElementById('data-type-err').classList.add('hidden');
+    }
+
+    // Star Rating
+    function setRating(val) {
+      enjoymentRating = val;
+      const stars = document.querySelectorAll('#star-rating .star-btn');
+      stars.forEach((s, idx) => {
+        if (idx < val) s.classList.add('active');
+        else s.classList.remove('active');
+      });
+      document.getElementById('rating-err').classList.add('hidden');
+    }
+
+    // Form Submission
+    async function submitExercise(ev) {
+      ev.preventDefault();
+      const banner = document.getElementById('submit-error-banner');
+      banner.classList.add('hidden');
+
+      let valid = true;
+
+      // Validate Data Types
+      if (selectedDataTypes.length === 0) {
+        document.getElementById('data-type-err').classList.remove('hidden');
+        valid = false;
+      } else {
+        document.getElementById('data-type-err').classList.add('hidden');
+      }
+
+      // Validate Text Fields
+      const explanation = document.getElementById('data-types-explanation').value.trim();
+      if (!explanation) {
+        document.getElementById('explanation-err').classList.remove('hidden');
+        document.getElementById('data-types-explanation').classList.add('error');
+        valid = false;
+      } else {
+        document.getElementById('explanation-err').classList.add('hidden');
+        document.getElementById('data-types-explanation').classList.remove('error');
+      }
+
+      const p1 = document.getElementById('pattern-1').value.trim();
+      if (!p1) {
+        document.getElementById('p1-err').classList.remove('hidden');
+        document.getElementById('pattern-1').classList.add('error');
+        valid = false;
+      } else {
+        document.getElementById('p1-err').classList.add('hidden');
+        document.getElementById('pattern-1').classList.remove('error');
+      }
+
+      const p2 = document.getElementById('pattern-2').value.trim();
+      if (!p2) {
+        document.getElementById('p2-err').classList.remove('hidden');
+        document.getElementById('pattern-2').classList.add('error');
+        valid = false;
+      } else {
+        document.getElementById('p2-err').classList.add('hidden');
+        document.getElementById('pattern-2').classList.remove('error');
+      }
+
+      const prediction = document.getElementById('ai-prediction').value.trim();
+      if (!prediction) {
+        document.getElementById('pred-err').classList.remove('hidden');
+        document.getElementById('ai-prediction').classList.add('error');
+        valid = false;
+      } else {
+        document.getElementById('pred-err').classList.add('hidden');
+        document.getElementById('ai-prediction').classList.remove('error');
+      }
+
+      const pitfalls = document.getElementById('ai-pitfalls').value.trim();
+      if (!pitfalls) {
+        document.getElementById('pitfall-err').classList.remove('hidden');
+        document.getElementById('ai-pitfalls').classList.add('error');
+        valid = false;
+      } else {
+        document.getElementById('pitfall-err').classList.add('hidden');
+        document.getElementById('ai-pitfalls').classList.remove('error');
+      }
+
+      if (enjoymentRating === 0) {
+        document.getElementById('rating-err').classList.remove('hidden');
+        valid = false;
+      } else {
+        document.getElementById('rating-err').classList.add('hidden');
+      }
+
+      if (!valid) {
+        banner.textContent = "Please fill out all required fields marked in red.";
+        banner.classList.remove('hidden');
+        return;
+      }
+
+      // UI Loading state
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = `<span class="spinner"></span> <span>Submitting Report...</span>`;
+
+      const payload = {
+        student_name: studentName,
+        student_email: studentEmail,
+        dataset_chosen: currentDataset ? currentDataset.name : 'Unknown Dataset',
+        data_types_identified: selectedDataTypes.join(', '),
+        data_types_explanation: explanation,
+        pattern_1_description: p1,
+        pattern_2_description: p2,
+        ai_prediction_usecase: prediction,
+        ai_pitfalls_reflections: pitfalls,
+        chart_visualization_idea: document.getElementById('chart-idea').value.trim() || 'None',
+        enjoyment_rating: enjoymentRating
+      };
+
+      try {
+        const { error } = await sb.from('introai_week07_data_detective').insert([payload]);
+
+        if (error) {
+          if (error.code === '23505' || error.message.includes('unique constraint') || error.message.includes('duplicate key')) {
+            throw new Error("⚠️ You have already submitted this activity!");
+          }
+          throw error;
+        }
+
+        // Show Success Screen
+        const firstName = studentName.split(' ')[0] || 'Detective';
+        document.getElementById('success-first-name').textContent = firstName;
+        document.getElementById('success-screen').classList.remove('hidden');
+
+      } catch (err) {
+        console.error("Submission error:", err);
+        banner.textContent = err.message || "Failed to submit exercise. Please try again.";
+        banner.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerHTML = `<span>Submit Detective Report 🚀</span>`;
+      }
+    }
+  </script>
 </body>
 
 </html>
