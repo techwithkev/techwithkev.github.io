@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Build Your Own Dataset — Intro to AI · Week 7</title>
+  <meta name="description"
+    content="Week 7 Activity 3: Build Your Own Dataset. Design an AI dataset from scratch: choose a goal, define 4 features, build 5 sample rows, and audit your dataset for bias.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    #registration-overlay { transition: opacity 0.4s ease; }
+    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
+    #registration-overlay .reg-card {
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
+    }
+    #registration-overlay.hiding .reg-card {
+      transform: scale(0.95) translateY(-10px); opacity: 0;
+    }
+    .reg-input:focus {
+      outline: none; border-color: #d97706;
+      box-shadow: 0 0 0 3px rgba(217,119,6,0.15);
+    }
+    .reg-input.error {
+      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+    }
+    .form-input:focus {
+      outline: none; border-color: #d97706;
+      box-shadow: 0 0 0 3px rgba(217,119,6,0.1);
+    }
+    .form-input.error { border-color: #ef4444; }
+    .opt-btn {
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .opt-btn:hover { transform: translateY(-1px); }
+    .opt-btn.selected {
+      border-color: #d97706 !important;
+      background: #fef3c7 !important;
+      color: #78350f !important;
+      font-weight: 700;
+    }
+    .star-btn {
+      font-size: 24px;
+      cursor: pointer;
+      filter: grayscale(100%);
+      transition: filter 0.15s ease, transform 0.1s ease;
+    }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body class="bg-[#F9FAFB] text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- REGISTRATION GATE -->
+  <div id="registration-overlay"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+    style="background: linear-gradient(135deg, #78350f 0%, #d97706 55%, #78350f 100%);">
+
+    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
+        style="background: radial-gradient(circle, #fde68a, transparent);"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
+        style="background: radial-gradient(circle, #f59e0b, transparent);"></div>
+    </div>
+
+    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center bg-amber-100 text-amber-700">
+          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+          </svg>
+        </div>
+        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 bg-amber-100 text-amber-800">
+          Week 7 · Exercise 3
+        </div>
+        <h1 class="text-2xl font-black text-gray-900 tracking-tight">Build Your Own <span class="text-amber-600">Dataset</span></h1>
+        <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">Enter your details and group members to begin dataset design.</p>
+      </div>
+
+      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
+        <div class="space-y-4 mb-6">
+          <div>
+            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Your Full Name</label>
+            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Jane Smith"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name.</p>
+          </div>
+          <div>
+            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
+            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. jane@school.edu"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
+          </div>
+          <div>
+            <label for="reg-group" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Group Members (Optional)</label>
+            <input id="reg-group" type="text" placeholder="e.g. Jane, Alex, Sam"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" />
+          </div>
+        </div>
+        <button id="reg-submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700">
+          <span id="reg-btn-label">Begin Dataset Builder &#8594;</span>
+        </button>
+      </form>
+      <p class="text-center text-[10px] text-gray-400 font-medium mt-5">Saved to the Intro to AI student roster.</p>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main-content" class="max-w-3xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+      <div>
+        <a href="index.html"
+          class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-amber-600 mb-3 hover:text-amber-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">
+          Build Your Own <span class="text-amber-600">Dataset</span>
+        </h1>
+        <p class="text-gray-500 font-medium italic mt-1">Exploring AI Ethics & Dataset Design · Week 7 · Exercise 3</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-amber-50 border border-amber-200 text-amber-800 shadow-sm self-start md:self-auto">
+        Group Activity · 15m
+      </div>
+    </header>
+
+    <!-- Brief Card -->
+    <div class="rounded-3xl p-6 mb-8 border bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200 shadow-sm">
+      <div class="flex gap-4">
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 bg-amber-500 text-white shadow-md text-xl">
+          🛠️
+        </div>
+        <div>
+          <h2 class="text-lg font-black text-amber-950 mb-1">Become the AI Data Engineer</h2>
+          <p class="text-sm text-amber-900 leading-relaxed mb-3">
+            Before an AI model can predict anything, humans must collect and format training data.
+            In this activity, your team will <strong>choose an AI goal, design 4 features, build 5 training samples</strong>, and check for bias!
+          </p>
+          <ul class="text-xs text-amber-900 space-y-1 bg-white/70 backdrop-blur-sm p-4 rounded-xl border border-amber-200/60">
+            <li>🎯 <strong>Step 1</strong> — Choose an AI Goal (or create your own!).</li>
+            <li>💡 <strong>Step 2</strong> — Design 4 specific features + 1 target prediction label.</li>
+            <li>📝 <strong>Step 3</strong> — Fill in 5 realistic training data rows.</li>
+            <li>🔍 <strong>Step 4</strong> — Audit your dataset for bias and prep a 2-minute class presentation.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN FORM -->
+    <form id="build-dataset-form" onsubmit="submitExercise(event)" novalidate>
+
+      <!-- STEP 1: CHOOSE AI GOAL -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-amber-500">1</div>
+          <h2 class="text-base font-black text-gray-900">Step 1 — Choose Your AI Goal</h2>
+        </div>
+        <p class="text-xs text-gray-500 mb-4 ml-11">Select the mission your AI model will be trained to perform:</p>
+
+        <div class="space-y-3" id="goal-picker">
+          <button type="button" class="opt-btn w-full text-left p-4 rounded-2xl border border-gray-200 bg-gray-50 flex items-start gap-3"
+            onclick="setGoal('Option A', this)">
+            <span class="w-6 h-6 rounded-lg bg-amber-100 text-amber-800 text-xs font-black flex items-center justify-center flex-shrink-0 mt-0.5">A</span>
+            <div>
+              <p class="text-xs font-bold text-gray-900">School Subject Enjoyment Predictor</p>
+              <p class="text-xs text-gray-500 mt-0.5">An AI that predicts whether a student will enjoy a new school subject.</p>
+            </div>
+          </button>
+
+          <button type="button" class="opt-btn w-full text-left p-4 rounded-2xl border border-gray-200 bg-gray-50 flex items-start gap-3"
+            onclick="setGoal('Option B', this)">
+            <span class="w-6 h-6 rounded-lg bg-amber-100 text-amber-800 text-xs font-black flex items-center justify-center flex-shrink-0 mt-0.5">B</span>
+            <div>
+              <p class="text-xs font-bold text-gray-900">Weekend Activity Recommender</p>
+              <p class="text-xs text-gray-500 mt-0.5">An AI that recommends a weekend activity based on a person's profile.</p>
+            </div>
+          </button>
+
+          <button type="button" class="opt-btn w-full text-left p-4 rounded-2xl border border-gray-200 bg-gray-50 flex items-start gap-3"
+            onclick="setGoal('Option C', this)">
+            <span class="w-6 h-6 rounded-lg bg-amber-100 text-amber-800 text-xs font-black flex items-center justify-center flex-shrink-0 mt-0.5">C</span>
+            <div>
+              <p class="text-xs font-bold text-gray-900">Text Message Sentiment Classifier</p>
+              <p class="text-xs text-gray-500 mt-0.5">An AI that detects whether a short text message is friendly or unfriendly.</p>
+            </div>
+          </button>
+
+          <button type="button" class="opt-btn w-full text-left p-4 rounded-2xl border border-gray-200 bg-gray-50 flex items-start gap-3"
+            onclick="setGoal('Option Custom', this)">
+            <span class="w-6 h-6 rounded-lg bg-amber-100 text-amber-800 text-xs font-black flex items-center justify-center flex-shrink-0 mt-0.5">★</span>
+            <div class="flex-grow">
+              <p class="text-xs font-bold text-gray-900">Your Own Custom AI Idea!</p>
+              <p class="text-xs text-gray-500 mt-0.5">Describe your team's custom AI goal below.</p>
+            </div>
+          </button>
+        </div>
+        <p id="goal-error" class="hidden text-xs text-red-500 font-medium mt-2 ml-11">Please select an AI goal option.</p>
+
+        <!-- Custom Goal Input -->
+        <div id="custom-goal-container" class="hidden mt-4 ml-11">
+          <label for="custom-goal-input" class="block text-xs font-black uppercase tracking-widest text-amber-800 mb-1.5">Describe your custom AI Goal <span class="text-red-500">*</span></label>
+          <input id="custom-goal-input" type="text" placeholder="e.g. An AI that predicts which video game a player will like based on their gaming habits..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-amber-200 bg-amber-50/40 text-sm font-medium text-gray-900 placeholder-amber-400/80 transition-all" />
+          <p id="custom-goal-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe your custom AI goal.</p>
+        </div>
+      </div>
+
+      <!-- STEP 2: DESIGN FEATURES & LABEL -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-amber-500">2</div>
+          <h2 class="text-base font-black text-gray-900">Step 2 — Design Your Features & Target Label</h2>
+        </div>
+        <p class="text-xs text-gray-500 mb-5 ml-11">
+          What information (features) would help your AI make a good prediction? Be specific (e.g. "age" or "fav_genre" rather than "info").
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label for="feature-1-input" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Feature 1 Name <span class="text-red-500">*</span></label>
+            <input id="feature-1-input" type="text" placeholder="e.g. age, text_length, favorite_genre" oninput="updateTableHeaders()"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="feature-1-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter Feature 1 name.</p>
+          </div>
+
+          <div>
+            <label for="feature-2-input" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Feature 2 Name <span class="text-red-500">*</span></label>
+            <input id="feature-2-input" type="text" placeholder="e.g. study_hours, word_count, budget" oninput="updateTableHeaders()"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="feature-2-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter Feature 2 name.</p>
+          </div>
+
+          <div>
+            <label for="feature-3-input" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Feature 3 Name <span class="text-red-500">*</span></label>
+            <input id="feature-3-input" type="text" placeholder="e.g. prefers_outdoors, uses_emoji, grade_level" oninput="updateTableHeaders()"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="feature-3-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter Feature 3 name.</p>
+          </div>
+
+          <div>
+            <label for="feature-4-input" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Feature 4 Name <span class="text-red-500">*</span></label>
+            <input id="feature-4-input" type="text" placeholder="e.g. introverted, uppercase_words, free_time" oninput="updateTableHeaders()"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="feature-4-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter Feature 4 name.</p>
+          </div>
+        </div>
+
+        <div>
+          <label for="label-input" class="block text-xs font-black uppercase tracking-widest text-amber-800 mb-1.5">Target Label (What the AI predicts) <span class="text-red-500">*</span></label>
+          <input id="label-input" type="text" placeholder="e.g. will_enjoy (Yes/No), activity_type, sentiment (Friendly/Unfriendly)" oninput="updateTableHeaders()"
+            class="form-input w-full px-4 py-3 rounded-xl border border-amber-300 bg-amber-50/50 text-sm font-medium text-gray-900 placeholder-amber-400 transition-all" required />
+          <p id="label-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter the Target Label name.</p>
+        </div>
+      </div>
+
+      <!-- STEP 3: FILL IN YOUR DATASET -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-amber-500">3</div>
+            <h2 class="text-base font-black text-gray-900">Step 3 — Fill In Your Dataset</h2>
+          </div>
+          <span class="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
+            5 Samples
+          </span>
+        </div>
+        <p class="text-xs text-gray-500 mb-5 ml-11">
+          Invent 5 realistic sample rows for your training dataset. Headers update automatically based on your Step 2 inputs!
+        </p>
+
+        <!-- Dynamic Table -->
+        <div class="overflow-x-auto rounded-2xl border border-gray-200">
+          <table class="w-full text-left text-xs font-medium min-w-[600px]">
+            <thead class="bg-amber-600 text-white font-bold tracking-wider">
+              <tr>
+                <th class="p-3 text-center w-12 border-r border-amber-500">#</th>
+                <th class="p-3 border-r border-amber-500" id="th-f1">Feature 1</th>
+                <th class="p-3 border-r border-amber-500" id="th-f2">Feature 2</th>
+                <th class="p-3 border-r border-amber-500" id="th-f3">Feature 3</th>
+                <th class="p-3 border-r border-amber-500" id="th-f4">Feature 4</th>
+                <th class="p-3 bg-amber-700 text-amber-100" id="th-label">Label (Answer)</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 bg-gray-50/50">
+              <!-- ROW 1 -->
+              <tr>
+                <td class="p-3 text-center font-bold text-gray-500 bg-gray-100 border-r">1</td>
+                <td class="p-2 border-r"><input id="r1-f1" type="text" placeholder="Value 1" class="form-input w-full p-2 rounded-lg border border-gray-200 text-xs" required /></td>
+                <td class="p-2 border-r"><input id="r1-f2" type="text" placeholder="Value 2" class="form-input w-full p-2 rounded-lg border border-gray-200 text-xs" required /></td>
+                <td class="p-2 border-r"><input id="r1-f3" type="text" placeholder="Value 3" class="form-input w-full p-2 rounded-lg border border-gray-200 text-xs" required /></td>
+                <td class="p-2 border-r"><input id="r1-f4" type="text" placeholder="Value 4" class="form-input w-full p-2 rounded-lg border border-gray-200 text-xs" required /></td>
+                <td class="p-2 bg-amber-50/40"><input id="r1-label" type="text" placeholder="Label answer" class="form-input w-full p-2 rounded-lg border border-amber-300 text-xs font-bold text-amber-900" required /></td>
+              </tr>
+              <!-- ROW 2 -->
+              <tr>
+                <td class="p-3 text-center font-bold text-gray-500 bg-gray-100 border-r">2</td>
+                <td class="p-2 border-r"><input id="r2-f1" type="text" placeholder="Value 1" class="form-input w-full p-2 rounded-lg border border-gray-200 text-xs" required /></td>
+                <td class="p-2 border-r"><input id="r2-f2" type="text" placeholder="Value 2" class="form-input w-full p-2 rounded-lg border border-gray-200 text-xs" required /></td>
+                <td class="p-2 border-r"><input id="r2-f3" type="text" placeholder="Value 3" class="form-input w-full p-2 rounded-lg border border-gray-200 text-xs" required /></td>
+                <td class="p-2 border-r"><input id="r2-f4" type="text" placeholder="Value 4" class="form-input w-full p-2 rounded-lg border border-gray-200 text-xs" required /></td>
+                <td class="p-2 bg-amber-50/40"><input id="r2-label" type="text" placeholder="Label answer" class="form-input w-full p-2 rounded-lg border border-amber-300 text-xs font-bold text-amber-900" required /></td>
+              </tr>
+              <!-- ROW 3 -->
+              <tr>
+                <td class="p-3 text-center font-bold text-gray-500 bg-gray-100 border-r">3</td>
+                <td class="p-2 border-r"><input id="r3-f1" type="text" placeholder="Value 1" class="form-input w-full p-2 rounded-lg border border-gray-200 text-xs" required /></td>
+                <td class="p-2 border-r"><input id="r3-f2" type="text" placeholder="Value 2" class="form-input w-full p-2 rounded-lg border border-gray-200 text-xs" required /></td>
+                <td class="p-2 border-r"><input id="r3-f3" type="text" placeholder="Value 3" class="form-input w-full p-2 rounded-lg border border-gray-200 text-xs" required /></td>
+                <td class="p-2 border-r"><input id="r3-f4" type="text" placeholder="Value 4" class="form-input w-full p-2 rounded-lg border border-gray-200 text-xs" required /></td>
+                <td class="p-2 bg-amber-50/40"><input id="r3-label" type="text" placeholder="Label answer" class="form-input w-full p-2 rounded-lg border border-amber-300 text-xs font-bold text-amber-900" required /></td>
+              </tr>
+              <!-- ROW 4 -->
+              <tr>
+                <td class="p-3 text-center font-bold text-gray-500 bg-gray-100 border-r">4</td>
+                <td class="p-2 border-r"><input id="r4-f1" type="text" placeholder="Value 1" class="form-input w-full p-2 rounded-lg border border-gray-200 text-xs" required /></td>
+                <td class="p-2 border-r"><input id="r4-f2" type="text" placeholder="Value 2" class="form-input w-full p-2 rounded-lg border border-gray-200 text-xs" required /></td>
+                <td class="p-2 border-r"><input id="r4-f3" type="text" placeholder="Value 3" class="form-input w-full p-2 rounded-lg border border-gray-200 text-xs" required /></td>
+                <td class="p-2 border-r"><input id="r4-f4" type="text" placeholder="Value 4" class="form-input w-full p-2 rounded-lg border border-gray-200 text-xs" required /></td>
+                <td class="p-2 bg-amber-50/40"><input id="r4-label" type="text" placeholder="Label answer" class="form-input w-full p-2 rounded-lg border border-amber-300 text-xs font-bold text-amber-900" required /></td>
+              </tr>
+              <!-- ROW 5 -->
+              <tr>
+                <td class="p-3 text-center font-bold text-gray-500 bg-gray-100 border-r">5</td>
+                <td class="p-2 border-r"><input id="r5-f1" type="text" placeholder="Value 1" class="form-input w-full p-2 rounded-lg border border-gray-200 text-xs" required /></td>
+                <td class="p-2 border-r"><input id="r5-f2" type="text" placeholder="Value 2" class="form-input w-full p-2 rounded-lg border border-gray-200 text-xs" required /></td>
+                <td class="p-2 border-r"><input id="r5-f3" type="text" placeholder="Value 3" class="form-input w-full p-2 rounded-lg border border-gray-200 text-xs" required /></td>
+                <td class="p-2 border-r"><input id="r5-f4" type="text" placeholder="Value 4" class="form-input w-full p-2 rounded-lg border border-gray-200 text-xs" required /></td>
+                <td class="p-2 bg-amber-50/40"><input id="r5-label" type="text" placeholder="Label answer" class="form-input w-full p-2 rounded-lg border border-amber-300 text-xs font-bold text-amber-900" required /></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p id="table-error" class="hidden text-xs text-red-500 font-medium mt-2">Please complete all 5 rows of dataset values.</p>
+      </div>
+
+      <!-- STEP 4: SPOT YOUR OWN BIAS -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-amber-500">4</div>
+          <h2 class="text-base font-black text-gray-900">Step 4 — Spot Your Own Bias</h2>
+        </div>
+        <p class="text-xs text-gray-500 mb-5 ml-11">
+          No dataset is perfect. Analyze your training data for gaps or hidden assumptions.
+        </p>
+
+        <div class="space-y-5">
+          <div>
+            <label for="dataset-bias-reflection" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              1. Describe one way your dataset might be biased or incomplete. Which group of real people might your AI treat unfairly? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="dataset-bias-reflection" rows="3"
+              placeholder="e.g. All 5 of our sample rows are teenagers, so our AI would fail for adults or younger children..."
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="dataset-bias-error" class="hidden text-xs text-red-500 font-medium mt-1">Please answer this reflection question.</p>
+          </div>
+
+          <div>
+            <label for="fairness-fix-reflection" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              2. How could you change your dataset to make it fairer? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="fairness-fix-reflection" rows="3"
+              placeholder="e.g. Collect samples from diverse age groups, include different cultural backgrounds, and expand to 100+ rows..."
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="fairness-fix-error" class="hidden text-xs text-red-500 font-medium mt-1">Please answer how you would make it fairer.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRESENTATION CALLOUT -->
+      <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-amber-500">🎤</div>
+          <h2 class="text-base font-black text-amber-950">Presenting to the Class! (2 Minutes)</h2>
+        </div>
+        <p class="text-xs text-amber-900 leading-relaxed mb-3">
+          Be ready to stand up and share your dataset with the class! Make sure your team can answer:
+        </p>
+        <ul class="text-xs text-amber-900 space-y-1 bg-white/80 p-3.5 rounded-xl border border-amber-200">
+          <li>1️⃣ <strong>Your AI's Goal</strong> — What is your model trying to predict?</li>
+          <li>2️⃣ <strong>The 4 Features</strong> — What inputs did you pick and why?</li>
+          <li>3️⃣ <strong>One Sample Row</strong> — Read out Row #1 as an example.</li>
+          <li>4️⃣ <strong>The Bias You Found</strong> — What bias did you discover and how will you fix it?</li>
+        </ul>
+      </div>
+
+      <!-- ENJOYMENT RATING -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">How much did you enjoy this activity?</label>
+        <div class="flex gap-1" id="enjoyment-stars" role="group" aria-label="Enjoyment rating">
+          <button type="button" class="star-btn" data-val="1" onclick="setRating(1)" aria-label="1 star">⭐</button>
+          <button type="button" class="star-btn" data-val="2" onclick="setRating(2)" aria-label="2 stars">⭐</button>
+          <button type="button" class="star-btn" data-val="3" onclick="setRating(3)" aria-label="3 stars">⭐</button>
+          <button type="button" class="star-btn" data-val="4" onclick="setRating(4)" aria-label="4 stars">⭐</button>
+          <button type="button" class="star-btn" data-val="5" onclick="setRating(5)" aria-label="5 stars">⭐</button>
+        </div>
+        <p id="rating-error" class="hidden text-xs text-red-500 font-medium mt-1">Please select an enjoyment rating.</p>
+      </div>
+
+      <!-- SUBMIT -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-12">
+        <p id="form-error" class="hidden text-sm font-medium text-red-500 mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+          <span id="form-error-text">Please complete all required fields.</span>
+        </p>
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700">
+          <span id="submit-label">Submit Dataset &#8594;</span>
+        </button>
+        <p class="text-center text-xs text-gray-400 font-medium mt-3">Results will load to the teacher dashboard.</p>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div id="success-screen"
+    class="hidden fixed inset-0 z-[90] bg-[#F9FAFB] flex items-center justify-center p-4">
+    <div class="text-center max-w-md bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+      <div class="w-20 h-20 mx-auto rounded-2xl mb-6 flex items-center justify-center bg-amber-100 text-amber-700 shadow-sm">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <div class="inline-block px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 bg-amber-50 text-amber-800">
+        Dataset Created!
+      </div>
+      <h2 class="text-3xl font-black text-gray-900 mb-3 tracking-tight">
+        Awesome dataset, <span id="success-name" class="text-amber-600"></span>!
+      </h2>
+      <p class="text-gray-500 mb-8 leading-relaxed text-sm">
+        Your dataset and bias analysis have been saved. Get ready to present your 2-minute summary to the class!
+      </p>
+      <a href="index.html"
+        class="inline-flex items-center gap-2 text-white font-black py-3.5 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm bg-gradient-to-r from-amber-500 to-amber-600">
+        Return to Course Hub
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+    const TABLE = 'introai_week07_build_dataset';
+
+    let studentName = '', studentEmail = '', groupMembers = '';
+    let selectedGoalOption = '';
+    let enjoymentRating = 0;
+
+    function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+    async function handleRegistration(ev) {
+      ev.preventDefault();
+      const nameEl = document.getElementById('reg-name');
+      const emailEl = document.getElementById('reg-email');
+      const nameErr = document.getElementById('reg-name-error');
+      const emailErr = document.getElementById('reg-email-error');
+      let ok = true;
+
+      nameEl.classList.remove('error'); nameErr.classList.add('hidden');
+      emailEl.classList.remove('error'); emailErr.classList.add('hidden');
+
+      if (!nameEl.value.trim()) { nameEl.classList.add('error'); nameErr.classList.remove('hidden'); ok = false; }
+      if (!emailEl.value.trim() || !validateEmail(emailEl.value.trim())) { emailEl.classList.add('error'); emailErr.classList.remove('hidden'); ok = false; }
+      if (!ok) return;
+
+      const btn = document.getElementById('reg-submit-btn');
+      btn.disabled = true;
+      document.getElementById('reg-btn-label').innerHTML = '<span class="spinner"></span> Starting\u2026';
+
+      studentName = nameEl.value.trim();
+      studentEmail = emailEl.value.trim();
+      groupMembers = document.getElementById('reg-group').value.trim();
+
+      sessionStorage.setItem('introai_w07_build_dataset_name', studentName);
+      sessionStorage.setItem('introai_w07_build_dataset_email', studentEmail);
+
+      const overlay = document.getElementById('registration-overlay');
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.remove(), 450);
+    }
+
+    (function restoreSession() {
+      const n = sessionStorage.getItem('introai_w07_build_dataset_name');
+      const e = sessionStorage.getItem('introai_w07_build_dataset_email');
+      if (n && e) {
+        studentName = n; studentEmail = e;
+        document.getElementById('registration-overlay').remove();
+      }
+    })();
+
+    function setGoal(opt, btn) {
+      selectedGoalOption = opt;
+      document.querySelectorAll('#goal-picker .opt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById('goal-error').classList.add('hidden');
+
+      const customContainer = document.getElementById('custom-goal-container');
+      if (opt === 'Option Custom') {
+        customContainer.classList.remove('hidden');
+      } else {
+        customContainer.classList.add('hidden');
+      }
+    }
+
+    function updateTableHeaders() {
+      const f1 = document.getElementById('feature-1-input').value.trim() || 'Feature 1';
+      const f2 = document.getElementById('feature-2-input').value.trim() || 'Feature 2';
+      const f3 = document.getElementById('feature-3-input').value.trim() || 'Feature 3';
+      const f4 = document.getElementById('feature-4-input').value.trim() || 'Feature 4';
+      const label = document.getElementById('label-input').value.trim() || 'Label (Answer)';
+
+      document.getElementById('th-f1').textContent = f1;
+      document.getElementById('th-f2').textContent = f2;
+      document.getElementById('th-f3').textContent = f3;
+      document.getElementById('th-f4').textContent = f4;
+      document.getElementById('th-label').textContent = label;
+    }
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#enjoyment-stars .star-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx < val);
+      });
+      document.getElementById('rating-error').classList.add('hidden');
+    }
+
+    async function supabaseInsert(payload) {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!resp.ok) { const t = await resp.text(); throw new Error(`HTTP ${resp.status}: ${t}`); }
+    }
+
+    async function submitExercise(ev) {
+      ev.preventDefault();
+      let ok = true;
+
+      // Goal validation
+      if (!selectedGoalOption) {
+        document.getElementById('goal-error').classList.remove('hidden'); ok = false;
+      }
+
+      if (selectedGoalOption === 'Option Custom') {
+        const customVal = document.getElementById('custom-goal-input').value.trim();
+        document.getElementById('custom-goal-input').classList.toggle('error', !customVal);
+        document.getElementById('custom-goal-error').classList.toggle('hidden', !!customVal);
+        if (!customVal) ok = false;
+      }
+
+      // Feature & Label validation
+      const featureInputs = [
+        { id: 'feature-1-input', errId: 'feature-1-error' },
+        { id: 'feature-2-input', errId: 'feature-2-error' },
+        { id: 'feature-3-input', errId: 'feature-3-error' },
+        { id: 'feature-4-input', errId: 'feature-4-error' },
+        { id: 'label-input', errId: 'label-error' },
+      ];
+
+      featureInputs.forEach(f => {
+        const el = document.getElementById(f.id);
+        const val = el ? el.value.trim() : '';
+        if (el) el.classList.toggle('error', !val);
+        const errEl = document.getElementById(f.errId);
+        if (errEl) errEl.classList.toggle('hidden', !!val);
+        if (!val) ok = false;
+      });
+
+      // Table rows validation (Row 1 to Row 5)
+      let tableOk = true;
+      for (let r = 1; r <= 5; r++) {
+        ['f1', 'f2', 'f3', 'f4', 'label'].forEach(c => {
+          const inputEl = document.getElementById(`r${r}-${c}`);
+          const val = inputEl ? inputEl.value.trim() : '';
+          if (inputEl) inputEl.classList.toggle('error', !val);
+          if (!val) tableOk = false;
+        });
+      }
+      document.getElementById('table-error').classList.toggle('hidden', tableOk);
+      if (!tableOk) ok = false;
+
+      // Reflection validation
+      const biasVal = document.getElementById('dataset-bias-reflection').value.trim();
+      document.getElementById('dataset-bias-reflection').classList.toggle('error', !biasVal);
+      document.getElementById('dataset-bias-error').classList.toggle('hidden', !!biasVal);
+      if (!biasVal) ok = false;
+
+      const fixVal = document.getElementById('fairness-fix-reflection').value.trim();
+      document.getElementById('fairness-fix-reflection').classList.toggle('error', !fixVal);
+      document.getElementById('fairness-fix-error').classList.toggle('hidden', !!fixVal);
+      if (!fixVal) ok = false;
+
+      // Rating validation
+      if (enjoymentRating === 0) {
+        document.getElementById('rating-error').classList.remove('hidden'); ok = false;
+      }
+
+      if (!ok) {
+        document.getElementById('form-error').classList.remove('hidden');
+        document.querySelector('[id$="-error"]:not(.hidden)')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      document.getElementById('form-error').classList.add('hidden');
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting\u2026';
+
+      const payload = {
+        student_name:              studentName,
+        student_email:             studentEmail,
+        group_members:             groupMembers || null,
+
+        ai_goal_option:            selectedGoalOption,
+        custom_ai_goal:            selectedGoalOption === 'Option Custom' ? document.getElementById('custom-goal-input').value.trim() : null,
+
+        feature_1_name:            document.getElementById('feature-1-input').value.trim(),
+        feature_2_name:            document.getElementById('feature-2-input').value.trim(),
+        feature_3_name:            document.getElementById('feature-3-input').value.trim(),
+        feature_4_name:            document.getElementById('feature-4-input').value.trim(),
+        target_label_name:         document.getElementById('label-input').value.trim(),
+
+        row_1_f1:                  document.getElementById('r1-f1').value.trim(),
+        row_1_f2:                  document.getElementById('r1-f2').value.trim(),
+        row_1_f3:                  document.getElementById('r1-f3').value.trim(),
+        row_1_f4:                  document.getElementById('r1-f4').value.trim(),
+        row_1_label:               document.getElementById('r1-label').value.trim(),
+
+        row_2_f1:                  document.getElementById('r2-f1').value.trim(),
+        row_2_f2:                  document.getElementById('r2-f2').value.trim(),
+        row_2_f3:                  document.getElementById('r2-f3').value.trim(),
+        row_2_f4:                  document.getElementById('r2-f4').value.trim(),
+        row_2_label:               document.getElementById('r2-label').value.trim(),
+
+        row_3_f1:                  document.getElementById('r3-f1').value.trim(),
+        row_3_f2:                  document.getElementById('r3-f2').value.trim(),
+        row_3_f3:                  document.getElementById('r3-f3').value.trim(),
+        row_3_f4:                  document.getElementById('r3-f4').value.trim(),
+        row_3_label:               document.getElementById('r3-label').value.trim(),
+
+        row_4_f1:                  document.getElementById('r4-f1').value.trim(),
+        row_4_f2:                  document.getElementById('r4-f2').value.trim(),
+        row_4_f3:                  document.getElementById('r4-f3').value.trim(),
+        row_4_f4:                  document.getElementById('r4-f4').value.trim(),
+        row_4_label:               document.getElementById('r4-label').value.trim(),
+
+        row_5_f1:                  document.getElementById('r5-f1').value.trim(),
+        row_5_f2:                  document.getElementById('r5-f2').value.trim(),
+        row_5_f3:                  document.getElementById('r5-f3').value.trim(),
+        row_5_f4:                  document.getElementById('r5-f4').value.trim(),
+        row_5_label:               document.getElementById('r5-label').value.trim(),
+
+        dataset_bias_reflection:   biasVal,
+        fairness_fix_reflection:   fixVal,
+
+        enjoyment_rating:          enjoymentRating,
+        submitted_at:              new Date().toISOString(),
+      };
+
+      try {
+        await supabaseInsert(payload);
+        document.getElementById('success-name').textContent = studentName.split(' ')[0];
+        document.getElementById('success-screen').classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        console.error('[Week 7 Build Dataset] Supabase error:', err.message);
+        btn.disabled = false;
+        document.getElementById('submit-label').textContent = 'Submit Dataset \u2192';
+        if (err.message.includes('409') || err.message.includes('duplicate key')) {
+          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f You have already submitted this activity!';
+        } else {
+          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f Network error. Please check your internet or notify your teacher.';
+        }
+        document.getElementById('form-error').classList.remove('hidden');
+      }
+    }
+  </script>
+
+</body>
+</html>
