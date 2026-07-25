@@ -1,5 +1,7 @@
--- Create table for Week 7 Activity: Data Detective
+-- ── Table: introai_week07_data_detective ─────────────────────────────────────
 -- Path: sql/create_introai_week07_data_detective.sql
+-- Week 7 Exercise: Be a Data Detective!
+-- ─────────────────────────────────────────────────────────────────────────────
 
 CREATE TABLE IF NOT EXISTS introai_week07_data_detective (
   id                        BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -19,13 +21,27 @@ CREATE TABLE IF NOT EXISTS introai_week07_data_detective (
   CONSTRAINT uq_w07_data_detective_email UNIQUE (student_email)
 );
 
--- Enable Row Level Security (RLS)
+COMMENT ON TABLE introai_week07_data_detective
+  IS 'Week 7 Exercise: Be a Data Detective! Anonymized dataset exploration & pattern discovery.';
+
+-- ── Row-Level Security ────────────────────────────────────────────────────────
 ALTER TABLE introai_week07_data_detective ENABLE ROW LEVEL SECURITY;
 
--- Allow anonymous users to submit exercise responses
-CREATE POLICY "anon_insert_w07_data_detective"
-  ON introai_week07_data_detective FOR INSERT TO anon WITH CHECK (true);
+-- Drop existing policies if re-running
+DROP POLICY IF EXISTS "anon_insert_w07_data_detective" ON introai_week07_data_detective;
+DROP POLICY IF EXISTS "auth_select_w07_data_detective" ON introai_week07_data_detective;
+DROP POLICY IF EXISTS "public_insert_w07_data_detective" ON introai_week07_data_detective;
 
--- Allow authenticated users (teachers) to view responses
+-- Allow anonymous & public users (students) to INSERT submissions
+CREATE POLICY "anon_insert_w07_data_detective"
+  ON introai_week07_data_detective
+  FOR INSERT
+  TO anon, public
+  WITH CHECK (true);
+
+-- Allow authenticated users (teachers) to SELECT records
 CREATE POLICY "auth_select_w07_data_detective"
-  ON introai_week07_data_detective FOR SELECT TO authenticated USING (true);
+  ON introai_week07_data_detective
+  FOR SELECT
+  TO authenticated
+  USING (true);

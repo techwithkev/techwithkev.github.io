@@ -3671,7 +3671,7 @@
     async function loadAll() {
       document.getElementById('last-refresh').textContent = 'Refreshing…';
       try {
-        const [hw, exam, codes, sa, sh, cb, cp, pd, ws, ap, pc, mg, isSwap, tm, bta, ayf, dsr, kc] = await Promise.all([
+        const [hw, exam, codes, sa, sh, cb, cp, pd, ws, ap, pc, mg, isSwap, tm, bta, ayf, dsr, kc, stb, da, bd, dd] = await Promise.all([
           sb.from('homework_submissions').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('caio_final_exam_results').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('access_codes').select('*').order('created_at', { ascending: false }).limit(10000),
@@ -3689,7 +3689,11 @@
           sb.from('introai_week06_be_the_algorithm').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('introai_week06_analyze_your_feed').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('introai_week06_design_a_recommender').select('*').order('submitted_at', { ascending: false }).limit(10000),
-          sb.from('introai_week06_knowledge_check').select('*').order('submitted_at', { ascending: false }).limit(10000)
+          sb.from('introai_week06_knowledge_check').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('introai_week07_spot_the_bias').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('introai_week07_data_audit').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('introai_week07_build_dataset').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('introai_week07_data_detective').select('*').order('submitted_at', { ascending: false }).limit(10000)
         ]);
 
         if (hw.error) { console.error('hw error:', hw.error); toast('⚠ Homework load error: ' + hw.error.message); }
@@ -3710,6 +3714,10 @@
         if (ayf.error) { console.error('ayf error:', ayf.error); toast('⚠ Analyze feed error: ' + ayf.error.message); }
         if (dsr.error) { console.error('dsr error:', dsr.error); toast('⚠ Design recommender error: ' + dsr.error.message); }
         if (kc.error) { console.error('kc error:', kc.error); toast('⚠ Knowledge check error: ' + kc.error.message); }
+        if (stb && stb.error) { console.error('stb error:', stb.error); toast('⚠ Spot the bias error: ' + stb.error.message); }
+        if (da && da.error) { console.error('da error:', da.error); toast('⚠ Data audit error: ' + da.error.message); }
+        if (bd && bd.error) { console.error('bd error:', bd.error); toast('⚠ Build dataset error: ' + bd.error.message); }
+        if (dd && dd.error) { console.error('dd error:', dd.error); toast('⚠ Data detective error: ' + dd.error.message); }
 
         hwData = hw.data || [];
         examData = exam.data || [];
@@ -3729,8 +3737,12 @@
         ayfData = ayf.data || [];
         dsrData = dsr.data || [];
         kcData = kc.data || [];
+        stbData = stb ? (stb.data || []) : [];
+        daData = da ? (da.data || []) : [];
+        bdData = bd ? (bd.data || []) : [];
+        ddData = dd ? (dd.data || []) : [];
 
-        console.log(`Loaded: ${hwData.length} hw, ${examData.length} exam, ${codesData.length} codes, ${saData.length} SA, ${shData.length} SH, ${cbData.length} CB, ${cpData.length} CP, ${pdData.length} PD, ${wsData.length} WS, ${apData.length} AP, ${pcData.length} PC, ${mgData.length} MG, ${isData.length} IS, ${tmData.length} TM, ${btaData.length} BTA, ${ayfData.length} AYF, ${dsrData.length} DSR, ${kcData.length} KC rows`);
+        console.log(`Loaded: ${hwData.length} hw, ${examData.length} exam, ${codesData.length} codes, ${saData.length} SA, ${shData.length} SH, ${cbData.length} CB, ${cpData.length} CP, ${pdData.length} PD, ${wsData.length} WS, ${apData.length} AP, ${pcData.length} PC, ${mgData.length} MG, ${isData.length} IS, ${tmData.length} TM, ${btaData.length} BTA, ${ayfData.length} AYF, ${dsrData.length} DSR, ${kcData.length} KC, ${stbData.length} STB, ${daData.length} DA, ${bdData.length} BD, ${ddData.length} DD rows`);
 
         populateFilters();
         renderOverview();
