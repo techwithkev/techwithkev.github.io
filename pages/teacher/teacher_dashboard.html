@@ -3967,7 +3967,7 @@
     async function loadAll() {
       document.getElementById('last-refresh').textContent = 'Refreshing…';
       try {
-        const [hw, exam, codes, sa, sh, cb, cp, pd, ws, ap, pc, mg, isSwap, tm, bta, ayf, dsr, kc, stb, da, bd, dd, testSub, testCodes, bct, bds, ftd, pvp, met] = await Promise.all([
+        const [hw, exam, codes, sa, sh, cb, cp, pd, ws, ap, pc, mg, isSwap, tm, bta, ayf, dsr, kc, stb, da, bd, dd, testSub, testCodes, bct, bds, ftd, pvp, met, caioOld] = await Promise.all([
           sb.from('homework_submissions').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('caio_final_exam_results').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('access_codes').select('*').order('created_at', { ascending: false }).limit(10000),
@@ -3996,7 +3996,8 @@
           sb.from('introai_week08_bias_detective_stations').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('introai_week08_fix_the_dataset').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('introai_week08_promise_vs_problem').select('*').order('submitted_at', { ascending: false }).limit(10000),
-          sb.from('introai_week08_mini_ethics_trial').select('*').order('submitted_at', { ascending: false }).limit(10000)
+          sb.from('introai_week08_mini_ethics_trial').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('caio_test_results').select('*').order('submitted_at', { ascending: false }).limit(10000)
         ]);
 
         if (hw.error) { console.error('hw error:', hw.error); toast('⚠ Homework load error: ' + hw.error.message); }
@@ -4022,8 +4023,11 @@
         if (bd && bd.error) { console.error('bd error:', bd.error); }
         if (dd && dd.error) { console.error('dd error:', dd.error); }
 
-        // Build access_code → cohort lookup from test_access_codes
+        // Build access_code → cohort lookup from BOTH access_codes and test_access_codes
         const codeToCohorMap = {};
+        (codes && codes.data ? codes.data : []).forEach(c => {
+          if (c.code) codeToCohorMap[c.code.toUpperCase()] = c.cohort || '';
+        });
         (testCodes && testCodes.data ? testCodes.data : []).forEach(c => {
           if (c.code) codeToCohorMap[c.code.toUpperCase()] = c.cohort || 'aijr';
         });
@@ -4084,8 +4088,57 @@
           created_at: c.created_at
         }));
 
+        // Normalize caio_final_exam_results (access code in access_codes table)
+        const normalizedCaioFinal = (exam.data || []).map(r => ({
+          id: r.id,
+          student_name: r.student_name,
+          cohort: r.access_code ? (codeToCohorMap[(r.access_code || '').toUpperCase()] || '') : '',
+          test_id: 'Classes 1–7 Final Exam (Legacy)',
+          access_code: r.access_code,
+          mcq_score: r.mcq_score ?? 0,
+          blank_score: r.blank_score ?? 0,
+          auto_score: r.auto_score ?? ((r.mcq_score ?? 0) + (r.blank_score ?? 0)),
+          total_possible: 60,
+          pct: r.pct ?? Math.round(((r.auto_score ?? 0) / 60) * 100),
+          question_detail: r.mcq_details || {},
+          mcq_details: r.mcq_details,
+          // Flat blank columns → items[] format for the renderer
+          q16_items: [r.q16_b1,r.q16_b2,r.q16_b3,r.q16_b4,r.q16_b5,r.q16_b6].filter(Boolean).map(v=>({val:v,ok:null})),
+          q17_items: [],
+          q18_items: [],
+          q19_items: [r.q19_b1,r.q19_b2,r.q19_b3,r.q19_b4,r.q19_b5,r.q19_b6,r.q19_b7].filter(Boolean).map(v=>({val:v,ok:null})),
+          q20_items: [r.q20_b1,r.q20_b2].filter(Boolean).map(v=>({val:v,ok:null})),
+          q21_text: r.q21_text || '',
+          started_at: r.started_at,
+          submitted_at: r.submitted_at
+        }));
+
+        // Normalize caio_test_results (no access code — older cohort, cohort unknown)
+        const normalizedCaioOld = (caioOld && caioOld.data ? caioOld.data : []).map(r => ({
+          id: r.id,
+          student_name: r.student_name,
+          cohort: '',  // No access code — show under all cohorts
+          test_id: 'Classes 1–7 Test (Older Cohort)',
+          access_code: null,
+          mcq_score: r.mcq_score ?? 0,
+          blank_score: r.blank_score ?? 0,
+          auto_score: r.auto_score ?? ((r.mcq_score ?? 0) + (r.blank_score ?? 0)),
+          total_possible: 60,
+          pct: Math.round(((r.auto_score ?? 0) / 60) * 100),
+          question_detail: r.mcq_details || {},
+          mcq_details: r.mcq_details,
+          q16_items: [r.q16_b1,r.q16_b2,r.q16_b3,r.q16_b4,r.q16_b5,r.q16_b6].filter(Boolean).map(v=>({val:v,ok:null})),
+          q17_items: [],
+          q18_items: [],
+          q19_items: [r.q19_b1,r.q19_b2,r.q19_b3,r.q19_b4,r.q19_b5,r.q19_b6,r.q19_b7].filter(Boolean).map(v=>({val:v,ok:null})),
+          q20_items: [r.q20_b1,r.q20_b2].filter(Boolean).map(v=>({val:v,ok:null})),
+          q21_text: r.q21_text || '',
+          started_at: null,
+          submitted_at: r.submitted_at
+        }));
+
         hwData = hw.data || [];
-        examData = [...normalizedTestSub, ...(exam.data || [])];
+        examData = [...normalizedTestSub, ...normalizedCaioFinal, ...normalizedCaioOld];
         codesData = [...normalizedTestCodes, ...(codes.data || [])];
         saData = sa.data || [];
         shData = sh.data || [];
@@ -4159,7 +4212,8 @@
       const classes = [...new Set(hwData.map(r => r.class_number))].sort((a, b) => a - b);
       const cohorts = [...new Set([
         ...hwData.map(r => r.cohort).filter(Boolean),
-        ...codesData.map(r => r.cohort).filter(Boolean)
+        ...codesData.map(r => r.cohort).filter(Boolean),
+        ...examData.map(r => r.cohort).filter(Boolean)
       ])].sort();
 
       // Sidebar global cohort selector
@@ -4197,6 +4251,7 @@
       renderOverview();
       renderHWTable();
       renderClassTiles();
+      renderExamTable();
       renderCodesTable();
     }
 
