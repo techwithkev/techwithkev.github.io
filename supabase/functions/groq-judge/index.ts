@@ -88,16 +88,16 @@ Deno.serve(async (req) => {
     }
 
     if (action === 'crossex') {
-      const sysPrompt = `TASK: You are cross-examining the student who is roleplaying as "${role}". Formulate 1 sharp, authoritative, judicial follow-up cross-examination question in character to challenge their testimony ethically. Keep it concise (under 50 words). Maintain all guardrails.`;
-      const usrPrompt = `Opening Testimony submitted by ${role}:\n"${argument}"\n\nCross-examine this student:`;
+      const sysPrompt = `You are The Honorable AI Judge. The student is roleplaying as "${role}". You MUST read their exact opening testimony, quote or reference a specific detail they wrote, and ask 1 sharp, highly tailored follow-up question challenging that exact point. Do NOT ask a generic question. Maintain all guardrails.`;
+      const usrPrompt = `STUDENT ROLE: ${role}\nSTUDENT OPENING TESTIMONY:\n"${argument}"\n\nAsk 1 sharp cross-examination question directly addressing what the student wrote above:`;
 
       const responseText = await callGroq(sysPrompt, usrPrompt, groqKey);
       return json({ response: responseText });
     }
 
     if (action === 'verdict') {
-      const sysPrompt = `TASK: Formulate an official 3-sentence Court Ruling detailing: (1) Finding of Liability & Fault, (2) Mandatory Remediation (dataset re-auditing), and (3) Policy Directive for future medical AI models. Keep it authoritative, educational, and under 80 words. Maintain all guardrails.`;
-      const usrPrompt = `Case Record:\n- Role: ${role}\n- Opening Testimony: "${argument}"\n- Cross-Exam Q&A: "${qa || ''}"\n\nIssue Court Ruling:`;
+      const sysPrompt = `You are The Honorable AI Judge rendering a court verdict. Read the student's exact testimony and Q&A response below. Issue a specific 3-sentence Court Ruling directly referencing their arguments. Maintain all guardrails.`;
+      const usrPrompt = `CASE RECORD:\n- Student Role: ${role}\n- Opening Testimony: "${argument}"\n- Cross-Exam Q&A: "${qa || ''}"\n\nIssue an official 3-sentence Court Ruling referencing their specific testimony:`;
 
       const responseText = await callGroq(sysPrompt, usrPrompt, groqKey);
       return json({ response: responseText });
