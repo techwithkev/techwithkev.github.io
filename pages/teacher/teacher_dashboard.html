@@ -4067,6 +4067,7 @@
           code: c.code,
           cohort: c.cohort || 'aijr',
           class_number: c.test_id || 'Classes 1–7 Test',
+          class_label: c.test_id === 'classes1to7_test' ? 'Classes 1–7 Exam' : (c.test_id || 'Exam'),
           is_active: c.is_active,
           uses_count: c.uses_count,
           max_uses: c.max_uses,
@@ -4756,7 +4757,7 @@
         return `<tr>
             <td class="text-mono" style="font-size:14px;font-weight:500;letter-spacing:2px">${esc(r.code)}</td>
             <td><span class="badge badge-gray">${esc(r.cohort || '—')}</span></td>
-            <td><span class="badge badge-teal">Class ${r.class_number}</span></td>
+            <td><span class="badge badge-teal">${r.class_label || ('Class ' + r.class_number)}</span></td>
             <td><span class="badge ${badgeCls}">${label}</span></td>
             <td class="text-mono">${r.uses_count}</td>
             <td class="text-mono">${r.max_uses}</td>
