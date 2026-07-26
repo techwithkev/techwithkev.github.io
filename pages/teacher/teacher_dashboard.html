@@ -3874,10 +3874,13 @@
     // SUPABASE INIT & AUTH
     // ════════════════════════════════════════════════════════════════════════════
     function initSupabase() {
-      sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+      if (!sb && typeof supabase !== 'undefined') {
+        sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+      }
     }
 
     async function doLogin() {
+      initSupabase();
       const email = document.getElementById('login-email').value.trim();
       const pwd = document.getElementById('login-password').value;
       const errEl = document.getElementById('login-error');
@@ -3893,9 +3896,15 @@
 
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('app').style.display = 'block';
-        const name = data.user.email.split('@')[0];
+        const name = (data.user?.email || 'Teacher').split('@')[0];
         document.getElementById('teacher-name').textContent = name.charAt(0).toUpperCase() + name.slice(1);
-        await loadAll();
+
+        try {
+          await loadAll();
+        } catch (loadErr) {
+          console.error('Data load error after sign-in:', loadErr);
+          toast('Signed in, but data load encountered an issue: ' + loadErr.message);
+        }
       } catch (e) {
         errEl.textContent = e.message || 'Sign-in failed. Check credentials.';
         btn.disabled = false;
@@ -4715,196 +4724,90 @@
       let r;
       let title = "";
       if (type === 'hw') {
-        r = hwData.find(x => x.id === id);
-        title = "Homework Submission Detail";
+        r = hwData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Homework Submission Detail";
       } else if (type === 'exam') {
-        r = examData.find(x => x.id === id);
-        title = "Exam Result Detail";
+        r = examData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Exam Result Detail";
       } else if (type === 'sa') {
-        r = saData.find(x => x.id === id);
-        title = "Self-Assessment Detail";
+        r = saData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Self-Assessment Detail";
       } else if (type === 'sh') {
-        r = shData.find(x => x.id === id);
-        title = "Scavenger Hunt Detail";
+        r = shData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Scavenger Hunt Detail";
       } else if (type === 'cb') {
-        r = cbData.find(x => x.id === id);
-        title = "Chatbot Exercise Detail";
+        r = cbData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Chatbot Exercise Detail";
       } else if (type === 'cp') {
-        r = cpData.find(x => x.id === id);
-        title = "Creative Prompting Detail";
+        r = cpData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Creative Prompting Detail";
       } else if (type === 'pd') {
-        r = pdData.find(x => x.id === id);
-        title = "Persona Detective Detail";
+        r = pdData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Persona Detective Detail";
       } else if (type === 'ws') {
-        r = wsData.find(x => x.id === id);
-        title = "Co-Writer Story Detail";
+        r = wsData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Co-Writer Story Detail";
       } else if (type === 'ap') {
-        r = apData.find(x => x.id === id);
-        title = "AI Pictionary Detail";
+        r = apData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — AI Pictionary Detail";
       } else if (type === 'pc') {
-        r = pcData.find(x => x.id === id);
-        title = "Prompt Comparison Detail";
+        r = pcData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Prompt Comparison Detail";
       } else if (type === 'mg') {
-        r = mgData.find(x => x.id === id);
-        title = "Music Generation Detail";
+        r = mgData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Music Generation Detail";
       } else if (type === 'is') {
-        r = isData.find(x => x.id === id);
-        title = "Instrument Swap Detail";
+        r = isData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Instrument Swap Detail";
       } else if (type === 'tm') {
-        r = tmData.find(x => x.id === id);
-        title = "Teachable Machine Model Detail";
+        r = tmData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Teachable Machine Model Detail";
       } else if (type === 'bta') {
-        r = btaData.find(x => x.id === id);
-        title = "Be the Algorithm Detail";
+        r = btaData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Be the Algorithm Detail";
       } else if (type === 'ayf') {
-        r = ayfData.find(x => x.id === id);
-        title = "Analyze Your Feed Detail";
+        r = ayfData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Analyze Your Feed Detail";
       } else if (type === 'dsr') {
-        r = dsrData.find(x => x.id === id);
-        title = "Design a Recommender Detail";
+        r = dsrData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Design a Recommender Detail";
       } else if (type === 'kc') {
-        r = kcData.find(x => x.id === id);
-        title = "Knowledge Check Quiz Detail";
+        r = kcData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Knowledge Check Quiz Detail";
       } else if (type === 'stb') {
-        r = stbData.find(x => x.id === id);
-        title = "Spot the Bias Detail";
+        r = stbData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Spot the Bias Detail";
       } else if (type === 'da') {
-        r = daData.find(x => x.id === id);
-        title = "Data Audit Detail";
+        r = daData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Data Audit Detail";
       } else if (type === 'bd') {
-        r = bdData.find(x => x.id === id);
-        title = "Build Your Own Dataset Detail";
-      } else if (type === 'bct') {
-        r = bctData.find(x => x.id === id);
-        title = "The Bias Card Twist Detail";
-      } else if (type === 'bds') {
-        r = bdsData.find(x => x.id === id);
-        title = "Bias Detective Stations Detail";
-      } else if (type === 'ftd') {
-        r = ftdData.find(x => x.id === id);
-        title = "Fix the Dataset Detail";
-      } else if (type === 'pvp') {
-        r = pvpData.find(x => x.id === id);
-        title = "Promise vs. Problem Placemat Detail";
-      } else if (type === 'met') {
-        r = metData.find(x => x.id === id);
-        title = "Mini Ethics Trial & AI Judge Detail";
-      }
-
-      if (!r) return;
-
-      if (type === 'bct') {
-        document.getElementById('modal-title').textContent = esc(r.student_name || "Detail View") + " — The Bias Card Twist";
-        bodyHtml = `
-          <div class="field-label">Student / Group</div>
-          <div class="field-value"><strong>${esc(r.student_name)}</strong> ${r.group_members ? `(Group: ${esc(r.group_members)})` : ''}</div>
-
-          <div class="field-label" style="margin-top:12px;">1. Chosen Local Problem</div>
-          <div class="field-value"><span class="badge badge-gold">${esc(r.local_problem || '—')}</span></div>
-
-          <div class="field-label" style="margin-top:12px;">Initial AI Solution Sketch</div>
-          <div class="field-value">${esc(r.initial_ai_solution || '—')}</div>
-
-          <div class="field-label" style="margin-top:12px;">2. Twist Card Revealed</div>
-          <div class="field-value" style="color:#b45309; background:#fffbeb; border-color:#fde68a;"><strong>${esc(r.twist_card || '—')}</strong></div>
-
-          <div class="field-label" style="margin-top:12px;">3. What Breaks Now?</div>
-          <div class="field-value">${esc(r.what_breaks || '—')}</div>
-
-          <div class="field-label" style="margin-top:12px;">Who Gets Left Out?</div>
-          <div class="field-value" style="color:#991b1b; background:#fef2f2; border-color:#fecaca;">${esc(r.who_left_out || '—')}</div>
-
-          <div class="field-label" style="margin-top:12px;">4. Debrief Reflection</div>
-          <div class="field-value">${esc(r.debrief_reflection || '—')}</div>
-        `;
-      } else if (type === 'bds') {
-        document.getElementById('modal-title').textContent = esc(r.student_name || "Detail View") + " — Bias Detective Stations";
-        bodyHtml = `
-          <div class="field-label">Student / Group</div>
-          <div class="field-value"><strong>${esc(r.student_name)}</strong> ${r.group_members ? `(Group: ${esc(r.group_members)})` : ''}</div>
-
-          <div class="field-label" style="margin-top:12px;">Station 1: Resume-Screening Tool</div>
-          <div class="field-value"><strong>Source:</strong> ${esc(r.st1_bias_source || '—')}<br><strong>Who Gets Hurt:</strong> ${esc(r.st1_who_gets_hurt || '—')}</div>
-
-          <div class="field-label" style="margin-top:12px;">Station 2: Voice Assistant & Accents</div>
-          <div class="field-value"><strong>Source:</strong> ${esc(r.st2_bias_source || '—')}<br><strong>Who Gets Hurt:</strong> ${esc(r.st2_who_gets_hurt || '—')}</div>
-
-          <div class="field-label" style="margin-top:12px;">Station 3: Heart Disease Predictor</div>
-          <div class="field-value"><strong>Source:</strong> ${esc(r.st3_bias_source || '—')}<br><strong>Who Gets Hurt:</strong> ${esc(r.st3_who_gets_hurt || '—')}</div>
-
-          <div class="field-label" style="margin-top:12px;">Station 4: Photo-Tagging Skin Tones</div>
-          <div class="field-value"><strong>Source:</strong> ${esc(r.st4_bias_source || '—')}<br><strong>Who Gets Hurt:</strong> ${esc(r.st4_who_gets_hurt || '—')}</div>
-
-          <div class="field-label" style="margin-top:12px;">Class Presentation Share</div>
-          <div class="field-value" style="color:#0e7490; background:#ecfeff; border-color:#a5f3fc;">${esc(r.favorite_station_share || '—')}</div>
-        `;
-      } else if (type === 'ftd') {
-        document.getElementById('modal-title').textContent = esc(r.student_name || "Detail View") + " — Fix the Dataset";
-        bodyHtml = `
-          <div class="field-label">Student / Partner</div>
-          <div class="field-value"><strong>${esc(r.student_name)}</strong> ${r.partner_name ? `(Partner: ${esc(r.partner_name)})` : ''}</div>
-
-          <div class="field-label" style="margin-top:12px;">Dataset Summary (Before ➔ After)</div>
-          <div class="field-value">
-            <span class="badge badge-red">Initial: ${esc(r.initial_dataset_summary || '—')}</span><br>
-            <span class="badge badge-green" style="margin-top:4px;display:inline-block">Final: ${esc(r.final_dataset_summary || '—')}</span>
-          </div>
-
-          <div class="field-label" style="margin-top:12px;">Changes Explanation ("I added/removed because...")</div>
-          <div class="field-value">${esc(r.changes_explanation || '—')}</div>
-
-          <div class="field-label" style="margin-top:12px;">Debrief Reflection (What was given up or added?)</div>
-          <div class="field-value">${esc(r.debrief_reflection || '—')}</div>
-        `;
-      } else if (type === 'pvp') {
-        document.getElementById('modal-title').textContent = esc(r.student_name || "Detail View") + " — Promise vs. Problem Placemat";
-        bodyHtml = `
-          <div class="field-label">Student / Partner</div>
-          <div class="field-value"><strong>${esc(r.student_name)}</strong> ${r.partner_name ? `(Partner: ${esc(r.partner_name)})` : ''}</div>
-
-          <div class="field-label" style="margin-top:12px;">1. AlphaFold 🧬</div>
-          <div class="field-value"><strong>Promise:</strong> ${esc(r.alphafold_promise || '—')}<br><strong>Problem:</strong> ${esc(r.alphafold_problem || '—')}</div>
-
-          <div class="field-label" style="margin-top:12px;">2. Woebot 💬</div>
-          <div class="field-value"><strong>Promise:</strong> ${esc(r.woebot_promise || '—')}<br><strong>Problem:</strong> ${esc(r.woebot_problem || '—')}</div>
-
-          <div class="field-label" style="margin-top:12px;">3. BeMyEyes 👁️</div>
-          <div class="field-value"><strong>Promise:</strong> ${esc(r.bemyeyes_promise || '—')}<br><strong>Problem:</strong> ${esc(r.bemyeyes_problem || '—')}</div>
-
-          <div class="field-label" style="margin-top:12px;">4. Ocean Cleanup 🌊</div>
-          <div class="field-value"><strong>Promise:</strong> ${esc(r.ocean_cleanup_promise || '—')}<br><strong>Problem:</strong> ${esc(r.ocean_cleanup_problem || '—')}</div>
-
-          <div class="field-label" style="margin-top:12px;">Debrief Reflection (Hardest problem to find)</div>
-          <div class="field-value">${esc(r.debrief_reflection || '—')}</div>
-        `;
-      } else if (type === 'met') {
-        document.getElementById('modal-title').textContent = esc(r.student_name || "Detail View") + " — Mini Ethics Trial & AI Judge";
-        bodyHtml = `
-          <div class="field-label">Student & Role</div>
-          <div class="field-value"><strong>${esc(r.student_name)}</strong> — <span class="badge badge-teal">${esc(r.role_selected || '—')}</span></div>
-
-          <div class="field-label" style="margin-top:12px;">2-Minute Opening Testimony</div>
-          <div class="field-value">${esc(r.case_argument || '—')}</div>
-
-          <div class="field-label" style="margin-top:12px;">⚡ Groq AI Judge Cross-Examination & Q&A Response</div>
-          <div class="field-value" style="color:#b45309; background:#fffbeb; border-color:#fde68a;">${esc(r.followup_qa || '—')}</div>
-
-          <div class="field-label" style="margin-top:12px;">🏛️ Final Verdict & Court Ruling</div>
-          <div class="field-value" style="color:#991b1b; background:#fef2f2; border-color:#fecaca;"><strong>${esc(r.verdict_ruling || '—')}</strong></div>
-
-          <div class="field-label" style="margin-top:12px;">Class Debrief Reflection</div>
-          <div class="field-value">${esc(r.debrief_reflection || '—')}</div>
-        `;
+        r = bdData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Build Your Own Dataset Detail";
       } else if (type === 'dd') {
-        r = ddData.find(x => x.id === id);
-        title = "Data Detective Detail";
+        r = ddData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Data Detective Detail";
+      } else if (type === 'bct') {
+        r = bctData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — The Bias Card Twist Detail";
+      } else if (type === 'bds') {
+        r = bdsData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Bias Detective Stations Detail";
+      } else if (type === 'ftd') {
+        r = ftdData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Fix the Dataset Detail";
+      } else if (type === 'pvp') {
+        r = pvpData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Promise vs. Problem Placemat Detail";
+      } else if (type === 'met') {
+        r = metData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Mini Ethics Trial & AI Judge Detail";
       }
 
       if (!r) return;
+      document.getElementById('modal-title').textContent = title;
+      let bodyHtml = '';
 
       if (type === 'hw') {
-        document.getElementById('modal-title').textContent = esc(r.student_name || "Detail View") + " — Homework Submission Detail";
-
         let qDetail = r.question_detail;
         if (typeof qDetail === 'string') {
           try { qDetail = JSON.parse(qDetail); } catch(e) {}
@@ -4991,7 +4894,7 @@
           `;
         }
 
-        const bodyHtml = `
+        bodyHtml = `
           <div style="padding:20px;">
             <!-- Header Summary Card -->
             <div style="background:var(--navy); color:#fff; border-radius:12px; padding:20px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
@@ -5039,7 +4942,7 @@
       const keys = Object.keys(r);
       const filtered = keys.filter(k => k !== 'id');
 
-      let bodyHtml = `<div style="padding: 20px;">
+      bodyHtml = `<div style="padding: 20px;">
         <table class="data-table" style="width: 100%; border-collapse: collapse; border: 1px solid var(--border);">
           <thead>
             <tr>
@@ -5327,6 +5230,103 @@
             <div class="field-label" style="margin-top:12px;">4. Chart / Visualization Plan</div>
             <div class="field-value">${esc(r.chart_visualization_idea)}</div>
           ` : ''}
+        `;
+      } else if (type === 'bct') {
+        bodyHtml = `
+          <div class="field-label">Student / Group</div>
+          <div class="field-value"><strong>${esc(r.student_name)}</strong> ${r.group_members ? `(Group: ${esc(r.group_members)})` : ''}</div>
+
+          <div class="field-label" style="margin-top:12px;">1. Chosen Local Problem</div>
+          <div class="field-value"><span class="badge badge-gold">${esc(r.local_problem || '—')}</span></div>
+
+          <div class="field-label" style="margin-top:12px;">Initial AI Solution Sketch</div>
+          <div class="field-value">${esc(r.initial_ai_solution || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">2. Twist Card Revealed</div>
+          <div class="field-value" style="color:#b45309; background:#fffbeb; border-color:#fde68a;"><strong>${esc(r.twist_card || '—')}</strong></div>
+
+          <div class="field-label" style="margin-top:12px;">3. What Breaks Now?</div>
+          <div class="field-value">${esc(r.what_breaks || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">Who Gets Left Out?</div>
+          <div class="field-value" style="color:#991b1b; background:#fef2f2; border-color:#fecaca;">${esc(r.who_left_out || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">4. Debrief Reflection</div>
+          <div class="field-value">${esc(r.debrief_reflection || '—')}</div>
+        `;
+      } else if (type === 'bds') {
+        bodyHtml = `
+          <div class="field-label">Student / Group</div>
+          <div class="field-value"><strong>${esc(r.student_name)}</strong> ${r.group_members ? `(Group: ${esc(r.group_members)})` : ''}</div>
+
+          <div class="field-label" style="margin-top:12px;">Station 1: Resume-Screening Tool</div>
+          <div class="field-value"><strong>Source:</strong> ${esc(r.st1_bias_source || '—')}<br><strong>Who Gets Hurt:</strong> ${esc(r.st1_who_gets_hurt || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">Station 2: Voice Assistant & Accents</div>
+          <div class="field-value"><strong>Source:</strong> ${esc(r.st2_bias_source || '—')}<br><strong>Who Gets Hurt:</strong> ${esc(r.st2_who_gets_hurt || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">Station 3: Heart Disease Predictor</div>
+          <div class="field-value"><strong>Source:</strong> ${esc(r.st3_bias_source || '—')}<br><strong>Who Gets Hurt:</strong> ${esc(r.st3_who_gets_hurt || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">Station 4: Photo-Tagging Skin Tones</div>
+          <div class="field-value"><strong>Source:</strong> ${esc(r.st4_bias_source || '—')}<br><strong>Who Gets Hurt:</strong> ${esc(r.st4_who_gets_hurt || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">Class Presentation Share</div>
+          <div class="field-value" style="color:#0e7490; background:#ecfeff; border-color:#a5f3fc;">${esc(r.favorite_station_share || '—')}</div>
+        `;
+      } else if (type === 'ftd') {
+        bodyHtml = `
+          <div class="field-label">Student / Partner</div>
+          <div class="field-value"><strong>${esc(r.student_name)}</strong> ${r.partner_name ? `(Partner: ${esc(r.partner_name)})` : ''}</div>
+
+          <div class="field-label" style="margin-top:12px;">Dataset Summary (Before ➔ After)</div>
+          <div class="field-value">
+            <span class="badge badge-red">Initial: ${esc(r.initial_dataset_summary || '—')}</span><br>
+            <span class="badge badge-green" style="margin-top:4px;display:inline-block">Final: ${esc(r.final_dataset_summary || '—')}</span>
+          </div>
+
+          <div class="field-label" style="margin-top:12px;">Changes Explanation ("I added/removed because...")</div>
+          <div class="field-value">${esc(r.changes_explanation || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">Debrief Reflection (What was given up or added?)</div>
+          <div class="field-value">${esc(r.debrief_reflection || '—')}</div>
+        `;
+      } else if (type === 'pvp') {
+        bodyHtml = `
+          <div class="field-label">Student / Partner</div>
+          <div class="field-value"><strong>${esc(r.student_name)}</strong> ${r.partner_name ? `(Partner: ${esc(r.partner_name)})` : ''}</div>
+
+          <div class="field-label" style="margin-top:12px;">1. AlphaFold 🧬</div>
+          <div class="field-value"><strong>Promise:</strong> ${esc(r.alphafold_promise || '—')}<br><strong>Problem:</strong> ${esc(r.alphafold_problem || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">2. Woebot 💬</div>
+          <div class="field-value"><strong>Promise:</strong> ${esc(r.woebot_promise || '—')}<br><strong>Problem:</strong> ${esc(r.woebot_problem || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">3. BeMyEyes 👁️</div>
+          <div class="field-value"><strong>Promise:</strong> ${esc(r.bemyeyes_promise || '—')}<br><strong>Problem:</strong> ${esc(r.bemyeyes_problem || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">4. Ocean Cleanup 🌊</div>
+          <div class="field-value"><strong>Promise:</strong> ${esc(r.ocean_cleanup_promise || '—')}<br><strong>Problem:</strong> ${esc(r.ocean_cleanup_problem || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">Debrief Reflection (Hardest problem to find)</div>
+          <div class="field-value">${esc(r.debrief_reflection || '—')}</div>
+        `;
+      } else if (type === 'met') {
+        bodyHtml = `
+          <div class="field-label">Student & Role</div>
+          <div class="field-value"><strong>${esc(r.student_name)}</strong> — <span class="badge badge-teal">${esc(r.role_selected || '—')}</span></div>
+
+          <div class="field-label" style="margin-top:12px;">2-Minute Opening Testimony</div>
+          <div class="field-value">${esc(r.case_argument || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">⚡ Groq AI Judge Cross-Examination & Q&A Response</div>
+          <div class="field-value" style="color:#b45309; background:#fffbeb; border-color:#fde68a;">${esc(r.followup_qa || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">🏛️ Final Verdict & Court Ruling</div>
+          <div class="field-value" style="color:#991b1b; background:#fef2f2; border-color:#fecaca;"><strong>${esc(r.verdict_ruling || '—')}</strong></div>
+
+          <div class="field-label" style="margin-top:12px;">Class Debrief Reflection</div>
+          <div class="field-value">${esc(r.debrief_reflection || '—')}</div>
         `;
       }
 
