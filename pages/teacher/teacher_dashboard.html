@@ -4022,40 +4022,46 @@
         if (bd && bd.error) { console.error('bd error:', bd.error); }
         if (dd && dd.error) { console.error('dd error:', dd.error); }
 
-        const normalizedTestSub = (testSub && testSub.data ? testSub.data : []).map(r => ({
-          id: r.id,
-          student_name: r.student_name,
-          test_id: r.test_id,
-          access_code: r.access_code,
-          mcq_score: r.mcq_score,
-          blank_score: r.blank_score,
-          auto_score: r.auto_score ?? ((r.mcq_score || 0) + (r.blank_score || 0)),
-          total_possible: r.total_possible || 100,
-          pct: r.pct,
-          question_detail: r.question_detail,
-          mcq_details: r.question_detail?.mcq || r.question_detail?.mcq_details || (typeof r.question_detail === 'object' ? r.question_detail : null),
-          q16_b1: r.question_detail?.q16_b1 || r.question_detail?.q16?.b1,
-          q16_b2: r.question_detail?.q16_b2 || r.question_detail?.q16?.b2,
-          q16_b3: r.question_detail?.q16_b3 || r.question_detail?.q16?.b3,
-          q16_b4: r.question_detail?.q16_b4 || r.question_detail?.q16?.b4,
-          q16_b5: r.question_detail?.q16_b5 || r.question_detail?.q16?.b5,
-          q16_b6: r.question_detail?.q16_b6 || r.question_detail?.q16?.b6,
-          q17_text: r.question_detail?.q17_text || r.question_detail?.q17?.text || (typeof r.question_detail?.q17 === 'string' ? r.question_detail.q17 : null),
-          q18_text: r.question_detail?.q18_text || r.question_detail?.q18?.text || (typeof r.question_detail?.q18 === 'string' ? r.question_detail.q18 : null),
-          q19_b1: r.question_detail?.q19_b1 || r.question_detail?.q19?.b1,
-          q19_b2: r.question_detail?.q19_b2 || r.question_detail?.q19?.b2,
-          q19_b3: r.question_detail?.q19_b3 || r.question_detail?.q19?.b3,
-          q19_b4: r.question_detail?.q19_b4 || r.question_detail?.q19?.b4,
-          q19_b5: r.question_detail?.q19_b5 || r.question_detail?.q19?.b5,
-          q19_b6: r.question_detail?.q19_b6 || r.question_detail?.q19?.b6,
-          q20_b1: r.question_detail?.q20_b1 || r.question_detail?.q20?.b1,
-          q20_b2: r.question_detail?.q20_b2 || r.question_detail?.q20?.b2,
-          q20_b3: r.question_detail?.q20_b3 || r.question_detail?.q20?.b3,
-          q20_b4: r.question_detail?.q20_b4 || r.question_detail?.q20?.b4,
-          q20_b5: r.question_detail?.q20_b5 || r.question_detail?.q20?.b5,
-          q21_text: r.question_detail?.q21_text || r.question_detail?.q21?.text || (typeof r.question_detail?.q21 === 'string' ? r.question_detail.q21 : null),
-          submitted_at: r.submitted_at
-        }));
+        const normalizedTestSub = (testSub && testSub.data ? testSub.data : []).map(r => {
+          let qd = r.question_detail;
+          if (typeof qd === 'string') {
+            try { qd = JSON.parse(qd); } catch(e) {}
+          }
+          qd = qd || {};
+
+          const getBlanks = (qNum) => {
+            const qObj = qd[`q${qNum}`];
+            if (qObj && Array.isArray(qObj.items)) return qObj.items;
+            return [];
+          };
+
+          const q21Text = qd.q21?.text || qd.q21_text || (typeof qd.q21 === 'string' ? qd.q21 : '');
+          const mcqScore = r.mcq_score ?? 0;
+          const blankScore = r.blank_score ?? 0;
+          const autoScore = r.auto_score ?? (mcqScore + blankScore);
+
+          return {
+            id: r.id,
+            student_name: r.student_name,
+            test_id: r.test_id || 'Classes 1–7 Test',
+            access_code: r.access_code,
+            mcq_score: mcqScore,
+            blank_score: blankScore,
+            auto_score: autoScore,
+            total_possible: 60,
+            pct: r.pct ?? Math.round((autoScore / 60) * 100),
+            question_detail: qd,
+            mcq_details: qd.mcq || qd.mcq_details || (typeof qd === 'object' ? qd : null),
+            q16_items: getBlanks(16),
+            q17_items: getBlanks(17),
+            q18_items: getBlanks(18),
+            q19_items: getBlanks(19),
+            q20_items: getBlanks(20),
+            q21_text: q21Text,
+            started_at: r.started_at,
+            submitted_at: r.submitted_at
+          };
+        });
 
         const normalizedTestCodes = (testCodes && testCodes.data ? testCodes.data : []).map(c => ({
           code: c.code,
@@ -4514,78 +4520,184 @@
     </table>`;
     }
 
+    const EXAM_QLBLS = {
+      1:'ANI / AGI / ASI — which exists today',
+      2:'NumPy dot product of two vectors',
+      3:'Population variance of [2,4,4,6,10]',
+      4:'Low train error, high CV error — diagnosis',
+      5:'Min-Max scaling — value of 40 in [10..50]',
+      6:'pd.get_dummies — shape after one-hot encoding',
+      7:'Train/val/test split proportions',
+      8:'5-fold cross-validation — number of fits',
+      9:'MSE cost J(w=0.8, b=0.9)',
+      10:'StandardScaler — correct fit/transform pattern',
+      11:'Sigmoid function — σ(5)',
+      12:'Confusion matrix — recall',
+      13:'Confusion matrix — precision',
+      14:'Quadratic kernel K(3,3)',
+      15:'What the kernel trick actually does'
+    };
+
+    const EXAM_BLANK_TITLES = {
+      q16: { label: 'Q16 — Data Preprocessing (Pandas)', rubric: "fillna · fillna · units_sold*price*(1-discount) · 'store_id' · sum · sort_values(ascending=False)" },
+      q17: { label: 'Q17 — MSE Cost Function', rubric: 'f_wb = w*x[i]+b  |  cost_sum += (f_wb-y[i])**2  →  J(0.8,0.9)=0.525' },
+      q18: { label: 'Q18 — Confusion Matrix Metrics', rubric: 'accuracy=(TP+TN)/total · precision=TP/(TP+FP) · recall=TP/(TP+FN) · f1=2·P·R/(P+R)' },
+      q19: { label: 'Q19 — Sigmoid & Logistic Regression', rubric: 'sigmoid: 1/(1+np.exp(-z)) · z=w@X.T+b · probabilities=sigmoid(z) · .astype(int)' },
+      q20: { label: 'Q20 — Kernel Functions & SVM', rubric: 'kernel: (x*xp+1)**2 · phi: [x,x**2] · rbf: math.exp(-gamma*distance**2)' }
+    };
+
+    const EXAM_Q21_RUBRIC = "Train R² ≫ Test R² = high variance/overfitting (Class 2). Fixes: more data, regularization, simpler model, more k-fold CV (Class 4). Full credit needs diagnosis + a named fix + the bias/variance link.";
+
+    function renderFullExamDetailHTML(r) {
+      let qd = r.question_detail;
+      if (typeof qd === 'string') {
+        try { qd = JSON.parse(qd); } catch(e) {}
+      }
+      qd = qd || {};
+
+      const mcqScore = r.mcq_score ?? 0;
+      const blankScore = r.blank_score ?? 0;
+      const autoScore = r.auto_score ?? (mcqScore + blankScore);
+      const pct = r.pct ?? Math.round((autoScore / 60) * 100);
+      const scoreColor = pct >= 80 ? '#059669' : pct >= 60 ? '#d97706' : '#dc2626';
+
+      let html = `
+        <div style="background:var(--navy); color:#fff; border-radius:12px; padding:20px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+          <div>
+            <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--mint); letter-spacing:0.5px; margin-bottom:4px;">Classes 1–7 Final Exam</div>
+            <h3 style="margin:0; font-size:18px; font-weight:800;">${esc(r.student_name || 'Student Result')}</h3>
+            <div style="font-size:12px; color:#94a3b8; margin-top:4px;">
+              Access Code: <span style="font-family:monospace; color:#cbd5e1;">${esc(r.access_code || '—')}</span> · Submitted: <span style="color:#cbd5e1;">${fmtDate(r.submitted_at)}</span>
+            </div>
+          </div>
+          <div style="text-align:right; background:rgba(255,255,255,0.08); padding:12px 20px; border-radius:10px; border:1px solid rgba(255,255,255,0.15);">
+            <div style="font-size:10px; font-weight:800; text-transform:uppercase; color:var(--teal); letter-spacing:0.5px; margin-bottom:2px;">Auto-Score</div>
+            <div style="font-size:28px; font-weight:900; font-family:monospace; color:${scoreColor};">${autoScore} <span style="font-size:16px; color:#94a3b8;">/ 60</span></div>
+            <div style="font-size:11px; font-weight:700; color:#cbd5e1;">${pct}% Overall Accuracy</div>
+          </div>
+        </div>
+
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+          <div class="stat-card teal">
+            <div class="stat-label">Part 1: MCQ Score</div>
+            <div class="stat-value">${mcqScore} / 30</div>
+            <div class="stat-sub">15 questions @ 2 pts</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-label">Part 2: Fill-in-Blanks</div>
+            <div class="stat-value">${blankScore} / 25</div>
+            <div class="stat-sub">5 exercises @ 5 pts</div>
+          </div>
+          <div class="stat-card gold">
+            <div class="stat-label">Part 3: Q21 Open-Ended</div>
+            <div class="stat-value font-mono" style="font-size:16px;padding-top:4px">Pending Review</div>
+            <div class="stat-sub">5 pts max (Manual review)</div>
+          </div>
+        </div>
+      `;
+
+      // Part 1: MCQ
+      const mcqD = r.mcq_details || qd.mcq || {};
+      if (mcqD && Object.keys(mcqD).length > 0) {
+        const mcqCount = Object.values(mcqD).filter(d => d.correct).length;
+        html += `
+          <div class="panel" style="margin-bottom:20px">
+            <div class="panel-header"><div class="panel-title">Part 1: MCQ Answers (${mcqCount}/15 Correct — ${mcqScore} pts)</div></div>
+            <div style="padding:16px 20px;">
+              <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:10px;">
+                ${Object.entries(mcqD).map(([qKey, d]) => {
+                  const qNum = parseInt(qKey.replace(/\D/g, '')) || 1;
+                  const isOk = d.correct === true || d.correct === 'true';
+                  const bg = isOk ? '#ecfdf5' : '#fef2f2';
+                  const border = isOk ? '#a7f3d0' : '#fecaca';
+                  const txtColor = isOk ? '#065f46' : '#991b1b';
+                  const icon = isOk ? '✓' : '✗';
+                  const topic = EXAM_QLBLS[qNum] || `Question ${qNum}`;
+                  return `
+                    <div style="background:${bg}; border:1px solid ${border}; border-radius:8px; padding:10px;">
+                      <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:800; color:var(--gray); margin-bottom:4px;">
+                        <span>Q${qNum} · MCQ</span>
+                        <span style="color:${txtColor}">${isOk ? '+2 pts' : '0 pts'}</span>
+                      </div>
+                      <div style="font-size:11px; font-weight:700; color:var(--navy); margin-bottom:6px;">${topic}</div>
+                      <div style="font-size:12px; font-weight:800; color:${txtColor};">${icon} Ans: ${esc(String(d.answer || '—'))}</div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Part 2: Blanks Q16-Q20
+      html += `<div class="panel" style="margin-bottom:20px"><div class="panel-header"><div class="panel-title">Part 2: Fill-in-the-Blank Code & Math Exercises (${blankScore}/25 pts)</div></div><div style="padding:16px 20px; display:flex; flex-direction:column; gap:16px;">`;
+
+      [16, 17, 18, 19, 20].forEach(qNum => {
+        const qKey = `q${qNum}`;
+        const meta = EXAM_BLANK_TITLES[qKey];
+        const qObj = qd[qKey] || {};
+        const items = qObj.items || r[`q${qNum}_items`] || [];
+        const pts = qObj.pts ?? (items.length ? (items.filter(i => i.ok).length ? Math.round((items.filter(i => i.ok).length / items.length) * 5) : 0) : '—');
+
+        html += `
+          <div style="background:#f8fafc; border:1px solid var(--border); border-radius:10px; padding:14px 16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <div style="font-size:13px; font-weight:800; color:var(--navy);">${meta.label}</div>
+              <span class="badge badge-gold" style="font-size:11px;">${pts} / 5 pts</span>
+            </div>
+            ${items.length > 0 ? `
+              <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+                ${items.map((b, idx) => {
+                  const isOk = b.ok === true || b.ok === 'true';
+                  const bg = isOk ? '#ecfdf5' : '#fef2f2';
+                  const border = isOk ? '#a7f3d0' : '#fecaca';
+                  return `
+                    <span style="background:${bg}; border:1px solid ${border}; border-radius:6px; padding:6px 10px; font-family:'DM Mono',monospace; font-size:12px; color:var(--navy);">
+                      <span style="color:var(--gray); font-size:10px;">[Blank ${idx+1}] ${isOk ? '✅' : '❌'} </span>
+                      <strong>"${esc(String(b.val || '—'))}"</strong>
+                    </span>
+                  `;
+                }).join('')}
+              </div>
+            ` : '<div style="font-size:12px; color:var(--gray); margin-bottom:8px;">No individual blank items recorded.</div>'}
+            <div style="font-size:11px; font-family:monospace; color:#475569; background:#f1f5f9; padding:8px 12px; border-radius:6px;">📋 <strong>Marking Guide:</strong> ${meta.rubric}</div>
+          </div>
+        `;
+      });
+      html += `</div></div>`;
+
+      // Part 3: Q21 Open-Ended
+      const q21Ans = r.q21_text || qd.q21?.text || (typeof qd.q21 === 'string' ? qd.q21 : '');
+      html += `
+        <div class="panel" style="margin-bottom:20px">
+          <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="panel-title">Part 3: Q21 Open-Ended Synthesis (5 pts max)</div>
+            <span class="badge badge-teal">Classes 2 & 4 Topics</span>
+          </div>
+          <div style="padding:16px 20px;">
+            <div style="font-size:12px; font-weight:700; color:var(--navy); margin-bottom:6px;">Prompt: High Train R² vs Test R² Diagnosis & Solutions</div>
+            <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:14px; margin-bottom:12px;">
+              <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:#b45309; margin-bottom:4px;">Student Submitted Response:</div>
+              <div style="font-size:13px; color:#78350f; line-height:1.6; white-space:pre-wrap;">${esc(q21Ans || '(No response submitted)')}</div>
+            </div>
+            <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:12px 14px;">
+              <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:#15803d; margin-bottom:4px;">📋 Official Marking Guide Rubric:</div>
+              <div style="font-size:12px; color:#166534; line-height:1.5;">${EXAM_Q21_RUBRIC}</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      return html;
+    }
+
     function openExamModal(id) {
       const r = examData.find(x => x.id === id);
       if (!r) return;
 
-      document.getElementById('modal-title').textContent = r.student_name + ' — Exam Detail';
-
-      let html = '';
-
-      // Score summary
-      html += `<div class="detail-grid">
-    <div class="detail-cell">
-      <div class="detail-cell-label">Auto-Score</div>
-      <div class="detail-cell-val">${r.auto_score ?? '—'}</div>
-      <div class="detail-cell-sub">MCQ + fill-in-blank</div>
-    </div>
-    <div class="detail-cell">
-      <div class="detail-cell-label">MCQ Score</div>
-      <div class="detail-cell-val">${r.mcq_score ?? '—'}</div>
-    </div>
-    <div class="detail-cell">
-      <div class="detail-cell-label">Blank Score</div>
-      <div class="detail-cell-val">${r.blank_score ?? '—'}</div>
-    </div>
-  </div>`;
-
-      // MCQ answers
-      if (r.mcq_details) {
-        const details = typeof r.mcq_details === 'string' ? JSON.parse(r.mcq_details) : r.mcq_details;
-        html += `<div style="padding:14px 20px 6px;border-top:1px solid var(--border)">
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--gray);margin-bottom:10px;">MCQ Answers</div>
-    </div>
-    <div class="answer-grid">`;
-        Object.entries(details).forEach(([q, d]) => {
-          const cls2 = d.correct ? 'correct' : 'wrong';
-          const ans = d.answer || '?';
-          html += `<div class="answer-pill ${cls2}"><div class="qnum">${q}</div>${esc(String(ans))}</div>`;
-        });
-        html += '</div>';
-      }
-
-      // Fill-in-the-blank answers
-      const blankSections = [
-        { label: 'Q16 — A* Search', keys: ['q16_b1', 'q16_b2', 'q16_b3', 'q16_b4', 'q16_b5', 'q16_b6'] },
-        { label: 'Q19 — k-Means sklearn', keys: ['q19_b1', 'q19_b2', 'q19_b3', 'q19_b4', 'q19_b5', 'q19_b6'] },
-        { label: 'Q20 — Q-learning', keys: ['q20_b1', 'q20_b2', 'q20_b3', 'q20_b4', 'q20_b5'] },
-      ];
-      blankSections.forEach(sec => {
-        const filled = sec.keys.filter(k => r[k]);
-        if (!filled.length) return;
-        html += `<div style="padding:12px 20px 4px;border-top:1px solid var(--border)">
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--gray);margin-bottom:8px;">${sec.label}</div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;">
-        ${sec.keys.map((k, i) => `<span style="background:var(--offwhite);border:1px solid var(--border);border-radius:5px;padding:4px 10px;font-family:'DM Mono',monospace;font-size:12px;color:var(--navy)"><span style="color:var(--gray);font-size:10px">[${i + 1}] </span>${esc(r[k] || '—')}</span>`).join('')}
-      </div>
-    </div>`;
-      });
-
-      // Open-ended answers
-      const openQ = [
-        { label: 'Q17 — Open Ended', key: 'q17_text' },
-        { label: 'Q18 — Open Ended', key: 'q18_text' },
-        { label: 'Q21 — Open Ended', key: 'q21_text' },
-      ];
-      openQ.forEach(q => {
-        if (!r[q.key]) return;
-        html += `<div class="open-answer-block" style="margin:10px 20px">
-      <label>${q.label}</label>
-      <p>${esc(r[q.key])}</p>
-    </div>`;
-      });
-
-      document.getElementById('modal-body').innerHTML = html;
+      document.getElementById('modal-title').textContent = (r.student_name || 'Student') + ' — Classes 1–7 Final Exam Detail';
+      document.getElementById('modal-body').innerHTML = renderFullExamDetailHTML(r);
       document.getElementById('modal-overlay').classList.add('open');
     }
 
@@ -4607,61 +4719,7 @@
         return;
       }
 
-      let html = `<div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
-    <div class="stat-card"><div class="stat-label">Auto-Score</div><div class="stat-value">${r.auto_score ?? '—'}</div><div class="stat-sub">Total automated</div></div>
-    <div class="stat-card teal"><div class="stat-label">MCQ</div><div class="stat-value">${r.mcq_score ?? '—'}</div></div>
-    <div class="stat-card gold"><div class="stat-label">Fill-in-Blank</div><div class="stat-value">${r.blank_score ?? '—'}</div></div>
-  </div>`;
-
-      // MCQ breakdown
-      if (r.mcq_details) {
-        const details = typeof r.mcq_details === 'string' ? JSON.parse(r.mcq_details) : r.mcq_details;
-        const correct = Object.values(details).filter(d => d.correct).length;
-        const total = Object.keys(details).length;
-        html += `<div class="panel" style="margin-bottom:20px">
-      <div class="panel-header"><div class="panel-title">MCQ Answers — ${correct}/${total} correct</div></div>
-      <div class="answer-grid">
-        ${Object.entries(details).map(([q, d]) => {
-          const cls2 = d.correct ? 'correct' : 'wrong';
-          return `<div class="answer-pill ${cls2}"><div class="qnum">${q}</div>${esc(String(d.answer || '?'))}</div>`;
-        }).join('')}
-      </div>
-    </div>`;
-      }
-
-      // Fill-in-blank
-      const blanks = [
-        { label: 'Q16 — A* Search Blanks', keys: ['q16_b1', 'q16_b2', 'q16_b3', 'q16_b4', 'q16_b5', 'q16_b6'] },
-        { label: 'Q19 — k-Means sklearn Blanks', keys: ['q19_b1', 'q19_b2', 'q19_b3', 'q19_b4', 'q19_b5', 'q19_b6'] },
-        { label: 'Q20 — Q-learning Blanks', keys: ['q20_b1', 'q20_b2', 'q20_b3', 'q20_b4', 'q20_b5'] },
-      ];
-      blanks.forEach(sec => {
-        if (!sec.keys.some(k => r[k])) return;
-        html += `<div class="panel" style="margin-bottom:20px">
-      <div class="panel-header"><div class="panel-title">${sec.label}</div></div>
-      <div style="padding:16px 20px;display:flex;flex-wrap:wrap;gap:10px;">
-        ${sec.keys.map((k, i) => `<div style="background:var(--offwhite);border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;min-width:120px">
-          <div style="font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:4px">Blank ${i + 1}</div>
-          <div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--navy)">${esc(r[k] || '—')}</div>
-        </div>`).join('')}
-      </div>
-    </div>`;
-      });
-
-      // Open-ended
-      const openQ = [['Q17', r.q17_text], ['Q18', r.q18_text], ['Q21', r.q21_text]];
-      const hasOpen = openQ.some(([, t]) => t);
-      if (hasOpen) {
-        html += `<div class="panel" style="margin-bottom:20px">
-      <div class="panel-header"><div class="panel-title">Open-Ended Answers</div></div>
-      ${openQ.filter(([, t]) => t).map(([q, t]) => `
-        <div class="open-answer-block"><label>${q}</label><p>${esc(t)}</p></div>
-      `).join('')}
-      <div style="height:8px"></div>
-    </div>`;
-      }
-
-      el.innerHTML = html;
+      el.innerHTML = renderFullExamDetailHTML(r);
     }
 
     // ════════════════════════════════════════════════════════════════════════════
