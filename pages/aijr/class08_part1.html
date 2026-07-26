@@ -1,1728 +1,1070 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Class 8 Exam Part 1</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
-    rel="stylesheet">
-  <style>
-    :root {
-      --teal: #0D2E3A;
-      --teal-mid: #164355;
-      --lime: #C8E63C;
-      --lime-dark: #a8c424;
-      --bg: #F2F2F0;
-      --white: #FFFFFF;
-      --off-white: #F8F8F6;
-      --border: #E2E2DE;
-      --text: #111111;
-      --mid: #555555;
-      --muted: #909090;
-      --red: #C0392B;
-      --correct: #1a7f4b;
-      --cbg: #e8f7ee;
-      --wrong: #c0392b;
-      --wbg: #fdecea;
-      --warn: #7a5700;
-      --warnbg: #fff8e1;
-      --mono: 'IBM Plex Mono', monospace;
-    }
-
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* HERO / COVER */
-    .cover-wrap {
-      max-width: 680px;
-      margin: 0 auto;
-      padding: 72px 24px 80px;
-      text-align: center;
-    }
-
-    .hero-tag {
-      display: inline-block;
-      font-family: var(--mono);
-      font-size: 0.63rem;
-      font-weight: 500;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      color: var(--teal);
-      background: #ddeaf0;
-      padding: 5px 14px;
-      border-radius: 3px;
-      margin-bottom: 22px;
-    }
-
-    .cover-wrap h1 {
-      font-family: 'Playfair Display', serif;
-      font-weight: 800;
-      font-size: clamp(2.4rem, 5vw, 3.6rem);
-      line-height: 1.08;
-      color: var(--teal);
-      margin-bottom: 8px;
-    }
-
-    .cover-wrap h1 em {
-      font-style: normal;
-      color: var(--teal-mid);
-    }
-
-    .cover-sub {
-      font-size: 0.95rem;
-      color: var(--mid);
-      line-height: 1.65;
-      max-width: 500px;
-      margin: 0 auto 40px;
-    }
-
-    .score-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-      max-width: 460px;
-      margin: 0 auto 36px;
-    }
-
-    .sc-cell {
-      background: var(--white);
-      padding: 18px 12px;
-      text-align: center;
-    }
-
-    .sc-cell .lbl {
-      font-family: var(--mono);
-      font-size: 0.61rem;
-      letter-spacing: 1.4px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-
-    .sc-cell .val {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.55rem;
-      font-weight: 700;
-      color: var(--teal);
-    }
-
-    .name-box {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 32px;
-      max-width: 460px;
-      margin: 0 auto;
-      box-shadow: 0 2px 14px rgba(0, 0, 0, 0.05);
-      text-align: left;
-    }
-
-    .name-box label {
-      display: block;
-      font-family: var(--mono);
-      font-size: 0.65rem;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--mid);
-      margin-bottom: 8px;
-    }
-
-    .name-box input {
-      width: 100%;
-      padding: 13px 15px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 1rem;
-      border: 1.5px solid var(--border);
-      border-radius: 6px;
-      outline: none;
-      background: var(--off-white);
-      transition: border-color .13s;
-      margin-bottom: 14px;
-    }
-
-    .name-box input:focus {
-      border-color: var(--teal);
-      background: var(--white);
-    }
-
-    .name-box input.field-err {
-      border-color: var(--red);
-    }
-
-    .err-msg {
-      font-size: 0.78rem;
-      color: var(--red);
-      margin-top: -8px;
-      margin-bottom: 14px;
-      display: none;
-    }
-
-    .btn-start {
-      width: 100%;
-      padding: 14px;
-      background: var(--teal);
-      color: var(--white);
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 600;
-      font-size: 0.95rem;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background .13s;
-      letter-spacing: 0.3px;
-    }
-
-    .btn-start:hover {
-      background: var(--teal-mid);
-    }
-
-    /* TEST AREA */
-    #test-area {
-      display: none;
-    }
-
-    .test-inner {
-      max-width: 780px;
-      margin: 0 auto;
-      padding: 32px 24px 100px;
-    }
-
-    .student-banner {
-      background: var(--teal);
-      color: var(--white);
-      border-radius: 8px;
-      padding: 13px 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 28px;
-      font-size: 0.86rem;
-    }
-
-    .s-name {
-      font-family: var(--mono);
-      font-size: 0.84rem;
-      color: var(--lime);
-      font-weight: 500;
-    }
-
-    .s-right {
-      margin-left: auto;
-      font-family: var(--mono);
-      font-size: 0.7rem;
-      color: rgba(255, 255, 255, 0.4);
-    }
-
-    .progress-sticky {
-      position: sticky;
-      top: 0px;
-      z-index: 100;
-      background: var(--bg);
-      padding: 8px 0 4px;
-      margin-bottom: 18px;
-    }
-
-    .prog-track {
-      height: 3px;
-      background: var(--border);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-
-    .prog-fill {
-      height: 100%;
-      background: var(--lime-dark);
-      border-radius: 2px;
-      width: 0%;
-      transition: width .3s ease;
-    }
-
-    .prog-txt {
-      font-family: var(--mono);
-      font-size: 0.66rem;
-      color: var(--muted);
-      text-align: right;
-      margin-top: 4px;
-    }
-
-    .part-hdr {
-      margin: 44px 0 16px;
-      padding-bottom: 11px;
-      border-bottom: 2px solid var(--teal);
-      display: flex;
-      align-items: baseline;
-      gap: 12px;
-    }
-
-    .part-hdr h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.3rem;
-      color: var(--teal);
-    }
-
-    .part-hdr p {
-      font-family: var(--mono);
-      font-size: 0.72rem;
-      color: var(--muted);
-    }
-
-    /* Question cards */
-    .qc {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-top: 3px solid var(--teal);
-      border-radius: 8px;
-      padding: 22px 26px;
-      margin-bottom: 14px;
-      transition: box-shadow .15s;
-    }
-
-    .qc:hover {
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
-    }
-
-    .qc.done {
-      border-top-color: var(--lime-dark);
-    }
-
-    .q-meta {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 13px;
-    }
-
-    .q-num {
-      font-family: var(--mono);
-      font-size: 0.66rem;
-      font-weight: 500;
-      background: var(--teal);
-      color: var(--white);
-      padding: 3px 9px;
-      border-radius: 3px;
-      letter-spacing: 0.4px;
-    }
-
-    .q-pts {
-      font-family: var(--mono);
-      font-size: 0.63rem;
-      color: var(--muted);
-      border: 1px solid var(--border);
-      padding: 2px 8px;
-      border-radius: 3px;
-    }
-
-    .q-body {
-      font-size: 0.94rem;
-      line-height: 1.65;
-      margin-bottom: 16px;
-    }
-
-    .q-body p {
-      margin-bottom: 8px;
-    }
-
-    pre {
-      font-family: var(--mono);
-      font-size: 0.79rem;
-      background: #f0eeeb;
-      border-left: 3px solid var(--teal);
-      border-radius: 0 5px 5px 0;
-      padding: 13px 16px;
-      overflow-x: auto;
-      margin: 8px 0 13px;
-      line-height: 1.65;
-    }
-
-    code {
-      font-family: var(--mono);
-      font-size: 0.81rem;
-      background: #efefed;
-      padding: 1px 5px;
-      border-radius: 3px;
-    }
-
-    .cm {
-      border-collapse: collapse;
-      font-size: 0.85rem;
-      margin: 9px 0 13px;
-    }
-
-    .cm th,
-    .cm td {
-      border: 1px solid var(--border);
-      padding: 7px 14px;
-      text-align: center;
-    }
-
-    .cm th {
-      background: #f0eeeb;
-      font-weight: 600;
-    }
-
-    /* Options */
-    .opts {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .opt-lbl {
-      display: flex;
-      align-items: flex-start;
-      gap: 11px;
-      padding: 10px 13px;
-      border: 1.5px solid var(--border);
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.91rem;
-      line-height: 1.5;
-      transition: border-color .1s, background .1s;
-    }
-
-    .opt-lbl:hover {
-      border-color: var(--teal);
-      background: #f4f9fb;
-    }
-
-    .opt-lbl input[type=radio] {
-      display: none;
-    }
-
-    .rdot {
-      flex-shrink: 0;
-      width: 17px;
-      height: 17px;
-      border: 2px solid var(--border);
-      border-radius: 50%;
-      margin-top: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all .1s;
-    }
-
-    .opt-lbl:has(input:checked) {
-      border-color: var(--teal);
-      background: #eaf2f6;
-    }
-
-    .opt-lbl:has(input:checked) .rdot {
-      border-color: var(--teal);
-      background: var(--teal);
-    }
-
-    .opt-lbl:has(input:checked) .rdot::after {
-      content: '';
-      width: 5px;
-      height: 5px;
-      background: var(--white);
-      border-radius: 50%;
-    }
-
-    /* Blanks */
-    .bcode {
-      font-family: var(--mono);
-      font-size: 0.79rem;
-      background: #f0eeeb;
-      border-left: 3px solid var(--teal);
-      border-radius: 0 5px 5px 0;
-      padding: 13px 18px;
-      line-height: 2.1;
-      margin: 8px 0 13px;
-    }
-
-    .bi {
-      font-family: var(--mono);
-      font-size: 0.78rem;
-      background: var(--white);
-      border: 1.5px solid #bbb;
-      border-radius: 4px;
-      padding: 2px 7px;
-      width: 152px;
-      outline: none;
-      display: inline-block;
-      vertical-align: middle;
-      transition: border-color .1s;
-    }
-
-    .bi:focus {
-      border-color: var(--teal);
-    }
-
-    textarea.oe {
-      width: 100%;
-      min-height: 130px;
-      padding: 12px 14px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.91rem;
-      border: 1.5px solid var(--border);
-      border-radius: 6px;
-      resize: vertical;
-      outline: none;
-      line-height: 1.65;
-      background: var(--off-white);
-      transition: border-color .1s;
-    }
-
-    textarea.oe:focus {
-      border-color: var(--teal);
-      background: var(--white);
-    }
-
-    .ch {
-      font-family: var(--mono);
-      font-size: 0.65rem;
-      color: var(--muted);
-      text-align: right;
-      margin-top: 4px;
-    }
-
-    .submit-area {
-      margin-top: 42px;
-      text-align: center;
-    }
-
-    .btn-sub {
-      padding: 14px 52px;
-      background: var(--teal);
-      color: var(--white);
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 600;
-      font-size: 1rem;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background .13s;
-    }
-
-    .btn-sub:hover {
-      background: var(--teal-mid);
-    }
-
-    .btn-sub:disabled {
-      background: #aaa;
-      cursor: not-allowed;
-    }
-
-    .sub-note {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-top: 9px;
-    }
-
-    /* RESULTS */
-    #results-area {
-      display: none;
-    }
-
-    .res-inner {
-      max-width: 780px;
-      margin: 0 auto;
-      padding: 40px 24px 80px;
-    }
-
-    .res-hero {
-      background: var(--teal);
-      border-radius: 12px;
-      padding: 40px 44px;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 24px;
-    }
-
-    .rh-l h2 {
-      font-family: var(--mono);
-      font-size: 0.66rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.4);
-      margin-bottom: 6px;
-    }
-
-    .rh-l .rname {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: var(--white);
-    }
-
-    .rh-l .rsub {
-      font-size: 0.8rem;
-      color: rgba(255, 255, 255, 0.45);
-      margin-top: 6px;
-    }
-
-    .rh-r {
-      text-align: right;
-    }
-
-    .big-sc {
-      font-family: 'Playfair Display', serif;
-      font-size: 3.8rem;
-      color: var(--lime);
-      line-height: 1;
-      font-weight: 800;
-    }
-
-    .big-sc span {
-      font-size: 1.6rem;
-      color: rgba(255, 255, 255, 0.35);
-    }
-
-    .sc-lbl {
-      font-family: var(--mono);
-      font-size: 0.67rem;
-      color: rgba(255, 255, 255, 0.4);
-      margin-top: 3px;
-    }
-
-    .pct-pill {
-      display: inline-block;
-      background: var(--lime);
-      color: var(--teal);
-      font-family: var(--mono);
-      font-size: 0.73rem;
-      font-weight: 600;
-      padding: 4px 12px;
-      border-radius: 20px;
-      margin-top: 7px;
-    }
-
-    .stat-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin-bottom: 26px;
-    }
-
-    .stat-c {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-top: 3px solid var(--teal);
-      border-radius: 8px;
-      padding: 16px 14px;
-      text-align: center;
-    }
-
-    .stat-c .sl {
-      font-family: var(--mono);
-      font-size: 0.6rem;
-      letter-spacing: 1.4px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 7px;
-    }
-
-    .stat-c .sv {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.45rem;
-      font-weight: 700;
-      color: var(--teal);
-    }
-
-    .sv.g {
-      color: var(--correct);
-    }
-
-    .rev-sec {
-      margin-bottom: 38px;
-    }
-
-    .rev-sec h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.2rem;
-      color: var(--teal);
-      margin-bottom: 14px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid var(--teal);
-    }
-
-    .rev-c {
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-top: 3px solid var(--border);
-      border-radius: 8px;
-      padding: 16px 20px;
-      margin-bottom: 10px;
-    }
-
-    .rev-c.ok {
-      border-top-color: var(--correct);
-    }
-
-    .rev-c.bad {
-      border-top-color: var(--wrong);
-    }
-
-    .rev-c.man {
-      border-top-color: var(--lime-dark);
-    }
-
-    .rev-qn {
-      font-family: var(--mono);
-      font-size: 0.65rem;
-      color: var(--muted);
-      margin-bottom: 4px;
-    }
-
-    .rev-qt {
-      font-size: 0.88rem;
-      line-height: 1.5;
-      margin-bottom: 10px;
-      color: var(--mid);
-    }
-
-    .pill-row {
-      display: flex;
-      gap: 7px;
-      flex-wrap: wrap;
-    }
-
-    .pill {
-      font-size: 0.78rem;
-      font-weight: 500;
-      padding: 4px 11px;
-      border-radius: 4px;
-      font-family: var(--mono);
-    }
-
-    .pill.sc {
-      background: var(--cbg);
-      color: var(--correct);
-    }
-
-    .pill.sw {
-      background: var(--wbg);
-      color: var(--wrong);
-    }
-
-    .pill.ca {
-      background: var(--cbg);
-      color: var(--correct);
-      border: 1px solid #a3d9b8;
-    }
-
-    .pill.mn {
-      background: var(--warnbg);
-      color: var(--warn);
-    }
-
-    .oe-ans {
-      margin-top: 9px;
-      background: var(--off-white);
-      border: 1px solid var(--border);
-      border-radius: 5px;
-      padding: 9px 13px;
-      font-size: 0.83rem;
-      color: var(--mid);
-      line-height: 1.6;
-      white-space: pre-wrap;
-      font-style: italic;
-    }
-
-    .rubric {
-      margin-top: 9px;
-      background: var(--warnbg);
-      border-radius: 5px;
-      padding: 7px 11px;
-      font-size: 0.75rem;
-      color: var(--warn);
-      line-height: 1.5;
-      font-family: var(--mono);
-    }
-
-    .b-detail {
-      margin-top: 9px;
-      font-size: 0.77rem;
-      font-family: var(--mono);
-      line-height: 1.85;
-      color: var(--mid);
-    }
-
-    .upload-status {
-      padding: 13px 18px;
-      border-radius: 7px;
-      font-size: 0.87rem;
-      margin-top: 22px;
-      text-align: center;
-    }
-
-    .upload-status.uploading {
-      background: #e8f0fe;
-      color: #1a4db5;
-    }
-
-    .upload-status.success {
-      background: var(--cbg);
-      color: var(--correct);
-    }
-
-    .upload-status.failed {
-      background: var(--wbg);
-      color: var(--wrong);
-    }
-
-    /* CTA BANNER (like reference design) */
-    .cta-banner {
-      background: var(--teal);
-      border-radius: 10px;
-      padding: 36px 44px;
-      margin-top: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-
-    .cta-banner h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.5rem;
-      color: var(--white);
-      max-width: 400px;
-      line-height: 1.3;
-    }
-
-    .cta-banner p {
-      font-size: 0.85rem;
-      color: rgba(255, 255, 255, 0.55);
-      margin-top: 6px;
-    }
-
-    .btn-lime {
-      padding: 13px 28px;
-      background: var(--lime);
-      color: var(--teal);
-      font-weight: 700;
-      font-size: 0.88rem;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background .13s;
-    }
-
-    .btn-lime:hover {
-      background: var(--lime-dark);
-    }
-
-
-
-
-
-    footer a:hover {
-      color: var(--white);
-    }
-
-    @media (max-width: 640px) {
-      .stat-row {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .res-hero {
-        flex-direction: column;
-        text-align: center;
-      }
-
-      .rh-r {
-        text-align: center;
-      }
-
-      .score-grid {
-        grid-template-columns: 1fr;
-      }
-
-      nav {
-        padding: 0 18px;
-      }
-
-      .nav-right a {
-        display: none;
-      }
-
-      .cta-banner {
-        flex-direction: column;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Classes 1–7 Test — AI Junior Competition</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal:       #0D2E3A;
+    --teal-mid:   #164355;
+    --lime:       #C8E63C;
+    --lime-dark:  #a8c424;
+    --bg:         #F2F2F0;
+    --white:      #FFFFFF;
+    --off-white:  #F8F8F6;
+    --border:     #E2E2DE;
+    --text:       #111111;
+    --mid:        #555555;
+    --muted:      #909090;
+    --red:        #C0392B;
+    --correct:    #1a7f4b;
+    --cbg:        #e8f7ee;
+    --wrong:      #c0392b;
+    --wbg:        #fdecea;
+    --warn:       #7a5700;
+    --warnbg:     #fff8e1;
+    --mono:       'IBM Plex Mono', monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* LOADING */
+  #loading-screen {
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 1rem; color: var(--muted);
+  }
+  .spinner {
+    width: 36px; height: 36px; border: 3px solid var(--border);
+    border-top-color: var(--teal); border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #loading-screen p { font-family: var(--mono); font-size: 0.8rem; }
+
+  /* ERROR */
+  #error-screen {
+    display: none; min-height: 100vh; align-items: center; justify-content: center; padding: 2rem;
+  }
+  .error-card {
+    background: var(--white); border-radius: 12px; border: 1.5px solid #f5c2c2;
+    padding: 2.5rem 2rem; max-width: 460px; width: 100%; text-align: center;
+  }
+  .error-card h2 { color: var(--red); margin-bottom: 0.75rem; font-family: 'Playfair Display', serif; }
+  .error-card p { color: var(--mid); font-size: 0.9rem; line-height: 1.5; }
+
+  /* GATE (access code) */
+  #access-code-gate {
+    display: none; min-height: 100vh; align-items: center; justify-content: center; padding: 2rem 1.5rem;
+  }
+  .gate-card {
+    background: var(--white); border-radius: 12px; box-shadow: 0 4px 32px rgba(13,46,58,0.12);
+    padding: 2.5rem 2rem; max-width: 460px; width: 100%; text-align: center;
+  }
+  .gate-logo {
+    font-family: var(--mono); font-size: 0.63rem; font-weight: 500; letter-spacing: 2.5px;
+    text-transform: uppercase; color: var(--teal); background: #ddeaf0;
+    display: inline-block; padding: 5px 14px; border-radius: 3px; margin-bottom: 1.2rem;
+  }
+  .gate-card h2 { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--teal); margin-bottom: 0.4rem; }
+  .gate-sub { font-size: 0.9rem; color: var(--mid); margin-bottom: 1.8rem; line-height: 1.5; }
+  .gate-label {
+    display: block; text-align: left; font-family: var(--mono); font-size: 0.68rem; font-weight: 500;
+    letter-spacing: 1.2px; text-transform: uppercase; color: var(--mid); margin-bottom: 0.5rem;
+  }
+  .gate-input {
+    width: 100%; padding: 0.8rem 1rem; font-size: 1rem; font-family: 'DM Sans', sans-serif;
+    border: 1.5px solid var(--border); border-radius: 6px; outline: none; background: var(--off-white);
+    color: var(--text); transition: border-color .13s, background .13s; margin-bottom: 0.5rem;
+  }
+  .gate-input:focus { border-color: var(--teal); background: var(--white); }
+  .gate-input.err { border-color: var(--red); }
+  .gate-err { font-size: 0.78rem; color: var(--red); text-align: left; margin-bottom: 0.8rem; display: none; }
+  .gate-btn {
+    width: 100%; padding: 0.85rem; background: var(--teal); color: var(--white);
+    font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 0.95rem;
+    border: none; border-radius: 6px; cursor: pointer; letter-spacing: 0.3px;
+    transition: background .13s; margin-top: 0.5rem;
+  }
+  .gate-btn:hover { background: var(--teal-mid); }
+  .gate-btn:disabled { background: #aaa; cursor: not-allowed; }
+
+  /* COVER / NAME */
+  #cover { display: none; }
+  .cover-wrap { max-width: 680px; margin: 0 auto; padding: 72px 24px 80px; text-align: center; }
+  .hero-tag {
+    display: inline-block; font-family: var(--mono); font-size: 0.63rem; font-weight: 500;
+    letter-spacing: 2.5px; text-transform: uppercase; color: var(--teal); background: #ddeaf0;
+    padding: 5px 14px; border-radius: 3px; margin-bottom: 22px;
+  }
+  .cover-wrap h1 {
+    font-family: 'Playfair Display', serif; font-weight: 800; font-size: clamp(2.4rem, 5vw, 3.6rem);
+    line-height: 1.08; color: var(--teal); margin-bottom: 8px;
+  }
+  .cover-wrap h1 em { font-style: normal; color: var(--teal-mid); }
+  .cover-sub { font-size: 0.95rem; color: var(--mid); line-height: 1.65; max-width: 500px; margin: 0 auto 40px; }
+
+  .score-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border);
+    border: 1px solid var(--border); border-radius: 8px; overflow: hidden; max-width: 460px; margin: 0 auto 36px;
+  }
+  .sc-cell { background: var(--white); padding: 18px 12px; text-align: center; }
+  .sc-cell .lbl { font-family: var(--mono); font-size: 0.61rem; letter-spacing: 1.4px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .sc-cell .val { font-family: 'Playfair Display', serif; font-size: 1.55rem; font-weight: 700; color: var(--teal); }
+
+  .name-box {
+    background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 32px;
+    max-width: 460px; margin: 0 auto; box-shadow: 0 2px 14px rgba(0,0,0,0.05); text-align: left;
+  }
+  .name-box label { display: block; font-family: var(--mono); font-size: 0.65rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mid); margin-bottom: 8px; }
+  .name-box input {
+    width: 100%; padding: 13px 15px; font-family: 'DM Sans', sans-serif; font-size: 1rem;
+    border: 1.5px solid var(--border); border-radius: 6px; outline: none; background: var(--off-white);
+    transition: border-color .13s; margin-bottom: 14px;
+  }
+  .name-box input:focus { border-color: var(--teal); background: var(--white); }
+  .name-box input.field-err { border-color: var(--red); }
+  .err-msg { font-size: 0.78rem; color: var(--red); margin-top: -8px; margin-bottom: 14px; display: none; }
+  .btn-start {
+    width: 100%; padding: 14px; background: var(--teal); color: var(--white);
+    font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 0.95rem;
+    border: none; border-radius: 6px; cursor: pointer; transition: background .13s; letter-spacing: 0.3px;
+  }
+  .btn-start:hover { background: var(--teal-mid); }
+
+  /* TEST AREA */
+  #test-area { display: none; }
+  .test-inner { max-width: 780px; margin: 0 auto; padding: 32px 24px 100px; }
+
+  .student-banner {
+    background: var(--teal); color: var(--white); border-radius: 8px; padding: 13px 20px;
+    display: flex; align-items: center; gap: 10px; margin-bottom: 28px; font-size: 0.86rem; flex-wrap: wrap;
+  }
+  .s-name { font-family: var(--mono); font-size: 0.84rem; color: var(--lime); font-weight: 500; }
+  .s-right { margin-left: auto; font-family: var(--mono); font-size: 0.7rem; color: rgba(255,255,255,0.4); }
+
+  .progress-sticky { position: sticky; top: 0; z-index: 100; background: var(--bg); padding: 8px 0 4px; margin-bottom: 18px; }
+  .prog-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .prog-fill { height: 100%; background: var(--lime-dark); border-radius: 2px; width: 0%; transition: width .3s ease; }
+  .prog-txt { font-family: var(--mono); font-size: 0.66rem; color: var(--muted); text-align: right; margin-top: 4px; }
+
+  .part-hdr {
+    margin: 44px 0 16px; padding-bottom: 11px; border-bottom: 2px solid var(--teal);
+    display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+  }
+  .part-hdr h2 { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--teal); }
+  .part-hdr p { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); }
+
+  .qc {
+    background: var(--white); border: 1px solid var(--border); border-top: 3px solid var(--teal);
+    border-radius: 8px; padding: 22px 26px; margin-bottom: 14px; transition: box-shadow .15s;
+  }
+  .qc:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.06); }
+
+  .q-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 13px; flex-wrap: wrap; }
+  .q-num {
+    font-family: var(--mono); font-size: 0.66rem; font-weight: 500; background: var(--teal); color: var(--white);
+    padding: 3px 9px; border-radius: 3px; letter-spacing: 0.4px;
+  }
+  .q-pts { font-family: var(--mono); font-size: 0.63rem; color: var(--muted); border: 1px solid var(--border); padding: 2px 8px; border-radius: 3px; }
+  .q-tag { font-family: var(--mono); font-size: 0.63rem; color: var(--teal-mid); }
+
+  .q-body { font-size: 0.94rem; line-height: 1.65; margin-bottom: 16px; }
+  .q-body p { margin-bottom: 8px; }
+
+  pre {
+    font-family: var(--mono); font-size: 0.79rem; background: #f0eeeb; border-left: 3px solid var(--teal);
+    border-radius: 0 5px 5px 0; padding: 13px 16px; overflow-x: auto; margin: 8px 0 13px; line-height: 1.65;
+  }
+  code { font-family: var(--mono); font-size: 0.81rem; background: #efefed; padding: 1px 5px; border-radius: 3px; }
+
+  .opts { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .opt-lbl {
+    display: flex; align-items: flex-start; gap: 11px; padding: 10px 13px; border: 1.5px solid var(--border);
+    border-radius: 6px; cursor: pointer; font-size: 0.91rem; line-height: 1.5; transition: border-color .1s, background .1s;
+  }
+  .opt-lbl:hover { border-color: var(--teal); background: #f4f9fb; }
+  .opt-lbl input[type=radio] { display: none; }
+  .rdot {
+    flex-shrink: 0; width: 17px; height: 17px; border: 2px solid var(--border); border-radius: 50%;
+    margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: all .1s;
+  }
+  .opt-lbl:has(input:checked) { border-color: var(--teal); background: #eaf2f6; }
+  .opt-lbl:has(input:checked) .rdot { border-color: var(--teal); background: var(--teal); }
+  .opt-lbl:has(input:checked) .rdot::after { content:''; width:5px; height:5px; background:var(--white); border-radius:50%; }
+
+  .bcode {
+    font-family: var(--mono); font-size: 0.79rem; background: #f0eeeb; border-left: 3px solid var(--teal);
+    border-radius: 0 5px 5px 0; padding: 13px 18px; line-height: 2.1; margin: 8px 0 13px; white-space: pre-wrap;
+  }
+  .bi {
+    font-family: var(--mono); font-size: 0.78rem; background: var(--white); border: 1.5px solid #bbb;
+    border-radius: 4px; padding: 2px 7px; width: 170px; outline: none; display: inline-block; vertical-align: middle;
+    transition: border-color .1s;
+  }
+  .bi:focus { border-color: var(--teal); }
+
+  textarea.oe {
+    width: 100%; min-height: 130px; padding: 12px 14px; font-family: 'DM Sans', sans-serif; font-size: 0.91rem;
+    border: 1.5px solid var(--border); border-radius: 6px; resize: vertical; outline: none; line-height: 1.65;
+    background: var(--off-white); transition: border-color .1s;
+  }
+  textarea.oe:focus { border-color: var(--teal); background: var(--white); }
+  .ch { font-family: var(--mono); font-size: 0.65rem; color: var(--muted); text-align: right; margin-top: 4px; }
+
+  .submit-area { margin-top: 42px; text-align: center; }
+  .btn-sub {
+    padding: 14px 52px; background: var(--teal); color: var(--white); font-family: 'DM Sans', sans-serif;
+    font-weight: 600; font-size: 1rem; border: none; border-radius: 6px; cursor: pointer; transition: background .13s;
+  }
+  .btn-sub:hover { background: var(--teal-mid); }
+  .btn-sub:disabled { background: #aaa; cursor: not-allowed; }
+  .sub-note { font-size: 0.78rem; color: var(--muted); margin-top: 9px; }
+
+  /* RESULTS */
+  #results-area { display: none; }
+  .res-inner { max-width: 780px; margin: 0 auto; padding: 40px 24px 80px; }
+  .res-hero {
+    background: var(--teal); border-radius: 12px; padding: 40px 44px; margin-bottom: 24px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px;
+  }
+  .rh-l h2 { font-family: var(--mono); font-size: 0.66rem; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
+  .rh-l .rname { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: var(--white); }
+  .rh-l .rsub { font-size: 0.8rem; color: rgba(255,255,255,0.45); margin-top: 6px; }
+  .rh-r { text-align: right; }
+  .big-sc { font-family: 'Playfair Display', serif; font-size: 3.8rem; color: var(--lime); line-height: 1; font-weight: 800; }
+  .big-sc span { font-size: 1.6rem; color: rgba(255,255,255,0.35); }
+  .sc-lbl { font-family: var(--mono); font-size: 0.67rem; color: rgba(255,255,255,0.4); margin-top: 3px; }
+  .pct-pill {
+    display: inline-block; background: var(--lime); color: var(--teal); font-family: var(--mono); font-size: 0.73rem;
+    font-weight: 600; padding: 4px 12px; border-radius: 20px; margin-top: 7px;
+  }
+  .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 26px; }
+  .stat-c {
+    background: var(--white); border: 1px solid var(--border); border-top: 3px solid var(--teal);
+    border-radius: 8px; padding: 16px 14px; text-align: center;
+  }
+  .stat-c .sl { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 1.4px; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; }
+  .stat-c .sv { font-family: 'Playfair Display', serif; font-size: 1.45rem; font-weight: 700; color: var(--teal); }
+  .sv.g { color: var(--correct); }
+
+  .rev-sec { margin-bottom: 38px; }
+  .rev-sec h3 {
+    font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--teal); margin-bottom: 14px;
+    padding-bottom: 10px; border-bottom: 2px solid var(--teal);
+  }
+  .rev-c {
+    background: var(--white); border: 1px solid var(--border); border-top: 3px solid var(--border);
+    border-radius: 8px; padding: 16px 20px; margin-bottom: 10px;
+  }
+  .rev-c.ok  { border-top-color: var(--correct); }
+  .rev-c.bad { border-top-color: var(--wrong); }
+  .rev-c.man { border-top-color: var(--lime-dark); }
+  .rev-qn { font-family: var(--mono); font-size: 0.65rem; color: var(--muted); margin-bottom: 4px; }
+  .rev-qt { font-size: 0.88rem; line-height: 1.5; margin-bottom: 10px; color: var(--mid); }
+  .pill-row { display: flex; gap: 7px; flex-wrap: wrap; }
+  .pill { font-size: 0.78rem; font-weight: 500; padding: 4px 11px; border-radius: 4px; font-family: var(--mono); }
+  .pill.sc { background: var(--cbg); color: var(--correct); }
+  .pill.sw { background: var(--wbg); color: var(--wrong); }
+  .pill.ca { background: var(--cbg); color: var(--correct); border: 1px solid #a3d9b8; }
+  .pill.mn { background: var(--warnbg); color: var(--warn); }
+  .oe-ans { margin-top: 9px; background: var(--off-white); border: 1px solid var(--border); border-radius: 5px; padding: 9px 13px; font-size: 0.83rem; color: var(--mid); line-height: 1.6; white-space: pre-wrap; font-style: italic; }
+  .rubric { margin-top: 9px; background: var(--warnbg); border-radius: 5px; padding: 7px 11px; font-size: 0.75rem; color: var(--warn); line-height: 1.5; font-family: var(--mono); }
+  .b-detail { margin-top: 9px; font-size: 0.77rem; font-family: var(--mono); line-height: 1.85; color: var(--mid); }
+
+  .upload-status { padding: 13px 18px; border-radius: 7px; font-size: 0.87rem; margin-top: 22px; text-align: center; }
+  .upload-status.uploading { background: #e8f0fe; color: #1a4db5; }
+  .upload-status.success   { background: var(--cbg); color: var(--correct); }
+  .upload-status.failed    { background: var(--wbg); color: var(--wrong); }
+
+  @media (max-width: 640px) {
+    .stat-row { grid-template-columns: 1fr 1fr; }
+    .res-hero { flex-direction: column; text-align: center; }
+    .rh-r { text-align: center; }
+    .score-grid { grid-template-columns: 1fr; }
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-
 <body>
 
-        <!-- Navigation -->
-        <nav class="mb-6 pt-4 no-print" style="max-width: 1000px; margin-left: auto; margin-right: auto;">
-            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 transition-colors" style="text-decoration: none; color: #9ca3af;">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                Back to Course Hub
-            </a>
-        </nav>
+<!-- ══ LOADING ══ -->
+<div id="loading-screen">
+  <div class="spinner"></div>
+  <p>Loading…</p>
+</div>
 
+<!-- ══ ERROR ══ -->
+<div id="error-screen">
+  <div class="error-card">
+    <h2>⚠ Something went wrong</h2>
+    <p id="error-message">Unable to load the test. Check your connection and try again.</p>
+  </div>
+</div>
 
+<!-- ══ ACCESS CODE GATE ══ -->
+<div id="access-code-gate">
+  <div class="gate-card">
+    <div class="gate-logo">AI Junior Competition · Classes 1–7 Test</div>
+    <h2>Test Access</h2>
+    <p class="gate-sub">Enter the access code your instructor gave you to begin.</p>
+    <label class="gate-label" for="access-code">Access Code</label>
+    <input class="gate-input" type="text" id="access-code" placeholder="e.g. C1TO7TEST" autocomplete="off">
+    <div class="gate-err" id="code-err"></div>
+    <button class="gate-btn" id="code-btn" onclick="validateAccessCode()">Continue →</button>
+  </div>
+</div>
 
+<!-- ══ COVER / NAME ══ -->
+<div id="cover">
+  <div class="cover-wrap">
+    <span class="hero-tag">STRUCTURED FOR SUCCESS</span>
+    <h1>Classes 1–7<br><em>Practice Test.</em></h1>
+    <p class="cover-sub">Assess your understanding across Classes 1–7. Complete all 21 questions and receive instant auto-graded feedback on the multiple choice and fill-in-the-blank sections.</p>
 
-  <!-- ══ COVER ══ -->
-  <div id="cover">
-    <div class="cover-wrap">
-      <span class="hero-tag">AI Junior Competition: Class 8</span>
-      <h1>Midterm<br><em>Test.</em></h1>
-      <p class="cover-sub">Assess your understanding across Classes 1–7. Complete all 21 questions and receive instant
-        auto-graded feedback.</p>
+    <div class="score-grid">
+      <div class="sc-cell"><div class="lbl">Total</div><div class="val">/ 60</div></div>
+      <div class="sc-cell"><div class="lbl">MCQ Q1–15</div><div class="val">/ 30</div></div>
+      <div class="sc-cell"><div class="lbl">Blanks &amp; Open Q16–21</div><div class="val">/ 30</div></div>
+    </div>
 
-      <div class="score-grid">
-        <div class="sc-cell">
-          <div class="lbl">Total</div>
-          <div class="val">/ 60</div>
-        </div>
-        <div class="sc-cell">
-          <div class="lbl">MCQ Q1–15</div>
-          <div class="val">/ 30</div>
-        </div>
-        <div class="sc-cell">
-          <div class="lbl">Open-Ended Q16–21</div>
-          <div class="val">/ 30</div>
-        </div>
-      </div>
+    <div class="name-box">
+      <label for="sname">Full Name — Required to Begin</label>
+      <input type="text" id="sname" placeholder="e.g. Sophie Tremblay" autocomplete="name">
+      <div class="err-msg" id="nerr">Please enter your first and last name.</div>
+      <button class="btn-start" onclick="startTest()">Begin Test →</button>
+    </div>
+  </div>
+</div>
 
-      <div class="name-box">
-        <label for="sname">Full Name — Required to Begin</label>
-        <input type="text" id="sname" placeholder="e.g. Sophie Tremblay" autocomplete="name">
-        <div class="err-msg" id="nerr">Please enter your first and last name.</div>
-        <button class="btn-start" onclick="startTest()">Begin Assessment →</button>
-      </div>
+<!-- ══ TEST ══ -->
+<div id="test-area">
+<div class="test-inner">
+
+  <div class="student-banner">
+    <span style="color:rgba(255,255,255,0.5);font-size:0.82rem;">Student:</span>
+    <span class="s-name" id="bname"></span>
+    <span class="s-right">21 questions · 60 pts</span>
+  </div>
+
+  <div class="progress-sticky">
+    <div class="prog-track"><div class="prog-fill" id="pfill"></div></div>
+    <div class="prog-txt" id="ptxt">0 / 21 answered</div>
+  </div>
+
+  <!-- PART 1 -->
+  <div class="part-hdr"><h2>Part 1: Multiple Choice</h2><p>Q1–15 · 2 pts each · Classes 1–7</p></div>
+
+  <!-- Q1 — Class 1 -->
+  <div class="qc" id="qcard-1">
+    <div class="q-meta"><span class="q-num">Q1</span><span class="q-pts">2 pts</span><span class="q-tag">Class 1</span></div>
+    <div class="q-body"><p>Spam filters, voice assistants, recommendation engines, and face unlock are all examples of AI systems that exist and are deployed at scale today. Which type of AI are they?</p></div>
+    <ul class="opts">
+      <li><label class="opt-lbl"><input type="radio" name="q1" value="A"><span class="rdot"></span>A) Artificial General Intelligence (AGI)</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q1" value="B"><span class="rdot"></span>B) Artificial Narrow Intelligence (ANI)</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q1" value="C"><span class="rdot"></span>C) Artificial Super Intelligence (ASI)</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q1" value="D"><span class="rdot"></span>D) Artificial Hybrid Intelligence</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q1" value="E"><span class="rdot"></span>E) General Deep Learning</label></li>
+    </ul>
+  </div>
+
+  <!-- Q2 — Class 1 -->
+  <div class="qc" id="qcard-2">
+    <div class="q-meta"><span class="q-num">Q2</span><span class="q-pts">2 pts</span><span class="q-tag">Class 1</span></div>
+    <div class="q-body">
+      <p>Consider the following NumPy code:</p>
+      <pre>import numpy as np
+v1 = np.array([1, 2, 3])
+v2 = np.array([4, 5, 6])
+result = np.dot(v1, v2)
+print(result)</pre>
+      <p>What is the output?</p>
+    </div>
+    <ul class="opts">
+      <li><label class="opt-lbl"><input type="radio" name="q2" value="A"><span class="rdot"></span>A) 32</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q2" value="B"><span class="rdot"></span>B) 21</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q2" value="C"><span class="rdot"></span>C) 30</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q2" value="D"><span class="rdot"></span>D) 15</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q2" value="E"><span class="rdot"></span>E) 24</label></li>
+    </ul>
+  </div>
+
+  <!-- Q3 — Class 2 -->
+  <div class="qc" id="qcard-3">
+    <div class="q-meta"><span class="q-num">Q3</span><span class="q-pts">2 pts</span><span class="q-tag">Class 2</span></div>
+    <div class="q-body"><p>For the dataset <code>[2, 4, 4, 6, 10]</code>, what is the population variance (<code>np.var()</code>)?</p></div>
+    <ul class="opts">
+      <li><label class="opt-lbl"><input type="radio" name="q3" value="A"><span class="rdot"></span>A) 7.36</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q3" value="B"><span class="rdot"></span>B) 5.20</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q3" value="C"><span class="rdot"></span>C) 2.713</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q3" value="D"><span class="rdot"></span>D) 6.40</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q3" value="E"><span class="rdot"></span>E) 8.00</label></li>
+    </ul>
+  </div>
+
+  <!-- Q4 — Class 2 -->
+  <div class="qc" id="qcard-4">
+    <div class="q-meta"><span class="q-num">Q4</span><span class="q-pts">2 pts</span><span class="q-tag">Class 2</span></div>
+    <div class="q-body"><p>A model reports <code>J_train = 0.05</code> and <code>J_cv = 0.38</code> — training error is low, but cross-validation error is much higher. What does this pattern indicate?</p></div>
+    <ul class="opts">
+      <li><label class="opt-lbl"><input type="radio" name="q4" value="A"><span class="rdot"></span>A) High bias (underfitting)</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q4" value="B"><span class="rdot"></span>B) High variance (overfitting)</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q4" value="C"><span class="rdot"></span>C) The model is perfectly calibrated</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q4" value="D"><span class="rdot"></span>D) Data leakage between train and test sets</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q4" value="E"><span class="rdot"></span>E) The learning rate is too small</label></li>
+    </ul>
+  </div>
+
+  <!-- Q5 — Class 3 -->
+  <div class="qc" id="qcard-5">
+    <div class="q-meta"><span class="q-num">Q5</span><span class="q-pts">2 pts</span><span class="q-tag">Class 3</span></div>
+    <div class="q-body"><p>A feature column has values <code>[10, 20, 30, 40, 50]</code>. After Min-Max scaling to <code>[0, 1]</code>, what is the scaled value of <strong>40</strong>?</p></div>
+    <ul class="opts">
+      <li><label class="opt-lbl"><input type="radio" name="q5" value="A"><span class="rdot"></span>A) 0.60</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q5" value="B"><span class="rdot"></span>B) 0.75</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q5" value="C"><span class="rdot"></span>C) 0.80</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q5" value="D"><span class="rdot"></span>D) 0.40</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q5" value="E"><span class="rdot"></span>E) 1.00</label></li>
+    </ul>
+  </div>
+
+  <!-- Q6 — Class 3 -->
+  <div class="qc" id="qcard-6">
+    <div class="q-meta"><span class="q-num">Q6</span><span class="q-pts">2 pts</span><span class="q-tag">Class 3</span></div>
+    <div class="q-body">
+      <p>A DataFrame has 400 rows and 5 columns, including a <code>store_id</code> column with 4 distinct categories. After running:</p>
+      <pre>df_encoded = pd.get_dummies(df, columns=['store_id'])</pre>
+      <p>what is the shape of <code>df_encoded</code>?</p>
+    </div>
+    <ul class="opts">
+      <li><label class="opt-lbl"><input type="radio" name="q6" value="A"><span class="rdot"></span>A) (400, 8)</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q6" value="B"><span class="rdot"></span>B) (400, 9)</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q6" value="C"><span class="rdot"></span>C) (400, 5)</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q6" value="D"><span class="rdot"></span>D) (400, 4)</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q6" value="E"><span class="rdot"></span>E) (400, 12)</label></li>
+    </ul>
+  </div>
+
+  <!-- Q7 — Class 4 -->
+  <div class="qc" id="qcard-7">
+    <div class="q-meta"><span class="q-num">Q7</span><span class="q-pts">2 pts</span><span class="q-tag">Class 4</span></div>
+    <div class="q-body"><p>You first split off 20% of the data as a test set. From the remaining 80%, you then split off 25% as a validation set. What are the final train / validation / test proportions of the full dataset?</p></div>
+    <ul class="opts">
+      <li><label class="opt-lbl"><input type="radio" name="q7" value="A"><span class="rdot"></span>A) 60 / 20 / 20</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q7" value="B"><span class="rdot"></span>B) 70 / 20 / 10</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q7" value="C"><span class="rdot"></span>C) 80 / 10 / 10</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q7" value="D"><span class="rdot"></span>D) 50 / 30 / 20</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q7" value="E"><span class="rdot"></span>E) 64 / 16 / 20</label></li>
+    </ul>
+  </div>
+
+  <!-- Q8 — Class 4 -->
+  <div class="qc" id="qcard-8">
+    <div class="q-meta"><span class="q-num">Q8</span><span class="q-pts">2 pts</span><span class="q-tag">Class 4</span></div>
+    <div class="q-body">
+      <p>Consider the following code:</p>
+      <pre>kf = KFold(n_splits=5, shuffle=True, random_state=4)
+cv_scores = cross_val_score(model, X, y, cv=kf, scoring='r2')</pre>
+      <p>How many times is the model trained and evaluated?</p>
+    </div>
+    <ul class="opts">
+      <li><label class="opt-lbl"><input type="radio" name="q8" value="A"><span class="rdot"></span>A) 5</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q8" value="B"><span class="rdot"></span>B) 1</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q8" value="C"><span class="rdot"></span>C) 10</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q8" value="D"><span class="rdot"></span>D) 4</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q8" value="E"><span class="rdot"></span>E) 25</label></li>
+    </ul>
+  </div>
+
+  <!-- Q9 — Class 5 -->
+  <div class="qc" id="qcard-9">
+    <div class="q-meta"><span class="q-num">Q9</span><span class="q-pts">2 pts</span><span class="q-tag">Class 5</span></div>
+    <div class="q-body">
+      <p>Given the MSE cost function <code>J(w, b) = (1 / 2m) Σ (f(xᵢ) − yᵢ)²</code> where <code>f(x) = w·x + b</code>, what is <code>J(w=0.8, b=0.9)</code> for <code>x = [1, 2, 3, 4, 5]</code> and <code>y = [2, 4, 5, 4, 5]</code>?</p>
+    </div>
+    <ul class="opts">
+      <li><label class="opt-lbl"><input type="radio" name="q9" value="A"><span class="rdot"></span>A) 0.525</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q9" value="B"><span class="rdot"></span>B) 1.050</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q9" value="C"><span class="rdot"></span>C) 0.2625</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q9" value="D"><span class="rdot"></span>D) 5.250</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q9" value="E"><span class="rdot"></span>E) 0.420</label></li>
+    </ul>
+  </div>
+
+  <!-- Q10 — Class 5 -->
+  <div class="qc" id="qcard-10">
+    <div class="q-meta"><span class="q-num">Q10</span><span class="q-pts">2 pts</span><span class="q-tag">Class 5</span></div>
+    <div class="q-body"><p>Which approach to feature scaling with <code>StandardScaler</code> is correct for a train/test split?</p></div>
+    <ul class="opts">
+      <li><label class="opt-lbl"><input type="radio" name="q10" value="A"><span class="rdot"></span>A) <code>fit_transform</code> on the training set, <code>transform</code> only on the test set</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q10" value="B"><span class="rdot"></span>B) <code>fit_transform</code> separately on train and on test</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q10" value="C"><span class="rdot"></span>C) <code>fit</code> on the test set, <code>transform</code> on the training set</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q10" value="D"><span class="rdot"></span>D) <code>fit_transform</code> on the full dataset, then split</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q10" value="E"><span class="rdot"></span>E) Scaling is unnecessary for linear regression</label></li>
+    </ul>
+  </div>
+
+  <!-- Q11 — Class 6 -->
+  <div class="qc" id="qcard-11">
+    <div class="q-meta"><span class="q-num">Q11</span><span class="q-pts">2 pts</span><span class="q-tag">Class 6</span></div>
+    <div class="q-body"><p>Using the sigmoid function <code>σ(z) = 1 / (1 + e⁻ᶻ)</code>, what does <code>σ(5)</code> round to?</p></div>
+    <ul class="opts">
+      <li><label class="opt-lbl"><input type="radio" name="q11" value="A"><span class="rdot"></span>A) 0.9933</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q11" value="B"><span class="rdot"></span>B) 0.5000</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q11" value="C"><span class="rdot"></span>C) 1.0000</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q11" value="D"><span class="rdot"></span>D) 0.0067</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q11" value="E"><span class="rdot"></span>E) 0.8590</label></li>
+    </ul>
+  </div>
+
+  <!-- Q12 — Class 6 -->
+  <div class="qc" id="qcard-12">
+    <div class="q-meta"><span class="q-num">Q12</span><span class="q-pts">2 pts</span><span class="q-tag">Class 6</span></div>
+    <div class="q-body"><p>A confusion matrix gives <code>TP=4, FP=1, FN=2, TN=3</code>. What is the <strong>recall</strong>?</p></div>
+    <ul class="opts">
+      <li><label class="opt-lbl"><input type="radio" name="q12" value="A"><span class="rdot"></span>A) 0.6667</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q12" value="B"><span class="rdot"></span>B) 0.8000</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q12" value="C"><span class="rdot"></span>C) 0.7000</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q12" value="D"><span class="rdot"></span>D) 0.7273</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q12" value="E"><span class="rdot"></span>E) 0.5000</label></li>
+    </ul>
+  </div>
+
+  <!-- Q13 — Class 6 -->
+  <div class="qc" id="qcard-13">
+    <div class="q-meta"><span class="q-num">Q13</span><span class="q-pts">2 pts</span><span class="q-tag">Class 6</span></div>
+    <div class="q-body"><p>A confusion matrix gives <code>TP=25, FP=8, FN=5, TN=12</code>. What is the <strong>precision</strong>?</p></div>
+    <ul class="opts">
+      <li><label class="opt-lbl"><input type="radio" name="q13" value="A"><span class="rdot"></span>A) 0.7576</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q13" value="B"><span class="rdot"></span>B) 0.8333</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q13" value="C"><span class="rdot"></span>C) 0.7400</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q13" value="D"><span class="rdot"></span>D) 0.7937</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q13" value="E"><span class="rdot"></span>E) 0.6250</label></li>
+    </ul>
+  </div>
+
+  <!-- Q14 — Class 7 -->
+  <div class="qc" id="qcard-14">
+    <div class="q-meta"><span class="q-num">Q14</span><span class="q-pts">2 pts</span><span class="q-tag">Class 7</span></div>
+    <div class="q-body"><p>Using the quadratic kernel <code>K(x, x′) = (x·x′ + 1)²</code>, what is <code>K(3, 3)</code>?</p></div>
+    <ul class="opts">
+      <li><label class="opt-lbl"><input type="radio" name="q14" value="A"><span class="rdot"></span>A) 100</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q14" value="B"><span class="rdot"></span>B) 49</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q14" value="C"><span class="rdot"></span>C) 91</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q14" value="D"><span class="rdot"></span>D) 82</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q14" value="E"><span class="rdot"></span>E) 64</label></li>
+    </ul>
+  </div>
+
+  <!-- Q15 — Class 7 -->
+  <div class="qc" id="qcard-15">
+    <div class="q-meta"><span class="q-num">Q15</span><span class="q-pts">2 pts</span><span class="q-tag">Class 7</span></div>
+    <div class="q-body">
+      <p>After fitting <code>KernelRidge(kernel='polynomial', degree=2, coef0=1)</code>, a check shows:</p>
+      <pre>X_train_s.shape          # (320, 5)
+model_poly.X_fit_.shape  # (320, 5)  — identical</pre>
+      <p>Based on this, what does the kernel trick actually do?</p>
+    </div>
+    <ul class="opts">
+      <li><label class="opt-lbl"><input type="radio" name="q15" value="A"><span class="rdot"></span>A) It literally adds new polynomial feature columns to the stored data</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q15" value="B"><span class="rdot"></span>B) It computes similarity as if points were mapped to a higher-dimensional space, without ever creating new columns</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q15" value="C"><span class="rdot"></span>C) It removes features to reduce dimensionality</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q15" value="D"><span class="rdot"></span>D) It only works when the model is linear</label></li>
+      <li><label class="opt-lbl"><input type="radio" name="q15" value="E"><span class="rdot"></span>E) It converts categorical features into numeric ones</label></li>
+    </ul>
+  </div>
+
+  <!-- PART 2 -->
+  <div class="part-hdr"><h2>Part 2: Fill-in-the-Blank &amp; Open-Ended</h2><p>Q16–21 · 5 pts each · Classes 2–7</p></div>
+
+  <!-- Q16 — Class 3 blanks -->
+  <div class="qc" id="qcard-16">
+    <div class="q-meta"><span class="q-num">Q16</span><span class="q-pts">5 pts · fill in blanks</span><span class="q-tag">Class 3</span></div>
+    <div class="q-body"><p>Fill in the six blanks to complete this data-cleaning and revenue pipeline:</p></div>
+    <div class="bcode">df['units_sold'] = df['units_sold'].<input class="bi" id="q16_b1" placeholder="b1" style="width:110px;">(0)
+df['discount']   = df['discount'].<input class="bi" id="q16_b2" placeholder="b2" style="width:150px;">(df['discount'].mean())
+df['revenue']    = <input class="bi" id="q16_b3" placeholder="b3" style="width:290px;">
+store_revenue    = df.groupby(<input class="bi" id="q16_b4" placeholder="b4" style="width:110px;">)['revenue'].<input class="bi" id="q16_b5" placeholder="b5" style="width:70px;">()
+store_revenue    = store_revenue.<input class="bi" id="q16_b6" placeholder="b6" style="width:180px;"></div>
+  </div>
+
+  <!-- Q17 — Class 5 blanks -->
+  <div class="qc" id="qcard-17">
+    <div class="q-meta"><span class="q-num">Q17</span><span class="q-pts">5 pts · fill in blanks</span><span class="q-tag">Class 5</span></div>
+    <div class="q-body"><p>Fill in the two blanks inside the loop to implement the MSE cost function:</p></div>
+    <div class="bcode">def compute_cost(x, y, w, b):
+    m = len(x)
+    cost_sum = 0.0
+    for i in range(m):
+        f_wb = <input class="bi" id="q17_b1" placeholder="b1" style="width:170px;">
+        cost_sum += <input class="bi" id="q17_b2" placeholder="b2" style="width:210px;">
+    total_cost = (1 / (2 * m)) * cost_sum
+    return total_cost</div>
+  </div>
+
+  <!-- Q18 — Class 6 blanks -->
+  <div class="qc" id="qcard-18">
+    <div class="q-meta"><span class="q-num">Q18</span><span class="q-pts">5 pts · fill in blanks</span><span class="q-tag">Class 6</span></div>
+    <div class="q-body"><p>Fill in the four blanks to compute the classification metrics from <code>TP, FP, FN, TN</code>:</p></div>
+    <div class="bcode">accuracy  = <input class="bi" id="q18_b1" placeholder="b1" style="width:230px;">
+precision = <input class="bi" id="q18_b2" placeholder="b2" style="width:150px;">
+recall    = <input class="bi" id="q18_b3" placeholder="b3" style="width:150px;">
+f1        = <input class="bi" id="q18_b4" placeholder="b4" style="width:290px;"></div>
+  </div>
+
+  <!-- Q19 — Class 6 blanks -->
+  <div class="qc" id="qcard-19">
+    <div class="q-meta"><span class="q-num">Q19</span><span class="q-pts">5 pts · fill in blanks</span><span class="q-tag">Class 6</span></div>
+    <div class="q-body"><p>Fill in the four blanks to complete the sigmoid and predict functions:</p></div>
+    <div class="bcode">def sigmoid(z):
+    return <input class="bi" id="q19_b1" placeholder="b1" style="width:190px;">
+
+def predict(X, w, b, threshold=0.5):
+    z = <input class="bi" id="q19_b2" placeholder="b2" style="width:150px;">
+    probabilities = <input class="bi" id="q19_b3" placeholder="b3" style="width:120px;">
+    return (probabilities >= threshold).<input class="bi" id="q19_b4" placeholder="b4" style="width:110px;">()</div>
+  </div>
+
+  <!-- Q20 — Class 7 blanks -->
+  <div class="qc" id="qcard-20">
+    <div class="q-meta"><span class="q-num">Q20</span><span class="q-pts">5 pts · fill in blanks</span><span class="q-tag">Class 7</span></div>
+    <div class="q-body"><p>Fill in the three blanks to complete the kernel functions from Class 7:</p></div>
+    <div class="bcode">def kernel(x, xp):
+    return <input class="bi" id="q20_b1" placeholder="b1" style="width:160px;">    # quadratic kernel
+
+def phi(x):
+    return <input class="bi" id="q20_b2" placeholder="b2" style="width:110px;">    # feature mapping
+
+def rbf_kernel(distance, gamma=1.0):
+    return <input class="bi" id="q20_b3" placeholder="b3" style="width:230px;">    # RBF kernel</div>
+  </div>
+
+  <!-- Q21 — Open-ended -->
+  <div class="qc" id="qcard-21">
+    <div class="q-meta"><span class="q-num">Q21</span><span class="q-pts">5 pts · open-ended</span><span class="q-tag">Classes 2 &amp; 4</span></div>
+    <div class="q-body">
+      <p>A model reports <code>Train R² = 0.98</code> and <code>Test R² = 0.41</code>. In 3–5 sentences: explain what is happening, name one technique from class you would try first to fix it, and connect your answer to the bias/variance idea from Class 2.</p>
+    </div>
+    <textarea class="oe" id="q21" placeholder="Type your answer here…"></textarea>
+    <div class="ch" id="q21-hint">0 chars</div>
+  </div>
+
+  <div class="submit-area">
+    <button class="btn-sub" id="sub-btn" onclick="submitTest()">Submit Test →</button>
+    <p class="sub-note">You can review and change any answer before submitting. Submission is final.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- ══ RESULTS ══ -->
+<div id="results-area">
+<div class="res-inner">
+
+  <div class="res-hero">
+    <div class="rh-l">
+      <h2>Student</h2>
+      <div class="rname" id="r-name"></div>
+      <p class="rsub">Classes 1–7 Test · Submitted just now</p>
+    </div>
+    <div class="rh-r">
+      <div class="big-sc"><span id="r-score"></span><span>/60</span></div>
+      <div class="sc-lbl">Auto-graded score</div>
+      <div class="pct-pill" id="r-pct"></div>
     </div>
   </div>
 
-  <!-- ══ TEST ══ -->
-  <div id="test-area">
-    <div class="test-inner">
-
-      <div class="student-banner">
-        <span style="color:rgba(255,255,255,0.5);font-size:0.82rem;">Student:</span>
-        <span class="s-name" id="bname"></span>
-        <span class="s-right">21 questions · 60 pts</span>
-      </div>
-
-      <div class="progress-sticky">
-        <div class="prog-track">
-          <div class="prog-fill" id="pfill"></div>
-        </div>
-        <div class="prog-txt" id="ptxt">0 / 21 answered</div>
-      </div>
-
-      <!-- PART 1 -->
-      <div class="part-hdr">
-        <h2>Part 1: Multiple Choice</h2>
-        <p>Q1–15 · 2 pts each</p>
-      </div>
-
-      <!-- Q1 -->
-      <div class="qc" id="qcard-1">
-        <div class="q-meta"><span class="q-num">Q1</span><span class="q-pts">2 pts</span></div>
-        <div class="q-body">
-          <p>Consider the following Python code:</p>
-          <pre>import numpy as np
-A = np.array([[1, 2, 3],
-              [4, 5, 6],
-              [7, 8, 9]])
-B = A[:2, 1:]
-print(B.shape, B[1, 0])</pre>
-          <p>What is the output?</p>
-        </div>
-        <ul class="opts">
-          <li><label class="opt-lbl"><input type="radio" name="q1" value="A"><span class="rdot"></span>A) (2, 2)
-              5</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q1" value="B"><span class="rdot"></span>B) (2, 3)
-              5</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q1" value="C"><span class="rdot"></span>C) (2, 2)
-              4</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q1" value="D"><span class="rdot"></span>D) (3, 2)
-              5</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q1" value="E"><span class="rdot"></span>E) (2, 2)
-              8</label></li>
-        </ul>
-      </div>
-
-      <!-- Q2 -->
-      <div class="qc" id="qcard-2">
-        <div class="q-meta"><span class="q-num">Q2</span><span class="q-pts">2 pts</span></div>
-        <div class="q-body">
-          <p>A hiring algorithm trained on 20 years of data where 90% of hires were male systematically scores male
-            applicants higher. This is an example of:</p>
-        </div>
-        <ul class="opts">
-          <li><label class="opt-lbl"><input type="radio" name="q2" value="A"><span class="rdot"></span>A) Random noise
-              in the data</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q2" value="B"><span class="rdot"></span>B) Overfitting to
-              the validation set</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q2" value="C"><span class="rdot"></span>C) Historical
-              bias embedded in the training data</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q2" value="D"><span class="rdot"></span>D) Underfitting
-              caused by insufficient model complexity</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q2" value="E"><span class="rdot"></span>E) Data leakage
-              between training and test sets</label></li>
-        </ul>
-      </div>
-
-      <!-- Q3 -->
-      <div class="qc" id="qcard-3">
-        <div class="q-meta"><span class="q-num">Q3</span><span class="q-pts">2 pts</span></div>
-        <div class="q-body">
-          <p>A feature column has values: [10, 20, 30, 40, 50]. After Min-Max scaling to [0, 1], what is the scaled
-            value of 30?</p>
-        </div>
-        <ul class="opts">
-          <li><label class="opt-lbl"><input type="radio" name="q3" value="A"><span class="rdot"></span>A) 0.25</label>
-          </li>
-          <li><label class="opt-lbl"><input type="radio" name="q3" value="B"><span class="rdot"></span>B) 0.40</label>
-          </li>
-          <li><label class="opt-lbl"><input type="radio" name="q3" value="C"><span class="rdot"></span>C) 0.50</label>
-          </li>
-          <li><label class="opt-lbl"><input type="radio" name="q3" value="D"><span class="rdot"></span>D) 0.60</label>
-          </li>
-          <li><label class="opt-lbl"><input type="radio" name="q3" value="E"><span class="rdot"></span>E) 0.75</label>
-          </li>
-        </ul>
-      </div>
-
-      <!-- Q4 -->
-      <div class="qc" id="qcard-4">
-        <div class="q-meta"><span class="q-num">Q4</span><span class="q-pts">2 pts</span></div>
-        <div class="q-body">
-          <p>Consider the following Python code:</p>
-          <pre>import pandas as pd
-import numpy as np
-df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, np.nan, 6]})
-df['C'] = df['A'] + df['B'].fillna(0)
-print(df.iloc[1])</pre>
-          <p>What is the output?</p>
-        </div>
-        <ul class="opts">
-          <li><label class="opt-lbl"><input type="radio" name="q4" value="A"><span class="rdot"></span>A) A 2.0 &nbsp; B
-              NaN &nbsp; C 2.0 &nbsp; Name: 1, dtype: float64</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q4" value="B"><span class="rdot"></span>B) A 2.0 &nbsp; B
-              0.0 &nbsp; C 2.0 &nbsp; Name: 1, dtype: float64</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q4" value="C"><span class="rdot"></span>C) A 2.0 &nbsp; B
-              0.0 &nbsp; C 6.0 &nbsp; Name: 1, dtype: float64</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q4" value="D"><span class="rdot"></span>D) A 2 &nbsp; B
-              NaN &nbsp; C NaN &nbsp; Name: 1, dtype: float64</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q4" value="E"><span class="rdot"></span>E) A 2.0 &nbsp; B
-              NaN &nbsp; C NaN &nbsp; Name: 1, dtype: float64</label></li>
-        </ul>
-      </div>
-
-      <!-- Q5 -->
-      <div class="qc" id="qcard-5">
-        <div class="q-meta"><span class="q-num">Q5</span><span class="q-pts">2 pts</span></div>
-        <div class="q-body">
-          <p>A model achieves 99% accuracy on the training set but only 58% on the test set. This is most likely:</p>
-        </div>
-        <ul class="opts">
-          <li><label class="opt-lbl"><input type="radio" name="q5" value="A"><span class="rdot"></span>A) Underfitting —
-              the model is too simple</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q5" value="B"><span class="rdot"></span>B) Overfitting —
-              the model memorised training data and fails to generalise</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q5" value="C"><span class="rdot"></span>C) A
-              well-calibrated model with balanced bias and variance</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q5" value="D"><span class="rdot"></span>D) Data leakage —
-              test data was accidentally included in training</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q5" value="E"><span class="rdot"></span>E) High bias —
-              the model cannot capture the underlying pattern</label></li>
-        </ul>
-      </div>
-
-      <!-- Q6 -->
-      <div class="qc" id="qcard-6">
-        <div class="q-meta"><span class="q-num">Q6</span><span class="q-pts">2 pts</span></div>
-        <div class="q-body">
-          <p>In 5-fold cross-validation on a dataset of 1,000 samples, how many samples are used for training in each
-            fold?</p>
-        </div>
-        <ul class="opts">
-          <li><label class="opt-lbl"><input type="radio" name="q6" value="A"><span class="rdot"></span>A) 200</label>
-          </li>
-          <li><label class="opt-lbl"><input type="radio" name="q6" value="B"><span class="rdot"></span>B) 400</label>
-          </li>
-          <li><label class="opt-lbl"><input type="radio" name="q6" value="C"><span class="rdot"></span>C) 500</label>
-          </li>
-          <li><label class="opt-lbl"><input type="radio" name="q6" value="D"><span class="rdot"></span>D) 800</label>
-          </li>
-          <li><label class="opt-lbl"><input type="radio" name="q6" value="E"><span class="rdot"></span>E) 900</label>
-          </li>
-        </ul>
-      </div>
-
-      <!-- Q7 -->
-      <div class="qc" id="qcard-7">
-        <div class="q-meta"><span class="q-num">Q7</span><span class="q-pts">2 pts</span></div>
-        <div class="q-body">
-          <p>For one-dimensional linear regression, the gradient of the loss <code>L(w,b) = (1/n)Σᵢ(yᵢ−(w·xᵢ+b))²</code>
-            with respect to <code>w</code> is:</p>
-        </div>
-        <ul class="opts">
-          <li><label class="opt-lbl"><input type="radio" name="q7" value="A"><span class="rdot"></span>A) (2/n) × Σᵢ
-              yᵢ</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q7" value="B"><span class="rdot"></span>B) (2/n) × Σᵢ (yᵢ
-              − (w·xᵢ+b))</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q7" value="C"><span class="rdot"></span>C) (2/n) × Σᵢ
-              xᵢ·(yᵢ − (w·xᵢ+b))</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q7" value="D"><span class="rdot"></span>D) −(2/n) × Σᵢ
-              xᵢ·(yᵢ − (w·xᵢ+b))</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q7" value="E"><span class="rdot"></span>E) −(2/n) × Σᵢ
-              (yᵢ − (w·xᵢ+b))</label></li>
-        </ul>
-      </div>
-
-      <!-- Q8 -->
-      <div class="qc" id="qcard-8">
-        <div class="q-meta"><span class="q-num">Q8</span><span class="q-pts">2 pts</span></div>
-        <div class="q-body">
-          <p>In matrix form, linear regression solves <code>ŵ = (XᵀX)⁻¹Xᵀy</code>. Which condition must hold for this to
-            be valid?</p>
-        </div>
-        <ul class="opts">
-          <li><label class="opt-lbl"><input type="radio" name="q8" value="A"><span class="rdot"></span>A) y has zero
-              mean</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q8" value="B"><span class="rdot"></span>B) XᵀX is
-              invertible</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q8" value="C"><span class="rdot"></span>C) X is
-              symmetric</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q8" value="D"><span class="rdot"></span>D) None of the
-              above is correct</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q8" value="E"><span class="rdot"></span>E) X is
-              orthogonal</label></li>
-        </ul>
-      </div>
-
-      <!-- Q9 -->
-      <div class="qc" id="qcard-9">
-        <div class="q-meta"><span class="q-num">Q9</span><span class="q-pts">2 pts</span></div>
-        <div class="q-body">
-          <p>If the learning rate α in gradient descent is set too high, what is most likely to happen?</p>
-        </div>
-        <ul class="opts">
-          <li><label class="opt-lbl"><input type="radio" name="q9" value="A"><span class="rdot"></span>A) The gradient
-              becomes very small and convergence slows down</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q9" value="B"><span class="rdot"></span>B) The cost
-              function oscillates or diverges instead of converging</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q9" value="C"><span class="rdot"></span>C) Training
-              reaches the global minimum faster with no downside</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q9" value="D"><span class="rdot"></span>D) The model
-              underfits the training data immediately</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q9" value="E"><span class="rdot"></span>E) Convergence
-              slows down but always remains stable</label></li>
-        </ul>
-      </div>
-
-      <!-- Q10 -->
-      <div class="qc" id="qcard-10">
-        <div class="q-meta"><span class="q-num">Q10</span><span class="q-pts">2 pts</span></div>
-        <div class="q-body">
-          <p>The sigmoid function <code>σ(z) = 1/(1+e⁻ᶻ)</code>. Which of the following is TRUE?</p>
-        </div>
-        <ul class="opts">
-          <li><label class="opt-lbl"><input type="radio" name="q10" value="A"><span class="rdot"></span>A) σ(0) = 0.5 —
-              at z = 0 the model outputs equal probability for both classes</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q10" value="B"><span class="rdot"></span>B) σ(z) can
-              exceed 1.0 for large positive z</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q10" value="C"><span class="rdot"></span>C) σ(z) produces
-              negative outputs for negative inputs</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q10" value="D"><span class="rdot"></span>D) The sigmoid
-              function is equivalent to the ReLU for binary classification</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q10" value="E"><span class="rdot"></span>E) σ(0) = 1 and
-              σ(∞) = 0.5</label></li>
-        </ul>
-      </div>
-
-      <!-- Q11 -->
-      <div class="qc" id="qcard-11">
-        <div class="q-meta"><span class="q-num">Q11</span><span class="q-pts">2 pts</span></div>
-        <div class="q-body">
-          <p>A classifier produces the following confusion matrix. What are the Precision and Recall?</p>
-          <table class="cm">
-            <tr>
-              <th></th>
-              <th>Predicted +</th>
-              <th>Predicted −</th>
-            </tr>
-            <tr>
-              <th>Actual +</th>
-              <td>50</td>
-              <td>20</td>
-            </tr>
-            <tr>
-              <th>Actual −</th>
-              <td>10</td>
-              <td>120</td>
-            </tr>
-          </table>
-        </div>
-        <ul class="opts">
-          <li><label class="opt-lbl"><input type="radio" name="q11" value="A"><span class="rdot"></span>A) Precision =
-              0.83, Recall = 0.71</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q11" value="B"><span class="rdot"></span>B) Precision =
-              0.71, Recall = 0.83</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q11" value="C"><span class="rdot"></span>C) Precision =
-              0.83, Recall = 0.83</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q11" value="D"><span class="rdot"></span>D) Precision =
-              0.71, Recall = 0.71</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q11" value="E"><span class="rdot"></span>E) Precision =
-              0.85, Recall = 0.71</label></li>
-        </ul>
-      </div>
-
-      <!-- Q12 -->
-      <div class="qc" id="qcard-12">
-        <div class="q-meta"><span class="q-num">Q12</span><span class="q-pts">2 pts</span></div>
-        <div class="q-body">
-          <p>A dataset has 950 Negative and 50 Positive samples. A model that always predicts Negative gets 95%
-            accuracy. Why is accuracy misleading here?</p>
-        </div>
-        <ul class="opts">
-          <li><label class="opt-lbl"><input type="radio" name="q12" value="A"><span class="rdot"></span>A) Accuracy
-              cannot be computed on imbalanced datasets</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q12" value="B"><span class="rdot"></span>B) The model has
-              0% recall for the Positive class — it never correctly identifies a Positive</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q12" value="C"><span class="rdot"></span>C) Accuracy
-              above 90% always indicates overfitting</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q12" value="D"><span class="rdot"></span>D) 95% accuracy
-              means the model is perfectly calibrated</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q12" value="E"><span class="rdot"></span>E) The confusion
-              matrix would show equal TP and TN values</label></li>
-        </ul>
-      </div>
-
-      <!-- Q13 -->
-      <div class="qc" id="qcard-13">
-        <div class="q-meta"><span class="q-num">Q13</span><span class="q-pts">2 pts</span></div>
-        <div class="q-body">
-          <p>What is the Euclidean distance between points A = (1, 4) and B = (4, 0)?</p>
-        </div>
-        <ul class="opts">
-          <li><label class="opt-lbl"><input type="radio" name="q13" value="A"><span class="rdot"></span>A) 3.0</label>
-          </li>
-          <li><label class="opt-lbl"><input type="radio" name="q13" value="B"><span class="rdot"></span>B) 4.0</label>
-          </li>
-          <li><label class="opt-lbl"><input type="radio" name="q13" value="C"><span class="rdot"></span>C) 5.0</label>
-          </li>
-          <li><label class="opt-lbl"><input type="radio" name="q13" value="D"><span class="rdot"></span>D) 7.0</label>
-          </li>
-          <li><label class="opt-lbl"><input type="radio" name="q13" value="E"><span class="rdot"></span>E) 25.0</label>
-          </li>
-        </ul>
-      </div>
-
-      <!-- Q14 -->
-      <div class="qc" id="qcard-14">
-        <div class="q-meta"><span class="q-num">Q14</span><span class="q-pts">2 pts</span></div>
-        <div class="q-body">
-          <p>You run K-Means with K = 2 on 1D data: <strong>1, 2, 3, 10, 12, 13</strong>. Initial centroids: C1 = 2, C2
-            = 12. After ONE full iteration, what are the new centroid values?</p>
-        </div>
-        <ul class="opts">
-          <li><label class="opt-lbl"><input type="radio" name="q14" value="A"><span class="rdot"></span>A) C1 = 2, C2 =
-              12</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q14" value="B"><span class="rdot"></span>B) C1 = 2, C2 =
-              11.67</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q14" value="C"><span class="rdot"></span>C) C1 = 3.5, C2
-              = 11.67</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q14" value="D"><span class="rdot"></span>D) C1 = 2, C2 =
-              13</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q14" value="E"><span class="rdot"></span>E) C1 = 2, C2 =
-              10</label></li>
-        </ul>
-      </div>
-
-      <!-- Q15 -->
-      <div class="qc" id="qcard-15">
-        <div class="q-meta"><span class="q-num">Q15</span><span class="q-pts">2 pts</span></div>
-        <div class="q-body">
-          <p>Which best describes the key difference between supervised learning (e.g. logistic regression) and
-            unsupervised learning (e.g. K-Means)?</p>
-        </div>
-        <ul class="opts">
-          <li><label class="opt-lbl"><input type="radio" name="q15" value="A"><span class="rdot"></span>A) Supervised
-              learning always requires more data than unsupervised learning</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q15" value="B"><span class="rdot"></span>B) Supervised
-              learning uses labelled data with known outputs; unsupervised learning finds structure in unlabelled
-              data</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q15" value="C"><span class="rdot"></span>C) Unsupervised
-              learning always produces more accurate predictions</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q15" value="D"><span class="rdot"></span>D) Supervised
-              learning cannot be used for classification tasks</label></li>
-          <li><label class="opt-lbl"><input type="radio" name="q15" value="E"><span class="rdot"></span>E) There is no
-              meaningful difference; both require labelled data</label></li>
-        </ul>
-      </div>
-
-      <!-- PART 2 -->
-      <div class="part-hdr">
-        <h2>Part 2: Open-Ended &amp; Coding</h2>
-        <p>Q16–21 · 5 pts each</p>
-      </div>
-
-      <!-- Q16 -->
-      <div class="qc" id="qcard-16">
-        <div class="q-meta"><span class="q-num">Q16</span><span class="q-pts">5 pts · fill in blanks</span></div>
-        <div class="q-body">
-          <p><strong>Data Cleaning and Preprocessing.</strong> File <code>sales.csv</code>: columns
-            <code>store_id</code>, <code>product</code> ('A'/'B'/'C'), <code>units_sold</code> (may be NaN),
-            <code>price</code> (float).
-          </p>
-        </div>
-        <div class="bcode">
-          import pandas as pd<br><br>
-          df = pd.read_csv('sales.csv')<br><br>
-          <span style="color:#777;"># Step 2: Fill missing units_sold with 0</span><br>
-          df['units_sold'] = df['units_sold'].<input class="bi" id="q16_b1" placeholder="method(0)"><br><br>
-          <span style="color:#777;"># Step 3: Min-Max scale price</span><br>
-          df['price_scaled'] = (df['price'] - df['price'].<input class="bi" id="q16_b2" placeholder="method()">)<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;/ (df['price'].<input class="bi" id="q16_b3" placeholder="method()"> -
-          df['price'].<input class="bi" id="q16_b4" placeholder="method()">)<br><br>
-          <span style="color:#777;"># Step 4: One-hot encode product</span><br>
-          df = pd.<input class="bi" id="q16_b5" placeholder="function(...)">(df, columns=['product'],
-          drop_first=True)<br><br>
-          <span style="color:#777;"># Step 5: Print first 3 rows</span><br>
-          print(df.<input class="bi" id="q16_b6" placeholder="attribute">)
-        </div>
-      </div>
-
-      <!-- Q17 -->
-      <div class="qc" id="qcard-17">
-        <div class="q-meta"><span class="q-num">Q17</span><span class="q-pts">5 pts · calculation</span></div>
-        <div class="q-body">
-          <p>We fit <code>f(x) = wx + b</code> with <strong>w = 4, b = −1</strong>. Points: (1,3), (2,7), (3,11),
-            (4,14), (5,20).</p>
-          <p>Compute <code>J(w,b) = 1/(2m) × Σᵢ (f(xᵢ)−yᵢ)²</code> where m = 5. Show all steps.</p>
-        </div>
-        <textarea class="oe" id="q17"
-          placeholder="f(1) = 4(1) − 1 = 3,  error = (3 − 3)² = 0&#10;f(2) = 4(2) − 1 = 7,  error = (7 − 7)² = 0&#10;...&#10;J = 1/10 × (...) = ___"></textarea>
-        <div class="ch" id="q17-hint">0 chars</div>
-      </div>
-
-      <!-- Q18 -->
-      <div class="qc" id="qcard-18">
-        <div class="q-meta"><span class="q-num">Q18</span><span class="q-pts">5 pts · metrics</span></div>
-        <div class="q-body">
-          <p>A binary classifier on 200 samples:</p>
-          <table class="cm">
-            <tr>
-              <th></th>
-              <th>Predicted +</th>
-              <th>Predicted −</th>
-            </tr>
-            <tr>
-              <th>Actual +</th>
-              <td>60</td>
-              <td>25</td>
-            </tr>
-            <tr>
-              <th>Actual −</th>
-              <td>15</td>
-              <td>100</td>
-            </tr>
-          </table>
-          <p>Calculate (a) Accuracy, (b) Precision, (c) Recall with full working. (d) Is the model more reliable at
-            avoiding FP or FN? Explain.</p>
-        </div>
-        <textarea class="oe" id="q18"
-          placeholder="a) Accuracy = (TP + TN) / Total = ...&#10;b) Precision = TP / (TP + FP) = ...&#10;c) Recall = TP / (TP + FN) = ...&#10;d) ..."></textarea>
-        <div class="ch" id="q18-hint">0 chars</div>
-      </div>
-
-      <!-- Q19 -->
-      <div class="qc" id="qcard-19">
-        <div class="q-meta"><span class="q-num">Q19</span><span class="q-pts">5 pts · fill in blanks</span></div>
-        <div class="q-body">
-          <p><strong>Binary Classification with Logistic Regression.</strong> File <code>students.csv</code>:
-            <code>hours</code>, <code>score</code>, <code>passed</code>.
-          </p>
-        </div>
-        <div class="bcode">
-          import pandas as pd<br>
-          from sklearn.model_selection import train_test_split<br>
-          from sklearn.linear_model import <input class="bi" id="q19_b1" placeholder="ClassName"><br>
-          from sklearn.metrics import <input class="bi" id="q19_b2" placeholder="function_name"><br><br>
-          df = pd.read_csv('students.csv')<br>
-          X = df[['hours', 'score']]<br>
-          y = df['<input class="bi" id="q19_b3" placeholder="column" style="width:90px;">']<br><br>
-          X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)<br><br>
-          model = <input class="bi" id="q19_b4" placeholder="ClassName">()<br>
-          model.<input class="bi" id="q19_b5" placeholder="method">(X_train, y_train)<br>
-          y_pred = model.<input class="bi" id="q19_b6" placeholder="method">(X_test)<br>
-          acc = <input class="bi" id="q19_b7" placeholder="function">(y_test, y_pred)<br>
-          print('Test accuracy:', acc)
-        </div>
-      </div>
-
-      <!-- Q20 -->
-      <div class="qc" id="qcard-20">
-        <div class="q-meta"><span class="q-num">Q20</span><span class="q-pts">5 pts · fill in blanks</span></div>
-        <div class="q-body">
-          <p>Fill in the two blanks inside the loop to implement the MSE cost function:</p>
-        </div>
-        <div class="bcode">
-          def compute_cost(x, y, w, b):<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;m = x.shape[0]<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;cost_sum = 0<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;for i in range(m):<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;f_wb = <input class="bi" id="q20_b1"
-            placeholder="expression"><br>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cost_sum += <input class="bi" id="q20_b2"
-            placeholder="expression"><br>
-          &nbsp;&nbsp;&nbsp;&nbsp;total_cost = (1 / (2 * m)) * cost_sum<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;return total_cost
-        </div>
-      </div>
-
-      <!-- Q21 -->
-      <div class="qc" id="qcard-21">
-        <div class="q-meta"><span class="q-num">Q21</span><span class="q-pts">5 pts · conceptual</span></div>
-        <div class="q-body">
-          <p>A student predicts university admission using GPA and test score. Two models:</p>
-          <p>• <strong>Model A:</strong> Linear Regression &nbsp;• <strong>Model B:</strong> Logistic Regression</p>
-          <p>Answer all three parts:<br>
-            1. Why is linear regression NOT appropriate for this task?<br>
-            2. How does logistic regression address this? Describe the sigmoid function's role.<br>
-            3. After training Model B: TP=40, FP=5, FN=15, TN=40. Calculate Precision and Recall. Which metric matters
-            more to minimise wrongly rejecting qualified applicants — and why?</p>
-        </div>
-        <textarea class="oe" id="q21"
-          placeholder="1. Linear regression is not appropriate because...&#10;2. Logistic regression addresses this by... The sigmoid function...&#10;3. Precision = 40/45 ≈ ...    Recall = 40/55 ≈ ...&#10;   The more important metric is ... because..."
-          style="min-height:165px;"></textarea>
-        <div class="ch" id="q21-hint">0 chars</div>
-      </div>
-
-      <div class="submit-area">
-        <button class="btn-sub" id="sub-btn" onclick="submitTest()">Submit Assessment</button>
-        <p class="sub-note">Results are graded instantly. Open-ended answers are saved for your instructor.</p>
-      </div>
-
-    </div><!-- end test-inner -->
-  </div><!-- end test-area -->
-
-  <!-- ══ RESULTS ══ -->
-  <div id="results-area">
-    <div class="res-inner">
-
-      <div class="res-hero">
-        <div class="rh-l">
-          <h2>Assessment Complete</h2>
-          <div class="rname" id="r-name"></div>
-          <div class="rsub">Open-ended questions pending instructor review</div>
-        </div>
-        <div class="rh-r">
-          <div class="big-sc"><span id="r-score">—</span><span> / 60</span></div>
-          <div class="sc-lbl">auto-graded score</div>
-          <div class="pct-pill" id="r-pct">—%</div>
-        </div>
-      </div>
-
-      <div class="stat-row">
-        <div class="stat-c">
-          <div class="sl">MCQ Score</div>
-          <div class="sv" id="r-mcq">—</div>
-        </div>
-        <div class="stat-c">
-          <div class="sl">MCQ Correct</div>
-          <div class="sv" id="r-mcqc">—</div>
-        </div>
-        <div class="stat-c">
-          <div class="sl">Blanks Score</div>
-          <div class="sv" id="r-blank">—</div>
-        </div>
-        <div class="stat-c">
-          <div class="sl">Upload</div>
-          <div class="sv" id="r-upload-icon" style="font-size:1.1rem;">⏳</div>
-        </div>
-      </div>
-
-      <div class="rev-sec">
-        <h3>MCQ Review — Questions 1–15</h3>
-        <div id="mcq-rev"></div>
-      </div>
-
-      <div class="rev-sec">
-        <h3>Open-Ended — Questions 16–21</h3>
-        <p style="font-family:var(--mono);font-size:0.75rem;color:var(--muted);margin-bottom:14px;">Answers recorded ·
-          Scores assigned by instructor</p>
-        <div id="oe-rev"></div>
-      </div>
-
-      <div id="upload-box"></div>
-
-      <div class="cta-banner">
-        <div>
-          <h3>Unsure where you stand on any topic?</h3>
-          <p>Review the relevant class materials and reattempt after consolidating your understanding.</p>
-        </div>
-        <button class="btn-lime" onclick="window.scrollTo(0,0)">Review Curriculum</button>
-      </div>
-
-    </div>
+  <div class="stat-row">
+    <div class="stat-c"><div class="sl">MCQ Score</div><div class="sv" id="r-mcq">—</div></div>
+    <div class="stat-c"><div class="sl">MCQ Correct</div><div class="sv" id="r-mcqc">—</div></div>
+    <div class="stat-c"><div class="sl">Blanks Score</div><div class="sv" id="r-blank">—</div></div>
+    <div class="stat-c"><div class="sl">Pending Review</div><div class="sv">Q21</div></div>
   </div>
 
+  <div id="upload-box"></div>
 
+  <div class="rev-sec">
+    <h3>Part 1 Review — Multiple Choice</h3>
+    <div id="mcq-rev"></div>
+  </div>
 
-  <script>
-    /* ══ SUPABASE CONFIG ══ */
-    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
-    const TABLE = 'caio_test_results';
+  <div class="rev-sec">
+    <h3>Part 2 Review — Fill-in-the-Blank &amp; Open-Ended</h3>
+    <div id="oe-rev"></div>
+  </div>
 
-    /* ══ ANSWER KEYS ══ */
-    const MCQ = { q1: 'A', q2: 'C', q3: 'C', q4: 'B', q5: 'B', q6: 'D', q7: 'D', q8: 'B', q9: 'B', q10: 'A', q11: 'A', q12: 'B', q13: 'C', q14: 'B', q15: 'B' };
+</div>
+</div>
 
-    const BLANKS = {
-      q16_b1: ['fillna'],
-      q16_b2: ['min'], q16_b3: ['max'], q16_b4: ['min'],
-      q16_b5: ['get_dummies'],
-      q16_b6: ['head(3)', 'head()'],
-      q19_b1: ['LogisticRegression'], q19_b2: ['accuracy_score'],
-      q19_b3: ['passed'], q19_b4: ['LogisticRegression'],
-      q19_b5: ['fit'], q19_b6: ['predict'], q19_b7: ['accuracy_score'],
-      q20_b1: ['w * x[i] + b', 'w*x[i]+b', 'w * x[i]+b'],
-      q20_b2: ['(f_wb - y[i])**2', '(f_wb-y[i])**2', '(f_wb - y[i]) ** 2']
-    };
+<script>
+/* ══ SUPABASE CONFIG ══ */
+const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+const TEST_ID = 'classes1to7_test';
 
-    const QLBLS = {
-      1: 'NumPy slicing: A[:2,1:] — shape and B[1,0]',
-      2: 'Hiring algorithm — type of bias',
-      3: 'Min-Max scaling — value of 30 in [10..50]',
-      4: 'pandas fillna(0) + column add output',
-      5: '99% train / 58% test — what is this?',
-      6: '5-fold CV on 1000 samples — training size per fold',
-      7: 'Gradient of MSE loss w.r.t. w',
-      8: 'Normal equation — validity condition',
-      9: 'High learning rate — what happens?',
-      10: 'Sigmoid function — which statement is TRUE?',
-      11: 'Precision & Recall from confusion matrix',
-      12: 'Why accuracy misleads on imbalanced data',
-      13: 'Euclidean distance: (1,4) to (4,0)',
-      14: 'K-Means centroid update — one iteration',
-      15: 'Supervised vs Unsupervised — key difference'
-    };
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, { auth: { persistSession: false } });
 
-    const OPTS = {
-      q1: { A: '(2,2) 5', B: '(2,3) 5', C: '(2,2) 4', D: '(3,2) 5', E: '(2,2) 8' },
-      q2: { A: 'Random noise', B: 'Overfitting to val set', C: 'Historical bias in training data', D: 'Underfitting', E: 'Data leakage' },
-      q3: { A: '0.25', B: '0.40', C: '0.50', D: '0.60', E: '0.75' },
-      q4: { A: 'B NaN, C 2.0', B: 'B 0.0, C 2.0', C: 'B 0.0, C 6.0', D: 'B NaN, C NaN', E: 'B NaN, C NaN' },
-      q5: { A: 'Underfitting', B: 'Overfitting', C: 'Well-calibrated', D: 'Data leakage', E: 'High bias' },
-      q6: { A: '200', B: '400', C: '500', D: '800', E: '900' },
-      q7: { A: '2/n Σyᵢ', B: '2/n Σerr', C: '2/n Σxᵢerr', D: '−2/n Σxᵢerr ✓', E: '−2/n Σerr' },
-      q8: { A: 'y zero mean', B: 'XᵀX invertible ✓', C: 'X symmetric', D: 'None correct', E: 'X orthogonal' },
-      q9: { A: 'Gradient small', B: 'Oscillates/diverges ✓', C: 'Faster, no downside', D: 'Underfits', E: 'Slow but stable' },
-      q10: { A: 'σ(0)=0.5 ✓', B: '>1 for large z', C: 'Negative for neg z', D: 'Same as ReLU', E: 'σ(0)=1' },
-      q11: { A: 'P=0.83, R=0.71 ✓', B: 'P=0.71, R=0.83', C: 'Both=0.83', D: 'Both=0.71', E: 'P=0.85' },
-      q12: { A: 'Cannot compute', B: '0% Positive recall ✓', C: '90%+=overfit', D: 'Perfectly calibrated', E: 'Equal TP/TN' },
-      q13: { A: '3.0', B: '4.0', C: '5.0 ✓', D: '7.0', E: '25.0' },
-      q14: { A: 'C1=2,C2=12', B: 'C1=2,C2=11.67 ✓', C: 'C1=3.5,C2=11.67', D: 'C1=2,C2=13', E: 'C1=2,C2=10' },
-      q15: { A: 'More data', B: 'Labelled vs unlabelled ✓', C: 'Unsup more accurate', D: 'Cannot classify', E: 'No difference' }
-    };
+let studentName = '';
+let validatedAccessCode = null;
+const startedAt = new Date().toISOString();
+const answered = new Set();
 
-    const RUBRICS = {
-      16: 'fillna(0) · min() · max() · min() · get_dummies · head(3)',
-      17: 'f(4)=15→err²=1, f(5)=19→err²=1. J=1/10×(0+0+0+1+1)=0.2',
-      18: 'Acc=160/200=0.80 · Prec=60/75=0.80 · Rec=60/85≈0.71 · Precision higher → better at avoiding FP',
-      19: 'LogisticRegression · accuracy_score · passed · LogisticRegression · fit · predict · accuracy_score',
-      20: 'f_wb = w*x[i]+b  |  cost_sum += (f_wb-y[i])**2',
-      21: 'LinReg outside [0,1]. Sigmoid → (0,1). Prec=40/45≈0.89, Rec=40/55≈0.73. Recall more important → minimise FN.'
-    };
+function show(id, flex = false) { document.getElementById(id).style.display = flex ? 'flex' : 'block'; }
+function hide(id) { document.getElementById(id).style.display = 'none'; }
 
-    let studentName = '';
-    const answered = new Set();
+function showError(msg) {
+  hide('loading-screen');
+  document.getElementById('error-message').textContent = msg;
+  show('error-screen', true);
+}
 
-    function startTest() {
-      const inp = document.getElementById('sname');
-      const err = document.getElementById('nerr');
-      const nm = inp.value.trim();
-      if (nm.length < 3 || !nm.includes(' ')) {
-        inp.classList.add('field-err'); err.style.display = 'block'; inp.focus(); return;
+/* ══ INIT ══ */
+async function init() {
+  hide('loading-screen');
+  show('access-code-gate', true);
+}
+
+/* ══ ACCESS CODE VALIDATION ══ */
+async function validateAccessCode() {
+  const codeInput = document.getElementById('access-code');
+  const codeErr = document.getElementById('code-err');
+  const codeBtn = document.getElementById('code-btn');
+  const code = codeInput.value.trim().toUpperCase();
+
+  codeInput.classList.remove('err');
+  codeErr.style.display = 'none';
+
+  if (!code) {
+    codeInput.classList.add('err');
+    codeErr.textContent = 'Enter an access code.';
+    codeErr.style.display = 'block';
+    return;
+  }
+
+  codeBtn.disabled = true;
+  codeBtn.textContent = '⏳ Validating…';
+
+  try {
+    const { data, error } = await db
+      .from('test_access_codes')
+      .select('id, test_id, cohort, max_uses, uses_count, is_active')
+      .eq('code', code)
+      .single();
+
+    if (error || !data) {
+      codeInput.classList.add('err');
+      codeErr.textContent = 'Invalid code. Try again.';
+      codeErr.style.display = 'block';
+      codeBtn.disabled = false; codeBtn.textContent = 'Continue →';
+      return;
+    }
+    if (data.test_id !== TEST_ID) {
+      codeErr.textContent = 'This code is not valid for the Classes 1–7 test.';
+      codeErr.style.display = 'block';
+      codeBtn.disabled = false; codeBtn.textContent = 'Continue →';
+      return;
+    }
+    if (!data.is_active) {
+      codeErr.textContent = 'This code has been deactivated.';
+      codeErr.style.display = 'block';
+      codeBtn.disabled = false; codeBtn.textContent = 'Continue →';
+      return;
+    }
+    if (data.uses_count >= data.max_uses) {
+      codeErr.textContent = 'This code has reached its use limit.';
+      codeErr.style.display = 'block';
+      codeBtn.disabled = false; codeBtn.textContent = 'Continue →';
+      return;
+    }
+
+    const { error: updateErr } = await db
+      .from('test_access_codes')
+      .update({ uses_count: data.uses_count + 1 })
+      .eq('id', data.id);
+
+    if (updateErr) {
+      codeErr.textContent = 'Error validating code. Please try again.';
+      codeErr.style.display = 'block';
+      codeBtn.disabled = false; codeBtn.textContent = 'Continue →';
+      return;
+    }
+
+    validatedAccessCode = code;
+    hide('access-code-gate');
+    show('cover', true);
+    codeInput.value = '';
+    codeBtn.disabled = false; codeBtn.textContent = 'Continue →';
+
+  } catch (err) {
+    codeErr.textContent = 'Validation error. Please try again.';
+    codeErr.style.display = 'block';
+    codeBtn.disabled = false; codeBtn.textContent = 'Continue →';
+  }
+}
+
+document.getElementById('access-code').addEventListener('keydown', e => {
+  if (e.key === 'Enter') validateAccessCode();
+});
+
+/* ══ NAME GATE / START ══ */
+function startTest() {
+  const inp = document.getElementById('sname');
+  const err = document.getElementById('nerr');
+  const nm = inp.value.trim();
+  if (nm.length < 3 || !nm.includes(' ')) {
+    inp.classList.add('field-err'); err.style.display = 'block'; inp.focus(); return;
+  }
+  studentName = nm;
+  document.getElementById('cover').style.display = 'none';
+  document.getElementById('test-area').style.display = 'block';
+  document.getElementById('bname').textContent = studentName;
+  window.scrollTo(0, 0);
+  attachListeners();
+}
+document.getElementById('sname').addEventListener('keydown', e => { if (e.key === 'Enter') startTest(); });
+
+function attachListeners() {
+  for (let q = 1; q <= 15; q++) {
+    document.querySelectorAll(`input[name="q${q}"]`).forEach(r => {
+      r.addEventListener('change', () => { answered.add(q); updateProgress(); });
+    });
+  }
+  document.querySelectorAll('.bi,.oe').forEach(el => {
+    el.addEventListener('input', () => {
+      const m = el.id.match(/^q(\d+)/);
+      if (m) { answered.add(+m[1]); updateProgress(); }
+      if (el.classList.contains('oe')) {
+        const h = document.getElementById(el.id + '-hint');
+        if (h) h.textContent = el.value.length + ' chars';
       }
-      studentName = nm;
-      document.getElementById('cover').style.display = 'none';
-      document.getElementById('test-area').style.display = 'block';
-      document.getElementById('bname').textContent = studentName;
-      window.scrollTo(0, 0);
-      attachListeners();
-    }
+    });
+  });
+}
 
-    function attachListeners() {
-      for (let q = 1; q <= 15; q++) {
-        document.querySelectorAll(`input[name="q${q}"]`).forEach(r => {
-          r.addEventListener('change', () => { answered.add(q); updateProgress(); });
-        });
-      }
-      document.querySelectorAll('.bi,.oe').forEach(el => {
-        el.addEventListener('input', () => {
-          const m = el.id.match(/^q(\d+)/);
-          if (m) { answered.add(+m[1]); updateProgress(); }
-          if (el.classList.contains('oe')) {
-            const h = document.getElementById(el.id + '-hint');
-            if (h) h.textContent = el.value.length + ' chars';
-          }
-        });
-      });
-    }
+function updateProgress() {
+  const pct = (answered.size / 21) * 100;
+  document.getElementById('pfill').style.width = pct + '%';
+  document.getElementById('ptxt').textContent = `${answered.size} / 21 answered`;
+}
 
-    function updateProgress() {
-      const pct = (answered.size / 21) * 100;
-      document.getElementById('pfill').style.width = pct + '%';
-      document.getElementById('ptxt').textContent = `${answered.size} / 21 answered`;
-    }
+/* ══ ANSWER KEYS ══ */
+const MCQ = { q1:'B',q2:'A',q3:'A',q4:'B',q5:'B',q6:'A',q7:'A',q8:'A',q9:'A',q10:'A',q11:'A',q12:'A',q13:'A',q14:'A',q15:'B' };
 
-    function collect() {
-      const a = {};
-      for (let q = 1; q <= 15; q++) { const s = document.querySelector(`input[name="q${q}"]:checked`); a[`q${q}`] = s ? s.value : null; }
-      ['q16_b1', 'q16_b2', 'q16_b3', 'q16_b4', 'q16_b5', 'q16_b6', 'q19_b1', 'q19_b2', 'q19_b3', 'q19_b4', 'q19_b5', 'q19_b6', 'q19_b7', 'q20_b1', 'q20_b2'].forEach(id => { const el = document.getElementById(id); a[id] = el ? el.value.trim() : ''; });
-      [17, 18, 21].forEach(q => { const el = document.getElementById(`q${q}`); a[`q${q}_text`] = el ? el.value.trim() : ''; });
-      return a;
-    }
+const BLANKS = {
+  q16_b1: ['fillna'],
+  q16_b2: ['fillna'],
+  q16_b3: ["df['units_sold'] * df['price'] * (1 - df['discount'])", "units_sold * price * (1 - discount)"],
+  q16_b4: ["'store_id'", "store_id"],
+  q16_b5: ['sum'],
+  q16_b6: ['sort_values(ascending=False)', 'sort_values(ascending = False)'],
+  q17_b1: ['w * x[i] + b', 'w*x[i]+b', 'w * x[i]+b', 'w*x[i] + b'],
+  q17_b2: ['(f_wb - y[i]) ** 2', '(f_wb-y[i])**2', '(f_wb - y[i])**2'],
+  q18_b1: ['(TP + TN) / (TP + FP + FN + TN)', '(tp+tn)/(tp+fp+fn+tn)'],
+  q18_b2: ['TP / (TP + FP)', 'tp/(tp+fp)'],
+  q18_b3: ['TP / (TP + FN)', 'tp/(tp+fn)'],
+  q18_b4: ['2 * precision * recall / (precision + recall)', '2*precision*recall/(precision+recall)'],
+  q19_b1: ['1 / (1 + np.exp(-z))', '1/(1+np.exp(-z))'],
+  q19_b2: ['w @ X.T + b', 'w@X.T+b'],
+  q19_b3: ['sigmoid(z)'],
+  q19_b4: ['astype(int)'],
+  q20_b1: ['(x * xp + 1) ** 2', '(x*xp+1)**2', '(x * xp + 1)**2'],
+  q20_b2: ['[x, x**2]', '[x, x ** 2]'],
+  q20_b3: ['math.exp(-gamma * distance**2)', 'math.exp(-gamma*distance**2)', 'math.exp(-gamma * distance ** 2)']
+};
 
-    function matchBlank(id, val) {
-      if (!val) return false;
-      const n = val.toLowerCase().replace(/\s/g, '');
-      return (BLANKS[id] || []).some(a => { const an = a.toLowerCase().replace(/\s/g, ''); return n === an || n.includes(an) || an.includes(n); });
-    }
+const QLBLS = {
+  1:'ANI / AGI / ASI — which exists today',
+  2:'NumPy dot product of two vectors',
+  3:'Population variance of [2,4,4,6,10]',
+  4:'Low train error, high CV error — diagnosis',
+  5:'Min-Max scaling — value of 40 in [10..50]',
+  6:'pd.get_dummies — shape after one-hot encoding',
+  7:'Train/val/test split proportions',
+  8:'5-fold cross-validation — number of fits',
+  9:'MSE cost J(w=0.8, b=0.9)',
+  10:'StandardScaler — correct fit/transform pattern',
+  11:'Sigmoid function — σ(5)',
+  12:'Confusion matrix — recall',
+  13:'Confusion matrix — precision',
+  14:'Quadratic kernel K(3,3)',
+  15:'What the kernel trick actually does'
+};
 
-    function gradeAll(a) {
-      const res = {}; let mcqS = 0, blankS = 0;
-      for (let q = 1; q <= 15; q++) { const ok = a[`q${q}`] === MCQ[`q${q}`]; if (ok) mcqS += 2; res[`q${q}`] = { ok, s: a[`q${q}`], c: MCQ[`q${q}`] }; }
-      function blanksGroup(k, ids) {
-        const cor = ids.filter(id => matchBlank(id, a[id])).length;
-        const pts = Math.round((cor / ids.length) * 5);
-        blankS += pts;
-        res[k] = { type: 'blanks', pts, cor, of: ids.length, items: ids.map(id => ({ id, val: a[id], ok: matchBlank(id, a[id]) })) };
-      }
-      blanksGroup('q16', ['q16_b1', 'q16_b2', 'q16_b3', 'q16_b4', 'q16_b5', 'q16_b6']);
-      blanksGroup('q19', ['q19_b1', 'q19_b2', 'q19_b3', 'q19_b4', 'q19_b5', 'q19_b6', 'q19_b7']);
-      blanksGroup('q20', ['q20_b1', 'q20_b2']);
-      [17, 18, 21].forEach(q => { res[`q${q}`] = { type: 'oe', text: a[`q${q}_text`] || '' }; });
-      return { res, mcqS, blankS, auto: mcqS + blankS };
-    }
+const OPTS = {
+  q1:{A:'AGI',B:'ANI',C:'ASI',D:'Artificial Hybrid Intelligence',E:'General Deep Learning'},
+  q2:{A:'32',B:'21',C:'30',D:'15',E:'24'},
+  q3:{A:'7.36',B:'5.20',C:'2.713',D:'6.40',E:'8.00'},
+  q4:{A:'High bias (underfitting)',B:'High variance (overfitting)',C:'Perfectly calibrated',D:'Data leakage',E:'Learning rate too small'},
+  q5:{A:'0.60',B:'0.75',C:'0.80',D:'0.40',E:'1.00'},
+  q6:{A:'(400,8)',B:'(400,9)',C:'(400,5)',D:'(400,4)',E:'(400,12)'},
+  q7:{A:'60/20/20',B:'70/20/10',C:'80/10/10',D:'50/30/20',E:'64/16/20'},
+  q8:{A:'5',B:'1',C:'10',D:'4',E:'25'},
+  q9:{A:'0.525',B:'1.050',C:'0.2625',D:'5.250',E:'0.420'},
+  q10:{A:'fit_transform train, transform test',B:'fit_transform both separately',C:'fit test, transform train',D:'fit_transform full dataset then split',E:'scaling unnecessary'},
+  q11:{A:'0.9933',B:'0.5000',C:'1.0000',D:'0.0067',E:'0.8590'},
+  q12:{A:'0.6667',B:'0.8000',C:'0.7000',D:'0.7273',E:'0.5000'},
+  q13:{A:'0.7576',B:'0.8333',C:'0.7400',D:'0.7937',E:'0.6250'},
+  q14:{A:'100',B:'49',C:'91',D:'82',E:'64'},
+  q15:{A:'Adds new polynomial columns',B:'Computes similarity in higher dimensions, no new columns',C:'Removes features',D:'Only works if linear',E:'Converts categorical to numeric'}
+};
 
-    function submitTest() {
-      const btn = document.getElementById('sub-btn');
-      btn.disabled = true; btn.textContent = 'Grading…';
-      const a = collect();
-      const { res, mcqS, blankS, auto } = gradeAll(a);
-      showResults(res, mcqS, blankS, auto);
-      upload(a, res, mcqS, blankS, auto);
-    }
+const RUBRICS = {
+  16:"fillna · fillna · units_sold*price*(1-discount) · 'store_id' · sum · sort_values(ascending=False)",
+  17:'f_wb = w*x[i]+b  |  cost_sum += (f_wb-y[i])**2  →  J(0.8,0.9)=0.525',
+  18:'accuracy=(TP+TN)/total · precision=TP/(TP+FP) · recall=TP/(TP+FN) · f1=2·P·R/(P+R)',
+  19:'sigmoid: 1/(1+np.exp(-z)) · z=w@X.T+b · probabilities=sigmoid(z) · .astype(int)',
+  20:'kernel: (x*xp+1)**2 · phi: [x,x**2] · rbf: math.exp(-gamma*distance**2)',
+  21:'Train R² ≫ Test R² = high variance/overfitting (Class 2). Fixes: more data, regularization, simpler model, more k-fold CV (Class 4). Full credit needs diagnosis + a named fix + the bias/variance link.'
+};
 
-    function showResults(res, mcqS, blankS, auto) {
-      document.getElementById('test-area').style.display = 'none';
-      document.getElementById('results-area').style.display = 'block';
-      window.scrollTo(0, 0);
+function collect() {
+  const a = {};
+  for (let q = 1; q <= 15; q++) { const s = document.querySelector(`input[name="q${q}"]:checked`); a[`q${q}`] = s ? s.value : null; }
+  ['q16_b1','q16_b2','q16_b3','q16_b4','q16_b5','q16_b6',
+   'q17_b1','q17_b2',
+   'q18_b1','q18_b2','q18_b3','q18_b4',
+   'q19_b1','q19_b2','q19_b3','q19_b4',
+   'q20_b1','q20_b2','q20_b3'].forEach(id => { const el = document.getElementById(id); a[id] = el ? el.value.trim() : ''; });
+  a['q21_text'] = (document.getElementById('q21') || {}).value?.trim() || '';
+  return a;
+}
 
-      document.getElementById('r-name').textContent = studentName;
-      document.getElementById('r-score').textContent = auto;
-      document.getElementById('r-pct').textContent = Math.round((auto / 60) * 100) + '%';
+function matchBlank(id, val) {
+  if (!val) return false;
+  const n = val.toLowerCase().replace(/\s/g,'');
+  return (BLANKS[id]||[]).some(ans => {
+    const an = ans.toLowerCase().replace(/\s/g,'');
+    return n===an || n.includes(an) || an.includes(n);
+  });
+}
 
-      const mcqC = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].filter(q => res[`q${q}`].ok).length;
-      const ms = document.getElementById('r-mcq'); ms.textContent = mcqS + ' / 30'; if (mcqS >= 20) ms.classList.add('g');
-      document.getElementById('r-mcqc').textContent = mcqC + ' / 15';
-      document.getElementById('r-blank').textContent = blankS + ' / 15';
+function gradeAll(a) {
+  const res = {}; let mcqS = 0, blankS = 0;
+  for (let q = 1; q <= 15; q++) { const ok = a[`q${q}`] === MCQ[`q${q}`]; if (ok) mcqS += 2; res[`q${q}`] = { ok, s: a[`q${q}`], c: MCQ[`q${q}`] }; }
 
-      // MCQ review
-      const md = document.getElementById('mcq-rev'); md.innerHTML = '';
-      for (let q = 1; q <= 15; q++) {
-        const r = res[`q${q}`]; const o = OPTS[`q${q}`] || {};
-        const sl = r.s ? `${r.s}) ${o[r.s] || r.s}` : 'No answer';
-        const cl = `${r.c}) ${o[r.c] || r.c}`;
-        const d = document.createElement('div');
-        d.className = `rev-c ${r.ok ? 'ok' : 'bad'}`;
-        d.innerHTML = `<div class="rev-qn">Q${q} · MCQ · ${r.ok ? '+2 pts' : '0 pts'}</div>
+  function blanksGroup(k, ids) {
+    const cor = ids.filter(id => matchBlank(id, a[id])).length;
+    const pts = Math.round((cor/ids.length)*5);
+    blankS += pts;
+    res[k] = { type:'blanks', pts, cor, of: ids.length, items: ids.map(id => ({ id, val: a[id], ok: matchBlank(id, a[id]) })) };
+  }
+  blanksGroup('q16', ['q16_b1','q16_b2','q16_b3','q16_b4','q16_b5','q16_b6']);
+  blanksGroup('q17', ['q17_b1','q17_b2']);
+  blanksGroup('q18', ['q18_b1','q18_b2','q18_b3','q18_b4']);
+  blanksGroup('q19', ['q19_b1','q19_b2','q19_b3','q19_b4']);
+  blanksGroup('q20', ['q20_b1','q20_b2','q20_b3']);
+  res['q21'] = { type:'oe', text: a['q21_text'] || '' };
+
+  return { res, mcqS, blankS, auto: mcqS + blankS };
+}
+
+function submitTest() {
+  const btn = document.getElementById('sub-btn');
+  btn.disabled = true; btn.textContent = 'Grading…';
+  const a = collect();
+  const { res, mcqS, blankS, auto } = gradeAll(a);
+  showResults(res, mcqS, blankS, auto);
+  upload(a, res, mcqS, blankS, auto);
+}
+
+function showResults(res, mcqS, blankS, auto) {
+  document.getElementById('test-area').style.display = 'none';
+  document.getElementById('results-area').style.display = 'block';
+  window.scrollTo(0, 0);
+
+  document.getElementById('r-name').textContent = studentName;
+  document.getElementById('r-score').textContent = auto;
+  document.getElementById('r-pct').textContent = Math.round((auto/60)*100) + '%';
+
+  const mcqC = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].filter(q => res[`q${q}`].ok).length;
+  const ms = document.getElementById('r-mcq'); ms.textContent = mcqS + ' / 30'; if (mcqS >= 20) ms.classList.add('g');
+  document.getElementById('r-mcqc').textContent = mcqC + ' / 15';
+  document.getElementById('r-blank').textContent = blankS + ' / 25';
+
+  const md = document.getElementById('mcq-rev'); md.innerHTML = '';
+  for (let q = 1; q <= 15; q++) {
+    const r = res[`q${q}`]; const o = OPTS[`q${q}`] || {};
+    const sl = r.s ? `${r.s}) ${o[r.s] || r.s}` : 'No answer';
+    const cl = `${r.c}) ${o[r.c] || r.c}`;
+    const d = document.createElement('div');
+    d.className = `rev-c ${r.ok ? 'ok' : 'bad'}`;
+    d.innerHTML = `<div class="rev-qn">Q${q} · MCQ · ${r.ok ? '+2 pts' : '0 pts'}</div>
       <div class="rev-qt">${QLBLS[q]}</div>
       <div class="pill-row">
         <span class="pill ${r.ok ? 'sc' : 'sw'}">${r.ok ? '✓' : '✗'} ${sl}</span>
         ${!r.ok ? `<span class="pill ca">✓ ${cl}</span>` : ''}
       </div>`;
-        md.appendChild(d);
-      }
+    md.appendChild(d);
+  }
 
-      // OE review
-      const od = document.getElementById('oe-rev'); od.innerHTML = '';
-      [16, 17, 18, 19, 20, 21].forEach(q => {
-        const r = res[`q${q}`];
-        const d = document.createElement('div');
-        d.className = 'rev-c man';
-        let inner = '';
-        if (r.type === 'blanks') {
-          inner = `<div class="pill-row"><span class="pill mn">Blanks: ${r.pts}/${5} pts (${r.cor}/${r.of} correct)</span></div>
+  const od = document.getElementById('oe-rev'); od.innerHTML = '';
+  const titles = {16:'Data Preprocessing blanks (Class 3)',17:'MSE Cost Function blanks (Class 5)',18:'Confusion Matrix Metrics blanks (Class 6)',19:'Sigmoid & Predict blanks (Class 6)',20:'Kernel Trick blanks (Class 7)',21:'Bias/Variance Open-Ended (Classes 2 & 4)'};
+  [16,17,18,19,20,21].forEach(q => {
+    const r = res[`q${q}`];
+    const d = document.createElement('div');
+    d.className = 'rev-c man';
+    let inner = '';
+    if (r.type === 'blanks') {
+      inner = `<div class="pill-row"><span class="pill mn">Blanks: ${r.pts}/5 pts (${r.cor}/${r.of} correct)</span></div>
         <div class="b-detail">${r.items.map(b => `${b.ok ? '✅' : '❌'} <code>${b.id}</code>: "${b.val || '—'}"`).join('<br>')}</div>`;
-        } else {
-          inner = `<div class="pill-row"><span class="pill mn">Submitted · pending review</span></div>
+    } else {
+      inner = `<div class="pill-row"><span class="pill mn">Submitted · pending instructor review</span></div>
         <div class="oe-ans">${esc(r.text || '(no answer)')}</div>`;
-        }
-        d.innerHTML = `<div class="rev-qn">Q${q} · ${r.type === 'blanks' ? 'Fill-in-blanks' : 'Open-ended'} · 5 pts</div>
-      <div class="rev-qt">${{ 16: 'Data Preprocessing blanks', 17: 'MSE cost calculation', 18: 'Confusion matrix metrics', 19: 'Logistic Regression blanks', 20: 'compute_cost blanks', 21: 'Linear vs Logistic Regression' }[q]}</div>
+    }
+    d.innerHTML = `<div class="rev-qn">Q${q} · ${r.type === 'blanks' ? 'Fill-in-blanks' : 'Open-ended'} · 5 pts</div>
+      <div class="rev-qt">${titles[q]}</div>
       ${inner}
       <div class="rubric">📋 Marking guide: ${RUBRICS[q]}</div>`;
-        od.appendChild(d);
-      });
-    }
+    od.appendChild(d);
+  });
+}
 
-    function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>'); }
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
 
-    async function upload(a, res, mcqS, blankS, auto) {
-      const box = document.getElementById('upload-box');
-      const ico = document.getElementById('r-upload-icon');
-      box.innerHTML = '<div class="upload-status uploading">⏳ Saving results…</div>';
-      const mcqD = {};
-      for (let q = 1; q <= 15; q++) mcqD[`q${q}`] = { answer: a[`q${q}`], correct: res[`q${q}`].ok };
-      const payload = {
-        student_name: studentName, submitted_at: new Date().toISOString(),
-        mcq_score: mcqS, blank_score: blankS, auto_score: auto, mcq_details: mcqD,
-        q16_b1: a.q16_b1, q16_b2: a.q16_b2, q16_b3: a.q16_b3, q16_b4: a.q16_b4, q16_b5: a.q16_b5, q16_b6: a.q16_b6,
-        q19_b1: a.q19_b1, q19_b2: a.q19_b2, q19_b3: a.q19_b3, q19_b4: a.q19_b4, q19_b5: a.q19_b5, q19_b6: a.q19_b6, q19_b7: a.q19_b7,
-        q20_b1: a.q20_b1, q20_b2: a.q20_b2,
-        q17_text: a.q17_text, q18_text: a.q18_text, q21_text: a.q21_text
-      };
-      try {
-        const r = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'return=minimal' },
-          body: JSON.stringify(payload)
-        });
-        if (r.ok || r.status === 201) {
-          box.innerHTML = '<div class="upload-status success">✅ Results saved. Your instructor will review open-ended answers.</div>';
-          ico.textContent = '✅';
-        } else { throw new Error(`HTTP ${r.status}`); }
-      } catch (e) {
-        box.innerHTML = `<div class="upload-status failed">⚠️ Upload failed — screenshot this page and send it to your instructor.<br><small>${e.message}</small></div>`;
-        ico.textContent = '⚠️';
-      }
-    }
-  </script>
+async function upload(a, res, mcqS, blankS, auto) {
+  const box = document.getElementById('upload-box');
+  box.innerHTML = '<div class="upload-status uploading">⏳ Saving results…</div>';
+
+  const mcqD = {};
+  for (let q = 1; q <= 15; q++) mcqD[`q${q}`] = { answer: a[`q${q}`], correct: res[`q${q}`].ok };
+
+  const questionDetail = { mcq: mcqD };
+  [16,17,18,19,20].forEach(q => { questionDetail[`q${q}`] = res[`q${q}`]; });
+  questionDetail['q21'] = { text: a.q21_text };
+
+  const payload = {
+    student_name: studentName,
+    test_id: TEST_ID,
+    access_code: validatedAccessCode,
+    mcq_score: mcqS,
+    blank_score: blankS,
+    auto_score: auto,
+    total_possible: 60,
+    pct: Math.round((auto/60)*100),
+    question_detail: questionDetail,
+    started_at: startedAt,
+    submitted_at: new Date().toISOString()
+  };
+
+  try {
+    const { error } = await db.from('test_submissions').insert([payload]);
+    if (error) throw error;
+    box.innerHTML = '<div class="upload-status success">✅ Results saved. Your instructor will review the open-ended answer (Q21).</div>';
+  } catch (err) {
+    box.innerHTML = `<div class="upload-status failed">⚠️ Upload failed — screenshot this page and send it to your instructor.<br><small>${err.message || ''}</small></div>`;
+  }
+}
+
+/* ══ BOOT ══ */
+init();
+</script>
 </body>
-
 </html>
