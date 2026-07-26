@@ -3580,7 +3580,12 @@
     let stbData = [];    // introai_week07_spot_the_bias rows
     let daData = [];     // introai_week07_data_audit rows
     let bdData = [];     // introai_week07_build_dataset rows
-    let ddData = [];     // introai_week01_data_detective rows
+    let ddData = [];     // introai_week07_data_detective rows
+    let bctData = [];    // introai_week08_bias_card_twist rows
+    let bdsData = [];    // introai_week08_bias_detective_stations rows
+    let ftdData = [];    // introai_week08_fix_the_dataset rows
+    let pvpData = [];    // introai_week08_promise_vs_problem rows
+    let metData = [];    // introai_week08_mini_ethics_trial rows
     let activeCohort = ''; // global cohort filter ('' = all)
 
     // ════════════════════════════════════════════════════════════════════════════
@@ -3671,7 +3676,7 @@
     async function loadAll() {
       document.getElementById('last-refresh').textContent = 'Refreshing…';
       try {
-        const [hw, exam, codes, sa, sh, cb, cp, pd, ws, ap, pc, mg, isSwap, tm, bta, ayf, dsr, kc, stb, da, bd, dd, testSub, testCodes] = await Promise.all([
+        const [hw, exam, codes, sa, sh, cb, cp, pd, ws, ap, pc, mg, isSwap, tm, bta, ayf, dsr, kc, stb, da, bd, dd, testSub, testCodes, bct, bds, ftd, pvp, met] = await Promise.all([
           sb.from('homework_submissions').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('caio_final_exam_results').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('access_codes').select('*').order('created_at', { ascending: false }).limit(10000),
@@ -3695,7 +3700,12 @@
           sb.from('introai_week07_build_dataset').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('introai_week07_data_detective').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('test_submissions').select('*').order('submitted_at', { ascending: false }).limit(10000),
-          sb.from('test_access_codes').select('*').order('created_at', { ascending: false }).limit(10000)
+          sb.from('test_access_codes').select('*').order('created_at', { ascending: false }).limit(10000),
+          sb.from('introai_week08_bias_card_twist').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('introai_week08_bias_detective_stations').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('introai_week08_fix_the_dataset').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('introai_week08_promise_vs_problem').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('introai_week08_mini_ethics_trial').select('*').order('submitted_at', { ascending: false }).limit(10000)
         ]);
 
         if (hw.error) { console.error('hw error:', hw.error); toast('⚠ Homework load error: ' + hw.error.message); }
@@ -3788,8 +3798,13 @@
         daData = da ? (da.data || []) : [];
         bdData = bd ? (bd.data || []) : [];
         ddData = dd ? (dd.data || []) : [];
+        bctData = bct ? (bct.data || []) : [];
+        bdsData = bds ? (bds.data || []) : [];
+        ftdData = ftd ? (ftd.data || []) : [];
+        pvpData = pvp ? (pvp.data || []) : [];
+        metData = met ? (met.data || []) : [];
 
-        console.log(`Loaded: ${hwData.length} hw, ${examData.length} exam, ${codesData.length} codes, ${saData.length} SA, ${shData.length} SH, ${cbData.length} CB, ${cpData.length} CP, ${pdData.length} PD, ${wsData.length} WS, ${apData.length} AP, ${pcData.length} PC, ${mgData.length} MG, ${isData.length} IS, ${tmData.length} TM, ${btaData.length} BTA, ${ayfData.length} AYF, ${dsrData.length} DSR, ${kcData.length} KC, ${stbData.length} STB, ${daData.length} DA, ${bdData.length} BD, ${ddData.length} DD rows`);
+        console.log(`Loaded: ${hwData.length} hw, ${examData.length} exam, ${codesData.length} codes, ${saData.length} SA, ${shData.length} SH, ${cbData.length} CB, ${cpData.length} CP, ${pdData.length} PD, ${wsData.length} WS, ${apData.length} AP, ${pcData.length} PC, ${mgData.length} MG, ${isData.length} IS, ${tmData.length} TM, ${btaData.length} BTA, ${ayfData.length} AYF, ${dsrData.length} DSR, ${kcData.length} KC, ${stbData.length} STB, ${daData.length} DA, ${bdData.length} BD, ${ddData.length} DD, ${bctData.length} BCT, ${bdsData.length} BDS, ${ftdData.length} FTD, ${pvpData.length} PVP, ${metData.length} MET rows`);
 
         populateFilters();
         renderOverview();

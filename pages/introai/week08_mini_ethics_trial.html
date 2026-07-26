@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini Ethics Trial — Intro to AI · Week 8</title>
+  <meta name="description"
+    content="Week 8 Exercise 5: Mini Ethics Trial. Roleplay an AI company representative, affected patient, regulator, and judge in a high-stakes AI medical courtroom trial.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    #registration-overlay { transition: opacity 0.4s ease; }
+    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
+    #registration-overlay .reg-card {
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
+    }
+    #registration-overlay.hiding .reg-card {
+      transform: scale(0.95) translateY(-10px); opacity: 0;
+    }
+    .reg-input:focus {
+      outline: none; border-color: #e11d48;
+      box-shadow: 0 0 0 3px rgba(225,29,72,0.15);
+    }
+    .reg-input.error {
+      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+    }
+    .form-input:focus {
+      outline: none; border-color: #e11d48;
+      box-shadow: 0 0 0 3px rgba(225,29,72,0.1);
+    }
+    .form-input.error { border-color: #ef4444; }
+    .opt-btn {
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .opt-btn:hover { transform: translateY(-1px); }
+    .opt-btn.selected {
+      border-color: #e11d48 !important;
+      background: #fff1f2 !important;
+      color: #9f1239 !important;
+      font-weight: 700;
+    }
+    .star-btn {
+      font-size: 24px;
+      cursor: pointer;
+      filter: grayscale(100%);
+      transition: filter 0.15s ease, transform 0.1s ease;
+    }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body class="bg-[#F9FAFB] text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- REGISTRATION GATE -->
+  <div id="registration-overlay"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+    style="background: linear-gradient(135deg, #4c0519 0%, #be123c 55%, #4c0519 100%);">
+
+    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
+        style="background: radial-gradient(circle, #fecdd3, transparent);"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
+        style="background: radial-gradient(circle, #fb7185, transparent);"></div>
+    </div>
+
+    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center bg-rose-100 text-rose-600">
+          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+          </svg>
+        </div>
+        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 bg-rose-100 text-rose-800">
+          Week 8 · Exercise 5
+        </div>
+        <h1 class="text-2xl font-black text-gray-900 tracking-tight">Mini Ethics <span class="text-rose-600">Trial ⚖️🏛️</span></h1>
+        <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">Enter your details to enter the courtroom session.</p>
+      </div>
+
+      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
+        <div class="space-y-4 mb-6">
+          <div>
+            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Full Name</label>
+            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Counsel Morgan"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name.</p>
+          </div>
+          <div>
+            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
+            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. morgan@school.edu"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
+          </div>
+        </div>
+        <button id="reg-submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700">
+          <span id="reg-btn-label">Enter Courtroom &#8594;</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main-content" class="max-w-3xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+      <div>
+        <a href="index.html"
+          class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-rose-600 mb-3 hover:text-rose-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">
+          Mini Ethics <span class="text-rose-600">Trial ⚖️🏛️</span>
+        </h1>
+        <p class="text-gray-500 font-medium italic mt-1">AI Healthcare Liability & Accountability · Week 8 · Exercise 5</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-rose-50 border border-rose-200 text-rose-800 shadow-sm self-start md:self-auto">
+        Week 8
+      </div>
+    </header>
+
+    <!-- Brief Card -->
+    <div class="bg-gradient-to-br from-rose-700 to-red-900 text-white rounded-3xl p-6 md:p-8 mb-8 shadow-lg">
+      <h2 class="text-xl font-black mb-2 flex items-center gap-2">
+        <span>⚖️ Court Case: The Skewed Heart Disease Predictor</span>
+      </h2>
+      <p class="text-sm text-rose-100 leading-relaxed mb-4">
+        A medical AI company released a heart disease prediction tool. Because the training data came heavily from middle-aged men, the AI frequently fails to detect cardiac risk in female and younger patients, leading to severe harm.
+      </p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-[11px] text-center font-bold">
+        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/10">🏢 Company Rep</div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/10">🩺 Affected Patient</div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/10">📋 Regulator</div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/10">⚖️ Judge & Jury</div>
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <form id="trial-form" onsubmit="submitExercise(event)" novalidate>
+
+      <!-- Step 1: Select Your Role -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-full bg-rose-600 text-white font-black text-sm flex items-center justify-center">1</span>
+          <h2 class="text-lg font-black text-gray-900">Select Your Assigned Courtroom Role</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4" id="role-picker">
+          <button type="button" class="opt-btn border border-gray-200 rounded-2xl p-4 text-left bg-gray-50 text-xs text-gray-700 hover:border-rose-400"
+            onclick="setRole('AI Company Representative 🏢', this)">
+            <span class="font-black text-sm block text-gray-900 mb-1">🏢 AI Company Representative</span>
+            Defend the AI tool: emphasize technical innovation, intended scope, and fast deployment benefits.
+          </button>
+          <button type="button" class="opt-btn border border-gray-200 rounded-2xl p-4 text-left bg-gray-50 text-xs text-gray-700 hover:border-rose-400"
+            onclick="setRole('Affected Patient 🩺', this)">
+            <span class="font-black text-sm block text-gray-900 mb-1">🩺 Affected Patient</span>
+            Explain the harm: share how diagnostic failure impacted health, trust, and safety.
+          </button>
+          <button type="button" class="opt-btn border border-gray-200 rounded-2xl p-4 text-left bg-gray-50 text-xs text-gray-700 hover:border-rose-400"
+            onclick="setRole('Regulator 📋', this)">
+            <span class="font-black text-sm block text-gray-900 mb-1">📋 Government Regulator</span>
+            Question oversight: demand proof of clinical testing, demographic audits, and safety standards.
+          </button>
+          <button type="button" class="opt-btn border border-gray-200 rounded-2xl p-4 text-left bg-gray-50 text-xs text-gray-700 hover:border-rose-400"
+            onclick="setRole('Judge / Juror ⚖️', this)">
+            <span class="font-black text-sm block text-gray-900 mb-1">⚖️ Judge / Juror</span>
+            Preside over trial: ask follow-up questions, weigh liability, and render final ruling.
+          </button>
+        </div>
+        <p id="role-error" class="hidden text-xs text-red-500 font-medium">Please select your courtroom role.</p>
+      </div>
+
+      <!-- Step 2: 2-Minute Opening Argument -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-full bg-rose-600 text-white font-black text-sm flex items-center justify-center">2</span>
+          <h2 class="text-lg font-black text-gray-900">Your Opening Testimony / Case Argument (2 Min)</h2>
+        </div>
+
+        <div>
+          <label for="case-argument" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
+            Present your case argument from the perspective of your role: <span class="text-red-500">*</span>
+          </label>
+          <textarea id="case-argument" rows="4" placeholder="Write key points for your 2-minute speech: Why should the court rule in your favor? What evidence or experience supports your stance?"
+            class="form-input w-full p-4 rounded-2xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all"></textarea>
+          <p id="case-argument-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your opening case argument.</p>
+        </div>
+      </div>
+
+      <!-- Step 3: Follow-Up Q&A -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-full bg-rose-600 text-white font-black text-sm flex items-center justify-center">3</span>
+          <h2 class="text-lg font-black text-gray-900">Judge's Follow-Up Question & Answer</h2>
+        </div>
+
+        <div>
+          <label for="followup-qa" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
+            Write the Judge's follow-up question and your response: <span class="text-red-500">*</span>
+          </label>
+          <textarea id="followup-qa" rows="3" placeholder="e.g. Q: 'Did your company test on women prior to launch?' A: 'Our initial trials focused on available clinic data, but we plan updates...'"
+            class="form-input w-full p-4 rounded-2xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all"></textarea>
+          <p id="followup-qa-error" class="hidden text-xs text-red-500 font-medium mt-1">Please log the follow-up question & answer.</p>
+        </div>
+      </div>
+
+      <!-- Step 4: Final Verdict & Ruling -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-full bg-rose-600 text-white font-black text-sm flex items-center justify-center">4</span>
+          <h2 class="text-lg font-black text-gray-900">Final Verdict & Ruling</h2>
+        </div>
+
+        <div>
+          <label for="verdict-ruling" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
+            What was the final verdict? Explain the reasoning out loud: <span class="text-red-500">*</span>
+          </label>
+          <textarea id="verdict-ruling" rows="3" placeholder="Should the tool be pulled? Who pays damages? Must training data be audited before re-release?"
+            class="form-input w-full p-4 rounded-2xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all"></textarea>
+          <p id="verdict-ruling-error" class="hidden text-xs text-red-500 font-medium mt-1">Please record the final verdict and ruling.</p>
+        </div>
+      </div>
+
+      <!-- Step 5: Debrief Reflection -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-full bg-rose-600 text-white font-black text-sm flex items-center justify-center">5</span>
+          <h2 class="text-lg font-black text-gray-900">Class Debrief Question</h2>
+        </div>
+
+        <div>
+          <label for="debrief-reflection" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
+            "Was there a clear right answer, or did the judge have to make a judgment call? What would you have needed to know to be sure?" <span class="text-red-500">*</span>
+          </label>
+          <textarea id="debrief-reflection" rows="3" placeholder="Reflect on ethical trade-offs between innovation, patient safety, legal regulation, and incomplete scientific data."
+            class="form-input w-full p-4 rounded-2xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all"></textarea>
+          <p id="debrief-reflection-error" class="hidden text-xs text-red-500 font-medium mt-1">Please answer the debrief reflection.</p>
+        </div>
+      </div>
+
+      <!-- Step 6: Rating & Submit -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-8">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-full bg-rose-600 text-white font-black text-sm flex items-center justify-center">6</span>
+          <h2 class="text-lg font-black text-gray-900">Rate This Activity</h2>
+        </div>
+
+        <div class="mb-6">
+          <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">How much did you enjoy this exercise?</p>
+          <div id="enjoyment-stars" class="flex gap-2 text-3xl">
+            <button type="button" class="star-btn" onclick="setRating(1)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(2)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(3)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(4)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(5)">⭐</button>
+          </div>
+          <p id="rating-error" class="hidden text-xs text-red-500 font-medium mt-1">Please select a star rating.</p>
+        </div>
+
+        <div id="form-error" class="hidden mb-4 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold">
+          <span id="form-error-text">⚠️ Please fill out all required fields marked in red.</span>
+        </div>
+
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-2xl shadow-xl transition-all active:scale-98 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800">
+          <span id="submit-label">Submit Trial Record &#8594;</span>
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div id="success-screen" class="hidden fixed inset-0 z-[110] bg-white flex items-center justify-center p-6 text-center">
+    <div class="max-w-md w-full">
+      <div class="w-20 h-20 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-inner">
+        🏛️
+      </div>
+      <h2 class="text-3xl font-black text-gray-900 tracking-tight mb-2">Court Adjourned, <span id="success-name">Counsel</span>!</h2>
+      <p class="text-sm text-gray-500 mb-8 leading-relaxed">
+        Your ethics trial testimony and final verdict have been logged to the teacher dashboard.
+      </p>
+      <a href="index.html"
+        class="inline-flex items-center justify-center w-full py-4 px-6 rounded-2xl font-black text-sm text-white bg-rose-700 hover:bg-rose-800 transition-all shadow-lg">
+        Return to Course Hub
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+    const TABLE = 'introai_week08_mini_ethics_trial';
+
+    let studentName = '', studentEmail = '';
+    let selectedRole = '', enjoymentRating = 0;
+
+    function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+
+    function handleRegistration(ev) {
+      ev.preventDefault();
+      const nameEl = document.getElementById('reg-name');
+      const emailEl = document.getElementById('reg-email');
+      let ok = true;
+
+      nameEl.classList.remove('error');
+      emailEl.classList.remove('error');
+      document.getElementById('reg-name-error').classList.add('hidden');
+      document.getElementById('reg-email-error').classList.add('hidden');
+
+      if (!nameEl.value.trim()) { nameEl.classList.add('error'); document.getElementById('reg-name-error').classList.remove('hidden'); ok = false; }
+      if (!emailEl.value.trim() || !validateEmail(emailEl.value.trim())) { emailEl.classList.add('error'); document.getElementById('reg-email-error').classList.remove('hidden'); ok = false; }
+      if (!ok) return;
+
+      studentName = nameEl.value.trim();
+      studentEmail = emailEl.value.trim();
+
+      sessionStorage.setItem('introai_w08_mini_ethics_trial_name', studentName);
+      sessionStorage.setItem('introai_w08_mini_ethics_trial_email', studentEmail);
+
+      const overlay = document.getElementById('registration-overlay');
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.remove(), 400);
+    }
+
+    (function restoreSession() {
+      const n = sessionStorage.getItem('introai_w08_mini_ethics_trial_name');
+      const e = sessionStorage.getItem('introai_w08_mini_ethics_trial_email');
+      if (n && e) {
+        studentName = n; studentEmail = e;
+        document.getElementById('registration-overlay').remove();
+      }
+    })();
+
+    function setRole(val, btn) {
+      selectedRole = val;
+      document.querySelectorAll('#role-picker .opt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById('role-error').classList.add('hidden');
+    }
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#enjoyment-stars .star-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx < val);
+      });
+      document.getElementById('rating-error').classList.add('hidden');
+    }
+
+    async function supabaseInsert(payload) {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!resp.ok) { const t = await resp.text(); throw new Error(`HTTP ${resp.status}: ${t}`); }
+    }
+
+    async function submitExercise(ev) {
+      ev.preventDefault();
+      let ok = true;
+
+      if (!selectedRole) { document.getElementById('role-error').classList.remove('hidden'); ok = false; }
+
+      const fields = [
+        { id: 'case-argument', errId: 'case-argument-error' },
+        { id: 'followup-qa', errId: 'followup-qa-error' },
+        { id: 'verdict-ruling', errId: 'verdict-ruling-error' },
+        { id: 'debrief-reflection', errId: 'debrief-reflection-error' },
+      ];
+
+      fields.forEach(f => {
+        const el = document.getElementById(f.id);
+        const val = el ? el.value.trim() : '';
+        if (el) el.classList.toggle('error', !val);
+        const errEl = document.getElementById(f.errId);
+        if (errEl) errEl.classList.toggle('hidden', !!val);
+        if (!val) ok = false;
+      });
+
+      if (enjoymentRating === 0) {
+        document.getElementById('rating-error').classList.remove('hidden'); ok = false;
+      }
+
+      if (!ok) {
+        document.getElementById('form-error').classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('form-error').classList.add('hidden');
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting…';
+
+      const payload = {
+        student_name: studentName,
+        student_email: studentEmail,
+        role_selected: selectedRole,
+        case_argument: document.getElementById('case-argument').value.trim(),
+        followup_qa: document.getElementById('followup-qa').value.trim(),
+        verdict_ruling: document.getElementById('verdict-ruling').value.trim(),
+        debrief_reflection: document.getElementById('debrief-reflection').value.trim(),
+        enjoyment_rating: enjoymentRating,
+        submitted_at: new Date().toISOString()
+      };
+
+      try {
+        await supabaseInsert(payload);
+        document.getElementById('success-name').textContent = studentName.split(' ')[0];
+        document.getElementById('success-screen').classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        console.error('Submission error:', err.message);
+        btn.disabled = false;
+        document.getElementById('submit-label').textContent = 'Submit Trial Record →';
+        if (err.message.includes('409') || err.message.includes('duplicate key')) {
+          document.getElementById('form-error-text').textContent = '⚠️ You have already submitted this activity!';
+        } else {
+          document.getElementById('form-error-text').textContent = '⚠️ Network error submitting exercise. Please try again.';
+        }
+        document.getElementById('form-error').classList.remove('hidden');
+      }
+    }
+  </script>
+</body>
+
+</html>
