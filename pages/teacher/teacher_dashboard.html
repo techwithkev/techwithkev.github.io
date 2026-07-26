@@ -3671,7 +3671,7 @@
     async function loadAll() {
       document.getElementById('last-refresh').textContent = 'Refreshing…';
       try {
-        const [hw, exam, codes, sa, sh, cb, cp, pd, ws, ap, pc, mg, isSwap, tm, bta, ayf, dsr, kc, stb, da, bd, dd] = await Promise.all([
+        const [hw, exam, codes, sa, sh, cb, cp, pd, ws, ap, pc, mg, isSwap, tm, bta, ayf, dsr, kc, stb, da, bd, dd, testSub, testCodes] = await Promise.all([
           sb.from('homework_submissions').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('caio_final_exam_results').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('access_codes').select('*').order('created_at', { ascending: false }).limit(10000),
@@ -3693,7 +3693,9 @@
           sb.from('introai_week07_spot_the_bias').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('introai_week07_data_audit').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('introai_week07_build_dataset').select('*').order('submitted_at', { ascending: false }).limit(10000),
-          sb.from('introai_week07_data_detective').select('*').order('submitted_at', { ascending: false }).limit(10000)
+          sb.from('introai_week07_data_detective').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('test_submissions').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('test_access_codes').select('*').order('created_at', { ascending: false }).limit(10000)
         ]);
 
         if (hw.error) { console.error('hw error:', hw.error); toast('⚠ Homework load error: ' + hw.error.message); }
@@ -3715,13 +3717,58 @@
         if (dsr.error) { console.error('dsr error:', dsr.error); toast('⚠ Design recommender error: ' + dsr.error.message); }
         if (kc.error) { console.error('kc error:', kc.error); toast('⚠ Knowledge check error: ' + kc.error.message); }
         if (stb && stb.error) { console.error('stb error:', stb.error); toast('⚠ Spot the bias error: ' + stb.error.message); }
-        if (da && da.error) { console.error('da error:', da.error); toast('⚠ Data audit error: ' + da.error.message); }
-        if (bd && bd.error) { console.error('bd error:', bd.error); toast('⚠ Build dataset error: ' + bd.error.message); }
-        if (dd && dd.error) { console.error('dd error:', dd.error); toast('⚠ Data detective error: ' + dd.error.message); }
+        if (da && da.error) { console.error('da error:', da.error); }
+        if (bd && bd.error) { console.error('bd error:', bd.error); }
+        if (dd && dd.error) { console.error('dd error:', dd.error); }
+
+        const normalizedTestSub = (testSub && testSub.data ? testSub.data : []).map(r => ({
+          id: r.id,
+          student_name: r.student_name,
+          test_id: r.test_id,
+          access_code: r.access_code,
+          mcq_score: r.mcq_score,
+          blank_score: r.blank_score,
+          auto_score: r.auto_score ?? ((r.mcq_score || 0) + (r.blank_score || 0)),
+          total_possible: r.total_possible || 100,
+          pct: r.pct,
+          question_detail: r.question_detail,
+          mcq_details: r.question_detail?.mcq || r.question_detail?.mcq_details || (typeof r.question_detail === 'object' ? r.question_detail : null),
+          q16_b1: r.question_detail?.q16_b1 || r.question_detail?.q16?.b1,
+          q16_b2: r.question_detail?.q16_b2 || r.question_detail?.q16?.b2,
+          q16_b3: r.question_detail?.q16_b3 || r.question_detail?.q16?.b3,
+          q16_b4: r.question_detail?.q16_b4 || r.question_detail?.q16?.b4,
+          q16_b5: r.question_detail?.q16_b5 || r.question_detail?.q16?.b5,
+          q16_b6: r.question_detail?.q16_b6 || r.question_detail?.q16?.b6,
+          q17_text: r.question_detail?.q17_text || r.question_detail?.q17?.text || (typeof r.question_detail?.q17 === 'string' ? r.question_detail.q17 : null),
+          q18_text: r.question_detail?.q18_text || r.question_detail?.q18?.text || (typeof r.question_detail?.q18 === 'string' ? r.question_detail.q18 : null),
+          q19_b1: r.question_detail?.q19_b1 || r.question_detail?.q19?.b1,
+          q19_b2: r.question_detail?.q19_b2 || r.question_detail?.q19?.b2,
+          q19_b3: r.question_detail?.q19_b3 || r.question_detail?.q19?.b3,
+          q19_b4: r.question_detail?.q19_b4 || r.question_detail?.q19?.b4,
+          q19_b5: r.question_detail?.q19_b5 || r.question_detail?.q19?.b5,
+          q19_b6: r.question_detail?.q19_b6 || r.question_detail?.q19?.b6,
+          q20_b1: r.question_detail?.q20_b1 || r.question_detail?.q20?.b1,
+          q20_b2: r.question_detail?.q20_b2 || r.question_detail?.q20?.b2,
+          q20_b3: r.question_detail?.q20_b3 || r.question_detail?.q20?.b3,
+          q20_b4: r.question_detail?.q20_b4 || r.question_detail?.q20?.b4,
+          q20_b5: r.question_detail?.q20_b5 || r.question_detail?.q20?.b5,
+          q21_text: r.question_detail?.q21_text || r.question_detail?.q21?.text || (typeof r.question_detail?.q21 === 'string' ? r.question_detail.q21 : null),
+          submitted_at: r.submitted_at
+        }));
+
+        const normalizedTestCodes = (testCodes && testCodes.data ? testCodes.data : []).map(c => ({
+          code: c.code,
+          cohort: c.cohort || 'aijr',
+          class_number: c.test_id || 'Classes 1–7 Test',
+          is_active: c.is_active,
+          uses_count: c.uses_count,
+          max_uses: c.max_uses,
+          created_at: c.created_at
+        }));
 
         hwData = hw.data || [];
-        examData = exam.data || [];
-        codesData = codes.data || [];
+        examData = [...normalizedTestSub, ...(exam.data || [])];
+        codesData = [...normalizedTestCodes, ...(codes.data || [])];
         saData = sa.data || [];
         shData = sh.data || [];
         cbData = cb.data || [];
