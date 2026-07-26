@@ -1833,6 +1833,38 @@
               </svg>
               W7 Ex4: Data Detective
             </button>
+
+            <div class="nav-section-label" style="margin-top:20px">Week 8 &mdash; Ethics &amp; Accountability</div>
+            <button class="nav-item" onclick="showPage('introai-bias-card-twist')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M4 2h8a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4a2 2 0 012-2z" stroke-linecap="round" />
+              </svg>
+              W8 Ex1: Bias Card Twist
+            </button>
+            <button class="nav-item" onclick="showPage('introai-bias-detective-stations')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" />
+              </svg>
+              W8 Ex2: Detective Stations
+            </button>
+            <button class="nav-item" onclick="showPage('introai-fix-the-dataset')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M3 13h10M3 9h10M3 5h10" stroke-linecap="round" />
+              </svg>
+              W8 Ex3: Fix the Dataset
+            </button>
+            <button class="nav-item" onclick="showPage('introai-promise-vs-problem')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M8 2v12M2 8h12" stroke-linecap="round" />
+              </svg>
+              W8 Ex4: Promise vs Problem
+            </button>
+            <button class="nav-item" onclick="showPage('introai-mini-ethics-trial')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M3 6l5-3 5 3v8a2 2 0 01-2 2H5a2 2 0 01-2-2V6z" stroke-linecap="round" />
+              </svg>
+              W8 Ex5: Mini Ethics Trial
+            </button>
           </div>
 
           <!-- Common Section -->
@@ -3526,6 +3558,256 @@
           </div>
         </div>
 
+        <!-- ══ INTRO TO AI: THE BIAS CARD TWIST (W8 Ex 1) ══ -->
+        <div class="page" id="page-introai-bias-card-twist">
+          <div class="page-header">
+            <div>
+              <div class="page-title">The Bias Card Twist — Week 8 Activity 1 🎴</div>
+              <div class="page-subtitle">Brainstorm local AI solutions and adapt when hidden dataset bias cards are revealed</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('bct')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card gold">
+              <div class="stat-label">Total Submissions</div>
+              <div class="stat-value" id="bct-stat-count">—</div>
+              <div class="stat-sub">Team solutions</div>
+            </div>
+            <div class="stat-card teal">
+              <div class="stat-label">Avg Enjoyment</div>
+              <div class="stat-value" id="bct-stat-enjoy">—</div>
+              <div class="stat-sub">Out of 5 stars</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Search:</label>
+              <input class="search-input" id="bct-search" type="text" placeholder="Student name, local problem..." oninput="renderBCTTable()" />
+              <span class="text-small text-muted" id="bct-count"></span>
+            </div>
+            <div id="bct-table-wrap">
+              <div class="loading"><div class="spinner"></div><br>Loading Bias Card Twist data&hellip;</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ INTRO TO AI: BIAS DETECTIVE STATIONS (W8 Ex 2) ══ -->
+        <div class="page" id="page-introai-bias-detective-stations">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Bias Detective Stations — Week 8 Activity 2 🕵️‍♀️</div>
+              <div class="page-subtitle">Rotate across 4 real-world bias case stations to uncover systemic dataset gaps</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('bds')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card teal">
+              <div class="stat-label">Total Submissions</div>
+              <div class="stat-value" id="bds-stat-count">—</div>
+              <div class="stat-sub">Station investigation reports</div>
+            </div>
+            <div class="stat-card green">
+              <div class="stat-label">Avg Enjoyment</div>
+              <div class="stat-value" id="bds-stat-enjoy">—</div>
+              <div class="stat-sub">Out of 5 stars</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Search:</label>
+              <input class="search-input" id="bds-search" type="text" placeholder="Student name, station..." oninput="renderBDSTable()" />
+              <span class="text-small text-muted" id="bds-count"></span>
+            </div>
+            <div id="bds-table-wrap">
+              <div class="loading"><div class="spinner"></div><br>Loading Station investigation data&hellip;</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ INTRO TO AI: FIX THE DATASET (W8 Ex 3) ══ -->
+        <div class="page" id="page-introai-fix-the-dataset">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Fix the Dataset — Week 8 Activity 3 📊</div>
+              <div class="page-subtitle">Interactive 20-row medical dataset editor to balance demographic representation</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('ftd')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card green">
+              <div class="stat-label">Total Submissions</div>
+              <div class="stat-value" id="ftd-stat-count">—</div>
+              <div class="stat-sub">Audited datasets</div>
+            </div>
+            <div class="stat-card gold">
+              <div class="stat-label">Avg Enjoyment</div>
+              <div class="stat-value" id="ftd-stat-enjoy">—</div>
+              <div class="stat-sub">Out of 5 stars</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Search:</label>
+              <input class="search-input" id="ftd-search" type="text" placeholder="Student name, summary..." oninput="renderFTDTable()" />
+              <span class="text-small text-muted" id="ftd-count"></span>
+            </div>
+            <div id="ftd-table-wrap">
+              <div class="loading"><div class="spinner"></div><br>Loading Fix the Dataset submissions&hellip;</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ INTRO TO AI: PROMISE VS PROBLEM (W8 Ex 4) ══ -->
+        <div class="page" id="page-introai-promise-vs-problem">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Promise vs. Problem Placemat — Week 8 Activity 4 ⚖️</div>
+              <div class="page-subtitle">Evaluating AlphaFold, Woebot, BeMyEyes, and Ocean Cleanup impact</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('pvp')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card gold">
+              <div class="stat-label">Total Submissions</div>
+              <div class="stat-value" id="pvp-stat-count">—</div>
+              <div class="stat-sub">Placemat evaluations</div>
+            </div>
+            <div class="stat-card teal">
+              <div class="stat-label">Avg Enjoyment</div>
+              <div class="stat-value" id="pvp-stat-enjoy">—</div>
+              <div class="stat-sub">Out of 5 stars</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Search:</label>
+              <input class="search-input" id="pvp-search" type="text" placeholder="Student name, promise..." oninput="renderPVPTable()" />
+              <span class="text-small text-muted" id="pvp-count"></span>
+            </div>
+            <div id="pvp-table-wrap">
+              <div class="loading"><div class="spinner"></div><br>Loading Promise vs. Problem submissions&hellip;</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ INTRO TO AI: MINI ETHICS TRIAL (W8 Ex 5) ══ -->
+        <div class="page" id="page-introai-mini-ethics-trial">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Mini Ethics Trial & AI Judge — Week 8 Activity 5 🏛️⚖️</div>
+              <div class="page-subtitle">Courtroom roleplay & live Groq LLM cross-examination / verdict rulings</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('met')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card green">
+              <div class="stat-label">Total Submissions</div>
+              <div class="stat-value" id="met-stat-count">—</div>
+              <div class="stat-sub">Trial records & verdicts</div>
+            </div>
+            <div class="stat-card teal">
+              <div class="stat-label">Avg Enjoyment</div>
+              <div class="stat-value" id="met-stat-enjoy">—</div>
+              <div class="stat-sub">Out of 5 stars</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Search:</label>
+              <input class="search-input" id="met-search" type="text" placeholder="Student name, role, ruling..." oninput="renderMETTable()" />
+              <span class="text-small text-muted" id="met-count"></span>
+            </div>
+            <div id="met-table-wrap">
+              <div class="loading"><div class="spinner"></div><br>Loading Ethics Trial records&hellip;</div>
+            </div>
+          </div>
+        </div>
+
       </main>
     </div>
   </div>
@@ -3832,6 +4114,11 @@
         renderDAPage();
         renderBDPage();
         renderDDPage();
+        renderBCTPage();
+        renderBDSPage();
+        renderFTDPage();
+        renderPVPPage();
+        renderMETPage();
 
         const now = new Date();
         document.getElementById('last-refresh').textContent = 'Updated ' + now.toLocaleTimeString();
@@ -7416,6 +7703,299 @@
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
           <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('dd', ${r.id})">View</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+    }
+
+    // ── Week 8 Activity 1: The Bias Card Twist ──
+    function renderBCTPage() {
+      if (!bctData.length) {
+        document.getElementById('bct-stat-count').textContent = '0';
+        document.getElementById('bct-stat-enjoy').textContent = '—';
+        renderBCTTable();
+        return;
+      }
+      document.getElementById('bct-stat-count').textContent = bctData.length;
+      const avg = (bctData.reduce((s, r) => s + (parseInt(r.enjoyment_rating) || 0), 0) / bctData.length).toFixed(1);
+      document.getElementById('bct-stat-enjoy').textContent = avg + ' / 5';
+      renderBCTTable();
+    }
+
+    function renderBCTTable() {
+      const search = (document.getElementById('bct-search')?.value || '').toLowerCase();
+      let rows = bctData.filter(r =>
+        !search || (r.student_name || '').toLowerCase().includes(search) || (r.local_problem || '').toLowerCase().includes(search) || (r.twist_card || '').toLowerCase().includes(search)
+      );
+
+      document.getElementById('bct-count').textContent = rows.length + ' solution' + (rows.length !== 1 ? 's' : '');
+      if (!rows.length) {
+        document.getElementById('bct-table-wrap').innerHTML = '<div class="empty-state"><p>No matching Bias Card Twist submissions.</p></div>';
+        return;
+      }
+
+      function starRating(v) {
+        if (!v) return '<span style="color:var(--gray)">—</span>';
+        const stars = '★'.repeat(v) + '☆'.repeat(5 - v);
+        const col = v >= 4 ? '#059669' : v >= 3 ? '#d97706' : '#dc2626';
+        return `<span style="color:${col};font-size:14px">${stars}</span>`;
+      }
+
+      document.getElementById('bct-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student / Group</th>
+        <th>Local Problem</th>
+        <th>Twist Card Revealed</th>
+        <th>What Breaks</th>
+        <th>Enjoyment</th>
+        <th>Submitted</th>
+        <th>Detail</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr class="clickable-row" onclick="showSubmissionDetail('bct', ${r.id})">
+          <td><strong>${esc(r.student_name)}</strong><br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
+          <td><span class="badge badge-gold">${esc(r.local_problem || '—')}</span></td>
+          <td style="font-size:11px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.twist_card)}">${esc(r.twist_card || '—')}</td>
+          <td style="font-size:11px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.what_breaks)}">${esc(r.what_breaks || '—')}</td>
+          <td>${starRating(r.enjoyment_rating)}</td>
+          <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('bct', ${r.id})">View</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+    }
+
+    // ── Week 8 Activity 2: Bias Detective Stations ──
+    function renderBDSPage() {
+      if (!bdsData.length) {
+        document.getElementById('bds-stat-count').textContent = '0';
+        document.getElementById('bds-stat-enjoy').textContent = '—';
+        renderBDSTable();
+        return;
+      }
+      document.getElementById('bds-stat-count').textContent = bdsData.length;
+      const avg = (bdsData.reduce((s, r) => s + (parseInt(r.enjoyment_rating) || 0), 0) / bdsData.length).toFixed(1);
+      document.getElementById('bds-stat-enjoy').textContent = avg + ' / 5';
+      renderBDSTable();
+    }
+
+    function renderBDSTable() {
+      const search = (document.getElementById('bds-search')?.value || '').toLowerCase();
+      let rows = bdsData.filter(r =>
+        !search || (r.student_name || '').toLowerCase().includes(search) || (r.st1_bias_source || '').toLowerCase().includes(search) || (r.st3_bias_source || '').toLowerCase().includes(search)
+      );
+
+      document.getElementById('bds-count').textContent = rows.length + ' report' + (rows.length !== 1 ? 's' : '');
+      if (!rows.length) {
+        document.getElementById('bds-table-wrap').innerHTML = '<div class="empty-state"><p>No matching station investigation reports.</p></div>';
+        return;
+      }
+
+      function starRating(v) {
+        if (!v) return '<span style="color:var(--gray)">—</span>';
+        const stars = '★'.repeat(v) + '☆'.repeat(5 - v);
+        const col = v >= 4 ? '#059669' : v >= 3 ? '#d97706' : '#dc2626';
+        return `<span style="color:${col};font-size:14px">${stars}</span>`;
+      }
+
+      document.getElementById('bds-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student</th>
+        <th>Station 1 Bias</th>
+        <th>Station 3 Bias</th>
+        <th>Class Presentation Share</th>
+        <th>Enjoyment</th>
+        <th>Submitted</th>
+        <th>Detail</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr class="clickable-row" onclick="showSubmissionDetail('bds', ${r.id})">
+          <td><strong>${esc(r.student_name)}</strong><br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
+          <td style="font-size:11px;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.st1_bias_source)}">${esc(r.st1_bias_source || '—')}</td>
+          <td style="font-size:11px;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.st3_bias_source)}">${esc(r.st3_bias_source || '—')}</td>
+          <td style="font-size:11px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.favorite_station_share)}">${esc(r.favorite_station_share || '—')}</td>
+          <td>${starRating(r.enjoyment_rating)}</td>
+          <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('bds', ${r.id})">View</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+    }
+
+    // ── Week 8 Activity 3: Fix the Dataset ──
+    function renderFTDPage() {
+      if (!ftdData.length) {
+        document.getElementById('ftd-stat-count').textContent = '0';
+        document.getElementById('ftd-stat-enjoy').textContent = '—';
+        renderFTDTable();
+        return;
+      }
+      document.getElementById('ftd-stat-count').textContent = ftdData.length;
+      const avg = (ftdData.reduce((s, r) => s + (parseInt(r.enjoyment_rating) || 0), 0) / ftdData.length).toFixed(1);
+      document.getElementById('ftd-stat-enjoy').textContent = avg + ' / 5';
+      renderFTDTable();
+    }
+
+    function renderFTDTable() {
+      const search = (document.getElementById('ftd-search')?.value || '').toLowerCase();
+      let rows = ftdData.filter(r =>
+        !search || (r.student_name || '').toLowerCase().includes(search) || (r.changes_explanation || '').toLowerCase().includes(search)
+      );
+
+      document.getElementById('ftd-count').textContent = rows.length + ' dataset' + (rows.length !== 1 ? 's' : '');
+      if (!rows.length) {
+        document.getElementById('ftd-table-wrap').innerHTML = '<div class="empty-state"><p>No matching dataset audit submissions.</p></div>';
+        return;
+      }
+
+      function starRating(v) {
+        if (!v) return '<span style="color:var(--gray)">—</span>';
+        const stars = '★'.repeat(v) + '☆'.repeat(5 - v);
+        const col = v >= 4 ? '#059669' : v >= 3 ? '#d97706' : '#dc2626';
+        return `<span style="color:${col};font-size:14px">${stars}</span>`;
+      }
+
+      document.getElementById('ftd-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student</th>
+        <th>Final Dataset Balance</th>
+        <th>Changes Explanation</th>
+        <th>Enjoyment</th>
+        <th>Submitted</th>
+        <th>Detail</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr class="clickable-row" onclick="showSubmissionDetail('ftd', ${r.id})">
+          <td><strong>${esc(r.student_name)}</strong><br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
+          <td><span class="badge badge-teal">${esc(r.final_dataset_summary || '—')}</span></td>
+          <td style="font-size:11px;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.changes_explanation)}">${esc(r.changes_explanation || '—')}</td>
+          <td>${starRating(r.enjoyment_rating)}</td>
+          <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('ftd', ${r.id})">View</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+    }
+
+    // ── Week 8 Activity 4: Promise vs. Problem Placemat ──
+    function renderPVPPage() {
+      if (!pvpData.length) {
+        document.getElementById('pvp-stat-count').textContent = '0';
+        document.getElementById('pvp-stat-enjoy').textContent = '—';
+        renderPVPTable();
+        return;
+      }
+      document.getElementById('pvp-stat-count').textContent = pvpData.length;
+      const avg = (pvpData.reduce((s, r) => s + (parseInt(r.enjoyment_rating) || 0), 0) / pvpData.length).toFixed(1);
+      document.getElementById('pvp-stat-enjoy').textContent = avg + ' / 5';
+      renderPVPTable();
+    }
+
+    function renderPVPTable() {
+      const search = (document.getElementById('pvp-search')?.value || '').toLowerCase();
+      let rows = pvpData.filter(r =>
+        !search || (r.student_name || '').toLowerCase().includes(search) || (r.alphafold_promise || '').toLowerCase().includes(search) || (r.debrief_reflection || '').toLowerCase().includes(search)
+      );
+
+      document.getElementById('pvp-count').textContent = rows.length + ' placemat' + (rows.length !== 1 ? 's' : '');
+      if (!rows.length) {
+        document.getElementById('pvp-table-wrap').innerHTML = '<div class="empty-state"><p>No matching placemat submissions.</p></div>';
+        return;
+      }
+
+      function starRating(v) {
+        if (!v) return '<span style="color:var(--gray)">—</span>';
+        const stars = '★'.repeat(v) + '☆'.repeat(5 - v);
+        const col = v >= 4 ? '#059669' : v >= 3 ? '#d97706' : '#dc2626';
+        return `<span style="color:${col};font-size:14px">${stars}</span>`;
+      }
+
+      document.getElementById('pvp-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student</th>
+        <th>AlphaFold Promise</th>
+        <th>Woebot Problem</th>
+        <th>Debrief Reflection</th>
+        <th>Enjoyment</th>
+        <th>Submitted</th>
+        <th>Detail</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr class="clickable-row" onclick="showSubmissionDetail('pvp', ${r.id})">
+          <td><strong>${esc(r.student_name)}</strong><br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
+          <td style="font-size:11px;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.alphafold_promise)}">${esc(r.alphafold_promise || '—')}</td>
+          <td style="font-size:11px;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.woebot_problem)}">${esc(r.woebot_problem || '—')}</td>
+          <td style="font-size:11px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.debrief_reflection)}">${esc(r.debrief_reflection || '—')}</td>
+          <td>${starRating(r.enjoyment_rating)}</td>
+          <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('pvp', ${r.id})">View</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+    }
+
+    // ── Week 8 Activity 5: Mini Ethics Trial & AI Judge ──
+    function renderMETPage() {
+      if (!metData.length) {
+        document.getElementById('met-stat-count').textContent = '0';
+        document.getElementById('met-stat-enjoy').textContent = '—';
+        renderMETTable();
+        return;
+      }
+      document.getElementById('met-stat-count').textContent = metData.length;
+      const avg = (metData.reduce((s, r) => s + (parseInt(r.enjoyment_rating) || 0), 0) / metData.length).toFixed(1);
+      document.getElementById('met-stat-enjoy').textContent = avg + ' / 5';
+      renderMETTable();
+    }
+
+    function renderMETTable() {
+      const search = (document.getElementById('met-search')?.value || '').toLowerCase();
+      let rows = metData.filter(r =>
+        !search || (r.student_name || '').toLowerCase().includes(search) || (r.role_selected || '').toLowerCase().includes(search) || (r.verdict_ruling || '').toLowerCase().includes(search)
+      );
+
+      document.getElementById('met-count').textContent = rows.length + ' record' + (rows.length !== 1 ? 's' : '');
+      if (!rows.length) {
+        document.getElementById('met-table-wrap').innerHTML = '<div class="empty-state"><p>No matching Ethics Trial records.</p></div>';
+        return;
+      }
+
+      function starRating(v) {
+        if (!v) return '<span style="color:var(--gray)">—</span>';
+        const stars = '★'.repeat(v) + '☆'.repeat(5 - v);
+        const col = v >= 4 ? '#059669' : v >= 3 ? '#d97706' : '#dc2626';
+        return `<span style="color:${col};font-size:14px">${stars}</span>`;
+      }
+
+      document.getElementById('met-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student</th>
+        <th>Courtroom Role</th>
+        <th>Opening Argument</th>
+        <th>AI Verdict Ruling</th>
+        <th>Enjoyment</th>
+        <th>Submitted</th>
+        <th>Detail</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr class="clickable-row" onclick="showSubmissionDetail('met', ${r.id})">
+          <td><strong>${esc(r.student_name)}</strong><br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
+          <td><span class="badge badge-teal">${esc(r.role_selected || '—')}</span></td>
+          <td style="font-size:11px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.case_argument)}">${esc(r.case_argument || '—')}</td>
+          <td style="font-size:11px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.verdict_ruling)}">${esc(r.verdict_ruling || '—')}</td>
+          <td>${starRating(r.enjoyment_rating)}</td>
+          <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('met', ${r.id})">View</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
