@@ -18,10 +18,11 @@ CREATE TABLE IF NOT EXISTS introai_week08_mini_ethics_trial (
   debrief_reflection  TEXT NOT NULL,
   enjoyment_rating    SMALLINT NOT NULL CHECK (enjoyment_rating BETWEEN 1 AND 5),
 
-  submitted_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
-
-  CONSTRAINT uq_w08_mini_ethics_trial_email UNIQUE (student_email)
+  submitted_at        TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Allow multiple runs per student
+ALTER TABLE introai_week08_mini_ethics_trial DROP CONSTRAINT IF EXISTS uq_w08_mini_ethics_trial_email;
 
 COMMENT ON TABLE introai_week08_mini_ethics_trial
   IS 'Week 8 Exercise 5: Mini Ethics Trial';

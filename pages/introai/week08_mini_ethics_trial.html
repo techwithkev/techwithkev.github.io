@@ -173,9 +173,19 @@
 
       <!-- Step 1: Select Your Role -->
       <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
-        <div class="flex items-center gap-3 mb-4">
-          <span class="w-8 h-8 rounded-full bg-rose-600 text-white font-black text-sm flex items-center justify-center">1</span>
-          <h2 class="text-lg font-black text-gray-900">Select Your Assigned Courtroom Role</h2>
+        <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-full bg-rose-600 text-white font-black text-sm flex items-center justify-center">1</span>
+            <h2 class="text-lg font-black text-gray-900">Select Your Assigned Courtroom Role</h2>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="trials-count-badge" class="px-3 py-1 rounded-full text-[10px] font-black uppercase bg-rose-100 text-rose-800 border border-rose-200">
+              ⚖️ Trials Completed: 0 / 4 Roles
+            </span>
+            <button type="button" onclick="startNewTrial()" class="text-xs font-bold text-gray-500 hover:text-rose-700 underline">
+              Reset Trial 🔄
+            </button>
+          </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4" id="role-picker">
@@ -337,17 +347,28 @@
   <!-- SUCCESS SCREEN -->
   <div id="success-screen" class="hidden fixed inset-0 z-[110] bg-white flex items-center justify-center p-6 text-center">
     <div class="max-w-md w-full">
-      <div class="w-20 h-20 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-inner">
+      <div class="w-20 h-20 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl shadow-inner">
         🏛️
       </div>
       <h2 class="text-3xl font-black text-gray-900 tracking-tight mb-2">Court Adjourned, <span id="success-name">Counsel</span>!</h2>
-      <p class="text-sm text-gray-500 mb-8 leading-relaxed">
-        Your ethics trial testimony and Groq AI Judge verdict have been logged to the teacher dashboard.
+      <p class="text-sm text-gray-500 mb-4 leading-relaxed">
+        Your trial record has been logged to the teacher dashboard.
       </p>
-      <a href="index.html"
-        class="inline-flex items-center justify-center w-full py-4 px-6 rounded-2xl font-black text-sm text-white bg-rose-700 hover:bg-rose-800 transition-all shadow-lg">
-        Return to Course Hub
-      </a>
+
+      <div id="trial-summary-badge" class="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-900 font-semibold leading-normal">
+        Logged trial submission as <span id="success-role-text" class="font-bold text-rose-700">Selected Role</span>.
+      </div>
+
+      <div class="space-y-3">
+        <button type="button" onclick="startNewTrial()"
+          class="w-full py-4 px-6 rounded-2xl font-black text-sm text-rose-950 bg-amber-400 hover:bg-amber-300 transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95">
+          <span>🔄 Run Another Trial (Try a Different Role)</span>
+        </button>
+        <a href="index.html"
+          class="inline-flex items-center justify-center w-full py-3 px-6 rounded-2xl font-bold text-xs text-gray-600 bg-gray-100 hover:bg-gray-200 transition-all">
+          Return to Course Hub
+        </a>
+      </div>
     </div>
   </div>
 
@@ -681,20 +702,53 @@ MANDATORY RULES:
 
       try {
         await supabaseInsert(payload);
+
+        let completedRuns = parseInt(sessionStorage.getItem('introai_w08_trial_runs_count') || '0') + 1;
+        sessionStorage.setItem('introai_w08_trial_runs_count', completedRuns.toString());
+
+        const countBadge = document.getElementById('trials-count-badge');
+        if (countBadge) countBadge.textContent = `⚖️ Trials Completed: ${completedRuns} / 4 Roles`;
+
         document.getElementById('success-name').textContent = studentName.split(' ')[0];
+        document.getElementById('success-role-text').textContent = selectedRole;
         document.getElementById('success-screen').classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } catch (err) {
         console.error('Submission error:', err.message);
         btn.disabled = false;
         document.getElementById('submit-label').textContent = 'Submit Trial Record →';
-        if (err.message.includes('409') || err.message.includes('duplicate key')) {
-          document.getElementById('form-error-text').textContent = '⚠️ You have already submitted this activity!';
-        } else {
-          document.getElementById('form-error-text').textContent = '⚠️ Network error submitting exercise. Please try again.';
-        }
+        document.getElementById('form-error-text').textContent = '⚠️ Network error submitting exercise. Please try again.';
         document.getElementById('form-error').classList.remove('hidden');
       }
+    }
+
+    function startNewTrial() {
+      // Clear inputs
+      document.getElementById('case-argument').value = '';
+      document.getElementById('followup-qa').value = '';
+      document.getElementById('verdict-ruling').value = '';
+      document.getElementById('debrief-reflection').value = '';
+
+      // Reset selected role
+      selectedRole = '';
+      document.querySelectorAll('#role-picker .opt-btn').forEach(b => b.classList.remove('selected'));
+
+      // Hide badges
+      document.getElementById('ai-judge-badge').classList.add('hidden');
+      document.getElementById('ai-verdict-badge').classList.add('hidden');
+      document.getElementById('form-error').classList.add('hidden');
+
+      // Re-enable submit button
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = false;
+      document.getElementById('submit-label').textContent = 'Submit Trial Record →';
+
+      // Hide success screen
+      document.getElementById('success-screen').classList.add('hidden');
+
+      // Scroll smoothly to Step 1 Role Picker
+      const picker = document.getElementById('role-picker');
+      if (picker) picker.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   </script>
 </body>
