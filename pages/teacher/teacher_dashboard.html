@@ -4022,6 +4022,12 @@
         if (bd && bd.error) { console.error('bd error:', bd.error); }
         if (dd && dd.error) { console.error('dd error:', dd.error); }
 
+        // Build access_code → cohort lookup from test_access_codes
+        const codeToCohorMap = {};
+        (testCodes && testCodes.data ? testCodes.data : []).forEach(c => {
+          if (c.code) codeToCohorMap[c.code.toUpperCase()] = c.cohort || 'aijr';
+        });
+
         const normalizedTestSub = (testSub && testSub.data ? testSub.data : []).map(r => {
           let qd = r.question_detail;
           if (typeof qd === 'string') {
@@ -4039,10 +4045,14 @@
           const mcqScore = r.mcq_score ?? 0;
           const blankScore = r.blank_score ?? 0;
           const autoScore = r.auto_score ?? (mcqScore + blankScore);
+          const cohort = r.access_code
+            ? (codeToCohorMap[(r.access_code || '').toUpperCase()] || 'aijr')
+            : 'aijr';
 
           return {
             id: r.id,
             student_name: r.student_name,
+            cohort,
             test_id: r.test_id || 'Classes 1–7 Test',
             access_code: r.access_code,
             mcq_score: mcqScore,
@@ -4485,7 +4495,11 @@
     // ════════════════════════════════════════════════════════════════════════════
     function renderExamTable() {
       const search = document.getElementById('exam-search').value.toLowerCase();
-      let rows = examData.filter(r => !search || r.student_name.toLowerCase().includes(search));
+      let rows = examData.filter(r => {
+        if (activeCohort && r.cohort !== activeCohort) return false;
+        if (search && !r.student_name.toLowerCase().includes(search)) return false;
+        return true;
+      });
 
       document.getElementById('exam-count').textContent = rows.length + ' result' + (rows.length !== 1 ? 's' : '');
 
@@ -4497,9 +4511,9 @@
         return;
       }
 
-      document.getElementById('exam-stat-count').textContent = examData.length;
-      document.getElementById('exam-stat-avg').textContent = Math.round(examData.reduce((s, r) => s + (r.auto_score || 0), 0) / examData.length);
-      document.getElementById('exam-stat-mcq').textContent = Math.round(examData.reduce((s, r) => s + (r.mcq_score || 0), 0) / examData.length);
+      document.getElementById('exam-stat-count').textContent = rows.length;
+      document.getElementById('exam-stat-avg').textContent = Math.round(rows.reduce((s, r) => s + (r.auto_score || 0), 0) / rows.length);
+      document.getElementById('exam-stat-mcq').textContent = Math.round(rows.reduce((s, r) => s + (r.mcq_score || 0), 0) / rows.length);
 
       document.getElementById('exam-table-wrap').innerHTML = `
     <table class="data-table">
