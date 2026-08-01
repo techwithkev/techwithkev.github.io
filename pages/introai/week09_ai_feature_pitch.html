@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Feature: The Prompt — Intro to AI · Week 9</title>
+  <meta name="description"
+    content="Week 9 Exercise 2: AI Feature: The Prompt. Pitch how a modern Generative AI model could fundamentally improve your favorite video game's core gameplay loop.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    #registration-overlay { transition: opacity 0.4s ease; }
+    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
+    #registration-overlay .reg-card {
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
+    }
+    #registration-overlay.hiding .reg-card {
+      transform: scale(0.95) translateY(-10px); opacity: 0;
+    }
+    .reg-input:focus {
+      outline: none; border-color: #0284c7;
+      box-shadow: 0 0 0 3px rgba(2,132,199,0.15);
+    }
+    .reg-input.error {
+      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+    }
+    .form-input:focus {
+      outline: none; border-color: #0284c7;
+      box-shadow: 0 0 0 3px rgba(2,132,199,0.1);
+    }
+    .form-input.error { border-color: #ef4444; }
+    .star-btn {
+      font-size: 24px;
+      cursor: pointer;
+      filter: grayscale(100%);
+      transition: filter 0.15s ease, transform 0.1s ease;
+    }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .opt-btn {
+      border: 2px solid #e0f2fe;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #334155;
+      background: #f8fafc;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: left;
+    }
+    .opt-btn:hover { border-color: #0284c7; background: #f0f9ff; color: #0369a1; }
+    .opt-btn.selected { border-color: #0284c7; background: #e0f2fe; color: #0369a1; box-shadow: 0 0 0 3px rgba(2,132,199,0.15); }
+  </style>
+</head>
+
+<body class="bg-[#F0F9FF] text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- REGISTRATION GATE -->
+  <div id="registration-overlay"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+    style="background: linear-gradient(135deg, #0c4a6e 0%, #0284c7 55%, #0369a1 100%);">
+
+    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
+        style="background: radial-gradient(circle, #bae6fd, transparent);"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
+        style="background: radial-gradient(circle, #38bdf8, transparent);"></div>
+    </div>
+
+    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center bg-sky-100 text-sky-600">
+          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 bg-sky-100 text-sky-800">
+          Week 9 · Exercise 2
+        </div>
+        <h1 class="text-2xl font-black text-gray-900 tracking-tight">AI Feature: <span class="text-sky-600">The Prompt 🚀</span></h1>
+        <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">Enter your details to pitch your GenAI game feature.</p>
+      </div>
+
+      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
+        <div class="space-y-4 mb-6">
+          <div>
+            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Your Full Name</label>
+            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Alex Morgan"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name.</p>
+          </div>
+          <div>
+            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
+            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. alex@school.edu"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
+          </div>
+        </div>
+        <button id="reg-submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-700 hover:to-sky-800">
+          <span id="reg-btn-label">Start Pitch Exercise &#8594;</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main-content" class="max-w-3xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-sky-200 pb-6">
+      <div>
+        <a href="index.html"
+          class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-sky-600 mb-3 hover:text-sky-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">
+          AI Feature: <span class="text-sky-600">The Prompt 🎮</span>
+        </h1>
+        <p class="text-gray-500 font-medium italic mt-1">Generative AI Game Design Pitch · Week 9 · Exercise 2</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-sky-50 border border-sky-200 text-sky-800 shadow-sm self-start md:self-auto">
+        Week 9
+      </div>
+    </header>
+
+    <!-- Brief Card -->
+    <div class="bg-gradient-to-br from-sky-700 to-blue-800 text-white rounded-3xl p-6 md:p-8 mb-8 shadow-lg">
+      <h2 class="text-xl font-black mb-3 flex items-center gap-2">
+        <span>🚀 Exercise Brief (~10 Minutes)</span>
+      </h2>
+      <p class="text-sm text-sky-100 leading-relaxed mb-4">
+        Choose your <strong>absolute favorite video game</strong>. How would you fundamentally improve it using a modern <strong>Generative AI model</strong>? Pitch your feature idea in <strong>exactly three sentences</strong>!
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-3 border border-white/10 text-xs">
+          <div class="font-black text-sky-200 mb-1">🎙️ Voice &amp; Dialogue</div>
+          <div>NPCs converse dynamically with real voice generation</div>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-3 border border-white/10 text-xs">
+          <div class="font-black text-sky-200 mb-1">🗺️ Adaptive World</div>
+          <div>Environment builds &amp; adapts to your unique playstyle</div>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-3 border border-white/10 text-xs">
+          <div class="font-black text-sky-200 mb-1">🔄 Core Loop Focus</div>
+          <div>Enhance core gameplay mechanics, not just graphics!</div>
+        </div>
+      </div>
+      <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10 text-xs leading-relaxed">
+        <strong>Key Rule:</strong> Focus on transforming how the game is actually <em>played</em> (quests, decisions, tactics, narrative, or environment) rather than just making textures sharper.
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <form id="feature-pitch-form" onsubmit="submitExercise(event)" novalidate>
+
+      <!-- Step 1: Game & AI Model Selection -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="w-8 h-8 rounded-full bg-sky-600 text-white font-black text-sm flex items-center justify-center">1</span>
+          <h2 class="text-lg font-black text-gray-900">Select Game &amp; GenAI Technology</h2>
+        </div>
+
+        <div class="mb-5">
+          <label for="game-title" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
+            What is your favorite video game? <span class="text-red-500">*</span>
+          </label>
+          <input id="game-title" type="text" placeholder="e.g. Minecraft, Zelda: Tears of the Kingdom, Skyrim, Valorant, GTA V, Portal 2..."
+            class="form-input w-full p-3.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" />
+          <p id="game-title-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your favorite game title.</p>
+        </div>
+
+        <div>
+          <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-3">Which GenAI capability will power your feature? <span class="text-red-500">*</span></p>
+          <div id="ai-tech-picker" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <button type="button" class="opt-btn" onclick="setChoice('aiTech','Voice & Dialogue Generation (NPCs converse in real voice)',this)">
+              🎙️ <strong>Voice &amp; Dialogue Gen</strong><br><span class="text-xs font-normal text-gray-500">Unscripted spoken conversations with NPCs</span>
+            </button>
+            <button type="button" class="opt-btn" onclick="setChoice('aiTech','Adaptive World & Map Generation (Environment changes per playstyle)',this)">
+              🗺️ <strong>Adaptive World Gen</strong><br><span class="text-xs font-normal text-gray-500">Environments morph to match your strategy</span>
+            </button>
+            <button type="button" class="opt-btn" onclick="setChoice('aiTech','Dynamic Quest & Story Engine (AI crafts personalized sidequests)',this)">
+              📜 <strong>Dynamic Quest Engine</strong><br><span class="text-xs font-normal text-gray-500">Infinite unique storylines &amp; plot twists</span>
+            </button>
+            <button type="button" class="opt-btn" onclick="setChoice('aiTech','Smart NPC Tactics & Memory (Enemies remember your habits)',this)">
+              🧠 <strong>Smart NPC Memory &amp; Tactics</strong><br><span class="text-xs font-normal text-gray-500">Opponents adapt to counter your moves</span>
+            </button>
+          </div>
+          <p id="ai-tech-error" class="hidden text-xs text-red-500 font-medium mt-2">Please select a GenAI technology type.</p>
+        </div>
+      </div>
+
+      <!-- Step 2: The 3-Sentence Pitch -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="w-8 h-8 rounded-full bg-sky-600 text-white font-black text-sm flex items-center justify-center">2</span>
+          <h2 class="text-lg font-black text-gray-900">Pitch Your Feature in 3 Sentences</h2>
+        </div>
+
+        <div class="bg-sky-50 border border-sky-200 rounded-2xl p-4 mb-5 text-xs text-sky-900 leading-relaxed space-y-1">
+          <div><strong>Sentence 1:</strong> Identify the current limitation or repetitive element in the game.</div>
+          <div><strong>Sentence 2:</strong> Introduce your Generative AI feature and how it works in real-time.</div>
+          <div><strong>Sentence 3:</strong> Explain how it fundamentally improves the core gameplay loop.</div>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label for="sentence-1" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              Sentence 1 — The Limitation / Problem <span class="text-red-500">*</span>
+            </label>
+            <input id="sentence-1" type="text"
+              placeholder="e.g. In Skyrim, town guard NPCs repeat the same 5 canned voice lines no matter what grand achievements your character has accomplished."
+              class="form-input w-full p-3.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" />
+            <p id="sentence-1-error" class="hidden text-xs text-red-500 font-medium mt-1">Please write sentence 1.</p>
+          </div>
+
+          <div>
+            <label for="sentence-2" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              Sentence 2 — The GenAI Feature Idea <span class="text-red-500">*</span>
+            </label>
+            <input id="sentence-2" type="text"
+              placeholder="e.g. Integrating a low-latency LLM and voice synthesis model would allow guards to comment dynamically on your exact recent quests, inventory, and reputation."
+              class="form-input w-full p-3.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" />
+            <p id="sentence-2-error" class="hidden text-xs text-red-500 font-medium mt-1">Please write sentence 2.</p>
+          </div>
+
+          <div>
+            <label for="sentence-3" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              Sentence 3 — Core Gameplay Loop Enhancement <span class="text-red-500">*</span>
+            </label>
+            <input id="sentence-3" type="text"
+              placeholder="e.g. This deepens the roleplay gameplay loop by turning passive towns into reactive political environments where rumors spread and your choices change how NPCs treat you."
+              class="form-input w-full p-3.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" />
+            <p id="sentence-3-error" class="hidden text-xs text-red-500 font-medium mt-1">Please write sentence 3.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Game Loop Impact & Technical Trade-offs -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="w-8 h-8 rounded-full bg-sky-600 text-white font-black text-sm flex items-center justify-center">3</span>
+          <h2 class="text-lg font-black text-gray-900">Gameplay Impact &amp; Engineering Hurdles</h2>
+        </div>
+
+        <div class="mb-5">
+          <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-3">Which primary gameplay pillar does your feature enhance? <span class="text-red-500">*</span></p>
+          <div id="gameplay-pillar-picker" class="flex flex-wrap gap-2">
+            <button type="button" class="opt-btn" onclick="setChoice('gameplayPillar','Roleplay & Storytelling',this)">🎭 Roleplay &amp; Storytelling</button>
+            <button type="button" class="opt-btn" onclick="setChoice('gameplayPillar','Exploration & Discovery',this)">🧭 Exploration &amp; Discovery</button>
+            <button type="button" class="opt-btn" onclick="setChoice('gameplayPillar','Tactical Combat & Strategy',this)">⚔️ Tactical Combat &amp; Strategy</button>
+            <button type="button" class="opt-btn" onclick="setChoice('gameplayPillar','Social & Multiplayer Interaction',this)">👥 Social &amp; Multiplayer</button>
+            <button type="button" class="opt-btn" onclick="setChoice('gameplayPillar','Puzzles & Problem Solving',this)">🧩 Puzzles &amp; Problem Solving</button>
+          </div>
+          <p id="gameplay-pillar-error" class="hidden text-xs text-red-500 font-medium mt-2">Please select a gameplay pillar.</p>
+        </div>
+
+        <div>
+          <label for="tech-hurdle" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
+            What is the biggest technical obstacle or trade-off to shipping this live? <span class="text-red-500">*</span>
+          </label>
+          <textarea id="tech-hurdle" rows="3"
+            placeholder="e.g. Latency (waiting 3 seconds for speech breaks fast combat), server costs for million players, or hallucinations breaking the lore..."
+            class="form-input w-full p-4 rounded-2xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all"></textarea>
+          <p id="tech-hurdle-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe the main technical hurdle.</p>
+        </div>
+      </div>
+
+      <!-- Step 4: Rating & Submit -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-8">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-full bg-sky-600 text-white font-black text-sm flex items-center justify-center">4</span>
+          <h2 class="text-lg font-black text-gray-900">Rate This Exercise</h2>
+        </div>
+
+        <div class="mb-6">
+          <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">How much did you enjoy pitching your AI feature?</p>
+          <div id="enjoyment-stars" class="flex gap-2 text-3xl">
+            <button type="button" class="star-btn" onclick="setRating(1)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(2)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(3)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(4)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(5)">⭐</button>
+          </div>
+          <p id="rating-error" class="hidden text-xs text-red-500 font-medium mt-1">Please select a star rating.</p>
+        </div>
+
+        <div id="form-error" class="hidden mb-4 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold">
+          <span id="form-error-text">⚠️ Please fill out all required fields marked in red.</span>
+        </div>
+
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-2xl shadow-xl transition-all active:scale-98 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-700 hover:to-sky-800">
+          <span id="submit-label">Submit Feature Pitch &#8594;</span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div id="success-screen" class="hidden fixed inset-0 z-[110] bg-white flex items-center justify-center p-6 text-center">
+    <div class="max-w-md w-full">
+      <div class="w-20 h-20 bg-sky-100 text-sky-600 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-inner">
+        🚀
+      </div>
+      <h2 class="text-3xl font-black text-gray-900 tracking-tight mb-2">Pitch Submitted, <span id="success-name">Student</span>!</h2>
+      <p class="text-sm text-gray-500 mb-8 leading-relaxed">
+        Your 3-sentence GenAI game feature pitch has been logged to the teacher dashboard.
+      </p>
+      <a href="index.html"
+        class="inline-flex items-center justify-center w-full py-4 px-6 rounded-2xl font-black text-sm text-white bg-sky-700 hover:bg-sky-800 transition-all shadow-lg">
+        Return to Course Hub
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+    const TABLE = 'introai_week09_ai_feature_pitch';
+
+    let studentName = '', studentEmail = '';
+    let enjoymentRating = 0;
+
+    const choices = { aiTech: '', gameplayPillar: '' };
+
+    const PICKER_IDS = {
+      aiTech: 'ai-tech-picker',
+      gameplayPillar: 'gameplay-pillar-picker'
+    };
+    const ERR_IDS = {
+      aiTech: 'ai-tech-error',
+      gameplayPillar: 'gameplay-pillar-error'
+    };
+
+    function setChoice(key, val, btn) {
+      choices[key] = val;
+      document.querySelectorAll('#' + PICKER_IDS[key] + ' .opt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById(ERR_IDS[key]).classList.add('hidden');
+    }
+
+    function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+
+    function handleRegistration(ev) {
+      ev.preventDefault();
+      const nameEl = document.getElementById('reg-name');
+      const emailEl = document.getElementById('reg-email');
+      let ok = true;
+
+      nameEl.classList.remove('error');
+      emailEl.classList.remove('error');
+      document.getElementById('reg-name-error').classList.add('hidden');
+      document.getElementById('reg-email-error').classList.add('hidden');
+
+      if (!nameEl.value.trim()) { nameEl.classList.add('error'); document.getElementById('reg-name-error').classList.remove('hidden'); ok = false; }
+      if (!emailEl.value.trim() || !validateEmail(emailEl.value.trim())) { emailEl.classList.add('error'); document.getElementById('reg-email-error').classList.remove('hidden'); ok = false; }
+      if (!ok) return;
+
+      studentName = nameEl.value.trim();
+      studentEmail = emailEl.value.trim();
+
+      sessionStorage.setItem('introai_w09_ai_feature_pitch_name', studentName);
+      sessionStorage.setItem('introai_w09_ai_feature_pitch_email', studentEmail);
+
+      const overlay = document.getElementById('registration-overlay');
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.remove(), 400);
+    }
+
+    (function restoreSession() {
+      const n = sessionStorage.getItem('introai_w09_ai_feature_pitch_name');
+      const e = sessionStorage.getItem('introai_w09_ai_feature_pitch_email');
+      if (n && e) { studentName = n; studentEmail = e; document.getElementById('registration-overlay').remove(); }
+    })();
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#enjoyment-stars .star-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx < val);
+      });
+      document.getElementById('rating-error').classList.add('hidden');
+    }
+
+    async function supabaseInsert(payload) {
+      const resp = await fetch(SUPABASE_URL + '/rest/v1/' + TABLE, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!resp.ok) { const t = await resp.text(); throw new Error('HTTP ' + resp.status + ': ' + t); }
+    }
+
+    async function submitExercise(ev) {
+      ev.preventDefault();
+      let ok = true;
+
+      // Validate choice pickers
+      Object.keys(choices).forEach(key => {
+        if (!choices[key]) { document.getElementById(ERR_IDS[key]).classList.remove('hidden'); ok = false; }
+      });
+
+      // Validate text inputs & textareas
+      const textFields = [
+        { id: 'game-title', errId: 'game-title-error' },
+        { id: 'sentence-1', errId: 'sentence-1-error' },
+        { id: 'sentence-2', errId: 'sentence-2-error' },
+        { id: 'sentence-3', errId: 'sentence-3-error' },
+        { id: 'tech-hurdle', errId: 'tech-hurdle-error' },
+      ];
+      textFields.forEach(f => {
+        const el = document.getElementById(f.id);
+        const val = el ? el.value.trim() : '';
+        if (el) el.classList.toggle('error', !val);
+        const errEl = document.getElementById(f.errId);
+        if (errEl) errEl.classList.toggle('hidden', !!val);
+        if (!val) ok = false;
+      });
+
+      if (enjoymentRating === 0) { document.getElementById('rating-error').classList.remove('hidden'); ok = false; }
+
+      if (!ok) {
+        document.getElementById('form-error').classList.remove('hidden');
+        const firstErr = document.querySelector('.error');
+        if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      document.getElementById('form-error').classList.add('hidden');
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting\u2026';
+
+      const s1 = document.getElementById('sentence-1').value.trim();
+      const s2 = document.getElementById('sentence-2').value.trim();
+      const s3 = document.getElementById('sentence-3').value.trim();
+      const fullPitch = `${s1} ${s2} ${s3}`;
+
+      const payload = {
+        student_name: studentName,
+        student_email: studentEmail,
+        game_title: document.getElementById('game-title').value.trim(),
+        ai_tech_type: choices.aiTech,
+        sentence_1: s1,
+        sentence_2: s2,
+        sentence_3: s3,
+        full_pitch: fullPitch,
+        gameplay_pillar: choices.gameplayPillar,
+        technical_hurdle: document.getElementById('tech-hurdle').value.trim(),
+        enjoyment_rating: enjoymentRating,
+        submitted_at: new Date().toISOString()
+      };
+
+      try {
+        await supabaseInsert(payload);
+        document.getElementById('success-name').textContent = studentName.split(' ')[0];
+        document.getElementById('success-screen').classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        console.error('Submission error:', err.message);
+        btn.disabled = false;
+        document.getElementById('submit-label').textContent = 'Submit Feature Pitch \u2192';
+        if (err.message.includes('409') || err.message.includes('duplicate key')) {
+          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f You have already submitted this activity!';
+        } else {
+          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f Network error submitting exercise. Please try again.';
+        }
+        document.getElementById('form-error').classList.remove('hidden');
+      }
+    }
+  </script>
+</body>
+
+</html>
