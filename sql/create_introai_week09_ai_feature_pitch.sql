@@ -31,10 +31,21 @@ COMMENT ON TABLE introai_week09_ai_feature_pitch
 -- ── Row-Level Security ────────────────────────────────────────────────────────
 ALTER TABLE introai_week09_ai_feature_pitch ENABLE ROW LEVEL SECURITY;
 
--- Anon can INSERT (student page uses anon key)
+-- Anon can INSERT, SELECT, and UPDATE (student page uses anon key with upserts)
 CREATE POLICY "anon_insert_w09_ai_feature_pitch"
   ON introai_week09_ai_feature_pitch
   FOR INSERT TO anon
+  WITH CHECK (true);
+
+CREATE POLICY "anon_select_w09_ai_feature_pitch"
+  ON introai_week09_ai_feature_pitch
+  FOR SELECT TO anon
+  USING (true);
+
+CREATE POLICY "anon_update_w09_ai_feature_pitch"
+  ON introai_week09_ai_feature_pitch
+  FOR UPDATE TO anon
+  USING (true)
   WITH CHECK (true);
 
 -- Authenticated users (teachers) can SELECT
@@ -42,3 +53,4 @@ CREATE POLICY "auth_select_w09_ai_feature_pitch"
   ON introai_week09_ai_feature_pitch
   FOR SELECT TO authenticated
   USING (true);
+

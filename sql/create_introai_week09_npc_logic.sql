@@ -40,10 +40,21 @@ COMMENT ON TABLE introai_week09_npc_logic
 -- ── Row-Level Security ────────────────────────────────────────────────────────
 ALTER TABLE introai_week09_npc_logic ENABLE ROW LEVEL SECURITY;
 
--- Anon can INSERT (student page uses anon key)
+-- Anon can INSERT, SELECT, and UPDATE (student page uses anon key with upserts)
 CREATE POLICY "anon_insert_w09_npc_logic"
   ON introai_week09_npc_logic
   FOR INSERT TO anon
+  WITH CHECK (true);
+
+CREATE POLICY "anon_select_w09_npc_logic"
+  ON introai_week09_npc_logic
+  FOR SELECT TO anon
+  USING (true);
+
+CREATE POLICY "anon_update_w09_npc_logic"
+  ON introai_week09_npc_logic
+  FOR UPDATE TO anon
+  USING (true)
   WITH CHECK (true);
 
 -- Authenticated users (teachers) can SELECT
@@ -51,3 +62,4 @@ CREATE POLICY "auth_select_w09_npc_logic"
   ON introai_week09_npc_logic
   FOR SELECT TO authenticated
   USING (true);
+

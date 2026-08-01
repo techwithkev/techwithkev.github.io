@@ -485,14 +485,14 @@
       document.getElementById('rating-error').classList.add('hidden');
     }
 
-    async function supabaseInsert(payload) {
-      const resp = await fetch(SUPABASE_URL + '/rest/v1/' + TABLE, {
+    async function supabaseUpsert(payload) {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?on_conflict=student_email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'apikey': SUPABASE_KEY,
           'Authorization': 'Bearer ' + SUPABASE_KEY,
-          'Prefer': 'return=minimal'
+          'Prefer': 'resolution=merge-duplicates,return=minimal'
         },
         body: JSON.stringify(payload)
       });
@@ -562,7 +562,7 @@
       };
 
       try {
-        await supabaseInsert(payload);
+        await supabaseUpsert(payload);
         document.getElementById('success-name').textContent = studentName.split(' ')[0];
         document.getElementById('success-screen').classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
