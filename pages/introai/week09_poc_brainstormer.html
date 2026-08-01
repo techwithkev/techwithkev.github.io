@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Final Project POC Brainstormer — Intro to AI · Week 9</title>
+  <meta name="description"
+    content="Week 9 Mini POC Brainstormer: Map out your AI interests across LLMs, Music, Vision, Ethics, and Gaming, build your final project Proof of Concept, and retrieve your saved ideas anytime.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    #registration-overlay { transition: opacity 0.4s ease; }
+    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
+    #registration-overlay .reg-card {
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
+    }
+    #registration-overlay.hiding .reg-card {
+      transform: scale(0.95) translateY(-10px); opacity: 0;
+    }
+    .reg-input:focus {
+      outline: none; border-color: #c026d3;
+      box-shadow: 0 0 0 3px rgba(192,38,211,0.15);
+    }
+    .reg-input.error {
+      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+    }
+    .form-input:focus {
+      outline: none; border-color: #c026d3;
+      box-shadow: 0 0 0 3px rgba(192,38,211,0.1);
+    }
+    .form-input.error { border-color: #ef4444; }
+    .star-btn {
+      font-size: 22px;
+      cursor: pointer;
+      filter: grayscale(100%);
+      transition: filter 0.15s ease, transform 0.1s ease;
+    }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .opt-btn {
+      border: 2px solid #fae8ff;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #374151;
+      background: #fdf4ff;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: left;
+    }
+    .opt-btn:hover { border-color: #c026d3; background: #fdf4ff; color: #a21caf; }
+    .opt-btn.selected { border-color: #c026d3; background: #fae8ff; color: #a21caf; box-shadow: 0 0 0 3px rgba(192,38,211,0.15); }
+  </style>
+</head>
+
+<body class="bg-[#FDF4FF] text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- REGISTRATION & RETRIEVAL GATE -->
+  <div id="registration-overlay"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+    style="background: linear-gradient(135deg, #701a75 0%, #c026d3 55%, #86198f 100%);">
+
+    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
+        style="background: radial-gradient(circle, #f5d0fe, transparent);"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
+        style="background: radial-gradient(circle, #e879f9, transparent);"></div>
+    </div>
+
+    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center bg-fuchsia-100 text-fuchsia-600">
+          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L5.594 15.12a2 2 0 00-1.15.124l-1.043.417A2 2 0 002 17.52V19a2 2 0 002 2h16a2 2 0 002-2v-1.48a2 2 0 00-1.572-1.956z" />
+          </svg>
+        </div>
+        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-2 bg-fuchsia-100 text-fuchsia-800">
+          Week 9 · Final Project POC
+        </div>
+        <h1 class="text-2xl font-black text-gray-900 tracking-tight">POC <span class="text-fuchsia-600">Brainstormer 💡</span></h1>
+        <p class="text-xs text-gray-500 mt-1 leading-relaxed">Map your AI interests &amp; design your project Proof of Concept.</p>
+      </div>
+
+      <!-- Mode Toggle: New Session vs Retrieve Existing -->
+      <div class="flex rounded-xl bg-gray-100 p-1 mb-6 text-xs font-bold">
+        <button id="toggle-new-btn" type="button" onclick="setRegMode('new')"
+          class="flex-1 py-2 rounded-lg text-center bg-white text-fuchsia-700 shadow-sm transition-all">
+          ✨ New POC Session
+        </button>
+        <button id="toggle-retrieve-btn" type="button" onclick="setRegMode('retrieve')"
+          class="flex-1 py-2 rounded-lg text-center text-gray-500 hover:text-gray-900 transition-all">
+          🔍 Retrieve Saved POC
+        </button>
+      </div>
+
+      <!-- Form for NEW registration -->
+      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
+        <div class="space-y-4 mb-6">
+          <div>
+            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Your Full Name</label>
+            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Taylor Swift"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name.</p>
+          </div>
+          <div>
+            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
+            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. taylor@school.edu"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
+          </div>
+        </div>
+        <button id="reg-submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-600 to-fuchsia-700 hover:from-fuchsia-700 hover:to-fuchsia-800">
+          <span id="reg-btn-label">Start Brainstorming &#8594;</span>
+        </button>
+      </form>
+
+      <!-- Form for RETRIEVING existing session -->
+      <form id="retrieve-form" onsubmit="handleRetrieval(event)" class="hidden" novalidate>
+        <div class="mb-6">
+          <label for="retrieve-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Your Registered Email</label>
+          <input id="retrieve-email" type="email" placeholder="e.g. taylor@school.edu"
+            class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+          <p id="retrieve-error" class="hidden text-xs text-red-500 font-medium mt-2.5">No saved POC found for this email. Try starting a new session!</p>
+        </div>
+        <button id="retrieve-submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-fuchsia-700 hover:from-purple-700 hover:to-fuchsia-800">
+          <span id="retrieve-btn-label">Find &amp; Load My Saved POC 🔍</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main-content" class="max-w-3xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-fuchsia-200 pb-6">
+      <div>
+        <a href="index.html"
+          class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-fuchsia-600 mb-3 hover:text-fuchsia-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">
+          Final Project <span class="text-fuchsia-600">POC Brainstormer 💡</span>
+        </h1>
+        <p class="text-gray-500 font-medium italic mt-1">Map AI Interests &amp; Build Your Proof of Concept Pitch · Week 9</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-fuchsia-50 border border-fuchsia-200 text-fuchsia-800 shadow-sm self-start md:self-auto flex items-center gap-2">
+        <span>Week 9</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-fuchsia-500 animate-pulse"></span>
+      </div>
+    </header>
+
+    <!-- Brief Card -->
+    <div class="bg-gradient-to-br from-fuchsia-700 to-purple-800 text-white rounded-3xl p-6 md:p-8 mb-8 shadow-lg">
+      <h2 class="text-xl font-black mb-3 flex items-center gap-2">
+        <span>🧪 What is a Proof of Concept (POC)?</span>
+      </h2>
+      <p class="text-sm text-fuchsia-100 leading-relaxed mb-4">
+        A <strong>Proof of Concept (POC)</strong> is a small, working prototype that proves your core AI idea actually works before you spend weeks building the full project.
+      </p>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-2.5 mb-4 text-xs font-bold">
+        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2.5 text-center">🤖 LLM Chatbots</div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2.5 text-center">🎨 Image Generation</div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2.5 text-center">🎵 Music &amp; Audio</div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2.5 text-center">📸 Teachable Machine</div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2.5 text-center">⚖️ AI Ethics &amp; Bias</div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2.5 text-center">🎮 Game AI &amp; NPCs</div>
+      </div>
+      <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10 text-xs leading-relaxed flex items-center justify-between">
+        <span><strong>Saved Progress:</strong> Your responses sync to the cloud so you can load them anytime by entering your email!</span>
+        <button type="button" onclick="openRetrieveModal()" class="ml-3 px-3 py-1 bg-white text-fuchsia-800 rounded-lg font-black hover:bg-fuchsia-100 transition-all flex-shrink-0 text-[11px]">
+          Load Saved 🔍
+        </button>
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <form id="poc-form" onsubmit="submitExercise(event)" novalidate>
+
+      <!-- Step 1: Modality & Topic Interest Radar -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="w-8 h-8 rounded-full bg-fuchsia-600 text-white font-black text-sm flex items-center justify-center">1</span>
+          <div>
+            <h2 class="text-lg font-black text-gray-900">Rate Your Interest Across AI Modalities</h2>
+            <p class="text-xs text-gray-500">Rate how excited you are to use each AI topic for your final project (1 = Low, 5 = High)</p>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <!-- LLMs -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3.5 bg-fuchsia-50/50 rounded-2xl border border-fuchsia-100">
+            <div>
+              <strong class="text-sm text-gray-900 flex items-center gap-1.5">🤖 LLMs &amp; Prompt Engineering</strong>
+              <p class="text-xs text-gray-500">Chatbots, custom personas, storytelling, Q&amp;A helpers</p>
+            </div>
+            <div id="stars-llm" class="flex gap-1 text-2xl flex-shrink-0">
+              <button type="button" class="star-btn" onclick="setModalityRating('llm', 1)">⭐</button>
+              <button type="button" class="star-btn" onclick="setModalityRating('llm', 2)">⭐</button>
+              <button type="button" class="star-btn" onclick="setModalityRating('llm', 3)">⭐</button>
+              <button type="button" class="star-btn" onclick="setModalityRating('llm', 4)">⭐</button>
+              <button type="button" class="star-btn" onclick="setModalityRating('llm', 5)">⭐</button>
+            </div>
+          </div>
+
+          <!-- Image Gen -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3.5 bg-fuchsia-50/50 rounded-2xl border border-fuchsia-100">
+            <div>
+              <strong class="text-sm text-gray-900 flex items-center gap-1.5">🎨 AI Image &amp; Art Generation</strong>
+              <p class="text-xs text-gray-500">Midjourney, Stable Diffusion, style &amp; detail prompts</p>
+            </div>
+            <div id="stars-image" class="flex gap-1 text-2xl flex-shrink-0">
+              <button type="button" class="star-btn" onclick="setModalityRating('image', 1)">⭐</button>
+              <button type="button" class="star-btn" onclick="setModalityRating('image', 2)">⭐</button>
+              <button type="button" class="star-btn" onclick="setModalityRating('image', 3)">⭐</button>
+              <button type="button" class="star-btn" onclick="setModalityRating('image', 4)">⭐</button>
+              <button type="button" class="star-btn" onclick="setModalityRating('image', 5)">⭐</button>
+            </div>
+          </div>
+
+          <!-- Music -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3.5 bg-fuchsia-50/50 rounded-2xl border border-fuchsia-100">
+            <div>
+              <strong class="text-sm text-gray-900 flex items-center gap-1.5">🎵 Music &amp; Audio Generation</strong>
+              <p class="text-xs text-gray-500">Suno music, voice generation, instrument swapping</p>
+            </div>
+            <div id="stars-music" class="flex gap-1 text-2xl flex-shrink-0">
+              <button type="button" class="star-btn" onclick="setModalityRating('music', 1)">⭐</button>
+              <button type="button" class="star-btn" onclick="setModalityRating('music', 2)">⭐</button>
+              <button type="button" class="star-btn" onclick="setModalityRating('music', 3)">⭐</button>
+              <button type="button" class="star-btn" onclick="setModalityRating('music', 4)">⭐</button>
+              <button type="button" class="star-btn" onclick="setModalityRating('music', 5)">⭐</button>
+            </div>
+          </div>
+
+          <!-- Teachable Machine -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3.5 bg-fuchsia-50/50 rounded-2xl border border-fuchsia-100">
+            <div>
+              <strong class="text-sm text-gray-900 flex items-center gap-1.5">📸 Teachable Machine &amp; Computer Vision</strong>
+              <p class="text-xs text-gray-500">Image, sound, or pose classification models</p>
+            </div>
+            <div id="stars-vision" class="flex gap-1 text-2xl flex-shrink-0">
+              <button type="button" class="star-btn" onclick="setModalityRating('vision', 1)">⭐</button>
+              <button type="button" class="star-btn" onclick="setModalityRating('vision', 2)">⭐</button>
+              <button type="button" class="star-btn" onclick="setModalityRating('vision', 3)">⭐</button>
+              <button type="button" class="star-btn" onclick="setModalityRating('vision', 4)">⭐</button>
+              <button type="button" class="star-btn" onclick="setModalityRating('vision', 5)">⭐</button>
+            </div>
+          </div>
+
+          <!-- Ethics -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3.5 bg-fuchsia-50/50 rounded-2xl border border-fuchsia-100">
+            <div>
+              <strong class="text-sm text-gray-900 flex items-center gap-1.5">⚖️ AI Ethics &amp; Bias Auditing</strong>
+              <p class="text-xs text-gray-500">Auditing datasets, detecting bias, representative AI</p>
+            </div>
+            <div id="stars-ethics" class="flex gap-1 text-2xl flex-shrink-0">
+              <button type="button" class="star-btn" onclick="setModalityRating('ethics', 1)">⭐</button>
+              <button type="button" class="star-btn" onclick="setModalityRating('ethics', 2)">⭐</button>
+              <button type="button" class="star-btn" onclick="setModalityRating('ethics', 3)">⭐</button>
+              <button type="button" class="star-btn" onclick="setModalityRating('ethics', 4)">⭐</button>
+              <button type="button" class="star-btn" onclick="setModalityRating('ethics', 5)">⭐</button>
+            </div>
+          </div>
+
+          <!-- Game AI -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3.5 bg-fuchsia-50/50 rounded-2xl border border-fuchsia-100">
+            <div>
+              <strong class="text-sm text-gray-900 flex items-center gap-1.5">🎮 Game AI &amp; NPC Logic</strong>
+              <p class="text-xs text-gray-500">Decision trees, guard logic, adaptive gameplay features</p>
+            </div>
+            <div id="stars-gameai" class="flex gap-1 text-2xl flex-shrink-0">
+              <button type="button" class="star-btn" onclick="setModalityRating('gameai', 1)">⭐</button>
+              <button type="button" class="star-btn" onclick="setModalityRating('gameai', 2)">⭐</button>
+              <button type="button" class="star-btn" onclick="setModalityRating('gameai', 3)">⭐</button>
+              <button type="button" class="star-btn" onclick="setModalityRating('gameai', 4)">⭐</button>
+              <button type="button" class="star-btn" onclick="setModalityRating('gameai', 5)">⭐</button>
+            </div>
+          </div>
+        </div>
+        <p id="modality-error" class="hidden text-xs text-red-500 font-medium mt-3">Please rate at least 3 AI modalities above.</p>
+      </div>
+
+      <!-- Step 2: Choose Primary & Secondary Modalities + Problem Space -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="w-8 h-8 rounded-full bg-fuchsia-600 text-white font-black text-sm flex items-center justify-center">2</span>
+          <h2 class="text-lg font-black text-gray-900">Select Modality Combination &amp; Domain</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+          <div>
+            <label for="primary-modality" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
+              Primary AI Engine <span class="text-red-500">*</span>
+            </label>
+            <select id="primary-modality" class="form-input w-full p-3.5 rounded-xl border border-gray-200 bg-gray-50 text-xs font-bold text-gray-900">
+              <option value="">Select Primary AI Engine...</option>
+              <option value="LLM Chatbot & Text Gen">🤖 LLM Chatbot / Text Generator</option>
+              <option value="Computer Vision & Teachable Machine">📸 Teachable Machine Classifier</option>
+              <option value="AI Image & Visual Asset Gen">🎨 AI Image & Art Generator</option>
+              <option value="AI Music & Audio Synthesizer">🎵 AI Music & Audio Generator</option>
+              <option value="NPC Decision Tree & Game AI">🎮 Game AI & Decision Tree</option>
+              <option value="Ethics Audit & Dataset Evaluator">⚖️ AI Ethics & Dataset Evaluator</option>
+            </select>
+            <p id="primary-modality-error" class="hidden text-xs text-red-500 font-medium mt-1">Select a primary engine.</p>
+          </div>
+
+          <div>
+            <label for="secondary-modality" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
+              Secondary AI / Component (Optional)
+            </label>
+            <select id="secondary-modality" class="form-input w-full p-3.5 rounded-xl border border-gray-200 bg-gray-50 text-xs font-bold text-gray-900">
+              <option value="None (Single AI Engine)">None (Single Engine)</option>
+              <option value="+ LLM for Story/Text">+ LLM for Story / Dialogue</option>
+              <option value="+ AI Image Gen for Artwork">+ AI Image Gen for Artwork</option>
+              <option value="+ Suno for Music/SFX">+ Suno / Voice for Audio</option>
+              <option value="+ Teachable Machine for Camera">+ Teachable Machine for Camera</option>
+              <option value="+ Ethics Audit Layer">+ Ethics & Safety Audit Layer</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-3">Which problem area / theme are you targeting? <span class="text-red-500">*</span></p>
+          <div id="target-domain-picker" class="flex flex-wrap gap-2">
+            <button type="button" class="opt-btn" onclick="setChoice('targetDomain','Education & Learning Helpers',this)">📚 Education &amp; Learning</button>
+            <button type="button" class="opt-btn" onclick="setChoice('targetDomain','Gaming & Interactive Stories',this)">🎮 Gaming &amp; Interactive Stories</button>
+            <button type="button" class="opt-btn" onclick="setChoice('targetDomain','Creative Arts & Music',this)">🎨 Creative Arts &amp; Music</button>
+            <button type="button" class="opt-btn" onclick="setChoice('targetDomain','Health, Wellness & Accessibility',this)">🏥 Health &amp; Accessibility</button>
+            <button type="button" class="opt-btn" onclick="setChoice('targetDomain','Environmental & Social Good',this)">🌱 Environment &amp; Social Good</button>
+            <button type="button" class="opt-btn" onclick="setChoice('targetDomain','Daily Productivity & Life Hacks',this)">⚡ Daily Productivity</button>
+          </div>
+          <p id="target-domain-error" class="hidden text-xs text-red-500 font-medium mt-2">Please select a target domain.</p>
+        </div>
+      </div>
+
+      <!-- Step 3: The Proof of Concept (POC) Proposal -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="w-8 h-8 rounded-full bg-fuchsia-600 text-white font-black text-sm flex items-center justify-center">3</span>
+          <h2 class="text-lg font-black text-gray-900">Define Your Proof of Concept (POC)</h2>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label for="poc-title" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              POC Project Codename / Working Title <span class="text-red-500">*</span>
+            </label>
+            <input id="poc-title" type="text" placeholder="e.g. EcoGuard AI, MoodTuner, HistoryBot 3000, StealthGuard Pro..."
+              class="form-input w-full p-3.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" />
+            <p id="poc-title-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a working title.</p>
+          </div>
+
+          <div>
+            <label for="poc-description" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              What does your POC demo actually DO? (Describe the input &amp; output) <span class="text-red-500">*</span>
+            </label>
+            <textarea id="poc-description" rows="3"
+              placeholder="e.g. Input: User holds up a recyclable item to the webcam. Teachable Machine classifies paper vs plastic. Output: LLM generates a fun 1-sentence eco-fact narrated with AI voice audio."
+              class="form-input w-full p-4 rounded-2xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all"></textarea>
+            <p id="poc-description-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe your POC input and output.</p>
+          </div>
+
+          <div>
+            <label for="mvp-scope" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              Minimum Viable Scope: What is the 1 core feature you will build first? <span class="text-red-500">*</span>
+            </label>
+            <input id="mvp-scope" type="text"
+              placeholder="e.g. Train a 3-class Teachable Machine model with 30 images each and connect it to a working HTML web page."
+              class="form-input w-full p-3.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" />
+            <p id="mvp-scope-error" class="hidden text-xs text-red-500 font-medium mt-1">Please specify your minimum viable scope.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Submission & Save -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-8">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-full bg-fuchsia-600 text-white font-black text-sm flex items-center justify-center">4</span>
+          <h2 class="text-lg font-black text-gray-900">Save &amp; Register Your POC</h2>
+        </div>
+
+        <div class="mb-6">
+          <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">How excited are you to build this POC project?</p>
+          <div id="enjoyment-stars" class="flex gap-2 text-3xl">
+            <button type="button" class="star-btn" onclick="setRating(1)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(2)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(3)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(4)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(5)">⭐</button>
+          </div>
+          <p id="rating-error" class="hidden text-xs text-red-500 font-medium mt-1">Please select an excitement rating.</p>
+        </div>
+
+        <div id="form-error" class="hidden mb-4 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold">
+          <span id="form-error-text">⚠️ Please fill out all required fields marked in red.</span>
+        </div>
+
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-2xl shadow-xl transition-all active:scale-98 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-600 to-purple-700 hover:from-fuchsia-700 hover:to-purple-800">
+          <span id="submit-label">Save &amp; Lock In POC Proposal &#8594;</span>
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+
+  <!-- SUCCESS SCREEN & PRINTABLE CARD -->
+  <div id="success-screen" class="hidden fixed inset-0 z-[110] bg-white overflow-y-auto p-6 md:p-12">
+    <div class="max-w-2xl mx-auto py-8">
+      <div class="text-center mb-8">
+        <div class="w-20 h-20 bg-fuchsia-100 text-fuchsia-600 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl shadow-inner">
+          💡
+        </div>
+        <h2 class="text-3xl font-black text-gray-900 tracking-tight">POC Proposal Saved, <span id="success-name">Student</span>!</h2>
+        <p class="text-xs text-gray-500 mt-1">Your brainstormed project brief is locked in and synced to your cloud account.</p>
+      </div>
+
+      <!-- Formatted POC Card -->
+      <div id="poc-card-output" class="bg-gradient-to-br from-fuchsia-900 to-purple-950 text-white rounded-3xl p-6 md:p-8 shadow-2xl mb-8 border border-fuchsia-500/30">
+        <div class="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
+          <div>
+            <span class="text-[10px] font-black uppercase tracking-widest text-fuchsia-300">Proof of Concept Proposal</span>
+            <h3 id="card-title" class="text-2xl font-black text-white">Project Title</h3>
+          </div>
+          <span class="px-3 py-1 bg-fuchsia-500/30 border border-fuchsia-400/40 rounded-full text-xs font-bold text-fuchsia-200">
+            Intro to AI · Final Project
+          </span>
+        </div>
+
+        <div class="space-y-4 text-xs">
+          <div>
+            <span class="text-fuchsia-300 font-bold uppercase tracking-wider text-[10px] block mb-1">Target Problem Domain</span>
+            <p id="card-domain" class="font-semibold text-sm text-white"></p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="bg-white/5 rounded-xl p-3 border border-white/10">
+              <span class="text-fuchsia-300 font-bold uppercase tracking-wider text-[10px] block mb-1">Primary Engine</span>
+              <p id="card-primary" class="font-semibold text-white"></p>
+            </div>
+            <div class="bg-white/5 rounded-xl p-3 border border-white/10">
+              <span class="text-fuchsia-300 font-bold uppercase tracking-wider text-[10px] block mb-1">Secondary Component</span>
+              <p id="card-secondary" class="font-semibold text-white"></p>
+            </div>
+          </div>
+
+          <div>
+            <span class="text-fuchsia-300 font-bold uppercase tracking-wider text-[10px] block mb-1">Core Demo Description</span>
+            <p id="card-description" class="text-gray-200 leading-relaxed bg-white/5 p-3.5 rounded-xl border border-white/10 font-medium"></p>
+          </div>
+
+          <div>
+            <span class="text-fuchsia-300 font-bold uppercase tracking-wider text-[10px] block mb-1">Minimum Viable Scope (MVP)</span>
+            <p id="card-mvp" class="text-gray-200 leading-relaxed bg-white/5 p-3 rounded-xl border border-white/10 font-medium"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button type="button" onclick="editPOC()" class="flex-1 py-3.5 px-6 rounded-xl font-bold text-xs text-gray-700 bg-gray-100 hover:bg-gray-200 transition-all text-center">
+          ✏️ Edit Proposal
+        </button>
+        <a href="index.html" class="flex-1 py-3.5 px-6 rounded-xl font-black text-xs text-white bg-fuchsia-700 hover:bg-fuchsia-800 transition-all text-center shadow-lg">
+          Return to Course Hub &#8594;
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+    const TABLE = 'introai_week09_poc_brainstormer';
+
+    let studentName = '', studentEmail = '';
+    let enjoymentRating = 0;
+
+    const modalityRatings = { llm: 0, image: 0, music: 0, vision: 0, ethics: 0, gameai: 0 };
+    const choices = { targetDomain: '' };
+
+    function setRegMode(mode) {
+      const isNew = mode === 'new';
+      document.getElementById('reg-form').classList.toggle('hidden', !isNew);
+      document.getElementById('retrieve-form').classList.toggle('hidden', isNew);
+
+      document.getElementById('toggle-new-btn').className = isNew
+        ? 'flex-1 py-2 rounded-lg text-center bg-white text-fuchsia-700 shadow-sm transition-all'
+        : 'flex-1 py-2 rounded-lg text-center text-gray-500 hover:text-gray-900 transition-all';
+
+      document.getElementById('toggle-retrieve-btn').className = !isNew
+        ? 'flex-1 py-2 rounded-lg text-center bg-white text-fuchsia-700 shadow-sm transition-all'
+        : 'flex-1 py-2 rounded-lg text-center text-gray-500 hover:text-gray-900 transition-all';
+    }
+
+    function setModalityRating(key, val) {
+      modalityRatings[key] = val;
+      document.querySelectorAll(`#stars-${key} .star-btn`).forEach((btn, idx) => {
+        btn.classList.toggle('active', idx < val);
+      });
+      document.getElementById('modality-error').classList.add('hidden');
+    }
+
+    function setChoice(key, val, btn) {
+      choices[key] = val;
+      document.querySelectorAll('#target-domain-picker .opt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById('target-domain-error').classList.add('hidden');
+    }
+
+    function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+
+    function handleRegistration(ev) {
+      ev.preventDefault();
+      const nameEl = document.getElementById('reg-name');
+      const emailEl = document.getElementById('reg-email');
+      let ok = true;
+
+      nameEl.classList.remove('error');
+      emailEl.classList.remove('error');
+      document.getElementById('reg-name-error').classList.add('hidden');
+      document.getElementById('reg-email-error').classList.add('hidden');
+
+      if (!nameEl.value.trim()) { nameEl.classList.add('error'); document.getElementById('reg-name-error').classList.remove('hidden'); ok = false; }
+      if (!emailEl.value.trim() || !validateEmail(emailEl.value.trim())) { emailEl.classList.add('error'); document.getElementById('reg-email-error').classList.remove('hidden'); ok = false; }
+      if (!ok) return;
+
+      studentName = nameEl.value.trim();
+      studentEmail = emailEl.value.trim();
+
+      sessionStorage.setItem('introai_w09_poc_name', studentName);
+      sessionStorage.setItem('introai_w09_poc_email', studentEmail);
+
+      const overlay = document.getElementById('registration-overlay');
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.remove(), 400);
+    }
+
+    async function handleRetrieval(ev) {
+      ev.preventDefault();
+      const emailEl = document.getElementById('retrieve-email');
+      const emailVal = emailEl.value.trim();
+      const errEl = document.getElementById('retrieve-error');
+      errEl.classList.add('hidden');
+
+      if (!emailVal || !validateEmail(emailVal)) {
+        emailEl.classList.add('error'); return;
+      }
+
+      const btn = document.getElementById('retrieve-submit-btn');
+      btn.disabled = true;
+      document.getElementById('retrieve-btn-label').innerHTML = '<span class="spinner"></span> Searching…';
+
+      try {
+        const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?student_email=eq.${encodeURIComponent(emailVal)}`, {
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        const records = await resp.json();
+        if (!resp.ok || !records || !records.length) {
+          errEl.classList.remove('hidden');
+          btn.disabled = false;
+          document.getElementById('retrieve-btn-label').textContent = 'Find & Load My Saved POC 🔍';
+          return;
+        }
+
+        const data = records[0];
+        studentName = data.student_name;
+        studentEmail = data.student_email;
+
+        // Populate fields
+        if (data.poc_title) document.getElementById('poc-title').value = data.poc_title;
+        if (data.poc_description) document.getElementById('poc-description').value = data.poc_description;
+        if (data.mvp_scope) document.getElementById('mvp-scope').value = data.mvp_scope;
+        if (data.primary_modality) document.getElementById('primary-modality').value = data.primary_modality;
+        if (data.secondary_modality) document.getElementById('secondary-modality').value = data.secondary_modality;
+
+        if (data.target_domain) {
+          choices.targetDomain = data.target_domain;
+          document.querySelectorAll('#target-domain-picker .opt-btn').forEach(b => {
+            if (b.textContent.includes(data.target_domain.split(' ')[0])) b.classList.add('selected');
+          });
+        }
+
+        if (data.modality_ratings) {
+          try {
+            const parsed = typeof data.modality_ratings === 'string' ? JSON.parse(data.modality_ratings) : data.modality_ratings;
+            Object.keys(parsed).forEach(k => setModalityRating(k, parsed[k]));
+          } catch(e){}
+        }
+
+        if (data.enjoyment_rating) setRating(data.enjoyment_rating);
+
+        sessionStorage.setItem('introai_w09_poc_name', studentName);
+        sessionStorage.setItem('introai_w09_poc_email', studentEmail);
+
+        const overlay = document.getElementById('registration-overlay');
+        overlay.classList.add('hiding');
+        setTimeout(() => overlay.remove(), 400);
+      } catch(err) {
+        console.error('Retrieval error:', err);
+        errEl.classList.remove('hidden');
+        btn.disabled = false;
+        document.getElementById('retrieve-btn-label').textContent = 'Find & Load My Saved POC 🔍';
+      }
+    }
+
+    function openRetrieveModal() {
+      setRegMode('retrieve');
+      document.body.appendChild(document.getElementById('registration-overlay'));
+    }
+
+    (function restoreSession() {
+      const n = sessionStorage.getItem('introai_w09_poc_name');
+      const e = sessionStorage.getItem('introai_w09_poc_email');
+      if (n && e) { studentName = n; studentEmail = e; document.getElementById('registration-overlay').remove(); }
+    })();
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#enjoyment-stars .star-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx < val);
+      });
+      document.getElementById('rating-error').classList.add('hidden');
+    }
+
+    async function supabaseUpsert(payload) {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'resolution=merge-duplicates,return=minimal'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!resp.ok) { const t = await resp.text(); throw new Error('HTTP ' + resp.status + ': ' + t); }
+    }
+
+    async function submitExercise(ev) {
+      ev.preventDefault();
+      let ok = true;
+
+      // Validate ratings (at least 3 rated)
+      const ratedCount = Object.values(modalityRatings).filter(v => v > 0).length;
+      if (ratedCount < 3) {
+        document.getElementById('modality-error').classList.remove('hidden'); ok = false;
+      }
+
+      if (!choices.targetDomain) {
+        document.getElementById('target-domain-error').classList.remove('hidden'); ok = false;
+      }
+
+      const primaryVal = document.getElementById('primary-modality').value;
+      if (!primaryVal) {
+        document.getElementById('primary-modality-error').classList.remove('hidden'); ok = false;
+      }
+
+      // Validate text inputs
+      const textFields = [
+        { id: 'poc-title', errId: 'poc-title-error' },
+        { id: 'poc-description', errId: 'poc-description-error' },
+        { id: 'mvp-scope', errId: 'mvp-scope-error' },
+      ];
+      textFields.forEach(f => {
+        const el = document.getElementById(f.id);
+        const val = el ? el.value.trim() : '';
+        if (el) el.classList.toggle('error', !val);
+        const errEl = document.getElementById(f.errId);
+        if (errEl) errEl.classList.toggle('hidden', !!val);
+        if (!val) ok = false;
+      });
+
+      if (enjoymentRating === 0) { document.getElementById('rating-error').classList.remove('hidden'); ok = false; }
+
+      if (!ok) {
+        document.getElementById('form-error').classList.remove('hidden');
+        const firstErr = document.querySelector('.error');
+        if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      document.getElementById('form-error').classList.add('hidden');
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Saving POC…';
+
+      const payload = {
+        student_name: studentName,
+        student_email: studentEmail,
+        modality_ratings: JSON.stringify(modalityRatings),
+        primary_modality: primaryVal,
+        secondary_modality: document.getElementById('secondary-modality').value,
+        target_domain: choices.targetDomain,
+        poc_title: document.getElementById('poc-title').value.trim(),
+        poc_description: document.getElementById('poc-description').value.trim(),
+        mvp_scope: document.getElementById('mvp-scope').value.trim(),
+        enjoyment_rating: enjoymentRating,
+        submitted_at: new Date().toISOString()
+      };
+
+      try {
+        await supabaseUpsert(payload);
+
+        // Update card
+        document.getElementById('success-name').textContent = studentName.split(' ')[0];
+        document.getElementById('card-title').textContent = payload.poc_title;
+        document.getElementById('card-domain').textContent = payload.target_domain;
+        document.getElementById('card-primary').textContent = payload.primary_modality;
+        document.getElementById('card-secondary').textContent = payload.secondary_modality;
+        document.getElementById('card-description').textContent = payload.poc_description;
+        document.getElementById('card-mvp').textContent = payload.mvp_scope;
+
+        document.getElementById('success-screen').classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        console.error('Submission error:', err.message);
+        btn.disabled = false;
+        document.getElementById('submit-label').textContent = 'Save & Lock In POC Proposal →';
+        document.getElementById('form-error-text').textContent = '⚠️ Error saving POC. Please check connection and try again.';
+        document.getElementById('form-error').classList.remove('hidden');
+      }
+    }
+
+    function editPOC() {
+      document.getElementById('success-screen').classList.add('hidden');
+      document.getElementById('submit-btn').disabled = false;
+      document.getElementById('submit-label').textContent = 'Update & Save POC Proposal →';
+    }
+  </script>
+</body>
+
+</html>
