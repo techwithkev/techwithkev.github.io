@@ -30,26 +30,24 @@ COMMENT ON TABLE introai_week09_poc_brainstormer
 -- ── Row-Level Security ────────────────────────────────────────────────────────
 ALTER TABLE introai_week09_poc_brainstormer ENABLE ROW LEVEL SECURITY;
 
--- Anon can INSERT and SELECT (allows email retrieval on student page)
-CREATE POLICY "anon_insert_w09_poc_brainstormer"
-  ON introai_week09_poc_brainstormer
-  FOR INSERT TO anon
-  WITH CHECK (true);
+-- Clean up any legacy policies
+DROP POLICY IF EXISTS "anon_insert_w09_poc_brainstormer" ON introai_week09_poc_brainstormer;
+DROP POLICY IF EXISTS "anon_select_w09_poc_brainstormer" ON introai_week09_poc_brainstormer;
+DROP POLICY IF EXISTS "anon_update_w09_poc_brainstormer" ON introai_week09_poc_brainstormer;
+DROP POLICY IF EXISTS "anon_all_w09_poc_brainstormer" ON introai_week09_poc_brainstormer;
+DROP POLICY IF EXISTS "auth_select_w09_poc_brainstormer" ON introai_week09_poc_brainstormer;
 
-CREATE POLICY "anon_select_w09_poc_brainstormer"
+-- Allow anonymous students to SELECT, INSERT, and UPDATE (for upsert & retrieval)
+CREATE POLICY "anon_all_w09_poc_brainstormer"
   ON introai_week09_poc_brainstormer
-  FOR SELECT TO anon
-  USING (true);
-
-CREATE POLICY "anon_update_w09_poc_brainstormer"
-  ON introai_week09_poc_brainstormer
-  FOR UPDATE TO anon
+  FOR ALL
+  TO anon
   USING (true)
   WITH CHECK (true);
 
--- Authenticated users (teachers) can SELECT
+-- Authenticated users (teachers) can SELECT for dashboard & CSV export
 CREATE POLICY "auth_select_w09_poc_brainstormer"
   ON introai_week09_poc_brainstormer
-  FOR SELECT TO authenticated
+  FOR SELECT
+  TO authenticated
   USING (true);
-

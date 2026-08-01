@@ -31,26 +31,26 @@ COMMENT ON TABLE introai_week09_ai_feature_pitch
 -- ── Row-Level Security ────────────────────────────────────────────────────────
 ALTER TABLE introai_week09_ai_feature_pitch ENABLE ROW LEVEL SECURITY;
 
--- Anon can INSERT, SELECT, and UPDATE (student page uses anon key with upserts)
-CREATE POLICY "anon_insert_w09_ai_feature_pitch"
-  ON introai_week09_ai_feature_pitch
-  FOR INSERT TO anon
-  WITH CHECK (true);
+-- Clean up any legacy policies
+DROP POLICY IF EXISTS "anon_insert_w09_ai_feature_pitch" ON introai_week09_ai_feature_pitch;
+DROP POLICY IF EXISTS "anon_select_w09_ai_feature_pitch" ON introai_week09_ai_feature_pitch;
+DROP POLICY IF EXISTS "anon_update_w09_ai_feature_pitch" ON introai_week09_ai_feature_pitch;
+DROP POLICY IF EXISTS "anon_all_w09_ai_feature_pitch" ON introai_week09_ai_feature_pitch;
+DROP POLICY IF EXISTS "auth_select_w09_ai_feature_pitch" ON introai_week09_ai_feature_pitch;
 
-CREATE POLICY "anon_select_w09_ai_feature_pitch"
+-- Allow anonymous students to SELECT, INSERT, and UPDATE (for upsert & retrieval)
+CREATE POLICY "anon_all_w09_ai_feature_pitch"
   ON introai_week09_ai_feature_pitch
-  FOR SELECT TO anon
-  USING (true);
-
-CREATE POLICY "anon_update_w09_ai_feature_pitch"
-  ON introai_week09_ai_feature_pitch
-  FOR UPDATE TO anon
+  FOR ALL
+  TO anon
   USING (true)
   WITH CHECK (true);
 
--- Authenticated users (teachers) can SELECT
+-- Authenticated users (teachers) can SELECT for dashboard & CSV export
 CREATE POLICY "auth_select_w09_ai_feature_pitch"
   ON introai_week09_ai_feature_pitch
-  FOR SELECT TO authenticated
+  FOR SELECT
+  TO authenticated
   USING (true);
+
 

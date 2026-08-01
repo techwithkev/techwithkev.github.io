@@ -40,26 +40,26 @@ COMMENT ON TABLE introai_week09_npc_logic
 -- ── Row-Level Security ────────────────────────────────────────────────────────
 ALTER TABLE introai_week09_npc_logic ENABLE ROW LEVEL SECURITY;
 
--- Anon can INSERT, SELECT, and UPDATE (student page uses anon key with upserts)
-CREATE POLICY "anon_insert_w09_npc_logic"
-  ON introai_week09_npc_logic
-  FOR INSERT TO anon
-  WITH CHECK (true);
+-- Clean up any legacy policies
+DROP POLICY IF EXISTS "anon_insert_w09_npc_logic" ON introai_week09_npc_logic;
+DROP POLICY IF EXISTS "anon_select_w09_npc_logic" ON introai_week09_npc_logic;
+DROP POLICY IF EXISTS "anon_update_w09_npc_logic" ON introai_week09_npc_logic;
+DROP POLICY IF EXISTS "anon_all_w09_npc_logic" ON introai_week09_npc_logic;
+DROP POLICY IF EXISTS "auth_select_w09_npc_logic" ON introai_week09_npc_logic;
 
-CREATE POLICY "anon_select_w09_npc_logic"
+-- Allow anonymous students to SELECT, INSERT, and UPDATE (for upsert & retrieval)
+CREATE POLICY "anon_all_w09_npc_logic"
   ON introai_week09_npc_logic
-  FOR SELECT TO anon
-  USING (true);
-
-CREATE POLICY "anon_update_w09_npc_logic"
-  ON introai_week09_npc_logic
-  FOR UPDATE TO anon
+  FOR ALL
+  TO anon
   USING (true)
   WITH CHECK (true);
 
--- Authenticated users (teachers) can SELECT
+-- Authenticated users (teachers) can SELECT for dashboard & CSV export
 CREATE POLICY "auth_select_w09_npc_logic"
   ON introai_week09_npc_logic
-  FOR SELECT TO authenticated
+  FOR SELECT
+  TO authenticated
   USING (true);
+
 
