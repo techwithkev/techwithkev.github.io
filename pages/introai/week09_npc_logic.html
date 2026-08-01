@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NPC Logic: Map Out Guard Logic — Intro to AI · Week 9</title>
+  <meta name="description"
+    content="Week 9 Exercise 1: NPC Logic. Design a decision tree for a stealth-game guard NPC — mapping out how AI reacts to noise, sight, and losing the player.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    #registration-overlay { transition: opacity 0.4s ease; }
+    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
+    #registration-overlay .reg-card {
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
+    }
+    #registration-overlay.hiding .reg-card {
+      transform: scale(0.95) translateY(-10px); opacity: 0;
+    }
+    .reg-input:focus {
+      outline: none; border-color: #0891b2;
+      box-shadow: 0 0 0 3px rgba(8,145,178,0.15);
+    }
+    .reg-input.error {
+      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+    }
+    .form-input:focus {
+      outline: none; border-color: #0891b2;
+      box-shadow: 0 0 0 3px rgba(8,145,178,0.1);
+    }
+    .form-input.error { border-color: #ef4444; }
+    .star-btn {
+      font-size: 24px;
+      cursor: pointer;
+      filter: grayscale(100%);
+      transition: filter 0.15s ease, transform 0.1s ease;
+    }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .opt-btn {
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #374151;
+      background: #f9fafb;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .opt-btn:hover { border-color: #0891b2; background: #ecfeff; color: #0e7490; }
+    .opt-btn.selected { border-color: #0891b2; background: #ecfeff; color: #0e7490; box-shadow: 0 0 0 3px rgba(8,145,178,0.15); }
+    .branch-label {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-bottom: 6px;
+    }
+    .branch-yes { background: #dcfce7; color: #166534; }
+    .branch-no  { background: #fee2e2; color: #991b1b; }
+  </style>
+</head>
+
+<body class="bg-[#F0FDFF] text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- REGISTRATION GATE -->
+  <div id="registration-overlay"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+    style="background: linear-gradient(135deg, #0c4a6e 0%, #0891b2 55%, #0c4a6e 100%);">
+
+    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
+        style="background: radial-gradient(circle, #a5f3fc, transparent);"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
+        style="background: radial-gradient(circle, #22d3ee, transparent);"></div>
+    </div>
+
+    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center bg-cyan-100 text-cyan-600">
+          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2h-2" />
+          </svg>
+        </div>
+        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 bg-cyan-100 text-cyan-800">
+          Week 9 · Exercise 1
+        </div>
+        <h1 class="text-2xl font-black text-gray-900 tracking-tight">NPC Logic: <span class="text-cyan-600">Guard AI 🎮</span></h1>
+        <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">Enter your details to start designing your guard's decision tree.</p>
+      </div>
+
+      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
+        <div class="space-y-4 mb-6">
+          <div>
+            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Your Full Name</label>
+            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Taylor Swift"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name.</p>
+          </div>
+          <div>
+            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
+            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. taylor@school.edu"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
+          </div>
+        </div>
+        <button id="reg-submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-700 hover:to-cyan-800">
+          <span id="reg-btn-label">Start Exercise &#8594;</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main-content" class="max-w-3xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-cyan-100 pb-6">
+      <div>
+        <a href="index.html"
+          class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-cyan-600 mb-3 hover:text-cyan-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">
+          NPC Logic: <span class="text-cyan-600">Guard AI 🎮</span>
+        </h1>
+        <p class="text-gray-500 font-medium italic mt-1">Game AI &amp; Decision Trees · Week 9 · Exercise 1</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-cyan-50 border border-cyan-200 text-cyan-800 shadow-sm self-start md:self-auto">
+        Week 9
+      </div>
+    </header>
+
+    <!-- Brief Card -->
+    <div class="bg-gradient-to-br from-cyan-700 to-sky-800 text-white rounded-3xl p-6 md:p-8 mb-8 shadow-lg">
+      <h2 class="text-xl font-black mb-3 flex items-center gap-2">
+        <span>🎮 Exercise Brief (~10 Minutes)</span>
+      </h2>
+      <p class="text-sm text-cyan-100 leading-relaxed mb-4">
+        You are designing the AI brain for a <strong>stealth game guard</strong>. Your guard needs clear, consistent rules for three different situations — otherwise it will behave randomly and ruin the game experience.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-3 border border-white/10 text-xs">
+          <div class="font-black text-cyan-200 mb-1">🔊 Situation 1</div>
+          <div>Guard hears a suspicious noise nearby</div>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-3 border border-white/10 text-xs">
+          <div class="font-black text-cyan-200 mb-1">👁️ Situation 2</div>
+          <div>Guard directly sees the player character</div>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-3 border border-white/10 text-xs">
+          <div class="font-black text-cyan-200 mb-1">❓ Situation 3</div>
+          <div>Guard was chasing player but lost sight</div>
+        </div>
+      </div>
+      <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10 text-xs leading-relaxed">
+        <strong>Your Goal:</strong> For each situation, pick the guard's <strong>immediate action</strong>, then describe the YES and NO branches — what happens next depending on whether the threat is confirmed or resolved.
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <form id="npc-logic-form" onsubmit="submitExercise(event)" novalidate>
+
+      <!-- Situation 1: Noise -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="w-8 h-8 rounded-full bg-cyan-600 text-white font-black text-sm flex items-center justify-center">1</span>
+          <h2 class="text-lg font-black text-gray-900">🔊 Guard Hears a Suspicious Noise</h2>
+        </div>
+
+        <div class="bg-cyan-50 border border-cyan-200 rounded-2xl p-4 mb-5 text-sm text-cyan-900 leading-relaxed">
+          <strong>Scenario:</strong> The guard is on patrol. There's a sound from around the corner — a footstep, a box falling. The guard didn't see anything yet.
+        </div>
+
+        <div class="mb-5">
+          <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-3">Immediate action upon hearing the noise: <span class="text-red-500">*</span></p>
+          <div id="noise-action-picker" class="flex flex-wrap gap-2">
+            <button type="button" class="opt-btn" onclick="setChoice('noiseAction','Investigate the source of the noise',this)">🔍 Investigate noise</button>
+            <button type="button" class="opt-btn" onclick="setChoice('noiseAction','Call for backup immediately',this)">📡 Call for backup</button>
+            <button type="button" class="opt-btn" onclick="setChoice('noiseAction','Freeze and scan the area',this)">🛑 Freeze and scan</button>
+            <button type="button" class="opt-btn" onclick="setChoice('noiseAction','Continue patrol and ignore it',this)">🚶 Ignore it</button>
+            <button type="button" class="opt-btn" onclick="setChoice('noiseAction','Sound alarm immediately',this)">🚨 Sound alarm</button>
+          </div>
+          <p id="noise-action-error" class="hidden text-xs text-red-500 font-medium mt-2">Please select an action.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-green-50 border border-green-200 rounded-2xl p-4">
+            <span class="branch-label branch-yes">✅ YES — Threat Confirmed</span>
+            <p class="text-xs text-gray-600 mb-2">Investigating reveals the player — what happens next?</p>
+            <textarea id="noise-yes" rows="2"
+              class="form-input w-full p-3 rounded-xl border border-green-200 bg-white text-xs font-medium text-gray-900 placeholder-gray-400 transition-all"
+              placeholder="e.g. Switch to chase state, pursue the player..."></textarea>
+            <p id="noise-yes-error" class="hidden text-xs text-red-500 font-medium mt-1">Please fill this in.</p>
+          </div>
+          <div class="bg-red-50 border border-red-200 rounded-2xl p-4">
+            <span class="branch-label branch-no">❌ NO — False Alarm</span>
+            <p class="text-xs text-gray-600 mb-2">Nothing found after investigating — what does the guard do?</p>
+            <textarea id="noise-no" rows="2"
+              class="form-input w-full p-3 rounded-xl border border-red-200 bg-white text-xs font-medium text-gray-900 placeholder-gray-400 transition-all"
+              placeholder="e.g. Return to patrol route after 10 seconds..."></textarea>
+            <p id="noise-no-error" class="hidden text-xs text-red-500 font-medium mt-1">Please fill this in.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Situation 2: Direct Sight -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="w-8 h-8 rounded-full bg-cyan-600 text-white font-black text-sm flex items-center justify-center">2</span>
+          <h2 class="text-lg font-black text-gray-900">👁️ Guard Directly Sees the Player</h2>
+        </div>
+
+        <div class="bg-cyan-50 border border-cyan-200 rounded-2xl p-4 mb-5 text-sm text-cyan-900 leading-relaxed">
+          <strong>Scenario:</strong> The guard is within line-of-sight and can clearly see the player. There's no ambiguity — direct visual contact confirmed.
+        </div>
+
+        <div class="mb-5">
+          <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-3">Immediate action upon seeing the player: <span class="text-red-500">*</span></p>
+          <div id="sight-action-picker" class="flex flex-wrap gap-2">
+            <button type="button" class="opt-btn" onclick="setChoice('sightAction','Chase the player immediately',this)">🏃 Chase immediately</button>
+            <button type="button" class="opt-btn" onclick="setChoice('sightAction','Shout a warning and wait 2 seconds',this)">📢 Shout a warning</button>
+            <button type="button" class="opt-btn" onclick="setChoice('sightAction','Sound alarm and call for backup',this)">🚨 Sound alarm + backup</button>
+            <button type="button" class="opt-btn" onclick="setChoice('sightAction','Take a combat stance and advance slowly',this)">🛡️ Combat stance + advance</button>
+            <button type="button" class="opt-btn" onclick="setChoice('sightAction','Freeze until the player moves',this)">🧊 Freeze and wait</button>
+          </div>
+          <p id="sight-action-error" class="hidden text-xs text-red-500 font-medium mt-2">Please select an action.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-green-50 border border-green-200 rounded-2xl p-4">
+            <span class="branch-label branch-yes">✅ YES — Player Caught / Cornered</span>
+            <p class="text-xs text-gray-600 mb-2">Guard catches up to or corners the player — what happens?</p>
+            <textarea id="sight-yes" rows="2"
+              class="form-input w-full p-3 rounded-xl border border-green-200 bg-white text-xs font-medium text-gray-900 placeholder-gray-400 transition-all"
+              placeholder="e.g. Trigger game over / arrest sequence..."></textarea>
+            <p id="sight-yes-error" class="hidden text-xs text-red-500 font-medium mt-1">Please fill this in.</p>
+          </div>
+          <div class="bg-red-50 border border-red-200 rounded-2xl p-4">
+            <span class="branch-label branch-no">❌ NO — Player Escapes Line of Sight</span>
+            <p class="text-xs text-gray-600 mb-2">Player ducks around a corner and guard loses visual — what now?</p>
+            <textarea id="sight-no" rows="2"
+              class="form-input w-full p-3 rounded-xl border border-red-200 bg-white text-xs font-medium text-gray-900 placeholder-gray-400 transition-all"
+              placeholder="e.g. Switch to search state at last known position..."></textarea>
+            <p id="sight-no-error" class="hidden text-xs text-red-500 font-medium mt-1">Please fill this in.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Situation 3: Lost Sight -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="w-8 h-8 rounded-full bg-cyan-600 text-white font-black text-sm flex items-center justify-center">3</span>
+          <h2 class="text-lg font-black text-gray-900">❓ Guard Loses Sight of the Player</h2>
+        </div>
+
+        <div class="bg-cyan-50 border border-cyan-200 rounded-2xl p-4 mb-5 text-sm text-cyan-900 leading-relaxed">
+          <strong>Scenario:</strong> The guard was chasing but the player disappeared — maybe they hid in a locker, climbed a ledge, or ducked into darkness. The guard knows someone was there, but can't see them now.
+        </div>
+
+        <div class="mb-5">
+          <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-3">Immediate action after losing sight: <span class="text-red-500">*</span></p>
+          <div id="lost-action-picker" class="flex flex-wrap gap-2">
+            <button type="button" class="opt-btn" onclick="setChoice('lostAction','Search the last known position',this)">🗺️ Search last position</button>
+            <button type="button" class="opt-btn" onclick="setChoice('lostAction','Stand still and listen for sounds',this)">🔇 Stand still and listen</button>
+            <button type="button" class="opt-btn" onclick="setChoice('lostAction','Return to patrol immediately',this)">🚶 Return to patrol</button>
+            <button type="button" class="opt-btn" onclick="setChoice('lostAction','Check all nearby hiding spots systematically',this)">🔎 Check hiding spots</button>
+            <button type="button" class="opt-btn" onclick="setChoice('lostAction','Alert nearby guards and coordinate a search',this)">📡 Alert other guards</button>
+          </div>
+          <p id="lost-action-error" class="hidden text-xs text-red-500 font-medium mt-2">Please select an action.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div class="bg-green-50 border border-green-200 rounded-2xl p-4">
+            <span class="branch-label branch-yes">✅ YES — Player Found During Search</span>
+            <p class="text-xs text-gray-600 mb-2">Searching reveals the hidden player — what does the guard do?</p>
+            <textarea id="lost-yes" rows="2"
+              class="form-input w-full p-3 rounded-xl border border-green-200 bg-white text-xs font-medium text-gray-900 placeholder-gray-400 transition-all"
+              placeholder="e.g. Reactivate chase mode, trigger alarm..."></textarea>
+            <p id="lost-yes-error" class="hidden text-xs text-red-500 font-medium mt-1">Please fill this in.</p>
+          </div>
+          <div class="bg-red-50 border border-red-200 rounded-2xl p-4">
+            <span class="branch-label branch-no">❌ NO — Search Ends With Nothing Found</span>
+            <p class="text-xs text-gray-600 mb-2">After searching for a set time with no result — what happens?</p>
+            <textarea id="lost-no" rows="2"
+              class="form-input w-full p-3 rounded-xl border border-red-200 bg-white text-xs font-medium text-gray-900 placeholder-gray-400 transition-all"
+              placeholder="e.g. Stay on elevated alert for 30s, then resume patrol..."></textarea>
+            <p id="lost-no-error" class="hidden text-xs text-red-500 font-medium mt-1">Please fill this in.</p>
+          </div>
+        </div>
+
+        <div>
+          <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">How long should the guard search before giving up? <span class="text-red-500">*</span></p>
+          <div id="search-time-picker" class="flex flex-wrap gap-2">
+            <button type="button" class="opt-btn" onclick="setChoice('searchTime','5 seconds',this)">⏱ 5 seconds</button>
+            <button type="button" class="opt-btn" onclick="setChoice('searchTime','15 seconds',this)">⏱ 15 seconds</button>
+            <button type="button" class="opt-btn" onclick="setChoice('searchTime','30 seconds',this)">⏱ 30 seconds</button>
+            <button type="button" class="opt-btn" onclick="setChoice('searchTime','60 seconds',this)">⏱ 60 seconds</button>
+            <button type="button" class="opt-btn" onclick="setChoice('searchTime','Never — searches until found',this)">🔁 Never gives up</button>
+          </div>
+          <p id="search-time-error" class="hidden text-xs text-red-500 font-medium mt-2">Please select a search duration.</p>
+        </div>
+      </div>
+
+      <!-- Step 4: Reflection -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="w-8 h-8 rounded-full bg-cyan-600 text-white font-black text-sm flex items-center justify-center">4</span>
+          <h2 class="text-lg font-black text-gray-900">🧠 Debrief Reflection</h2>
+        </div>
+
+        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-5 text-sm text-amber-900 leading-relaxed">
+          <strong>Think about it:</strong> What if your guard's logic was set to extremes? A guard that <em>always ignores noise</em> makes the game too easy. A guard that <em>never loses sight and searches forever</em> makes it unplayable. Game AI needs to be fair — it's designed, not random!
+        </div>
+
+        <div class="mb-5">
+          <label for="debrief-reflection" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
+            What would break the game if your guard's logic was set too extreme in either direction? <span class="text-red-500">*</span>
+          </label>
+          <textarea id="debrief-reflection" rows="4"
+            placeholder="Think about both too easy (guard ignores everything) and too hard (guard always finds you instantly). What is the sweet spot and why?"
+            class="form-input w-full p-4 rounded-2xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all"></textarea>
+          <p id="debrief-reflection-error" class="hidden text-xs text-red-500 font-medium mt-1">Please answer the debrief question.</p>
+        </div>
+
+        <div>
+          <label for="real-world-connection" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
+            Can you think of a real-world AI system that uses similar IF/THEN decision logic? <span class="text-red-500">*</span>
+          </label>
+          <textarea id="real-world-connection" rows="3"
+            placeholder="e.g. Security camera AI that flags intruders, self-driving car obstacle detection, spam filter that decides if an email is suspicious..."
+            class="form-input w-full p-4 rounded-2xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all"></textarea>
+          <p id="real-world-connection-error" class="hidden text-xs text-red-500 font-medium mt-1">Please answer the real-world connection question.</p>
+        </div>
+      </div>
+
+      <!-- Step 5: Rating & Submit -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-8">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-full bg-cyan-600 text-white font-black text-sm flex items-center justify-center">5</span>
+          <h2 class="text-lg font-black text-gray-900">Rate This Activity</h2>
+        </div>
+
+        <div class="mb-6">
+          <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">How much did you enjoy this exercise?</p>
+          <div id="enjoyment-stars" class="flex gap-2 text-3xl">
+            <button type="button" class="star-btn" onclick="setRating(1)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(2)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(3)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(4)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(5)">⭐</button>
+          </div>
+          <p id="rating-error" class="hidden text-xs text-red-500 font-medium mt-1">Please select a star rating.</p>
+        </div>
+
+        <div id="form-error" class="hidden mb-4 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold">
+          <span id="form-error-text">⚠️ Please fill out all required fields marked in red.</span>
+        </div>
+
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-2xl shadow-xl transition-all active:scale-98 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-700 hover:to-cyan-800">
+          <span id="submit-label">Submit Guard Logic &#8594;</span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div id="success-screen" class="hidden fixed inset-0 z-[110] bg-white flex items-center justify-center p-6 text-center">
+    <div class="max-w-md w-full">
+      <div class="w-20 h-20 bg-cyan-100 text-cyan-600 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-inner">
+        🎮
+      </div>
+      <h2 class="text-3xl font-black text-gray-900 tracking-tight mb-2">Guard Logic Locked In, <span id="success-name">Student</span>!</h2>
+      <p class="text-sm text-gray-500 mb-8 leading-relaxed">
+        Your NPC decision tree has been saved to the teacher dashboard. Time for the class debrief!
+      </p>
+      <a href="index.html"
+        class="inline-flex items-center justify-center w-full py-4 px-6 rounded-2xl font-black text-sm text-white bg-cyan-700 hover:bg-cyan-800 transition-all shadow-lg">
+        Return to Course Hub
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+    const TABLE = 'introai_week09_npc_logic';
+
+    let studentName = '', studentEmail = '';
+    let enjoymentRating = 0;
+
+    const choices = { noiseAction: '', sightAction: '', lostAction: '', searchTime: '' };
+
+    const PICKER_IDS = {
+      noiseAction: 'noise-action-picker',
+      sightAction: 'sight-action-picker',
+      lostAction: 'lost-action-picker',
+      searchTime: 'search-time-picker'
+    };
+    const ERR_IDS = {
+      noiseAction: 'noise-action-error',
+      sightAction: 'sight-action-error',
+      lostAction: 'lost-action-error',
+      searchTime: 'search-time-error'
+    };
+
+    function setChoice(key, val, btn) {
+      choices[key] = val;
+      document.querySelectorAll('#' + PICKER_IDS[key] + ' .opt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById(ERR_IDS[key]).classList.add('hidden');
+    }
+
+    function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+
+    function handleRegistration(ev) {
+      ev.preventDefault();
+      const nameEl = document.getElementById('reg-name');
+      const emailEl = document.getElementById('reg-email');
+      let ok = true;
+
+      nameEl.classList.remove('error');
+      emailEl.classList.remove('error');
+      document.getElementById('reg-name-error').classList.add('hidden');
+      document.getElementById('reg-email-error').classList.add('hidden');
+
+      if (!nameEl.value.trim()) { nameEl.classList.add('error'); document.getElementById('reg-name-error').classList.remove('hidden'); ok = false; }
+      if (!emailEl.value.trim() || !validateEmail(emailEl.value.trim())) { emailEl.classList.add('error'); document.getElementById('reg-email-error').classList.remove('hidden'); ok = false; }
+      if (!ok) return;
+
+      studentName = nameEl.value.trim();
+      studentEmail = emailEl.value.trim();
+
+      sessionStorage.setItem('introai_w09_npc_logic_name', studentName);
+      sessionStorage.setItem('introai_w09_npc_logic_email', studentEmail);
+
+      const overlay = document.getElementById('registration-overlay');
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.remove(), 400);
+    }
+
+    (function restoreSession() {
+      const n = sessionStorage.getItem('introai_w09_npc_logic_name');
+      const e = sessionStorage.getItem('introai_w09_npc_logic_email');
+      if (n && e) { studentName = n; studentEmail = e; document.getElementById('registration-overlay').remove(); }
+    })();
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#enjoyment-stars .star-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx < val);
+      });
+      document.getElementById('rating-error').classList.add('hidden');
+    }
+
+    async function supabaseInsert(payload) {
+      const resp = await fetch(SUPABASE_URL + '/rest/v1/' + TABLE, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!resp.ok) { const t = await resp.text(); throw new Error('HTTP ' + resp.status + ': ' + t); }
+    }
+
+    async function submitExercise(ev) {
+      ev.preventDefault();
+      let ok = true;
+
+      // Validate choice pickers
+      Object.keys(choices).forEach(key => {
+        if (!choices[key]) { document.getElementById(ERR_IDS[key]).classList.remove('hidden'); ok = false; }
+      });
+
+      // Validate textareas
+      const textFields = [
+        { id: 'noise-yes', errId: 'noise-yes-error' },
+        { id: 'noise-no', errId: 'noise-no-error' },
+        { id: 'sight-yes', errId: 'sight-yes-error' },
+        { id: 'sight-no', errId: 'sight-no-error' },
+        { id: 'lost-yes', errId: 'lost-yes-error' },
+        { id: 'lost-no', errId: 'lost-no-error' },
+        { id: 'debrief-reflection', errId: 'debrief-reflection-error' },
+        { id: 'real-world-connection', errId: 'real-world-connection-error' },
+      ];
+      textFields.forEach(f => {
+        const el = document.getElementById(f.id);
+        const val = el ? el.value.trim() : '';
+        if (el) el.classList.toggle('error', !val);
+        const errEl = document.getElementById(f.errId);
+        if (errEl) errEl.classList.toggle('hidden', !!val);
+        if (!val) ok = false;
+      });
+
+      if (enjoymentRating === 0) { document.getElementById('rating-error').classList.remove('hidden'); ok = false; }
+
+      if (!ok) {
+        document.getElementById('form-error').classList.remove('hidden');
+        const firstErr = document.querySelector('.error');
+        if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      document.getElementById('form-error').classList.add('hidden');
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting\u2026';
+
+      const payload = {
+        student_name: studentName,
+        student_email: studentEmail,
+        noise_action: choices.noiseAction,
+        noise_yes_branch: document.getElementById('noise-yes').value.trim(),
+        noise_no_branch: document.getElementById('noise-no').value.trim(),
+        sight_action: choices.sightAction,
+        sight_yes_branch: document.getElementById('sight-yes').value.trim(),
+        sight_no_branch: document.getElementById('sight-no').value.trim(),
+        lost_action: choices.lostAction,
+        lost_yes_branch: document.getElementById('lost-yes').value.trim(),
+        lost_no_branch: document.getElementById('lost-no').value.trim(),
+        search_time_limit: choices.searchTime,
+        debrief_reflection: document.getElementById('debrief-reflection').value.trim(),
+        real_world_connection: document.getElementById('real-world-connection').value.trim(),
+        enjoyment_rating: enjoymentRating,
+        submitted_at: new Date().toISOString()
+      };
+
+      try {
+        await supabaseInsert(payload);
+        document.getElementById('success-name').textContent = studentName.split(' ')[0];
+        document.getElementById('success-screen').classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        console.error('Submission error:', err.message);
+        btn.disabled = false;
+        document.getElementById('submit-label').textContent = 'Submit Guard Logic \u2192';
+        if (err.message.includes('409') || err.message.includes('duplicate key')) {
+          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f You have already submitted this activity!';
+        } else {
+          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f Network error submitting exercise. Please try again.';
+        }
+        document.getElementById('form-error').classList.remove('hidden');
+      }
+    }
+  </script>
+</body>
+
+</html>
