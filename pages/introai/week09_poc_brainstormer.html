@@ -653,7 +653,7 @@
     }
 
     async function supabaseUpsert(payload) {
-      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?on_conflict=student_email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -746,7 +746,7 @@
         console.error('Submission error:', err.message);
         btn.disabled = false;
         document.getElementById('submit-label').textContent = 'Save & Lock In POC Proposal →';
-        document.getElementById('form-error-text').textContent = '⚠️ Error saving POC. Please check connection and try again.';
+        document.getElementById('form-error-text').textContent = '⚠️ Error saving POC: ' + err.message;
         document.getElementById('form-error').classList.remove('hidden');
       }
     }

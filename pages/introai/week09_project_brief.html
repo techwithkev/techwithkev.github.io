@@ -65,7 +65,7 @@
 
 <body class="bg-[#F5F3FF] text-gray-900 min-h-screen font-sans antialiased pb-20">
 
-  <!-- REGISTRATION GATE -->
+  <!-- REGISTRATION & RETRIEVAL GATE -->
   <div id="registration-overlay"
     class="fixed inset-0 z-[100] flex items-center justify-center p-4"
     style="background: linear-gradient(135deg, #1e1b4b 0%, #4f46e5 55%, #3730a3 100%);">
@@ -78,19 +78,32 @@
     </div>
 
     <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
-      <div class="text-center mb-8">
+      <div class="text-center mb-6">
         <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center bg-indigo-100 text-indigo-600">
           <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 01-2-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
         </div>
-        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 bg-indigo-100 text-indigo-800">
+        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-2 bg-indigo-100 text-indigo-800">
           Week 9 · Kickoff Task
         </div>
         <h1 class="text-2xl font-black text-gray-900 tracking-tight">Your <span class="text-indigo-600">Project Brief 📝</span></h1>
-        <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">Enter team details to unlock your kickoff planning workspace.</p>
+        <p class="text-xs text-gray-500 mt-1 leading-relaxed">Enter team details to unlock or retrieve your kickoff planning workspace.</p>
       </div>
 
+      <!-- Mode Toggle: New Session vs Retrieve Existing -->
+      <div class="flex rounded-xl bg-gray-100 p-1 mb-6 text-xs font-bold">
+        <button id="toggle-new-btn" type="button" onclick="setRegMode('new')"
+          class="flex-1 py-2 rounded-lg text-center bg-white text-indigo-700 shadow-sm transition-all">
+          ✨ New Project Brief
+        </button>
+        <button id="toggle-retrieve-btn" type="button" onclick="setRegMode('retrieve')"
+          class="flex-1 py-2 rounded-lg text-center text-gray-500 hover:text-gray-900 transition-all">
+          🔍 Retrieve Saved Brief
+        </button>
+      </div>
+
+      <!-- Form for NEW registration -->
       <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
         <div class="space-y-4 mb-6">
           <div>
@@ -117,6 +130,20 @@
           <span id="reg-btn-label">Start Project Brief &#8594;</span>
         </button>
       </form>
+
+      <!-- Form for RETRIEVING existing session -->
+      <form id="retrieve-form" onsubmit="handleRetrieval(event)" class="hidden" novalidate>
+        <div class="mb-6">
+          <label for="retrieve-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Your Registered Email</label>
+          <input id="retrieve-email" type="email" placeholder="e.g. jordan@school.edu"
+            class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+          <p id="retrieve-error" class="hidden text-xs text-red-500 font-medium mt-2.5">No saved Project Brief found for this email. Try starting a new session!</p>
+        </div>
+        <button id="retrieve-submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-700 hover:from-indigo-700 hover:to-purple-800">
+          <span id="retrieve-btn-label">Find &amp; Load My Saved Brief 🔍</span>
+        </button>
+      </form>
     </div>
   </div>
 
@@ -137,8 +164,9 @@
         </h1>
         <p class="text-gray-500 font-medium italic mt-1">Final AI Project Planning · Week 9 Kickoff</p>
       </div>
-      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-indigo-50 border border-indigo-200 text-indigo-800 shadow-sm self-start md:self-auto">
-        Week 9
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-indigo-50 border border-indigo-200 text-indigo-800 shadow-sm self-start md:self-auto flex items-center gap-2">
+        <span>Week 9</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
       </div>
     </header>
 
@@ -150,8 +178,11 @@
       <p class="text-sm text-indigo-100 leading-relaxed mb-4">
         Complete as a group before you leave today — <strong>this is required before building starts</strong>! Align on your goal, audience, tools, roles, ethics, and definition of done.
       </p>
-      <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10 text-xs leading-relaxed">
-        <strong>Tip:</strong> Be specific. Clearly defined project boundaries make building faster and prevent team confusion later.
+      <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10 text-xs leading-relaxed flex items-center justify-between">
+        <span><strong>Saved Progress:</strong> Your brief syncs to the cloud so you can retrieve or update it anytime by entering your email!</span>
+        <button type="button" onclick="openRetrieveModal()" class="ml-3 px-3 py-1 bg-white text-indigo-900 rounded-lg font-black hover:bg-indigo-100 transition-all flex-shrink-0 text-[11px]">
+          Load Saved 🔍
+        </button>
       </div>
     </div>
 
@@ -299,6 +330,20 @@
     let studentName = '', studentEmail = '', groupMembers = '';
     let enjoymentRating = 0;
 
+    function setRegMode(mode) {
+      const isNew = mode === 'new';
+      document.getElementById('reg-form').classList.toggle('hidden', !isNew);
+      document.getElementById('retrieve-form').classList.toggle('hidden', isNew);
+
+      document.getElementById('toggle-new-btn').className = isNew
+        ? 'flex-1 py-2 rounded-lg text-center bg-white text-indigo-700 shadow-sm transition-all'
+        : 'flex-1 py-2 rounded-lg text-center text-gray-500 hover:text-gray-900 transition-all';
+
+      document.getElementById('toggle-retrieve-btn').className = !isNew
+        ? 'flex-1 py-2 rounded-lg text-center bg-white text-indigo-700 shadow-sm transition-all'
+        : 'flex-1 py-2 rounded-lg text-center text-gray-500 hover:text-gray-900 transition-all';
+    }
+
     function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
 
     function handleRegistration(ev) {
@@ -333,6 +378,67 @@
       setTimeout(() => overlay.remove(), 400);
     }
 
+    async function handleRetrieval(ev) {
+      ev.preventDefault();
+      const emailEl = document.getElementById('retrieve-email');
+      const emailVal = emailEl.value.trim();
+      const errEl = document.getElementById('retrieve-error');
+      errEl.classList.add('hidden');
+
+      if (!emailVal || !validateEmail(emailVal)) {
+        emailEl.classList.add('error'); return;
+      }
+
+      const btn = document.getElementById('retrieve-submit-btn');
+      btn.disabled = true;
+      document.getElementById('retrieve-btn-label').innerHTML = '<span class="spinner"></span> Searching…';
+
+      try {
+        const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?student_email=eq.${encodeURIComponent(emailVal)}`, {
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        const records = await resp.json();
+        if (!resp.ok || !records || !records.length) {
+          errEl.classList.remove('hidden');
+          btn.disabled = false;
+          document.getElementById('retrieve-btn-label').textContent = 'Find & Load My Saved Brief 🔍';
+          return;
+        }
+
+        const data = records[0];
+        studentName = data.student_name;
+        studentEmail = data.student_email;
+        groupMembers = data.group_members || '';
+
+        // Populate fields
+        if (data.project_goal) document.getElementById('project-goal').value = data.project_goal;
+        if (data.intended_audience) document.getElementById('intended-audience').value = data.intended_audience;
+        if (data.ai_tools_methods) document.getElementById('ai-tools').value = data.ai_tools_methods;
+        if (data.division_of_labor) document.getElementById('division-of-labor').value = data.division_of_labor;
+        if (data.ethical_considerations) document.getElementById('ethical-considerations').value = data.ethical_considerations;
+        if (data.definition_of_done) document.getElementById('definition-of-done').value = data.definition_of_done;
+        if (data.enjoyment_rating) setRating(data.enjoyment_rating);
+
+        sessionStorage.setItem('introai_w09_project_brief_name', studentName);
+        sessionStorage.setItem('introai_w09_project_brief_email', studentEmail);
+        sessionStorage.setItem('introai_w09_project_brief_group', groupMembers);
+
+        const overlay = document.getElementById('registration-overlay');
+        overlay.classList.add('hiding');
+        setTimeout(() => overlay.remove(), 400);
+      } catch(err) {
+        console.error('Retrieval error:', err);
+        errEl.classList.remove('hidden');
+        btn.disabled = false;
+        document.getElementById('retrieve-btn-label').textContent = 'Find & Load My Saved Brief 🔍';
+      }
+    }
+
+    function openRetrieveModal() {
+      setRegMode('retrieve');
+      document.body.appendChild(document.getElementById('registration-overlay'));
+    }
+
     (function restoreSession() {
       const n = sessionStorage.getItem('introai_w09_project_brief_name');
       const e = sessionStorage.getItem('introai_w09_project_brief_email');
@@ -348,14 +454,14 @@
       document.getElementById('rating-error').classList.add('hidden');
     }
 
-    async function supabaseInsert(payload) {
-      const resp = await fetch(SUPABASE_URL + '/rest/v1/' + TABLE, {
+    async function supabaseUpsert(payload) {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?on_conflict=student_email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'apikey': SUPABASE_KEY,
-          'Authorization': 'Bearer ' + SUPABASE_KEY,
-          'Prefer': 'return=minimal'
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'resolution=merge-duplicates,return=minimal'
         },
         body: JSON.stringify(payload)
       });
@@ -413,7 +519,7 @@
       };
 
       try {
-        await supabaseInsert(payload);
+        await supabaseUpsert(payload);
         document.getElementById('success-name').textContent = studentName.split(' ')[0];
         document.getElementById('success-screen').classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -421,11 +527,7 @@
         console.error('Submission error:', err.message);
         btn.disabled = false;
         document.getElementById('submit-label').textContent = 'Submit Project Brief \u2192';
-        if (err.message.includes('409') || err.message.includes('duplicate key')) {
-          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f You have already submitted this activity!';
-        } else {
-          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f Network error submitting exercise. Please try again.';
-        }
+        document.getElementById('form-error-text').textContent = '⚠️ Error saving Project Brief: ' + err.message;
         document.getElementById('form-error').classList.remove('hidden');
       }
     }

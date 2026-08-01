@@ -41,8 +41,15 @@ CREATE POLICY "anon_select_w09_poc_brainstormer"
   FOR SELECT TO anon
   USING (true);
 
+CREATE POLICY "anon_update_w09_poc_brainstormer"
+  ON introai_week09_poc_brainstormer
+  FOR UPDATE TO anon
+  USING (true)
+  WITH CHECK (true);
+
 -- Authenticated users (teachers) can SELECT
 CREATE POLICY "auth_select_w09_poc_brainstormer"
   ON introai_week09_poc_brainstormer
   FOR SELECT TO authenticated
   USING (true);
+
