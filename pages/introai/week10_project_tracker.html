@@ -265,6 +265,60 @@
       </div>
     </header>
 
+    <!-- BUILD CHECK-IN 1 BANNER -->
+    <div class="bg-gradient-to-br from-emerald-900 via-teal-900 to-emerald-950 text-white rounded-3xl p-6 md:p-7 mb-8 shadow-xl border border-emerald-700/40">
+      <div class="flex items-center justify-between flex-wrap gap-2 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase tracking-widest">
+            BUILD CHECK-IN 1
+          </span>
+          <span class="text-emerald-200 text-xs font-bold">Class 10 Build Tasks</span>
+        </div>
+        <span class="text-emerald-400 text-xs font-mono font-bold">Week 10 Milestone Check</span>
+      </div>
+
+      <h2 class="text-2xl font-black text-white tracking-tight mb-2">
+        Today's <span class="text-emerald-400">Build Tasks 🛠️</span>
+      </h2>
+      <p class="text-xs text-emerald-100/80 mb-5 max-w-2xl leading-relaxed">
+        Complete these four check-in items during today's session to ensure your project stays on track and ready for prototype iteration.
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-xs">
+        <div class="bg-white/10 backdrop-blur-sm p-4 rounded-2xl border border-white/10 flex items-start gap-3">
+          <div class="w-8 h-8 rounded-xl bg-emerald-500/30 flex items-center justify-center text-emerald-300 font-bold shrink-0">1</div>
+          <div>
+            <strong class="text-emerald-200 font-black block mb-0.5 text-sm">Tool Access Confirmation 🔑</strong>
+            <span class="text-gray-200 leading-snug block">Confirm every group member can access the tool(s) your project needs (Teachable Machine, HuggingFace, Groq, ChatGPT, VSCode, etc.).</span>
+          </div>
+        </div>
+
+        <div class="bg-white/10 backdrop-blur-sm p-4 rounded-2xl border border-white/10 flex items-start gap-3">
+          <div class="w-8 h-8 rounded-xl bg-emerald-500/30 flex items-center justify-center text-emerald-300 font-bold shrink-0">2</div>
+          <div>
+            <strong class="text-emerald-200 font-black block mb-0.5 text-sm">Core Feature Sketch ✏️</strong>
+            <span class="text-gray-200 leading-snug block">Sketch the core feature of your project — on paper or in Google Slides (doesn't need to be polished!).</span>
+          </div>
+        </div>
+
+        <div class="bg-white/10 backdrop-blur-sm p-4 rounded-2xl border border-white/10 flex items-start gap-3">
+          <div class="w-8 h-8 rounded-xl bg-emerald-500/30 flex items-center justify-center text-emerald-300 font-bold shrink-0">3</div>
+          <div>
+            <strong class="text-emerald-200 font-black block mb-0.5 text-sm">Flag Blockers Now 🚩</strong>
+            <span class="text-gray-200 leading-snug block">Flag anything blocking you or your team to your teacher <em>now</em>, not next class session.</span>
+          </div>
+        </div>
+
+        <div class="bg-white/10 backdrop-blur-sm p-4 rounded-2xl border border-white/10 flex items-start gap-3">
+          <div class="w-8 h-8 rounded-xl bg-emerald-500/30 flex items-center justify-center text-emerald-300 font-bold shrink-0">4</div>
+          <div>
+            <strong class="text-emerald-200 font-black block mb-0.5 text-sm">Revisit Ethical Pre-Review ⚖️</strong>
+            <span class="text-gray-200 leading-snug block">Revisit your ethical pre-review from Class 9: does anything need updating after today's discussion?</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
       <!-- LEFT COLUMN: ADD PROGRESS LOG ENTRY FORM -->
@@ -273,7 +327,7 @@
           <h2 class="text-lg font-black text-gray-900 mb-1 flex items-center gap-2">
             <span>📝 Log Class Progress</span>
           </h2>
-          <p class="text-xs text-gray-500 mb-5">Record what you completed in class today and set your next milestone.
+          <p class="text-xs text-gray-500 mb-5">Record what you completed in class today and complete Build Check-In 1.
           </p>
 
           <form id="log-form" onsubmit="submitProgressLog(event)" novalidate>
@@ -285,13 +339,39 @@
                 </label>
                 <select id="log-class"
                   class="form-input w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-xs font-bold text-gray-900">
-                  <option value="Class 10 - Day 1">Class 10 — Session 1</option>
-                  <option value="Class 10 - Day 2">Class 10 — Session 2</option>
+                  <option value="Class 10 - Build Check-In 1">Class 10 — Build Check-In 1</option>
+                  <option value="Class 10 - Session 2">Class 10 — Session 2</option>
                   <option value="Class 11 - Day 1">Class 11 — Session 1</option>
                   <option value="Class 11 - Day 2">Class 11 — Session 2</option>
                   <option value="Class 12 - Polish">Class 12 — Final Polish</option>
                   <option value="Final Demo Day">🚀 Final Demo Day</option>
                 </select>
+              </div>
+
+              <!-- CHECK-IN TASK 1: TOOL ACCESS -->
+              <div>
+                <label for="log-tool-access"
+                  class="block text-[11px] font-black uppercase tracking-widest text-gray-500 mb-1">
+                  1. Tool Access Status 🔑
+                </label>
+                <select id="log-tool-access"
+                  class="form-input w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900">
+                  <option value="Confirmed — All members can access required tools">✅ Confirmed — All members can access required tools</option>
+                  <option value="In Progress — Setting up tool accounts / permissions">⏳ In Progress — Setting up tool accounts / permissions</option>
+                  <option value="Need Help — Blocked on tool access or API key">🚩 Need Help — Blocked on tool access or API key</option>
+                </select>
+              </div>
+
+              <!-- CHECK-IN TASK 2: MOCKUP / SKETCH LINK -->
+              <div>
+                <label for="log-mockup-url"
+                  class="block text-[11px] font-black uppercase tracking-widest text-gray-500 mb-1">
+                  2. Core Feature Sketch Link ✏️
+                </label>
+                <input id="log-mockup-url" type="url"
+                  placeholder="https://docs.google.com/presentation/d/... or sketch link"
+                  class="form-input w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 transition-all" />
+                <p class="text-[10px] text-gray-400 mt-1">Google Slides link or description of your core feature sketch.</p>
               </div>
 
               <div>
@@ -300,7 +380,19 @@
                   Milestone Completed Today <span class="text-red-500">*</span>
                 </label>
                 <textarea id="log-milestone" rows="3"
-                  placeholder="e.g. Trained 30 image samples on Teachable Machine and hooked up the webcam feed to HTML."
+                  placeholder="e.g. Confirmed tool access, sketched core feature in Google Slides, and trained 30 image samples on Teachable Machine."
+                  class="form-input w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 transition-all"
+                  required></textarea>
+              </div>
+
+              <!-- CHECK-IN TASK 4: ETHICAL PRE-REVIEW REVISIT -->
+              <div>
+                <label for="log-ethics-update"
+                  class="block text-[11px] font-black uppercase tracking-widest text-gray-500 mb-1">
+                  4. Ethical Pre-Review Updates ⚖️
+                </label>
+                <textarea id="log-ethics-update" rows="2"
+                  placeholder="e.g. After today's ethics discussion, we added a privacy disclaimer for webcam photo storage."
                   class="form-input w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 transition-all"></textarea>
               </div>
 
@@ -316,13 +408,14 @@
                   class="w-full accent-emerald-600 cursor-pointer" />
               </div>
 
+              <!-- CHECK-IN TASK 3: FLAG BLOCKERS -->
               <div>
                 <label for="log-blockers"
                   class="block text-[11px] font-black uppercase tracking-widest text-gray-500 mb-1">
-                  Blockers / Challenges Faced (Optional)
+                  3. Flag Blockers to Teacher 🚩
                 </label>
                 <input id="log-blockers" type="text"
-                  placeholder="e.g. API rate limit hit, webcam permission bug on Chrome..."
+                  placeholder="e.g. Need teacher help with camera permission error on Chrome or API limit..."
                   class="form-input w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 transition-all" />
               </div>
 
@@ -332,7 +425,8 @@
                 </label>
                 <input id="log-next" type="text"
                   placeholder="e.g. Connect LLM prompt to display eco-facts on camera detection."
-                  class="form-input w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 transition-all" />
+                  class="form-input w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 transition-all"
+                  required />
               </div>
             </div>
 
@@ -604,7 +698,7 @@
       container.innerHTML = progressLogs.map(log => `
       <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm hover:border-emerald-300 transition-all">
         <div class="flex items-center justify-between border-b border-gray-100 pb-3 mb-4">
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 flex-wrap">
             <span class="px-3 py-1 bg-emerald-100 text-emerald-800 font-black text-xs rounded-full">${esc(log.class_label)}</span>
             <span class="text-xs text-gray-400 font-medium">${fmtDate(log.logged_at)}</span>
           </div>
@@ -614,10 +708,22 @@
         </div>
 
         <div class="space-y-3 text-xs">
+          <!-- Build Check-In 1 Status Pills -->
+          <div class="flex items-center gap-2 flex-wrap">
+            ${log.tool_access_status ? `<span class="px-2.5 py-1 bg-teal-50 text-teal-800 border border-teal-200 rounded-lg text-[11px] font-bold">🔑 ${esc(log.tool_access_status)}</span>` : ''}
+            ${log.mockup_sketch_url ? `<a href="${esc(log.mockup_sketch_url)}" target="_blank" class="px-2.5 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-lg text-[11px] font-bold hover:bg-amber-100 transition-colors">✏️ Feature Sketch Link ↗</a>` : ''}
+          </div>
+
           <div>
             <strong class="text-gray-400 font-bold uppercase tracking-wider text-[10px] block mb-1">Milestone Completed Today</strong>
             <p class="text-gray-900 font-medium leading-relaxed bg-emerald-50/50 p-3 rounded-xl border border-emerald-100">${esc(log.milestone_completed)}</p>
           </div>
+
+          ${log.ethics_review_update ? `
+          <div>
+            <strong class="text-emerald-700 font-bold uppercase tracking-wider text-[10px] block mb-1">Ethical Pre-Review Updates ⚖️</strong>
+            <p class="text-emerald-900 font-medium bg-emerald-50/80 p-3 rounded-xl border border-emerald-200">${esc(log.ethics_review_update)}</p>
+          </div>` : ''}
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
@@ -626,8 +732,8 @@
             </div>
             ${log.blockers_faced ? `
             <div>
-              <strong class="text-red-400 font-bold uppercase tracking-wider text-[10px] block mb-1">Blockers / Bugs Faced</strong>
-              <p class="text-red-800 font-medium bg-red-50 p-2.5 rounded-xl border border-red-200">${esc(log.blockers_faced)}</p>
+              <strong class="text-red-500 font-bold uppercase tracking-wider text-[10px] block mb-1">Blockers Flagged to Teacher 🚩</strong>
+              <p class="text-red-900 font-medium bg-red-50 p-2.5 rounded-xl border border-red-200">${esc(log.blockers_faced)}</p>
             </div>` : ''}
           </div>
         </div>
@@ -637,7 +743,10 @@
     async function submitProgressLog(ev) {
       ev.preventDefault();
       const classLabel = document.getElementById('log-class').value;
+      const toolAccess = document.getElementById('log-tool-access').value;
+      const mockupUrl = document.getElementById('log-mockup-url').value.trim();
       const milestone = document.getElementById('log-milestone').value.trim();
+      const ethicsUpdate = document.getElementById('log-ethics-update').value.trim();
       const pct = parseInt(document.getElementById('log-pct').value) || 0;
       const blockers = document.getElementById('log-blockers').value.trim();
       const nextGoal = document.getElementById('log-next').value.trim();
@@ -656,6 +765,9 @@
         student_email: currentStudent.email,
         class_label: classLabel,
         milestone_completed: milestone,
+        tool_access_status: toolAccess || null,
+        mockup_sketch_url: mockupUrl || null,
+        ethics_review_update: ethicsUpdate || null,
         blockers_faced: blockers || null,
         next_goal: nextGoal,
         progress_pct: pct,
@@ -705,7 +817,9 @@
         });
 
         // Reset inputs
+        document.getElementById('log-mockup-url').value = '';
         document.getElementById('log-milestone').value = '';
+        document.getElementById('log-ethics-update').value = '';
         document.getElementById('log-blockers').value = '';
         document.getElementById('log-next').value = '';
 

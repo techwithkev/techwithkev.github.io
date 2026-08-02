@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Build Check-In 3 — Class 12 Project Progress</title>
+  <meta name="description"
+    content="Class 12 Build Check-In 3 for Intro to AI final projects. Show progress since Class 11, analyze delay reasons & fixes, check project goal drift, and agree on Class 13 targets.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    #registration-overlay { transition: opacity 0.4s ease; }
+    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
+    #registration-overlay .reg-card { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease; }
+    #registration-overlay.hiding .reg-card { transform: scale(0.95) translateY(-10px); opacity: 0; }
+    .reg-input:focus, .form-input:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255, 255, 255, 0.35); border-top-color: #fff; border-radius: 50%; animation: spin 0.65s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body class="bg-[#EEF2FF] text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- REGISTRATION & RETRIEVAL GATE -->
+  <div id="registration-overlay" class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+    style="background: linear-gradient(135deg, #312e81 0%, #4338ca 55%, #4f46e5 100%);">
+    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-9 max-h-[90vh] overflow-y-auto">
+      <div class="text-center mb-6">
+        <div class="w-14 h-14 mx-auto rounded-2xl mb-3 flex items-center justify-center bg-indigo-100 text-indigo-600">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-1.5 bg-indigo-100 text-indigo-800">
+          Class 12 Progress Check
+        </div>
+        <h1 class="text-2xl font-black text-gray-900 tracking-tight">Build Check-In <span class="text-indigo-600">3 ⚡</span></h1>
+        <p class="text-xs text-gray-500 mt-1 leading-relaxed">Enter your registered email address to load your project thread.</p>
+      </div>
+
+      <form id="retrieve-form" onsubmit="handleProjectRetrieval(event)" novalidate>
+        <div class="mb-5">
+          <label for="retrieve-email" class="block text-[11px] font-black uppercase tracking-widest text-gray-500 mb-1">Registered Email Address</label>
+          <input id="retrieve-email" type="email" placeholder="e.g. alex@school.edu"
+            class="reg-input w-full px-3.5 py-3 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 transition-all" required />
+          <p id="retrieve-error" class="hidden text-xs text-red-500 font-medium mt-2">No project tracker found for this email. <a href="week10_project_tracker.html" class="underline text-indigo-700 font-bold">Create tracker in Week 10 first!</a></p>
+        </div>
+        <button id="retrieve-submit-btn" type="submit"
+          class="w-full text-white font-black py-3.5 px-6 rounded-xl shadow-lg transition-all active:scale-95 text-xs tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-violet-700 hover:from-indigo-700 hover:to-violet-800">
+          <span id="retrieve-btn-label">Open Check-In 3 Tracker 🔍</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MAIN TRACKER DASHBOARD -->
+  <div id="main-content" class="max-w-4xl mx-auto px-4 md:px-8 py-8 md:py-12">
+    <header class="mb-8 border-b border-indigo-200 pb-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div>
+          <a href="index.html" class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-indigo-600 mb-2 hover:text-indigo-800 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            Back to Course Hub
+          </a>
+          <h1 id="header-proj-name" class="text-3xl md:text-4xl font-black tracking-tight text-gray-900">
+            Build Check-In <span class="text-indigo-600">3 ⚡</span>
+          </h1>
+          <p id="header-proj-goal" class="text-gray-600 text-sm font-medium mt-1">Class 12 Goal Alignment &amp; Mid-Sprint Review</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="openRetrieveModal()" class="px-4 py-2 bg-white border border-indigo-300 text-indigo-800 rounded-xl font-bold text-xs hover:bg-indigo-50 transition-all shadow-sm">
+            Switch Email 🔍
+          </button>
+          <a id="header-url-btn" href="#" target="_blank" class="hidden px-4 py-2 bg-indigo-600 text-white rounded-xl font-black text-xs hover:bg-indigo-700 transition-all shadow-sm">
+            View Project Demo 🔗
+          </a>
+        </div>
+      </div>
+
+      <!-- Live Progress Bar Card -->
+      <div class="bg-white border border-indigo-200 rounded-3xl p-6 shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+          <div>
+            <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Current Status</span>
+            <div id="status-badge" class="text-lg font-black text-indigo-700">Core Model &amp; Feature Integration</div>
+          </div>
+          <div class="text-right">
+            <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Overall Progress</span>
+            <div id="progress-pct-display" class="text-2xl font-black text-indigo-600">60%</div>
+          </div>
+        </div>
+        <div class="w-full bg-gray-100 h-4 rounded-full overflow-hidden p-0.5 border border-gray-200">
+          <div id="progress-bar-fill" class="bg-gradient-to-r from-indigo-500 to-purple-600 h-full rounded-full transition-all duration-500" style="width: 60%;"></div>
+        </div>
+        <div class="flex items-center justify-between mt-3 text-[11px] text-gray-500 font-medium">
+          <span>Student: <strong id="student-name-display" class="text-gray-900">—</strong></span>
+          <span>Team: <strong id="team-members-display" class="text-gray-900">Solo</strong></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- BUILD CHECK-IN 3 BANNER -->
+    <div class="bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-950 text-white rounded-3xl p-6 md:p-7 mb-8 shadow-xl border border-indigo-700/40">
+      <div class="flex items-center justify-between flex-wrap gap-2 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 text-[10px] font-black uppercase tracking-widest">
+            BUILD CHECK-IN 3
+          </span>
+          <span class="text-indigo-200 text-xs font-bold">Class 12 Build Tasks</span>
+        </div>
+        <span class="text-indigo-400 text-xs font-mono font-bold">Scope &amp; Goal Alignment Check</span>
+      </div>
+
+      <h2 class="text-2xl font-black text-white tracking-tight mb-2">Today's <span class="text-indigo-400">Build Tasks 🛠️</span></h2>
+      <p class="text-xs text-indigo-100/80 mb-5 max-w-2xl leading-relaxed">
+        Verify what's changed since Class 11, check whether your project matches your original brief, and fix any delay causes.
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-xs">
+        <div class="bg-white/10 backdrop-blur-sm p-4 rounded-2xl border border-white/10 flex items-start gap-3">
+          <div class="w-8 h-8 rounded-xl bg-indigo-500/30 flex items-center justify-center text-indigo-300 font-bold shrink-0">1</div>
+          <div>
+            <strong class="text-indigo-200 font-black block mb-0.5 text-sm">Show Progress Since Class 11 🛠️</strong>
+            <span class="text-gray-200 leading-snug block">Show your teacher what's changed in your project since Class 11.</span>
+          </div>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm p-4 rounded-2xl border border-white/10 flex items-start gap-3">
+          <div class="w-8 h-8 rounded-xl bg-indigo-500/30 flex items-center justify-center text-indigo-300 font-bold shrink-0">2</div>
+          <div>
+            <strong class="text-indigo-200 font-black block mb-0.5 text-sm">Analyze Delays &amp; Fix 💡</strong>
+            <span class="text-gray-200 leading-snug block">If your group is behind, name the single biggest reason why — and one way to fix it.</span>
+          </div>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm p-4 rounded-2xl border border-white/10 flex items-start gap-3">
+          <div class="w-8 h-8 rounded-xl bg-indigo-500/30 flex items-center justify-center text-indigo-300 font-bold shrink-0">3</div>
+          <div>
+            <strong class="text-indigo-200 font-black block mb-0.5 text-sm">Check Goal Drift 🎯</strong>
+            <span class="text-gray-200 leading-snug block">Check: does your project still match the goal in your brief, or has it drifted?</span>
+          </div>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm p-4 rounded-2xl border border-white/10 flex items-start gap-3">
+          <div class="w-8 h-8 rounded-xl bg-indigo-500/30 flex items-center justify-center text-indigo-300 font-bold shrink-0">4</div>
+          <div>
+            <strong class="text-indigo-200 font-black block mb-0.5 text-sm">Agree on Class 13 Target 🏁</strong>
+            <span class="text-gray-200 leading-snug block">Agree as a group on what you'll finish before Class 13.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- LEFT COLUMN: FORM -->
+      <div class="lg:col-span-1">
+        <div class="bg-white border border-indigo-200 rounded-3xl p-6 shadow-sm sticky top-6">
+          <h2 class="text-lg font-black text-gray-900 mb-1 flex items-center gap-2">
+            <span>📝 Submit Check-In 3</span>
+          </h2>
+          <p class="text-xs text-gray-500 mb-5">Record Class 12 progress, goal drift check, and Class 13 target.</p>
+
+          <form id="log-form" onsubmit="submitProgressLog(event)" novalidate>
+            <div class="space-y-4 mb-5">
+              <div>
+                <label for="log-class" class="block text-[11px] font-black uppercase tracking-widest text-gray-500 mb-1">Class Session <span class="text-red-500">*</span></label>
+                <input id="log-class" type="text" value="Class 12 - Build Check-In 3" class="form-input w-full p-3 rounded-xl border border-gray-200 bg-gray-100 text-xs font-bold text-gray-900" readonly />
+              </div>
+
+              <div>
+                <label for="log-milestone" class="block text-[11px] font-black uppercase tracking-widest text-gray-500 mb-1">1. Changed Since Class 11 <span class="text-red-500">*</span></label>
+                <textarea id="log-milestone" rows="3" placeholder="e.g. Added real-time prediction output styling and formatted API error fallbacks." class="form-input w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900" required></textarea>
+              </div>
+
+              <div>
+                <label for="log-behind" class="block text-[11px] font-black uppercase tracking-widest text-gray-500 mb-1">2. Delay Reason &amp; Fix (If Behind)</label>
+                <textarea id="log-behind" rows="2" placeholder="e.g. Behind on UI styling because API integration took long — fixing by using Tailwind utility classes." class="form-input w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900"></textarea>
+              </div>
+
+              <div>
+                <label for="log-drift" class="block text-[11px] font-black uppercase tracking-widest text-gray-500 mb-1">3. Goal Drift Check 🎯</label>
+                <input id="log-drift" type="text" placeholder="e.g. Matches brief 100%, pivoted slightly from sound to text inputs." class="form-input w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900" />
+              </div>
+
+              <div>
+                <div class="flex justify-between items-center mb-1">
+                  <label for="log-pct" class="block text-[11px] font-black uppercase tracking-widest text-gray-500">Overall Progress % <span class="text-red-500">*</span></label>
+                  <span id="log-pct-val" class="text-xs font-black text-indigo-600">65%</span>
+                </div>
+                <input id="log-pct" type="range" min="0" max="100" step="5" value="65" oninput="document.getElementById('log-pct-val').textContent = this.value + '%'" class="w-full accent-indigo-600 cursor-pointer" />
+              </div>
+
+              <div>
+                <label for="log-next" class="block text-[11px] font-black uppercase tracking-widest text-gray-500 mb-1">4. Finish Before Class 13 <span class="text-red-500">*</span></label>
+                <input id="log-next" type="text" placeholder="e.g. Complete end-to-end user flow and test with 2 team members." class="form-input w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900" required />
+              </div>
+            </div>
+
+            <p id="log-error" class="hidden text-xs text-red-500 font-medium mb-3">Please fill out all required fields.</p>
+            <button id="log-btn" type="submit" class="w-full text-white font-black py-3.5 px-6 rounded-xl shadow-md transition-all active:scale-95 text-xs tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-violet-700 hover:from-indigo-700 hover:to-violet-800">
+              <span id="log-btn-label">Post Check-In 3 Entry &#8594;</span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: TIMELINE -->
+      <div class="lg:col-span-2">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-black text-gray-900 flex items-center gap-2">
+            <span>📅 Project Progress Thread</span>
+          </h2>
+          <span id="log-count-badge" class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full font-black text-xs">0 Updates</span>
+        </div>
+        <div id="timeline-container" class="space-y-4">
+          <div class="bg-white border border-gray-200 rounded-3xl p-8 text-center text-gray-400">
+            <div class="text-3xl mb-2">📋</div>
+            <p class="text-sm font-bold text-gray-600">Loading timeline...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+    const TABLE_TRACKER = 'introai_project_tracker';
+    const TABLE_LOGS = 'introai_project_progress_logs';
+
+    let currentStudent = { name: '', email: '', team: '', projectName: '', projectGoal: '', projectUrl: '', progressPct: 60, currentStatus: 'Core Model & Feature Integration' };
+    let progressLogs = [];
+
+    function openRetrieveModal() { document.body.appendChild(document.getElementById('registration-overlay')); }
+    function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+
+    async function handleProjectRetrieval(ev) {
+      ev.preventDefault();
+      const email = document.getElementById('retrieve-email').value.trim();
+      const errEl = document.getElementById('retrieve-error');
+      errEl.classList.add('hidden');
+      if (!email || !validateEmail(email)) return;
+
+      const btn = document.getElementById('retrieve-submit-btn');
+      btn.disabled = true;
+      document.getElementById('retrieve-btn-label').innerHTML = '<span class="spinner"></span> Finding…';
+
+      try {
+        const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_TRACKER}?student_email=eq.${encodeURIComponent(email)}`, {
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        const rows = await resp.json();
+        if (!resp.ok || !rows || !rows.length) {
+          errEl.classList.remove('hidden');
+          btn.disabled = false;
+          document.getElementById('retrieve-btn-label').textContent = 'Open Check-In 3 Tracker 🔍';
+          return;
+        }
+
+        const r = rows[0];
+        currentStudent = { name: r.student_name, email: r.student_email, team: r.team_members || 'Solo', projectName: r.project_name, projectGoal: r.project_goal, projectUrl: r.project_url || '', progressPct: r.overall_progress_pct || 60, currentStatus: r.current_status || 'Core Model & Feature Integration' };
+        saveSession();
+        updateDashboardUI();
+        await fetchLogs();
+
+        const overlay = document.getElementById('registration-overlay');
+        overlay.classList.add('hiding');
+        setTimeout(() => overlay.remove(), 400);
+      } catch (err) {
+        console.error(err);
+        btn.disabled = false;
+        document.getElementById('retrieve-btn-label').textContent = 'Open Check-In 3 Tracker 🔍';
+      }
+    }
+
+    function saveSession() { sessionStorage.setItem('introai_tracker_data', JSON.stringify(currentStudent)); }
+
+    (function restoreSession() {
+      const raw = sessionStorage.getItem('introai_tracker_data');
+      if (raw) {
+        try {
+          currentStudent = JSON.parse(raw);
+          document.getElementById('registration-overlay').remove();
+          updateDashboardUI();
+          fetchLogs();
+        } catch (e) { }
+      }
+    })();
+
+    function updateDashboardUI() {
+      document.getElementById('header-proj-name').innerHTML = `${esc(currentStudent.projectName)} <span class="text-indigo-600">(Check-In 3) ⚡</span>`;
+      document.getElementById('header-proj-goal').textContent = currentStudent.projectGoal;
+      document.getElementById('student-name-display').textContent = currentStudent.name;
+      document.getElementById('team-members-display').textContent = currentStudent.team;
+      document.getElementById('progress-pct-display').textContent = currentStudent.progressPct + '%';
+      document.getElementById('progress-bar-fill').style.width = currentStudent.progressPct + '%';
+      document.getElementById('status-badge').textContent = currentStudent.currentStatus;
+
+      const urlBtn = document.getElementById('header-url-btn');
+      if (currentStudent.projectUrl) {
+        urlBtn.href = currentStudent.projectUrl;
+        urlBtn.classList.remove('hidden');
+      } else {
+        urlBtn.classList.add('hidden');
+      }
+    }
+
+    async function fetchLogs() {
+      if (!currentStudent.email) return;
+      try {
+        const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_LOGS}?student_email=eq.${encodeURIComponent(currentStudent.email)}&order=logged_at.desc`, {
+          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        if (resp.ok) {
+          progressLogs = await resp.json();
+          renderTimeline();
+        }
+      } catch (err) { console.error(err); }
+    }
+
+    function esc(str) { if (!str) return ''; return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+    function fmtDate(isoStr) { if (!isoStr) return ''; const d = new Date(isoStr); return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' at ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); }
+
+    function renderTimeline() {
+      const container = document.getElementById('timeline-container');
+      document.getElementById('log-count-badge').textContent = progressLogs.length + ' Update' + (progressLogs.length !== 1 ? 's' : '');
+
+      if (!progressLogs.length) {
+        container.innerHTML = `<div class="bg-white border border-gray-200 rounded-3xl p-8 text-center text-gray-400"><div class="text-3xl mb-2">📋</div><p class="text-sm font-bold text-gray-600">No progress updates logged yet!</p></div>`;
+        return;
+      }
+
+      container.innerHTML = progressLogs.map(log => `
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm hover:border-indigo-300 transition-all">
+        <div class="flex items-center justify-between border-b border-gray-100 pb-3 mb-4">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="px-3 py-1 bg-indigo-100 text-indigo-800 font-black text-xs rounded-full">${esc(log.class_label)}</span>
+            <span class="text-xs text-gray-400 font-medium">${fmtDate(log.logged_at)}</span>
+          </div>
+          <span class="px-3 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 font-black text-xs rounded-full">${log.progress_pct}% Complete</span>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <strong class="text-gray-400 font-bold uppercase tracking-wider text-[10px] block mb-1">Built / Changed</strong>
+            <p class="text-gray-900 font-medium leading-relaxed bg-indigo-50/50 p-3 rounded-xl border border-indigo-100">${esc(log.milestone_completed)}</p>
+          </div>
+
+          ${log.behind_reason_and_fix ? `
+          <div>
+            <strong class="text-rose-700 font-bold uppercase tracking-wider text-[10px] block mb-1">Delay Reason &amp; Fix 💡</strong>
+            <p class="text-rose-900 font-medium bg-rose-50 p-2.5 rounded-xl border border-rose-200">${esc(log.behind_reason_and_fix)}</p>
+          </div>` : ''}
+
+          ${log.goal_drift_check ? `
+          <div>
+            <strong class="text-indigo-700 font-bold uppercase tracking-wider text-[10px] block mb-1">Goal Drift Check 🎯</strong>
+            <p class="text-indigo-900 font-medium bg-indigo-50 p-2.5 rounded-xl border border-indigo-200">${esc(log.goal_drift_check)}</p>
+          </div>` : ''}
+
+          <div>
+            <strong class="text-gray-400 font-bold uppercase tracking-wider text-[10px] block mb-1">Target for Class 13</strong>
+            <p class="text-gray-800 font-medium bg-gray-50 p-2.5 rounded-xl border border-gray-200">${esc(log.next_goal)}</p>
+          </div>
+        </div>
+      </div>`).join('');
+    }
+
+    async function submitProgressLog(ev) {
+      ev.preventDefault();
+      const classLabel = document.getElementById('log-class').value;
+      const milestone = document.getElementById('log-milestone').value.trim();
+      const behindFix = document.getElementById('log-behind').value.trim();
+      const goalDrift = document.getElementById('log-drift').value.trim();
+      const pct = parseInt(document.getElementById('log-pct').value) || 65;
+      const nextGoal = document.getElementById('log-next').value.trim();
+      const errEl = document.getElementById('log-error');
+
+      if (!milestone || !nextGoal) { errEl.classList.remove('hidden'); return; }
+      errEl.classList.add('hidden');
+
+      const btn = document.getElementById('log-btn');
+      btn.disabled = true;
+      document.getElementById('log-btn-label').innerHTML = '<span class="spinner"></span> Posting…';
+
+      const logPayload = {
+        student_email: currentStudent.email,
+        class_label: classLabel,
+        checkin_type: 'checkin_3',
+        milestone_completed: milestone,
+        behind_reason_and_fix: behindFix || null,
+        goal_drift_check: goalDrift || null,
+        next_goal: nextGoal,
+        progress_pct: pct,
+        logged_at: new Date().toISOString()
+      };
+
+      try {
+        const logResp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_LOGS}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'return=minimal' },
+          body: JSON.stringify(logPayload)
+        });
+        if (!logResp.ok) throw new Error('HTTP ' + logResp.status);
+
+        let newStatus = 'Core Model & Feature Integration';
+        if (pct >= 90) newStatus = 'Final Polish & Presentation Ready';
+        else if (pct < 40) newStatus = 'Prototype & Wireframing';
+
+        currentStudent.progressPct = pct;
+        currentStudent.currentStatus = newStatus;
+        saveSession();
+        updateDashboardUI();
+
+        await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_TRACKER}?student_email=eq.${encodeURIComponent(currentStudent.email)}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ overall_progress_pct: pct, current_status: newStatus, updated_at: new Date().toISOString() })
+        });
+
+        document.getElementById('log-milestone').value = '';
+        document.getElementById('log-behind').value = '';
+        document.getElementById('log-drift').value = '';
+        document.getElementById('log-next').value = '';
+
+        btn.disabled = false;
+        document.getElementById('log-btn-label').textContent = 'Post Check-In 3 Entry →';
+        await fetchLogs();
+      } catch (err) {
+        console.error(err);
+        btn.disabled = false;
+        document.getElementById('log-btn-label').textContent = 'Post Check-In 3 Entry →';
+        errEl.textContent = '⚠️ Error posting update log. Please try again.';
+        errEl.classList.remove('hidden');
+      }
+    }
+  </script>
+</body>
+
+</html>

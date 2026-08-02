@@ -25,25 +25,128 @@ COMMENT ON TABLE introai_project_tracker
   IS 'Main final AI project registry for students';
 
 -- ── Table 2: introai_project_progress_logs ──────────────────────────────
--- Class-by-class progress update logs
+-- Class-by-class progress update logs for Build Check-Ins 1 through 5+
 -- ─────────────────────────────────────────────────────────────────────────────
 
 CREATE TABLE IF NOT EXISTS introai_project_progress_logs (
   id                      BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   student_email           TEXT NOT NULL,
-  class_label             TEXT NOT NULL, -- e.g. "Class 10", "Class 11 - Day 1"
+  class_label             TEXT NOT NULL, -- e.g. "Class 10 - Build Check-In 1", "Class 11 - Build Check-In 2"
+  checkin_type            TEXT DEFAULT 'general', -- 'checkin_1', 'checkin_2', 'checkin_3', 'checkin_4', 'build_goals', 'ready_class15'
 
-  -- Log Details
+  -- Core Log Details
   milestone_completed     TEXT NOT NULL,
-  blockers_faced          TEXT,
-  next_goal               TEXT NOT NULL,
   progress_pct            SMALLINT NOT NULL CHECK (progress_pct BETWEEN 0 AND 100),
+  next_goal               TEXT NOT NULL,
+
+  -- Build Check-In 1 (Class 10)
+  tool_access_status      TEXT,          -- Tool access confirmation status
+  mockup_sketch_url       TEXT,          -- Google Slides or feature sketch link
+
+  -- Shared Across Check-Ins 1, 2 & Class 15
+  ethics_review_update    TEXT,          -- Ethical pre-review updates & Class 15 finished review
+  blockers_faced          TEXT,          -- Flagged blockers to teacher (Check-Ins 1-4)
+
+  -- Build Check-In 2 (Class 11)
+  blocker_solution_plan   TEXT,          -- How group will solve blocker before leaving today
+
+  -- Build Check-In 3 (Class 12)
+  behind_reason_and_fix   TEXT,          -- Single biggest reason if behind & way to fix it
+  goal_drift_check        TEXT,          -- Does project match original brief goal or has it drifted?
+
+  -- Build Check-In 4 (Class 13)
+  current_state_honesty   TEXT,          -- Current project state & what's not working yet
+  top_priorities_left     TEXT,          -- 2-3 most important things left to finish
+  non_essentials_cut      TEXT,          -- What non-essential features were cut
+
+  -- Build Goals (Class 14)
+  priorities_confirmation TEXT,          -- Confirmation of Class 13 priorities (still right or changed?)
+  team_member_tasks       TEXT,          -- Task assignments: who is doing what for next stretch
+  user_testing_notes      TEXT,          -- Stranger user testing feedback if finished early
+
+  -- Ready for Class 15 & Presentation (Class 15/16)
+  working_version_url     TEXT,          -- Working demo / prototype URL
+  presentation_rough_idea TEXT,          -- Rough idea of what student will say at Class 16 presentation
+  unsure_questions        TEXT,          -- One thing still unsure about to ask in Class 15
+
+  -- Catch-all for extra check-in metadata
+  checkin_data            JSONB DEFAULT '{}'::jsonb,
 
   logged_at               TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- Safely add columns if table already exists in Supabase
+DO $$
+BEGIN
+  -- Build Check-In 1 & General
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='introai_project_progress_logs' AND column_name='checkin_type') THEN
+    ALTER TABLE introai_project_progress_logs ADD COLUMN checkin_type TEXT DEFAULT 'general';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='introai_project_progress_logs' AND column_name='tool_access_status') THEN
+    ALTER TABLE introai_project_progress_logs ADD COLUMN tool_access_status TEXT;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='introai_project_progress_logs' AND column_name='mockup_sketch_url') THEN
+    ALTER TABLE introai_project_progress_logs ADD COLUMN mockup_sketch_url TEXT;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='introai_project_progress_logs' AND column_name='ethics_review_update') THEN
+    ALTER TABLE introai_project_progress_logs ADD COLUMN ethics_review_update TEXT;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='introai_project_progress_logs' AND column_name='blockers_faced') THEN
+    ALTER TABLE introai_project_progress_logs ADD COLUMN blockers_faced TEXT;
+  END IF;
+
+  -- Build Check-In 2
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='introai_project_progress_logs' AND column_name='blocker_solution_plan') THEN
+    ALTER TABLE introai_project_progress_logs ADD COLUMN blocker_solution_plan TEXT;
+  END IF;
+
+  -- Build Check-In 3
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='introai_project_progress_logs' AND column_name='behind_reason_and_fix') THEN
+    ALTER TABLE introai_project_progress_logs ADD COLUMN behind_reason_and_fix TEXT;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='introai_project_progress_logs' AND column_name='goal_drift_check') THEN
+    ALTER TABLE introai_project_progress_logs ADD COLUMN goal_drift_check TEXT;
+  END IF;
+
+  -- Build Check-In 4
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='introai_project_progress_logs' AND column_name='current_state_honesty') THEN
+    ALTER TABLE introai_project_progress_logs ADD COLUMN current_state_honesty TEXT;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='introai_project_progress_logs' AND column_name='top_priorities_left') THEN
+    ALTER TABLE introai_project_progress_logs ADD COLUMN top_priorities_left TEXT;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='introai_project_progress_logs' AND column_name='non_essentials_cut') THEN
+    ALTER TABLE introai_project_progress_logs ADD COLUMN non_essentials_cut TEXT;
+  END IF;
+
+  -- Build Goals (Class 14)
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='introai_project_progress_logs' AND column_name='priorities_confirmation') THEN
+    ALTER TABLE introai_project_progress_logs ADD COLUMN priorities_confirmation TEXT;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='introai_project_progress_logs' AND column_name='team_member_tasks') THEN
+    ALTER TABLE introai_project_progress_logs ADD COLUMN team_member_tasks TEXT;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='introai_project_progress_logs' AND column_name='user_testing_notes') THEN
+    ALTER TABLE introai_project_progress_logs ADD COLUMN user_testing_notes TEXT;
+  END IF;
+
+  -- Class 15 & Demo Day
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='introai_project_progress_logs' AND column_name='working_version_url') THEN
+    ALTER TABLE introai_project_progress_logs ADD COLUMN working_version_url TEXT;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='introai_project_progress_logs' AND column_name='presentation_rough_idea') THEN
+    ALTER TABLE introai_project_progress_logs ADD COLUMN presentation_rough_idea TEXT;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='introai_project_progress_logs' AND column_name='unsure_questions') THEN
+    ALTER TABLE introai_project_progress_logs ADD COLUMN unsure_questions TEXT;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='introai_project_progress_logs' AND column_name='checkin_data') THEN
+    ALTER TABLE introai_project_progress_logs ADD COLUMN checkin_data JSONB DEFAULT '{}'::jsonb;
+  END IF;
+END $$;
+
 COMMENT ON TABLE introai_project_progress_logs
-  IS 'Class-by-class progress update logs for final AI projects';
+  IS 'Class-by-class progress update logs for final AI projects across all Build Check-Ins';
 
 -- ── Row-Level Security: introai_project_tracker ───────────────────────────────
 ALTER TABLE introai_project_tracker ENABLE ROW LEVEL SECURITY;

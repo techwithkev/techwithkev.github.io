@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Design Tool Sprint — Intro to AI · Week 10</title>
+  <meta name="description"
+    content="Week 10 Exercise 1: AI Design Tool Sprint. Pick a product brief, craft generative AI image prompts, map UI layout components, and defend your core design choices.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    #registration-overlay { transition: opacity 0.4s ease; }
+    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
+    #registration-overlay .reg-card {
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
+    }
+    #registration-overlay.hiding .reg-card {
+      transform: scale(0.95) translateY(-10px); opacity: 0;
+    }
+    .reg-input:focus {
+      outline: none; border-color: #e11d48;
+      box-shadow: 0 0 0 3px rgba(225,29,72,0.15);
+    }
+    .reg-input.error {
+      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+    }
+    .form-input:focus {
+      outline: none; border-color: #e11d48;
+      box-shadow: 0 0 0 3px rgba(225,29,72,0.1);
+    }
+    .form-input.error { border-color: #ef4444; }
+    .star-btn {
+      font-size: 24px;
+      cursor: pointer;
+      filter: grayscale(100%);
+      transition: filter 0.15s ease, transform 0.1s ease;
+    }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .opt-btn {
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #374151;
+      background: #f9fafb;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: left;
+    }
+    .opt-btn:hover { border-color: #f43f5e; background: #fff1f2; color: #9f1239; }
+    .opt-btn.selected { border-color: #e11d48; background: #fff1f2; color: #9f1239; box-shadow: 0 0 0 3px rgba(225,29,72,0.15); }
+    .badge-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+
+<body class="bg-[#FFF1F2]/30 text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- REGISTRATION GATE -->
+  <div id="registration-overlay"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+    style="background: linear-gradient(135deg, #4c0519 0%, #be123c 55%, #4c0519 100%);">
+
+    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
+        style="background: radial-gradient(circle, #fecdd3, transparent);"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
+        style="background: radial-gradient(circle, #fb7185, transparent);"></div>
+    </div>
+
+    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center bg-rose-100 text-rose-600 shadow-sm">
+          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 bg-rose-100 text-rose-800">
+          Week 10 · Exercise 1
+        </div>
+        <h1 class="text-2xl font-black text-gray-900 tracking-tight">AI Design Tool Sprint 🎨</h1>
+        <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">Enter your details to start prototyping your AI product interface.</p>
+      </div>
+
+      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
+        <div class="space-y-4 mb-6">
+          <div>
+            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Your Full Name</label>
+            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Alex Morgan"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name.</p>
+          </div>
+          <div>
+            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
+            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. alex@school.edu"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
+          </div>
+        </div>
+        <button id="reg-submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800">
+          <span id="reg-btn-label">Start Design Sprint &#8594;</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main-content" class="max-w-3xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-rose-200 pb-6">
+      <div>
+        <a href="index.html"
+          class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-rose-600 mb-3 hover:text-rose-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">
+          AI Design Tool Sprint 🎨
+        </h1>
+        <p class="text-gray-500 font-medium italic mt-1">Rapid AI Prototyping &amp; UX Decisions · Week 10 · Exercise 1</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-rose-50 border border-rose-200 text-rose-800 shadow-sm self-start md:self-auto">
+        Week 10
+      </div>
+    </header>
+
+    <!-- Brief Card -->
+    <div class="bg-gradient-to-br from-rose-700 via-rose-800 to-pink-900 text-white rounded-3xl p-6 md:p-8 mb-8 shadow-xl">
+      <h2 class="text-xl font-black mb-3 flex items-center gap-2">
+        <span>🎨 Exercise Brief (~15–20 Minutes)</span>
+      </h2>
+      <p class="text-sm text-rose-100 leading-relaxed mb-4">
+        As the lead product designer for a new AI feature, your mission is to turn a high-level product brief into a clear visual interface concept.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-3 border border-white/10 text-xs">
+          <div class="font-black text-rose-200 mb-1">1. Pick Brief</div>
+          <div>Select your target AI feature concept</div>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-3 border border-white/10 text-xs">
+          <div class="font-black text-rose-200 mb-1">2. Prompts</div>
+          <div>Write 2–3 generative prompts for visuals</div>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-3 border border-white/10 text-xs">
+          <div class="font-black text-rose-200 mb-1">3. Screen Layout</div>
+          <div>Define focal UI components &amp; hierarchy</div>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-3 border border-white/10 text-xs">
+          <div class="font-black text-rose-200 mb-1">4. Explain &amp; Defend</div>
+          <div>Justify one core design choice made</div>
+        </div>
+      </div>
+      <div class="bg-white/15 backdrop-blur-md rounded-2xl p-4 border border-white/20 text-xs leading-relaxed">
+        <strong>Goal:</strong> Complete each step below to build your individual AI Design Sprint document and submit it to the class repository.
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <form id="ai-design-sprint-form" onsubmit="submitExercise(event)" novalidate>
+
+      <!-- Step 1: Design Brief Selection -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="w-8 h-8 rounded-full bg-rose-600 text-white font-black text-sm flex items-center justify-center">1</span>
+          <h2 class="text-lg font-black text-gray-900">Choose Your Design Brief</h2>
+        </div>
+
+        <div class="bg-rose-50 border border-rose-200 rounded-2xl p-4 mb-5 text-sm text-rose-950 leading-relaxed">
+          <strong>Instructions:</strong> Select one of the 5 AI product briefs below as your design focus for this sprint.
+        </div>
+
+        <div class="mb-5">
+          <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-3">Select a product brief: <span class="text-red-500">*</span></p>
+          <div id="brief-picker" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <button type="button" class="opt-btn" onclick="setChoice('productBrief','AI Study Companion App (Smart Flashcards & Tutor)',this)">
+              📚 <strong>AI Study Companion</strong>
+              <div class="text-[11px] text-gray-500 font-normal mt-1">Smart flashcards, homework tutor &amp; exam prep assistant</div>
+            </button>
+            <button type="button" class="opt-btn" onclick="setChoice('productBrief','AI Music Curator & DJ (Mood & Lyric Visualizer)',this)">
+              🎵 <strong>AI Music Curator &amp; DJ</strong>
+              <div class="text-[11px] text-gray-500 font-normal mt-1">Mood-based playlist generator &amp; AI cover art creator</div>
+            </button>
+            <button type="button" class="opt-btn" onclick="setChoice('productBrief','Smart Nutrition & Recipe Chef (Photo Recognition)',this)">
+              🥗 <strong>Smart Recipe &amp; Meal Chef</strong>
+              <div class="text-[11px] text-gray-500 font-normal mt-1">Fridge photo ingredient recognition &amp; customized recipe generator</div>
+            </button>
+            <button type="button" class="opt-btn" onclick="setChoice('productBrief','Pixel RPG AI Companion (Quest & Dialogue Engine)',this)">
+              🕹️ <strong>Pixel RPG Companion</strong>
+              <div class="text-[11px] text-gray-500 font-normal mt-1">Dynamic NPC dialogue generator &amp; AI inventory strategist</div>
+            </button>
+            <button type="button" class="opt-btn" onclick="setChoice('productBrief','Sustainable Fashion Stylist (Virtual Wardrobe AI)',this)">
+              👗 <strong>Sustainable Fashion Stylist</strong>
+              <div class="text-[11px] text-gray-500 font-normal mt-1">Virtual outfit matcher &amp; eco-friendly wardrobe recommendation engine</div>
+            </button>
+          </div>
+          <p id="brief-error" class="hidden text-xs text-red-500 font-medium mt-2">Please select a product brief.</p>
+        </div>
+      </div>
+
+      <!-- Step 2: AI Visual Prompts (Craiyon / DALL-E) -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="w-8 h-8 rounded-full bg-rose-600 text-white font-black text-sm flex items-center justify-center">2</span>
+          <h2 class="text-lg font-black text-gray-900">Craft Generative Visual Prompts</h2>
+        </div>
+
+        <div class="bg-rose-50 border border-rose-200 rounded-2xl p-4 mb-5 text-xs text-rose-950 leading-relaxed flex items-start gap-3">
+          <span class="text-xl">💡</span>
+          <div>
+            <strong>AI Image Generation Tip:</strong> Good AI prompts specify the <em>subject, art style, lighting, color palette, and layout context</em> (e.g. <code>"Sleek mobile app UI card, minimalist dark mode gradient, vibrant neon accents, high resolution design mockup"</code>).
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label for="prompt-1" class="block text-xs font-black uppercase tracking-widest text-gray-600 mb-1">
+              Visual Asset 1: Hero Banner / Logo Prompt <span class="text-red-500">*</span>
+            </label>
+            <p class="text-[11px] text-gray-400 mb-1.5">Write an AI prompt to generate a brand logo, icon, or hero illustration for your app.</p>
+            <input id="prompt-1" type="text"
+              placeholder="e.g. Minimalist futuristic owl logo for AI study app, glowing cyan line art, dark navy background, vector design..."
+              class="form-input w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 placeholder-gray-400 transition-all" />
+            <p id="prompt-1-error" class="hidden text-xs text-red-500 font-medium mt-1">Please provide Prompt 1.</p>
+          </div>
+
+          <div>
+            <label for="prompt-2" class="block text-xs font-black uppercase tracking-widest text-gray-600 mb-1">
+              Visual Asset 2: Main Screen Mockup Prompt <span class="text-red-500">*</span>
+            </label>
+            <p class="text-[11px] text-gray-400 mb-1.5">Write an AI prompt to generate a preview of the main UI screen or interactive card widget.</p>
+            <input id="prompt-2" type="text"
+              placeholder="e.g. Modern UI mockup of an AI chat dashboard, clean white card layout with rounded corners, colorful badge chips, Figma aesthetic..."
+              class="form-input w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 placeholder-gray-400 transition-all" />
+            <p id="prompt-2-error" class="hidden text-xs text-red-500 font-medium mt-1">Please provide Prompt 2.</p>
+          </div>
+
+          <div>
+            <label for="prompt-3" class="block text-xs font-black uppercase tracking-widest text-gray-600 mb-1">
+              Visual Asset 3: Feature Highlight / Result Badge Prompt <span class="text-red-500">*</span>
+            </label>
+            <p class="text-[11px] text-gray-400 mb-1.5">Write an AI prompt for a supporting visual (e.g. success badge, recommendation card, data chart icon).</p>
+            <input id="prompt-3" type="text"
+              placeholder="e.g. 3D isometric badge icon of a sparkling brain with lightbulbs, pastel gradient, smooth render..."
+              class="form-input w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 placeholder-gray-400 transition-all" />
+            <p id="prompt-3-error" class="hidden text-xs text-red-500 font-medium mt-1">Please provide Prompt 3.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Screen UI Component Layout -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="w-8 h-8 rounded-full bg-rose-600 text-white font-black text-sm flex items-center justify-center">3</span>
+          <h2 class="text-lg font-black text-gray-900">Assemble Screen Layout &amp; UI Components</h2>
+        </div>
+
+        <div class="mb-5">
+          <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-3">Primary focal UI component on your screen: <span class="text-red-500">*</span></p>
+          <div id="focal-picker" class="flex flex-wrap gap-2">
+            <button type="button" class="opt-btn" onclick="setChoice('focalComponent','Interactive Voice & Chat Console',this)">💬 Interactive Voice/Chat Console</button>
+            <button type="button" class="opt-btn" onclick="setChoice('focalComponent','Dynamic Visual Recommendation Cards',this)">🎴 Dynamic Recommendation Cards</button>
+            <button type="button" class="opt-btn" onclick="setChoice('focalComponent','Live Analytics & Progress Dashboard',this)">📊 Live Analytics Dashboard</button>
+            <button type="button" class="opt-btn" onclick="setChoice('focalComponent','Step-by-Step AI Wizard Flow',this)">🧙 Step-by-Step AI Wizard</button>
+            <button type="button" class="opt-btn" onclick="setChoice('focalComponent','Camera Photo Scanning Viewfinder',this)">📷 Photo Scan Viewfinder</button>
+          </div>
+          <p id="focal-error" class="hidden text-xs text-red-500 font-medium mt-2">Please select a focal component.</p>
+        </div>
+
+        <div class="mb-5">
+          <label for="screen-layout-desc" class="block text-xs font-black uppercase tracking-widest text-gray-600 mb-2">
+            Describe how your screen is laid out (Header, Main Focus, Actions &amp; Nav Bar): <span class="text-red-500">*</span>
+          </label>
+          <textarea id="screen-layout-desc" rows="3"
+            placeholder="e.g. Top header shows user profile & streak count. Main area displays a large AI suggestion card with image preview. Bottom bar has prompt input field and quick action buttons..."
+            class="form-input w-full p-3.5 rounded-2xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 placeholder-gray-400 transition-all"></textarea>
+          <p id="screen-layout-desc-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe your screen layout.</p>
+        </div>
+
+        <div>
+          <label for="slides-link" class="block text-xs font-black uppercase tracking-widest text-gray-600 mb-1">
+            Google Slides Share Link (One Slide Mockup): <span class="text-red-500">*</span>
+          </label>
+          <p class="text-[11px] text-gray-500 mb-2">Assemble your 2–3 visual assets onto one Google Slide laid out like a real app screen, set link permissions to <strong>"Anyone with link can view"</strong>, and paste the URL here for teacher review.</p>
+          <input id="slides-link" type="url"
+            placeholder="e.g. https://docs.google.com/presentation/d/1A2B3C.../edit?usp=sharing"
+            class="form-input w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 placeholder-gray-400 transition-all" />
+          <p id="slides-link-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your Google Slides share link.</p>
+        </div>
+      </div>
+
+      <!-- Step 4: Design Justification & Defense -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="w-8 h-8 rounded-full bg-rose-600 text-white font-black text-sm flex items-center justify-center">4</span>
+          <h2 class="text-lg font-black text-gray-900">Explain &amp; Defend Your Design Choices</h2>
+        </div>
+
+        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-5 text-xs text-amber-900 leading-relaxed">
+          <strong>Design Defense:</strong> Good UI designers don't just pick things because they "look cool". Every element must serve a clear purpose for the user!
+        </div>
+
+        <div class="mb-5">
+          <label for="key-choice-justification" class="block text-xs font-black uppercase tracking-widest text-gray-600 mb-2">
+            Explain ONE key design choice you made (layout, colour, AI interaction) and WHY: <span class="text-red-500">*</span>
+          </label>
+          <textarea id="key-choice-justification" rows="3"
+            placeholder="e.g. I chose a prominent 'Regenerate Output' button in bright rose colour because AI suggestions are not always perfect on the first try, giving users instant control..."
+            class="form-input w-full p-3.5 rounded-2xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 placeholder-gray-400 transition-all"></textarea>
+          <p id="key-choice-justification-error" class="hidden text-xs text-red-500 font-medium mt-1">Please explain your key design choice.</p>
+        </div>
+
+        <div>
+          <label for="ux-risk-reflection" class="block text-xs font-black uppercase tracking-widest text-gray-600 mb-2">
+            What is ONE potential UX risk or AI limitation of your app, and how does your design handle it? <span class="text-red-500">*</span>
+          </label>
+          <textarea id="ux-risk-reflection" rows="3"
+            placeholder="e.g. Hallucinations or slow response time. My design includes a loading skeleton animation and a feedback thumbs-down icon so users know when data is being retrieved..."
+            class="form-input w-full p-3.5 rounded-2xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 placeholder-gray-400 transition-all"></textarea>
+          <p id="ux-risk-reflection-error" class="hidden text-xs text-red-500 font-medium mt-1">Please answer the UX risk reflection question.</p>
+        </div>
+      </div>
+
+      <!-- Step 5: Rating & Submit -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-8">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-full bg-rose-600 text-white font-black text-sm flex items-center justify-center">5</span>
+          <h2 class="text-lg font-black text-gray-900">Rate This Activity</h2>
+        </div>
+
+        <div class="mb-6">
+          <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">How much did you enjoy this Design Sprint exercise?</p>
+          <div id="enjoyment-stars" class="flex gap-2 text-3xl">
+            <button type="button" class="star-btn" onclick="setRating(1)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(2)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(3)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(4)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(5)">⭐</button>
+          </div>
+          <p id="rating-error" class="hidden text-xs text-red-500 font-medium mt-1">Please select a star rating.</p>
+        </div>
+
+        <div id="form-error" class="hidden mb-4 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold">
+          <span id="form-error-text">⚠️ Please fill out all required fields marked in red.</span>
+        </div>
+
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-2xl shadow-xl transition-all active:scale-98 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800">
+          <span id="submit-label">Submit Design Sprint &#8594;</span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div id="success-screen" class="hidden fixed inset-0 z-[110] bg-white flex items-center justify-center p-6 text-center">
+    <div class="max-w-md w-full">
+      <div class="w-20 h-20 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-inner">
+        🎨
+      </div>
+      <h2 class="text-3xl font-black text-gray-900 tracking-tight mb-2">Design Sprint Complete, <span id="success-name">Student</span>!</h2>
+      <p class="text-sm text-gray-500 mb-8 leading-relaxed">
+        Your AI product design mockup concept has been submitted to the teacher dashboard. Excellent job!
+      </p>
+      <a href="index.html"
+        class="inline-flex items-center justify-center w-full py-4 px-6 rounded-2xl font-black text-sm text-white bg-rose-700 hover:bg-rose-800 transition-all shadow-lg">
+        Return to Course Hub
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+    const TABLE = 'introai_week10_ai_design_sprint';
+
+    let studentName = '', studentEmail = '';
+    let enjoymentRating = 0;
+
+    const choices = { productBrief: '', focalComponent: '' };
+
+    const PICKER_IDS = {
+      productBrief: 'brief-picker',
+      focalComponent: 'focal-picker'
+    };
+    const ERR_IDS = {
+      productBrief: 'brief-error',
+      focalComponent: 'focal-error'
+    };
+
+    function setChoice(key, val, btn) {
+      choices[key] = val;
+      document.querySelectorAll('#' + PICKER_IDS[key] + ' .opt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById(ERR_IDS[key]).classList.add('hidden');
+    }
+
+    function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+
+    function handleRegistration(ev) {
+      ev.preventDefault();
+      const nameEl = document.getElementById('reg-name');
+      const emailEl = document.getElementById('reg-email');
+      let ok = true;
+
+      nameEl.classList.remove('error');
+      emailEl.classList.remove('error');
+      document.getElementById('reg-name-error').classList.add('hidden');
+      document.getElementById('reg-email-error').classList.add('hidden');
+
+      if (!nameEl.value.trim()) { nameEl.classList.add('error'); document.getElementById('reg-name-error').classList.remove('hidden'); ok = false; }
+      if (!emailEl.value.trim() || !validateEmail(emailEl.value.trim())) { emailEl.classList.add('error'); document.getElementById('reg-email-error').classList.remove('hidden'); ok = false; }
+      if (!ok) return;
+
+      studentName = nameEl.value.trim();
+      studentEmail = emailEl.value.trim();
+
+      sessionStorage.setItem('introai_w10_ai_design_sprint_name', studentName);
+      sessionStorage.setItem('introai_w10_ai_design_sprint_email', studentEmail);
+
+      const overlay = document.getElementById('registration-overlay');
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.remove(), 400);
+    }
+
+    (function restoreSession() {
+      const n = sessionStorage.getItem('introai_w10_ai_design_sprint_name');
+      const e = sessionStorage.getItem('introai_w10_ai_design_sprint_email');
+      if (n && e) { studentName = n; studentEmail = e; document.getElementById('registration-overlay').remove(); }
+    })();
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#enjoyment-stars .star-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx < val);
+      });
+      document.getElementById('rating-error').classList.add('hidden');
+    }
+
+    async function supabaseUpsert(payload) {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?on_conflict=student_email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Prefer': 'resolution=merge-duplicates,return=minimal'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!resp.ok) { const t = await resp.text(); throw new Error('HTTP ' + resp.status + ': ' + t); }
+    }
+
+    async function submitExercise(ev) {
+      ev.preventDefault();
+      let ok = true;
+
+      // Validate choice pickers
+      Object.keys(choices).forEach(key => {
+        if (!choices[key]) { document.getElementById(ERR_IDS[key]).classList.remove('hidden'); ok = false; }
+      });
+
+      // Validate inputs and textareas
+      const textFields = [
+        { id: 'prompt-1', errId: 'prompt-1-error' },
+        { id: 'prompt-2', errId: 'prompt-2-error' },
+        { id: 'prompt-3', errId: 'prompt-3-error' },
+        { id: 'screen-layout-desc', errId: 'screen-layout-desc-error' },
+        { id: 'slides-link', errId: 'slides-link-error' },
+        { id: 'key-choice-justification', errId: 'key-choice-justification-error' },
+        { id: 'ux-risk-reflection', errId: 'ux-risk-reflection-error' }
+      ];
+      textFields.forEach(f => {
+        const el = document.getElementById(f.id);
+        const val = el ? el.value.trim() : '';
+        if (el) el.classList.toggle('error', !val);
+        const errEl = document.getElementById(f.errId);
+        if (errEl) errEl.classList.toggle('hidden', !!val);
+        if (!val) ok = false;
+      });
+
+      if (enjoymentRating === 0) { document.getElementById('rating-error').classList.remove('hidden'); ok = false; }
+
+      if (!ok) {
+        document.getElementById('form-error').classList.remove('hidden');
+        const firstErr = document.querySelector('.error');
+        if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      document.getElementById('form-error').classList.add('hidden');
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting\u2026';
+
+      const payload = {
+        student_name: studentName,
+        student_email: studentEmail,
+        product_brief: choices.productBrief,
+        visual_prompt_1: document.getElementById('prompt-1').value.trim(),
+        visual_prompt_2: document.getElementById('prompt-2').value.trim(),
+        visual_prompt_3: document.getElementById('prompt-3').value.trim(),
+        focal_component: choices.focalComponent,
+        screen_layout_desc: document.getElementById('screen-layout-desc').value.trim(),
+        slides_link: document.getElementById('slides-link').value.trim(),
+        key_choice_justification: document.getElementById('key-choice-justification').value.trim(),
+        ux_risk_reflection: document.getElementById('ux-risk-reflection').value.trim(),
+        enjoyment_rating: enjoymentRating,
+        submitted_at: new Date().toISOString()
+      };
+
+      try {
+        await supabaseUpsert(payload);
+        document.getElementById('success-name').textContent = studentName.split(' ')[0];
+        document.getElementById('success-screen').classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        console.error('Submission error:', err.message);
+        btn.disabled = false;
+        document.getElementById('submit-label').textContent = 'Submit Design Sprint \u2192';
+        if (err.message.includes('409') || err.message.includes('duplicate key')) {
+          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f You have already submitted this activity!';
+        } else {
+          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f Network error submitting exercise. Please try again.';
+        }
+        document.getElementById('form-error').classList.remove('hidden');
+      }
+    }
+  </script>
+</body>
+
+</html>
