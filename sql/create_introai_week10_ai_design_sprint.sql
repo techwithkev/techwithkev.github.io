@@ -35,6 +35,9 @@ CREATE TABLE IF NOT EXISTS introai_week10_ai_design_sprint (
 COMMENT ON TABLE introai_week10_ai_design_sprint
   IS 'Week 10 Exercise 1: AI Design Tool Sprint';
 
+-- ── Safe Schema Migration (if table already exists) ──────────────────────────
+ALTER TABLE introai_week10_ai_design_sprint ADD COLUMN IF NOT EXISTS slides_link TEXT;
+
 -- ── Row-Level Security ────────────────────────────────────────────────────────
 ALTER TABLE introai_week10_ai_design_sprint ENABLE ROW LEVEL SECURITY;
 

@@ -1887,7 +1887,7 @@
             </button>
             <button class="nav-item" onclick="showPage('introai-poc-brainstormer')">
               <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L5.594 15.12a2 2 0 00-1.15.124l-1.043.417A2 2 0 002 17.52V19a2 2 0 002 2h16a2 2 0 002-2v-1.48a2 2 0 05-1.572-1.956z" stroke-linecap="round" />
+                <path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L5.594 15.12a2 2 0 00-1.15.124l-1.043.417A2 2 0 002 17.52V19a2 2 0 002 2h16a2 2 0 002-2v-1.48a2 2 0 0 0-1.572-1.956z" stroke-linecap="round" />
               </svg>
               W9 Ex4: POC Brainstormer
             </button>
@@ -4423,28 +4423,20 @@
           sb.from('introai_week10_mockup_critique').select('*').order('submitted_at', { ascending: false }).limit(10000)
         ]);
 
-        if (hw.error) { console.error('hw error:', hw.error); toast('⚠ Homework load error: ' + hw.error.message); }
-        if (exam.error) { console.error('exam error:', exam.error); toast('⚠ Exam load error: ' + exam.error.message); }
-        if (codes.error) { console.error('codes error:', codes.error); toast('⚠ Codes load error: ' + codes.error.message); }
-        if (sa.error) { console.error('sa error:', sa.error); toast('⚠ Self-assessment error: ' + sa.error.message); }
-        if (sh.error) { console.error('sh error:', sh.error); toast('⚠ Scavenger hunt error: ' + sh.error.message); }
-        if (cb.error) { console.error('cb error:', cb.error); toast('⚠ Chatbots error: ' + cb.error.message); }
-        if (cp.error) { console.error('cp error:', cp.error); toast('⚠ Creative prompting error: ' + cp.error.message); }
-        if (pd.error) { console.error('pd error:', pd.error); toast('⚠ Persona detective error: ' + pd.error.message); }
-        if (ws.error) { console.error('ws error:', ws.error); toast('\u26A0 Co-writer story error: ' + ws.error.message); }
-        if (ap.error) { console.error('ap error:', ap.error); toast('\u26A0 AI Pictionary error: ' + ap.error.message); }
-        if (pc.error) { console.error('pc error:', pc.error); toast('\u26A0 Prompt comparison error: ' + pc.error.message); }
-        if (mg.error) { console.error('mg error:', mg.error); toast('\u26A0 Music generation error: ' + mg.error.message); }
-        if (isSwap.error) { console.error('isSwap error:', isSwap.error); toast('\u26A0 Instrument swap error: ' + isSwap.error.message); }
-        if (tm.error) { console.error('tm error:', tm.error); toast('⚠ Train your model error: ' + tm.error.message); }
-        if (bta.error) { console.error('bta error:', bta.error); toast('⚠ Be the algorithm error: ' + bta.error.message); }
-        if (ayf.error) { console.error('ayf error:', ayf.error); toast('⚠ Analyze feed error: ' + ayf.error.message); }
-        if (dsr.error) { console.error('dsr error:', dsr.error); toast('⚠ Design recommender error: ' + dsr.error.message); }
-        if (kc.error) { console.error('kc error:', kc.error); toast('⚠ Knowledge check error: ' + kc.error.message); }
-        if (stb && stb.error) { console.error('stb error:', stb.error); toast('⚠ Spot the bias error: ' + stb.error.message); }
-        if (da && da.error) { console.error('da error:', da.error); }
-        if (bd && bd.error) { console.error('bd error:', bd.error); }
-        if (dd && dd.error) { console.error('dd error:', dd.error); }
+        function checkErr(res, name) {
+          if (res && res.error && res.error.code !== 'PGRST205') {
+            console.error(`${name} error:`, res.error);
+          }
+        }
+        checkErr(hw, 'hw'); checkErr(exam, 'exam'); checkErr(codes, 'codes');
+        checkErr(sa, 'sa'); checkErr(sh, 'sh'); checkErr(cb, 'cb'); checkErr(cp, 'cp');
+        checkErr(pd, 'pd'); checkErr(ws, 'ws'); checkErr(ap, 'ap'); checkErr(pc, 'pc');
+        checkErr(mg, 'mg'); checkErr(isSwap, 'isSwap'); checkErr(tm, 'tm'); checkErr(bta, 'bta');
+        checkErr(ayf, 'ayf'); checkErr(dsr, 'dsr'); checkErr(kc, 'kc'); checkErr(stb, 'stb');
+        checkErr(da, 'da'); checkErr(bd, 'bd'); checkErr(dd, 'dd'); checkErr(bct, 'bct');
+        checkErr(bds, 'bds'); checkErr(ftd, 'ftd'); checkErr(pvp, 'pvp'); checkErr(met, 'met');
+        checkErr(nl, 'nl'); checkErr(fp, 'fp'); checkErr(pb, 'pb'); checkErr(poc, 'poc');
+        checkErr(pt, 'pt'); checkErr(pl, 'pl'); checkErr(ads, 'ads'); checkErr(mc, 'mc');
 
         // Build access_code → cohort lookup from BOTH access_codes and test_access_codes
         const codeToCohorMap = {};

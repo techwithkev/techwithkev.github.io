@@ -33,6 +33,9 @@ CREATE TABLE IF NOT EXISTS introai_week10_mockup_critique (
 COMMENT ON TABLE introai_week10_mockup_critique
   IS 'Week 10 Exercise 2: Mockup Critique & Ethical UI Redesign';
 
+-- ── Safe Schema Migration (if table already exists) ──────────────────────────
+ALTER TABLE introai_week10_mockup_critique ADD COLUMN IF NOT EXISTS slides_link TEXT;
+
 -- ── Row-Level Security ────────────────────────────────────────────────────────
 ALTER TABLE introai_week10_mockup_critique ENABLE ROW LEVEL SECURITY;
 

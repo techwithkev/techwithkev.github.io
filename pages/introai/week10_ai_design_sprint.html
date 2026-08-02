@@ -474,17 +474,36 @@
     }
 
     async function supabaseUpsert(payload) {
-      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?on_conflict=student_email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_KEY,
-          'Authorization': 'Bearer ' + SUPABASE_KEY,
-          'Prefer': 'resolution=merge-duplicates,return=minimal'
-        },
-        body: JSON.stringify(payload)
-      });
-      if (!resp.ok) { const t = await resp.text(); throw new Error('HTTP ' + resp.status + ': ' + t); }
+      const makeReq = async (p) => {
+        return await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?on_conflict=student_email`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_KEY,
+            'Authorization': 'Bearer ' + SUPABASE_KEY,
+            'Prefer': 'resolution=merge-duplicates,return=minimal'
+          },
+          body: JSON.stringify(p)
+        });
+      };
+
+      let resp = await makeReq(payload);
+      if (!resp.ok) {
+        const text = await resp.text();
+        // Fallback if slides_link column doesn't exist yet in Supabase schema cache
+        if (text.includes('PGRST204') && text.includes('slides_link')) {
+          const fallbackPayload = { ...payload };
+          const link = fallbackPayload.slides_link;
+          delete fallbackPayload.slides_link;
+          if (link) {
+            fallbackPayload.screen_layout_desc = (fallbackPayload.screen_layout_desc || '') + '\n[Google Slides: ' + link + ']';
+          }
+          resp = await makeReq(fallbackPayload);
+          if (!resp.ok) { const t2 = await resp.text(); throw new Error('HTTP ' + resp.status + ': ' + t2); }
+          return;
+        }
+        throw new Error('HTTP ' + resp.status + ': ' + text);
+      }
     }
 
     async function submitExercise(ev) {
