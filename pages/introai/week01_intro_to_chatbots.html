@@ -519,16 +519,16 @@
       btn.disabled = true;
       document.getElementById('reg-btn-label').innerHTML = '<span class="spinner"></span>';
       studentName = nameEl.value.trim(); studentEmail = emailEl.value.trim();
-      sessionStorage.setItem('introai_cb_name', studentName);
-      sessionStorage.setItem('introai_cb_email', studentEmail);
+      sessionStorage.setItem(INTROAI_NAME_KEY, studentName);
+      sessionStorage.setItem(INTROAI_EMAIL_KEY, studentEmail);
       const overlay = document.getElementById('registration-overlay');
       overlay.classList.add('hiding');
       setTimeout(() => overlay.remove(), 450);
     }
 
     (function restoreSession() {
-      const n = sessionStorage.getItem('introai_cb_name');
-      const e = sessionStorage.getItem('introai_cb_email');
+      const n = sessionStorage.getItem(INTROAI_NAME_KEY);
+      const e = sessionStorage.getItem(INTROAI_EMAIL_KEY);
       if (n && e) { studentName = n; studentEmail = e; document.getElementById('registration-overlay').remove(); }
     })();
 

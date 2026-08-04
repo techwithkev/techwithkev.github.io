@@ -377,8 +377,8 @@
         studentEmail = email;
         classNumber = classNum;
 
-        sessionStorage.setItem('introai_w02_story_name', name);
-        sessionStorage.setItem('introai_w02_story_email', email);
+        sessionStorage.setItem(INTROAI_NAME_KEY, name);
+        sessionStorage.setItem(INTROAI_EMAIL_KEY, email);
         sessionStorage.setItem('introai_w02_story_class', classNum);
         sessionStorage.setItem('introai_w02_story_code', codeVal);
 
@@ -407,8 +407,8 @@
 
     /* ── Restore session ── */
     (function restoreSession() {
-      const n = sessionStorage.getItem('introai_w02_story_name');
-      const e = sessionStorage.getItem('introai_w02_story_email');
+      const n = sessionStorage.getItem(INTROAI_NAME_KEY);
+      const e = sessionStorage.getItem(INTROAI_EMAIL_KEY);
       const c = sessionStorage.getItem('introai_w02_story_class');
       if (n && e && c) {
         studentName = n;

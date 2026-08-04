@@ -357,8 +357,8 @@
       studentEmail = emailEl.value.trim();
       groupMembers = groupEl.value.trim();
 
-      sessionStorage.setItem('introai_w08_bias_card_twist_name', studentName);
-      sessionStorage.setItem('introai_w08_bias_card_twist_email', studentEmail);
+      sessionStorage.setItem(INTROAI_NAME_KEY, studentName);
+      sessionStorage.setItem(INTROAI_EMAIL_KEY, studentEmail);
       sessionStorage.setItem('introai_w08_bias_card_twist_group', groupMembers);
 
       const overlay = document.getElementById('registration-overlay');
@@ -367,8 +367,8 @@
     }
 
     (function restoreSession() {
-      const n = sessionStorage.getItem('introai_w08_bias_card_twist_name');
-      const e = sessionStorage.getItem('introai_w08_bias_card_twist_email');
+      const n = sessionStorage.getItem(INTROAI_NAME_KEY);
+      const e = sessionStorage.getItem(INTROAI_EMAIL_KEY);
       const g = sessionStorage.getItem('introai_w08_bias_card_twist_group');
       if (n && e) {
         studentName = n; studentEmail = e; groupMembers = g || '';

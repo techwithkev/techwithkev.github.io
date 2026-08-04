@@ -512,8 +512,8 @@
       // Persist for the session
       studentName  = name;
       studentEmail = email;
-      sessionStorage.setItem('introai_w01_name',  name);
-      sessionStorage.setItem('introai_w01_email', email);
+      sessionStorage.setItem(INTROAI_NAME_KEY,  name);
+      sessionStorage.setItem(INTROAI_EMAIL_KEY, email);
 
       // Dismiss the overlay with animation
       const overlay = document.getElementById('registration-overlay');
@@ -523,8 +523,8 @@
 
     /* Check if already registered this session */
     (function checkSession() {
-      const savedName  = sessionStorage.getItem('introai_w01_name');
-      const savedEmail = sessionStorage.getItem('introai_w01_email');
+      const savedName  = sessionStorage.getItem(INTROAI_NAME_KEY);
+      const savedEmail = sessionStorage.getItem(INTROAI_EMAIL_KEY);
       if (savedName && savedEmail) {
         studentName  = savedName;
         studentEmail = savedEmail;

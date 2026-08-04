@@ -599,8 +599,8 @@
       // Store identity
       studentName  = name;
       studentEmail = email;
-      sessionStorage.setItem('introai_sa_name',  name);
-      sessionStorage.setItem('introai_sa_email', email);
+      sessionStorage.setItem(INTROAI_NAME_KEY,  name);
+      sessionStorage.setItem(INTROAI_EMAIL_KEY, email);
 
       // Dismiss overlay
       const overlay = document.getElementById('registration-overlay');
@@ -610,8 +610,8 @@
 
     /* ── Restore session if already registered ── */
     (function checkSession() {
-      const n = sessionStorage.getItem('introai_sa_name');
-      const e = sessionStorage.getItem('introai_sa_email');
+      const n = sessionStorage.getItem(INTROAI_NAME_KEY);
+      const e = sessionStorage.getItem(INTROAI_EMAIL_KEY);
       if (n && e) {
         studentName  = n;
         studentEmail = e;

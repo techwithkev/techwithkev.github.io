@@ -79,7 +79,7 @@
     </button>
   </div>
   <!-- Mobile menu -->
-  <div class="hidden md:hidden px-6 pb-4 flex flex-col gap-3" id="mobile-menu">
+  <div class="hidden flex-col gap-3 px-6 pb-4" id="mobile-menu">
     <a class="text-slate-600 hover:text-[#003345] font-medium font-headline py-2" href="{{ '/courses' | relative_url }}">Methodology</a>
     <a class="text-slate-600 hover:text-[#003345] font-medium font-headline py-2" href="{{ '/assessments' | relative_url }}">Assessments</a>
     <a class="text-slate-600 hover:text-[#003345] font-medium font-headline py-2" href="{{ '/pricing' | relative_url }}">Pricing</a>
@@ -90,7 +90,8 @@
 <script>
   document.getElementById('mobile-menu-btn').addEventListener('click', function() {
     var menu = document.getElementById('mobile-menu');
-    menu.classList.toggle('hidden');
+    var isHidden = menu.classList.toggle('hidden');
+    menu.classList.toggle('flex', !isHidden);
   });
 </script>
 

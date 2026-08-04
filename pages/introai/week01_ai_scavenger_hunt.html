@@ -450,8 +450,8 @@
 
       studentName  = name;
       studentEmail = email;
-      sessionStorage.setItem('introai_sh_name',  name);
-      sessionStorage.setItem('introai_sh_email', email);
+      sessionStorage.setItem(INTROAI_NAME_KEY,  name);
+      sessionStorage.setItem(INTROAI_EMAIL_KEY, email);
 
       const overlay = document.getElementById('registration-overlay');
       overlay.classList.add('hiding');
@@ -460,8 +460,8 @@
 
     /* ── Restore session ── */
     (function checkSession() {
-      const n = sessionStorage.getItem('introai_sh_name');
-      const e = sessionStorage.getItem('introai_sh_email');
+      const n = sessionStorage.getItem(INTROAI_NAME_KEY);
+      const e = sessionStorage.getItem(INTROAI_EMAIL_KEY);
       if (n && e) {
         studentName  = n;
         studentEmail = e;

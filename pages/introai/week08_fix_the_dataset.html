@@ -406,8 +406,8 @@
       studentEmail = emailEl.value.trim();
       partnerName = partnerEl.value.trim();
 
-      sessionStorage.setItem('introai_w08_fix_the_dataset_name', studentName);
-      sessionStorage.setItem('introai_w08_fix_the_dataset_email', studentEmail);
+      sessionStorage.setItem(INTROAI_NAME_KEY, studentName);
+      sessionStorage.setItem(INTROAI_EMAIL_KEY, studentEmail);
       sessionStorage.setItem('introai_w08_fix_the_dataset_partner', partnerName);
 
       const overlay = document.getElementById('registration-overlay');
@@ -416,8 +416,8 @@
     }
 
     (function restoreSession() {
-      const n = sessionStorage.getItem('introai_w08_fix_the_dataset_name');
-      const e = sessionStorage.getItem('introai_w08_fix_the_dataset_email');
+      const n = sessionStorage.getItem(INTROAI_NAME_KEY);
+      const e = sessionStorage.getItem(INTROAI_EMAIL_KEY);
       const p = sessionStorage.getItem('introai_w08_fix_the_dataset_partner');
       if (n && e) {
         studentName = n; studentEmail = e; partnerName = p || '';

@@ -608,8 +608,8 @@
       populateDatasetSelect();
       selectDataset(0);
 
-      const savedName = sessionStorage.getItem('introai_w07_data_detective_name');
-      const savedEmail = sessionStorage.getItem('introai_w07_data_detective_email');
+      const savedName = sessionStorage.getItem(INTROAI_NAME_KEY);
+      const savedEmail = sessionStorage.getItem(INTROAI_EMAIL_KEY);
       if (savedName && savedEmail) {
         document.getElementById('reg-name').value = savedName;
         document.getElementById('reg-email').value = savedEmail;
@@ -673,8 +673,8 @@
       }
 
       if (valid) {
-        sessionStorage.setItem('introai_w07_data_detective_name', name);
-        sessionStorage.setItem('introai_w07_data_detective_email', email);
+        sessionStorage.setItem(INTROAI_NAME_KEY, name);
+        sessionStorage.setItem(INTROAI_EMAIL_KEY, email);
         applyRegistration(name, email);
       }
     }

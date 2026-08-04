@@ -544,8 +544,8 @@
       studentName = nameEl.value.trim();
       studentEmail = emailEl.value.trim();
 
-      sessionStorage.setItem('introai_w09_poc_name', studentName);
-      sessionStorage.setItem('introai_w09_poc_email', studentEmail);
+      sessionStorage.setItem(INTROAI_NAME_KEY, studentName);
+      sessionStorage.setItem(INTROAI_EMAIL_KEY, studentEmail);
 
       const overlay = document.getElementById('registration-overlay');
       overlay.classList.add('hiding');
@@ -606,8 +606,8 @@
 
         if (data.enjoyment_rating) setRating(data.enjoyment_rating);
 
-        sessionStorage.setItem('introai_w09_poc_name', studentName);
-        sessionStorage.setItem('introai_w09_poc_email', studentEmail);
+        sessionStorage.setItem(INTROAI_NAME_KEY, studentName);
+        sessionStorage.setItem(INTROAI_EMAIL_KEY, studentEmail);
 
         const overlay = document.getElementById('registration-overlay');
         overlay.classList.add('hiding');
@@ -626,8 +626,8 @@
     }
 
     (function restoreSession() {
-      const n = sessionStorage.getItem('introai_w09_poc_name');
-      const e = sessionStorage.getItem('introai_w09_poc_email');
+      const n = sessionStorage.getItem(INTROAI_NAME_KEY);
+      const e = sessionStorage.getItem(INTROAI_EMAIL_KEY);
       if (n && e) { studentName = n; studentEmail = e; document.getElementById('registration-overlay').remove(); }
     })();
 
