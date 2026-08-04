@@ -7,22 +7,11 @@
   <title>AI Self-Assessment — Intro to AI · Week 1</title>
   <meta name="description" content="Rate your confidence in key AI concepts at the start of the course. Week 1 self-assessment survey.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
     rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Outfit', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
-          },
-        },
-      },
-    }
-  </script>
+    <link rel="stylesheet" href="../../assets/css/activity.css">
   <style>
     /* ── Registration / Gate overlay ── */
     #registration-overlay {
@@ -548,10 +537,9 @@
     </div>
   </div>
 
+  <script src="../../assets/js/introai-shared.js"></script>
   <script>
     /* ══ SUPABASE CONFIG ══ */
-    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
     const TABLE = 'introai_week01_self_assessment';
 
     /* ── Student identity ── */

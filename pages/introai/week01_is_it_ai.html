@@ -7,22 +7,11 @@
   <title>Is it AI? — Sorting Activity</title>
   <meta name="description" content="Week 1 sorting activity: learn to distinguish rule-based software from AI-driven systems.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
     rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Outfit', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
-          },
-        },
-      },
-    }
-  </script>
+    <link rel="stylesheet" href="../../assets/css/activity.css">
   <style>
     .drag-over-rule {
       background-color: rgba(59, 130, 246, 0.1) !important;
@@ -441,8 +430,6 @@
 
   <script>
     /* ══ SUPABASE CONFIG ══ */
-    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
     const REG_TABLE   = 'introai_week01_registrations';
     const SCORE_TABLE = 'introai_week01_scores';
 
@@ -546,6 +533,7 @@
     })();
 
   </script>
+  <script src="../../assets/js/introai-shared.js"></script>
   <script>
     // Cards Dataset
     const items = [

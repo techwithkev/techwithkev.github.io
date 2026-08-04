@@ -29,3 +29,7 @@ exclude:
   - vendor/cache/
   - vendor/gems/
   - vendor/ruby/
+  - tailwind.config.js
+  - assets/css/activity-src.css
+  - package.json
+  - package-lock.json

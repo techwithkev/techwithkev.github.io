@@ -8,22 +8,11 @@
   <meta name="description"
     content="Week 9 Mini POC Brainstormer: Map out your AI interests across LLMs, Music, Vision, Ethics, and Gaming, build your final project Proof of Concept, and retrieve your saved ideas anytime.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
     rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Outfit', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
-          },
-        },
-      },
-    }
-  </script>
+    <link rel="stylesheet" href="../../assets/css/activity.css">
   <style>
     #registration-overlay { transition: opacity 0.4s ease; }
     #registration-overlay.hiding { opacity: 0; pointer-events: none; }
@@ -497,9 +486,8 @@
     </div>
   </div>
 
+  <script src="../../assets/js/introai-shared.js"></script>
   <script>
-    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
     const TABLE = 'introai_week09_poc_brainstormer';
 
     let studentName = '', studentEmail = '';
@@ -537,7 +525,6 @@
       document.getElementById('target-domain-error').classList.add('hidden');
     }
 
-    function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
 
     function handleRegistration(ev) {
       ev.preventDefault();

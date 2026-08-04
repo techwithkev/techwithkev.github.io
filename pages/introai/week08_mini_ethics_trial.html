@@ -8,22 +8,11 @@
   <meta name="description"
     content="Week 8 Exercise 5: Mini Ethics Trial with AI Groq Judge. Roleplay an AI healthcare company, affected patient, regulator, and judge in a high-stakes AI medical courtroom trial.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
     rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Outfit', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
-          },
-        },
-      },
-    }
-  </script>
+    <link rel="stylesheet" href="../../assets/css/activity.css">
   <style>
     #registration-overlay { transition: opacity 0.4s ease; }
     #registration-overlay.hiding { opacity: 0; pointer-events: none; }
@@ -372,9 +361,8 @@
     </div>
   </div>
 
+  <script src="../../assets/js/introai-shared.js"></script>
   <script>
-    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
     const TABLE = 'introai_week08_mini_ethics_trial';
 
     // Set a default Groq API Key here (or students/teachers can set it via the UI)
@@ -586,7 +574,6 @@ MANDATORY RULES:
       }
     }
 
-    function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
 
     function handleRegistration(ev) {
       ev.preventDefault();

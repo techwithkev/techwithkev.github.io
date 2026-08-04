@@ -5,3 +5,8 @@
 _site/
 .jekyll-cache/
 pages/.DS_Store
+
+# Node / Tailwind build tooling
+node_modules/
+# activity.css is intentionally committed — it is the built Tailwind output
+# served by GitHub Pages. Re-generate it with: npm run build:css

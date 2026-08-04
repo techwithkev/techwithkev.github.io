@@ -1,0 +1,86 @@
+/* ============================================================
+ * Activity Pages CSS — Source for Tailwind CLI build
+ *
+ * This file is compiled to assets/css/activity.css.
+ * Run:  npx tailwindcss -i assets/css/activity-src.css \
+ *                       -o assets/css/activity.css --minify
+ *
+ * Google Fonts are still loaded via <link> in each HTML
+ * page's <head> for optimal font performance.
+ * ============================================================ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Shared component styles used across all activity pages ── */
+@layer components {
+
+  /* Registration overlay transition */
+  #registration-overlay {
+    transition: opacity 0.4s ease;
+  }
+  #registration-overlay.hiding {
+    opacity: 0;
+    pointer-events: none;
+  }
+  #registration-overlay .reg-card {
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+  }
+  #registration-overlay.hiding .reg-card {
+    transform: scale(0.95) translateY(-10px);
+    opacity: 0;
+  }
+
+  /* Spinner used on submit buttons */
+  .spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.65s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Star rating buttons */
+  .star-btn {
+    font-size: 24px;
+    cursor: pointer;
+    filter: grayscale(100%);
+    transition: filter 0.15s ease, transform 0.1s ease;
+  }
+  .star-btn:hover { transform: scale(1.15); }
+  .star-btn.active { filter: grayscale(0%); }
+
+  /* Multiple-choice option buttons */
+  .opt-btn {
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #374151;
+    background: #f9fafb;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-align: left;
+    width: 100%;
+  }
+
+  /* Badge / tag chips */
+  .badge-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 6px;
+  }
+}

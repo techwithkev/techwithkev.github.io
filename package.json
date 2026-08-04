@@ -1,0 +1,28 @@
+{
+  "name": "techwithkev.github.io",
+  "version": "1.0.0",
+  "description": "Tech With Kev — Jekyll tutoring site with Tailwind-based student activity pages",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "build:css": "tailwindcss -i assets/css/activity-src.css -o assets/css/activity.css --minify",
+    "watch:css": "tailwindcss -i assets/css/activity-src.css -o assets/css/activity.css --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/techwithkev/techwithkev.github.io.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/techwithkev/techwithkev.github.io/issues"
+  },
+  "homepage": "https://github.com/techwithkev/techwithkev.github.io#readme",
+  "devDependencies": {
+    "tailwindcss": "^3.4.19"
+  }
+}
