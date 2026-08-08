@@ -6271,19 +6271,22 @@
           </div>
 
           <div class="field-label" style="margin-top:12px;">Case Study 1: Cat Diving Olympics 🐱</div>
-          <div class="field-value"><strong>Verdict:</strong> <span class="badge badge-teal">${esc(r.case_study_1_real_or_ai || '—')}</span><br><strong>Analysis:</strong> ${esc(r.case_study_1_analysis || '—')}</div>
+          <div class="field-value"><strong>Verdict:</strong> <span class="badge badge-teal">${esc(r.cat_diving_choice || '—')}</span><br><strong>Analysis:</strong> ${esc(r.cat_diving_analysis || '—')}</div>
 
           <div class="field-label" style="margin-top:12px;">Case Study 2: Nicolas Cage Deepfake 🎬</div>
-          <div class="field-value"><strong>Verdict:</strong> <span class="badge badge-teal">${esc(r.case_study_2_real_or_ai || '—')}</span><br><strong>Analysis:</strong> ${esc(r.case_study_2_analysis || '—')}</div>
+          <div class="field-value"><strong>Verdict:</strong> <span class="badge badge-teal">${esc(r.cage_deepfake_choice || '—')}</span><br><strong>Analysis:</strong> ${esc(r.cage_deepfake_analysis || '—')}</div>
 
           <div class="field-label" style="margin-top:12px;">Case Study 3: AI Drake Song 🎵</div>
-          <div class="field-value"><strong>Verdict:</strong> <span class="badge badge-teal">${esc(r.case_study_3_real_or_ai || '—')}</span><br><strong>Analysis:</strong> ${esc(r.case_study_3_analysis || '—')}</div>
+          <div class="field-value"><strong>Verdict:</strong> <span class="badge badge-teal">${esc(r.drake_ai_choice || '—')}</span><br><strong>Analysis:</strong> ${esc(r.drake_ai_analysis || '—')}</div>
 
           <div class="field-label" style="margin-top:12px;">Case Study 4: Tom Cruise TikTok Deepfake 🕶️</div>
-          <div class="field-value"><strong>Verdict:</strong> <span class="badge badge-teal">${esc(r.case_study_4_real_or_ai || '—')}</span><br><strong>Analysis:</strong> ${esc(r.case_study_4_analysis || '—')}</div>
+          <div class="field-value"><strong>Realism Rating:</strong> <span class="badge badge-gold">${r.tom_cruise_realism_rating ? r.tom_cruise_realism_rating + '/5 ⭐' : '—'}</span><br><strong>Analysis:</strong> ${esc(r.tom_cruise_analysis || '—')}</div>
 
-          <div class="field-label" style="margin-top:12px; color:#0d9488;">🌟 Personal Golden Rule of Media Verification</div>
-          <div class="field-value" style="background:#f0fdfa; border-color:#ccfbf1; font-weight:600;">${esc(r.personal_rule_reflection || '—')}</div>
+          <div class="field-label" style="margin-top:12px; color:#0d9488;">⚠️ Ethical Risks &amp; Society Impact</div>
+          <div class="field-value" style="background:#f0fdfa; border-color:#ccfbf1;">${esc(r.ethical_risk_reflection || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px; color:#0d9488;">🔍 Detection Strategy &amp; Verification Rule</div>
+          <div class="field-value" style="background:#f0fdfa; border-color:#ccfbf1; font-weight:600;">${esc(r.detection_strategy_reflection || '—')}</div>
         `;
       } else if (type === 'wwyd') {
         bodyHtml = `
@@ -9498,7 +9501,7 @@
     function renderSMTable() {
       const search = (document.getElementById('sm-search')?.value || '').toLowerCase();
       let rows = smData.filter(r =>
-        !search || (r.student_name || '').toLowerCase().includes(search) || (r.personal_rule_reflection || '').toLowerCase().includes(search)
+        !search || (r.student_name || '').toLowerCase().includes(search) || (r.cat_diving_analysis || '').toLowerCase().includes(search) || (r.detection_strategy_reflection || '').toLowerCase().includes(search) || (r.ethical_risk_reflection || '').toLowerCase().includes(search)
       );
 
       document.getElementById('sm-count').textContent = rows.length + ' audit' + (rows.length !== 1 ? 's' : '');
@@ -9518,11 +9521,11 @@
     <table class="data-table">
       <thead><tr>
         <th>Student</th>
-        <th>Case Study 1</th>
-        <th>Case Study 2</th>
-        <th>Case Study 3</th>
-        <th>Case Study 4</th>
-        <th>Golden Rule Takeaway</th>
+        <th>Cat Diving (Case 1)</th>
+        <th>Nick Cage (Case 2)</th>
+        <th>AI Drake (Case 3)</th>
+        <th>Tom Cruise (Case 4)</th>
+        <th>Detection Strategy Idea</th>
         <th>Enjoyment</th>
         <th>Submitted</th>
         <th>Detail</th>
@@ -9531,11 +9534,11 @@
         ${rows.map(r => `
         <tr class="clickable-row" onclick="showSubmissionDetail('sm', ${r.id})">
           <td><strong>${esc(r.student_name)}</strong><br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
-          <td><span class="badge badge-teal">${esc(r.case_study_1_real_or_ai || '—')}</span></td>
-          <td><span class="badge badge-teal">${esc(r.case_study_2_real_or_ai || '—')}</span></td>
-          <td><span class="badge badge-teal">${esc(r.case_study_3_real_or_ai || '—')}</span></td>
-          <td><span class="badge badge-teal">${esc(r.case_study_4_real_or_ai || '—')}</span></td>
-          <td style="font-size:11px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.personal_rule_reflection)}">${esc(r.personal_rule_reflection || '—')}</td>
+          <td><span class="badge badge-teal">${esc(r.cat_diving_choice || '—')}</span></td>
+          <td><span class="badge badge-teal">${esc(r.cage_deepfake_choice || '—')}</span></td>
+          <td><span class="badge badge-teal">${esc(r.drake_ai_choice || '—')}</span></td>
+          <td><span class="badge badge-gold">${r.tom_cruise_realism_rating ? r.tom_cruise_realism_rating + '/5 ⭐' : '—'}</span></td>
+          <td style="font-size:11px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.detection_strategy_reflection || r.ethical_risk_reflection)}">${esc(r.detection_strategy_reflection || r.ethical_risk_reflection || '—')}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
           <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('sm', ${r.id})">View</button></td>
