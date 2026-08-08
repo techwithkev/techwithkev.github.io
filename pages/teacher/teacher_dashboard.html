@@ -2138,6 +2138,10 @@
 
           <div class="panel">
             <div class="filter-row" style="margin-bottom:16px;">
+              <label>Filter Cohort:</label>
+              <select class="filter-select" id="hw-gradebook-filter-cohort" onchange="renderHWGradebookTable()">
+                <option value="">All cohorts</option>
+              </select>
               <label>Search Student:</label>
               <input class="search-input" id="hw-gradebook-search" type="text" placeholder="Search by student name…" oninput="renderHWGradebookTable()" />
               <span class="text-small text-muted" id="hw-gradebook-count"></span>
@@ -4635,8 +4639,46 @@
     });
 
     // ════════════════════════════════════════════════════════════════════════════
-    // NAVIGATION
+    // NAVIGATION & CURRICULUM STATE
     // ════════════════════════════════════════════════════════════════════════════
+    let activeCurriculum = 'comp-jr';
+
+    function getCohortsForCurriculum(curr) {
+      curr = curr || activeCurriculum;
+      if (curr === 'intro-ai') {
+        const cohorts = new Set(['aijr']);
+        const introTables = [
+          saData, shData, cbData, cpData, pdData, wsData, apData, pcData, mgData, isData,
+          tmData, btaData, ayfData, dsrData, kcData, stbData, daData, bdData, ddData,
+          bctData, bdsData, ftdData, pvpData, metData, nlData, fpData, pbData, pocData,
+          ptData, plData, adsData, mcData, smData, wwydData, mcbotData, bvlData
+        ];
+        introTables.forEach(arr => {
+          if (Array.isArray(arr)) {
+            arr.forEach(r => { if (r && r.cohort) cohorts.add(String(r.cohort).toLowerCase()); });
+          }
+        });
+        if (typeof cohortExercisesMap === 'object') {
+          Object.keys(cohortExercisesMap).forEach(key => {
+            const parts = key.split(':');
+            if (parts[0]) cohorts.add(parts[0].toLowerCase());
+          });
+        }
+        return Array.from(cohorts).sort();
+      } else {
+        const cohorts = new Set();
+        hwData.forEach(r => { if (r && r.cohort) cohorts.add(r.cohort); });
+        examData.forEach(r => { if (r && r.cohort) cohorts.add(r.cohort); });
+        codesData.forEach(r => {
+          if (r && r.cohort && r.cohort.toLowerCase() !== 'aijr') cohorts.add(r.cohort);
+        });
+        if (cohorts.size === 0) {
+          hwData.forEach(r => { if (r && r.cohort) cohorts.add(r.cohort); });
+        }
+        return Array.from(cohorts).sort();
+      }
+    }
+
     function showPage(id) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -4649,6 +4691,10 @@
       // Synchronize curriculum selector based on page ID prefix
       if (id !== 'codes') {
         const isIntro = id.startsWith('introai-');
+        const newCurr = isIntro ? 'intro-ai' : 'comp-jr';
+        const currChanged = activeCurriculum !== newCurr;
+        activeCurriculum = newCurr;
+
         document.querySelectorAll('.curr-btn').forEach(btn => btn.classList.remove('active'));
         if (isIntro) {
           document.getElementById('curr-btn-intro').classList.add('active');
@@ -4659,15 +4705,21 @@
           document.getElementById('nav-group-comp-jr').style.display = 'block';
           document.getElementById('nav-group-intro-ai').style.display = 'none';
         }
+
+        if (currChanged) {
+          populateFilters();
+        }
       }
     }
 
     function switchCurriculum(curr) {
+      activeCurriculum = curr;
       if (curr === 'comp-jr') {
         showPage('overview');
       } else {
         showPage('introai-self-assessment');
       }
+      populateFilters();
     }
 
     // ════════════════════════════════════════════════════════════════════════════
@@ -4950,31 +5002,72 @@
 
     function populateFilters() {
       const classes = [...new Set(hwData.map(r => r.class_number))].sort((a, b) => a - b);
-      const cohorts = [...new Set([
-        ...hwData.map(r => r.cohort).filter(Boolean),
-        ...codesData.map(r => r.cohort).filter(Boolean),
-        ...examData.map(r => r.cohort).filter(Boolean)
-      ])].sort();
+      const filteredCohorts = getCohortsForCurriculum(activeCurriculum);
 
       // Sidebar global cohort selector
       const sidebarSel = document.getElementById('sidebar-cohort');
-      const prevCohort = sidebarSel.value;
-      sidebarSel.innerHTML = '<option value="">All cohorts</option>';
-      cohorts.forEach(c => {
-        sidebarSel.innerHTML += `<option value="${esc(c)}">${esc(c)}</option>`;
-      });
-      // Restore previous selection if it still exists
-      if (prevCohort && cohorts.includes(prevCohort)) sidebarSel.value = prevCohort;
+      if (sidebarSel) {
+        const prevCohort = sidebarSel.value;
+        sidebarSel.innerHTML = '<option value="">All cohorts</option>';
+        filteredCohorts.forEach(c => {
+          sidebarSel.innerHTML += `<option value="${esc(c)}">${esc(c)}</option>`;
+        });
+        if (prevCohort && filteredCohorts.includes(prevCohort)) {
+          sidebarSel.value = prevCohort;
+        } else if (activeCohort && filteredCohorts.includes(activeCohort)) {
+          sidebarSel.value = activeCohort;
+        } else {
+          sidebarSel.value = '';
+          activeCohort = '';
+          const pill = document.getElementById('cohort-pill');
+          if (pill) pill.classList.remove('show');
+        }
+      }
 
       // Per-page class selectors
       const hwClassSel = document.getElementById('hw-filter-class');
       const codesClassSel = document.getElementById('codes-filter-class');
-      hwClassSel.innerHTML = '<option value="">All classes</option>';
-      codesClassSel.innerHTML = '<option value="">All classes</option>';
-      classes.forEach(c => {
-        hwClassSel.innerHTML += `<option value="${c}">Class ${c}</option>`;
-        codesClassSel.innerHTML += `<option value="${c}">Class ${c}</option>`;
-      });
+      if (hwClassSel && codesClassSel) {
+        hwClassSel.innerHTML = '<option value="">All classes</option>';
+        codesClassSel.innerHTML = '<option value="">All classes</option>';
+        classes.forEach(c => {
+          hwClassSel.innerHTML += `<option value="${c}">Class ${c}</option>`;
+          codesClassSel.innerHTML += `<option value="${c}">Class ${c}</option>`;
+        });
+      }
+
+      // Gradebook cohort selector
+      const gbCohortSel = document.getElementById('hw-gradebook-filter-cohort');
+      if (gbCohortSel) {
+        const prevGbCohort = gbCohortSel.value;
+        gbCohortSel.innerHTML = '<option value="">All cohorts</option>';
+        filteredCohorts.forEach(c => {
+          gbCohortSel.innerHTML += `<option value="${esc(c)}">${esc(c)}</option>`;
+        });
+        if (prevGbCohort && filteredCohorts.includes(prevGbCohort)) {
+          gbCohortSel.value = prevGbCohort;
+        } else if (activeCohort && filteredCohorts.includes(activeCohort)) {
+          gbCohortSel.value = activeCohort;
+        } else {
+          gbCohortSel.value = '';
+        }
+      }
+
+      // Exercise Controls cohort selector
+      const ecCohortSel = document.getElementById('exercise-control-cohort-select');
+      if (ecCohortSel) {
+        const prevEcCohort = ecCohortSel.value;
+        ecCohortSel.innerHTML = '';
+        const introCohorts = getCohortsForCurriculum('intro-ai');
+        introCohorts.forEach(c => {
+          ecCohortSel.innerHTML += `<option value="${esc(c)}">${esc(c)} ${c==='aijr'?'(Default)':''}</option>`;
+        });
+        if (prevEcCohort && introCohorts.includes(prevEcCohort)) {
+          ecCohortSel.value = prevEcCohort;
+        } else {
+          ecCohortSel.value = 'aijr';
+        }
+      }
     }
 
     function setActiveCohort(cohort) {
@@ -4987,9 +5080,14 @@
       } else {
         pill.classList.remove('show');
       }
+
+      const gbCohortSel = document.getElementById('hw-gradebook-filter-cohort');
+      if (gbCohortSel) gbCohortSel.value = cohort || '';
+
       // Re-render all views with the new cohort filter
       renderOverview();
       renderHWTable();
+      renderHWGradebookTable();
       renderClassTiles();
       renderExamTable();
       renderCodesTable();
@@ -5233,9 +5331,10 @@
     // ════════════════════════════════════════════════════════════════════════════
     function renderHWGradebookTable() {
       const search = (document.getElementById('hw-gradebook-search')?.value || '').toLowerCase();
-      
-      // Filter hwData by active cohort if set
-      const source = activeCohort ? hwData.filter(r => r.cohort === activeCohort) : hwData;
+      const selectedCohort = document.getElementById('hw-gradebook-filter-cohort')?.value || activeCohort;
+
+      // Filter hwData by cohort if set (local dropdown or activeCohort)
+      const source = selectedCohort ? hwData.filter(r => r.cohort === selectedCohort) : hwData;
 
       // Group submissions by unique student (using name trimmed)
       const studentMap = {};
@@ -5365,7 +5464,8 @@
     }
 
     function exportGradebookCSV() {
-      const source = activeCohort ? hwData.filter(r => r.cohort === activeCohort) : hwData;
+      const selectedCohort = document.getElementById('hw-gradebook-filter-cohort')?.value || activeCohort;
+      const source = selectedCohort ? hwData.filter(r => r.cohort === selectedCohort) : hwData;
       const studentMap = {};
       source.forEach(r => {
         const name = (r.student_name || '').trim();
