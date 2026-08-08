@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Build Your Own Mini-Chatbot — Intro to AI · Week 12</title>
+  <meta name="description"
+    content="Week 12 Exercise: Build Your Own Mini-Chatbot. Type Python code using variables, loops, and conditionals, parse it, and test your chatbot live in your browser.">
+
+  <!-- Google Fonts Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Compiled Activity CSS -->
+  <link rel="stylesheet" href="../../assets/css/activity.css">
+  <style>
+    #registration-overlay { transition: opacity 0.4s ease; }
+    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
+    #registration-overlay .reg-card {
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+    }
+    #registration-overlay.hiding .reg-card {
+      transform: scale(0.95) translateY(-10px); opacity: 0;
+    }
+    .reg-input:focus {
+      outline: none; border-color: #0d9488;
+      box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+    }
+    .reg-input.error {
+      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+    }
+    .form-input:focus {
+      outline: none; border-color: #0d9488;
+      box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+    }
+    .form-input.error { border-color: #ef4444; }
+    .star-btn {
+      font-size: 26px;
+      cursor: pointer;
+      filter: grayscale(100%);
+      transition: filter 0.15s ease, transform 0.1s ease;
+    }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Chat bubble styles */
+    .chat-bubble-bot {
+      background: #f0fdfa;
+      border: 1px solid #ccfbf1;
+      color: #115e59;
+      border-radius: 18px 18px 18px 4px;
+    }
+    .chat-bubble-user {
+      background: #0d9488;
+      color: #ffffff;
+      border-radius: 18px 18px 4px 18px;
+    }
+    
+    /* Code editor color coding styling */
+    .code-editor-container {
+      position: relative;
+      background-color: #1e1e1e;
+      border-radius: 1rem;
+      border: 1px solid #334155;
+      overflow: hidden;
+    }
+    .code-editor-display {
+      position: absolute;
+      inset: 0;
+      padding: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      line-height: 1.625;
+      overflow: auto;
+      pointer-events: none;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: #9CDCFE;
+      margin: 0;
+    }
+    .code-editor-textarea {
+      position: absolute;
+      inset: 0;
+      padding: 1rem;
+      width: 100%;
+      height: 100%;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      line-height: 1.625;
+      background: transparent;
+      color: transparent;
+      caret-color: #ffffff;
+      resize: none;
+      border: none;
+      outline: none;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 0;
+    }
+  </style>
+</head>
+
+<body class="bg-[#F0FDFA]/40 text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- REGISTRATION GATE -->
+  <div id="registration-overlay"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+    style="background: linear-gradient(135deg, #115e59 0%, #0d9488 55%, #0f766e 100%);">
+
+    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
+        style="background: radial-gradient(circle, #99f6e4, transparent);"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
+        style="background: radial-gradient(circle, #0d9488, transparent);"></div>
+    </div>
+
+    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center bg-teal-100 text-teal-600 shadow-sm">
+          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+          </svg>
+        </div>
+        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 bg-teal-100 text-teal-800">
+          Week 12 · Python Coding Exercise
+        </div>
+        <h1 class="text-2xl font-black text-gray-900 tracking-tight">Build a Mini-Chatbot 🤖</h1>
+        <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">Enter your details to open the Python code editor &amp; live chatbot runner.</p>
+      </div>
+
+      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
+        <div class="space-y-4 mb-6">
+          <div>
+            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Full Name</label>
+            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Alex Morgan"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name.</p>
+          </div>
+          <div>
+            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
+            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. alex@school.edu"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
+          </div>
+        </div>
+        <button id="reg-submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-teal-600 to-emerald-700 hover:from-teal-700 hover:to-emerald-800">
+          <span id="reg-btn-label">Open Python IDE &#8594;</span>
+        </button>
+      </form>
+      <p class="text-center text-[10px] text-gray-400 font-medium mt-5">Saved to Intro to AI course portal.</p>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main-content" class="max-w-5xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-teal-200 pb-6">
+      <div>
+        <a href="index.html"
+          class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-teal-600 mb-3 hover:text-teal-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">
+          Build Your Own Mini-Chatbot 🐍
+        </h1>
+        <p class="text-gray-500 font-medium italic mt-1">Python Building Blocks: Variables, Loops &amp; Conditionals · Week 12</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-teal-50 border border-teal-200 text-teal-800 shadow-sm self-start md:self-auto">
+        Week 12
+      </div>
+    </header>
+
+    <!-- Brief Card -->
+    <div class="bg-gradient-to-br from-teal-700 via-teal-800 to-emerald-900 text-white rounded-3xl p-6 md:p-8 mb-8 shadow-xl">
+      <h2 class="text-xl font-black mb-3 flex items-center gap-2">
+        <span>🚀 Python Coding Task (~15–20 Minutes)</span>
+      </h2>
+      <p class="text-sm text-teal-100 leading-relaxed mb-4">
+        Type your Python code in the editor on the left using the 3 building blocks from class. Click <strong>"Run Python Code &amp; Start Chatbot 🚀"</strong> — the browser will parse your Python script and run your chatbot live in the simulator!
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10 text-xs">
+          <div class="font-black text-teal-200 mb-1">Building Block 1: Variables 📦</div>
+          <code class="block font-mono bg-black/30 px-2 py-1 rounded text-[11px] text-teal-300 mb-1">bot_name = "Buddy"</code>
+          <p class="text-[11px] text-teal-100/90">Store bot name &amp; greeting message in labeled memory variables.</p>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10 text-xs">
+          <div class="font-black text-teal-200 mb-1">Building Block 2: Loops 🔄</div>
+          <code class="block font-mono bg-black/30 px-2 py-1 rounded text-[11px] text-teal-300 mb-1">while True:</code>
+          <p class="text-[11px] text-teal-100/90">Keep checking for user input over and over until they type <code class="font-mono">"bye"</code>.</p>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10 text-xs">
+          <div class="font-black text-teal-200 mb-1">Building Block 3: Conditionals 🔀</div>
+          <code class="block font-mono bg-black/30 px-2 py-1 rounded text-[11px] text-teal-300 mb-1">if user_input == "joke":</code>
+          <p class="text-[11px] text-teal-100/90">Branch logic so the bot makes decisions on how to reply.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN FORM & INTERACTIVE CODE EDITOR + SIMULATOR -->
+    <form id="chatbot-form" onsubmit="submitExercise(event)" novalidate>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+
+        <!-- Left 7 Cols: Python Code IDE -->
+        <div class="lg:col-span-7 space-y-4">
+          <div class="bg-gray-900 text-gray-100 rounded-3xl p-6 shadow-xl border border-gray-800 flex flex-col h-[580px]">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-gray-800">
+              <div class="flex items-center gap-2 font-mono text-xs text-teal-400 font-bold">
+                <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+                <span class="w-3 h-3 rounded-full bg-yellow-500 inline-block"></span>
+                <span class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+                <span class="ml-2 text-gray-300">main.py</span>
+              </div>
+              <div class="flex gap-2 text-[11px]">
+                <button type="button" onclick="loadTemplate('blank')"
+                  class="bg-teal-600 hover:bg-teal-500 text-white font-bold font-mono px-2.5 py-1 rounded-lg transition-colors">
+                  Blank (Scratch) 📝
+                </button>
+                <button type="button" onclick="loadTemplate('starter')"
+                  class="bg-gray-800 hover:bg-gray-700 text-gray-300 font-mono px-2.5 py-1 rounded-lg transition-colors">
+                  Starter Example
+                </button>
+                <button type="button" onclick="loadTemplate('gaming')"
+                  class="bg-gray-800 hover:bg-gray-700 text-gray-300 font-mono px-2.5 py-1 rounded-lg transition-colors">
+                  Gaming Bot
+                </button>
+              </div>
+            </div>
+
+            <!-- Python Color Coded Editor Container -->
+            <div class="flex-1 my-3 code-editor-container">
+              <pre id="highlight-display" aria-hidden="true" class="code-editor-display"><code id="code-output"></code></pre>
+              <textarea id="python-editor" spellcheck="false"
+                oninput="syncEditor(); executePythonCode();"
+                onscroll="syncScroll()"
+                class="code-editor-textarea"
+                placeholder="Type your Python code here..."></textarea>
+            </div>
+
+            <!-- Execution Status Banner -->
+            <div id="parse-status-banner" class="mb-3 px-3 py-2 rounded-xl text-xs font-mono bg-teal-950/80 border border-teal-800 text-teal-300 flex items-center justify-between">
+              <span>Ready to parse Python script.</span>
+              <span class="text-[10px] uppercase font-bold text-teal-400">Python 3 Interpreter</span>
+            </div>
+
+            <!-- Run Button -->
+            <button type="button" onclick="executePythonCode()"
+              class="w-full text-white font-black py-3.5 px-6 rounded-xl shadow-lg transition-all active:scale-95 text-xs tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700">
+              <span>Run Python Code &amp; Start Chatbot 🚀</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right 5 Cols: Live Chat Simulator -->
+        <div class="lg:col-span-5 space-y-4">
+          <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm flex flex-col h-[580px]">
+            <div class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">
+              <div class="flex items-center gap-2">
+                <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
+                <span id="simulator-bot-title" class="font-black text-sm text-gray-900">Chatbot Simulator</span>
+              </div>
+              <button type="button" onclick="executePythonCode()"
+                class="text-[11px] font-bold text-teal-600 hover:text-teal-800 bg-teal-50 px-2.5 py-1 rounded-lg transition-colors">
+                Restart Chat 🔄
+              </button>
+            </div>
+
+            <!-- Messages Stream -->
+            <div id="chat-messages" class="flex-1 overflow-y-auto space-y-3 p-2 text-xs">
+              <!-- Dynamically populated by Python execution -->
+            </div>
+
+            <!-- Input Bar -->
+            <form onsubmit="sendChatMessage(event)" class="mt-3 flex gap-2 pt-2 border-t border-gray-100">
+              <input id="chat-user-input" type="text" placeholder="Type input to test Python logic..."
+                class="flex-1 px-3.5 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 focus:outline-none focus:border-teal-600" />
+              <button type="submit"
+                class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition-all active:scale-95">
+                Send
+              </button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Building Blocks Verification Checklist -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-full bg-teal-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0">✓</span>
+          <div>
+            <h2 class="text-lg font-black text-gray-900">Python Building Blocks Detected</h2>
+            <p class="text-xs text-gray-500">Live parser check of your Python script</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-medium">
+          <div id="card-check-vars" class="p-4 rounded-2xl border border-gray-200 bg-gray-50 flex items-start gap-3 transition-colors">
+            <span id="badge-vars" class="w-5 h-5 rounded-full bg-gray-300 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">?</span>
+            <div>
+              <strong class="text-gray-900 block font-bold">1. Variables 📦</strong>
+              <span id="text-vars" class="text-gray-500 text-[11px]">Define variables like <code class="font-mono">bot_name = "..."</code> or <code class="font-mono">greeting = "..."</code></span>
+            </div>
+          </div>
+
+          <div id="card-check-loops" class="p-4 rounded-2xl border border-gray-200 bg-gray-50 flex items-start gap-3 transition-colors">
+            <span id="badge-loops" class="w-5 h-5 rounded-full bg-gray-300 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">?</span>
+            <div>
+              <strong class="text-gray-900 block font-bold">2. Loops 🔄</strong>
+              <span id="text-loops" class="text-gray-500 text-[11px]">Use a loop like <code class="font-mono">while True:</code> or <code class="font-mono">for i in range():</code></span>
+            </div>
+          </div>
+
+          <div id="card-check-conds" class="p-4 rounded-2xl border border-gray-200 bg-gray-50 flex items-start gap-3 transition-colors">
+            <span id="badge-conds" class="w-5 h-5 rounded-full bg-gray-300 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">?</span>
+            <div>
+              <strong class="text-gray-900 block font-bold">3. Conditionals 🔀</strong>
+              <span id="text-conds" class="text-gray-500 text-[11px]">Use <code class="font-mono">if</code>, <code class="font-mono">elif</code>, and <code class="font-mono">else</code> branches to make decisions.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reflection Section -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-full text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-teal-600">💬</div>
+          <div>
+            <h2 class="text-lg font-black text-gray-900">Coding Reflection</h2>
+            <p class="text-xs text-gray-500">Reflect on building your rule-based Python chatbot</p>
+          </div>
+        </div>
+
+        <div class="space-y-5">
+          <div>
+            <label for="ref-diff" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              1. How is a rule-based Python chatbot (conditionals &amp; keywords) different from an LLM like ChatGPT? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="ref-diff" rows="3"
+              placeholder="Think about learning vs hardcoded rules, handling unexpected questions, and flexibility..."
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="ref-diff-error" class="hidden text-xs text-red-500 font-medium mt-1">Please answer this reflection question.</p>
+          </div>
+
+          <div>
+            <label for="ref-challenge" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              2. What was the most challenging part of writing your Python logic, and how would you expand your chatbot further? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="ref-challenge" rows="3"
+              placeholder="Reflect on indentation, handling typos, adding more elif branches, or tracking conversation state..."
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="ref-challenge-error" class="hidden text-xs text-red-500 font-medium mt-1">Please answer this reflection question.</p>
+          </div>
+
+          <!-- Enjoyment stars -->
+          <div>
+            <label class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">How much did you enjoy this coding activity?</label>
+            <div class="flex gap-1" id="enjoyment-stars" role="group" aria-label="Enjoyment rating">
+              <button type="button" class="star-btn" onclick="setRating(1)" aria-label="1 star">⭐</button>
+              <button type="button" class="star-btn" onclick="setRating(2)" aria-label="2 stars">⭐</button>
+              <button type="button" class="star-btn" onclick="setRating(3)" aria-label="3 stars">⭐</button>
+              <button type="button" class="star-btn" onclick="setRating(4)" aria-label="4 stars">⭐</button>
+              <button type="button" class="star-btn" onclick="setRating(5)" aria-label="5 stars">⭐</button>
+            </div>
+            <p id="rating-error" class="hidden text-xs text-red-500 font-medium mt-1">Please select an enjoyment rating.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Section -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-12">
+        <p id="form-error" class="hidden text-sm font-medium text-red-500 mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+              clip-rule="evenodd" />
+          </svg>
+          <span id="form-error-text">Please ensure your Python code runs and reflection questions are completed.</span>
+        </p>
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-teal-600 to-emerald-700 hover:from-teal-700 hover:to-emerald-800">
+          <span id="submit-label">Submit Python Chatbot Code &#8594;</span>
+        </button>
+        <p class="text-center text-xs text-gray-400 font-medium mt-3">Results will load to the teacher dashboard.</p>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div id="success-screen" class="hidden fixed inset-0 z-[90] bg-[#F0FDFA] flex items-center justify-center p-4">
+    <div class="text-center max-w-md bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+      <div
+        class="w-20 h-20 mx-auto rounded-2xl mb-6 flex items-center justify-center bg-teal-100 text-teal-600 shadow-sm">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <div
+        class="inline-block px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 bg-teal-50 text-teal-800">
+        Python Code Submitted!
+      </div>
+      <h2 class="text-3xl font-black text-gray-900 mb-3 tracking-tight">
+        Awesome job, <span id="success-name" class="text-teal-600">Coder</span>!
+      </h2>
+      <p class="text-gray-500 mb-8 leading-relaxed text-sm">
+        Your Python chatbot script and reflection responses have been submitted successfully.
+      </p>
+      <a href="index.html"
+        class="inline-flex items-center gap-2 text-white font-black py-3.5 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm bg-gradient-to-r from-teal-600 to-emerald-700 hover:from-teal-700 hover:to-emerald-800">
+        Return to Course Hub
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- Shared JS Utilities -->
+  <script src="../../assets/js/introai-shared.js"></script>
+
+  <script>
+    const TABLE = 'introai_week12_mini_chatbot';
+
+    let studentName = '', studentEmail = '';
+    let enjoymentRating = 0;
+
+    // Parsed State of Student's Python Code
+    let parsedState = {
+      botName: 'Buddy',
+      greeting: 'Hello! I am Buddy.',
+      rules: [], // list of { condition: 'hello', response: 'Hi there!' }
+      elseResponse: "I don't understand that yet!",
+      exitKeyword: 'bye',
+      exitResponse: 'Goodbye! Have a great day!',
+      hasVariables: false,
+      hasLoops: false,
+      hasConditionals: false,
+      syntaxOk: true,
+      errorMsg: ''
+    };
+
+    let isChatEnded = false;
+
+    const STARTER_TEMPLATES = {
+      blank: `# --- BUILD YOUR CHATBOT FROM SCRATCH ---
+# Building Block 1: Variables
+bot_name = "MyBot"
+greeting = "Hello! Ask me anything."
+
+print(bot_name + ": " + greeting)
+
+# Building Block 2: Loops
+while True:
+    user_input = input("You: ").lower()
+    
+    # Building Block 3: Conditionals
+    if user_input == "bye":
+        print(bot_name + ": Goodbye!")
+        break
+    elif "hello" in user_input:
+        print(bot_name + ": Hi there! How can I help?")
+    else:
+        print(bot_name + ": I don't understand that yet!")`,
+
+      starter: `# --- FULL EXAMPLE CHATBOT ---
+bot_name = "Buddy"
+greeting = "Hello! I am Buddy, your AI chatbot helper."
+
+print(bot_name + ": " + greeting)
+
+while True:
+    user_input = input("You: ").lower()
+    
+    if user_input == "bye":
+        print(bot_name + ": Goodbye! Have a great day!")
+        break
+    elif "hello" in user_input or "hi" in user_input:
+        print(bot_name + ": Hey there! How can I help you today?")
+    elif "joke" in user_input:
+        print(bot_name + ": Why do programmers prefer dark mode? Because light attracts bugs!")
+    elif "game" in user_input:
+        print(bot_name + ": My favorite game is Minecraft. What is yours?")
+    else:
+        print(bot_name + ": I don't understand that yet! Ask me for a 'joke' or type 'bye'.")`,
+
+      gaming: `# --- GAMING CHATBOT TEMPLATE ---
+bot_name = "PixelBot"
+greeting = "Welcome player! I am PixelBot, your gaming guide."
+
+print(bot_name + ": " + greeting)
+
+while True:
+    user_input = input("You: ").lower()
+    
+    if user_input == "bye" or user_input == "quit":
+        print(bot_name + ": Game over! See you next time.")
+        break
+    elif "roblox" in user_input:
+        print(bot_name + ": Roblox is awesome! Do you like obbies or simulator games?")
+    elif "fortnite" in user_input:
+        print(bot_name + ": Victory Royale! Drop into tilted towers.")
+    elif "code" in user_input:
+        print(bot_name + ": Coding games is super fun using Python and Luau!")
+    else:
+        print(bot_name + ": Cool! Tell me more about games or type 'bye'.")`
+    };
+
+    // --- REAL-TIME PYTHON SYNTAX HIGHLIGHTER (VS CODE DARK THEME) ---
+    function highlightPython(code) {
+      let html = code
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+      return html.replace(
+        /(#.*)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|\b(while|if|elif|else|break|in|or|and|not|True|False|for|def|import|return|pass)\b|\b(print|input|range|len|lower|upper|strip|int|str)\b|([=+\-*\/%!:<>]+)|(\b\d+\b)/g,
+        function(match, comment, string, keyword, func, operator, number) {
+          if (comment)  return `<span style="color: #6A9955; font-style: italic;">${comment}</span>`;
+          if (string)   return `<span style="color: #CE9178;">${string}</span>`;
+          if (keyword)  return `<span style="color: #C586C0; font-weight: bold;">${keyword}</span>`;
+          if (func)     return `<span style="color: #DCDCAA; font-weight: bold;">${func}</span>`;
+          if (operator) return `<span style="color: #D4D4D4;">${operator}</span>`;
+          if (number)   return `<span style="color: #B5CEA8;">${number}</span>`;
+          return match;
+        }
+      );
+    }
+
+    function syncEditor() {
+      const code = document.getElementById('python-editor').value;
+      const highlighted = highlightPython(code);
+      document.getElementById('code-output').innerHTML = highlighted + (code.endsWith('\n') ? '\n' : '');
+      syncScroll();
+    }
+
+    function syncScroll() {
+      const textarea = document.getElementById('python-editor');
+      const display = document.getElementById('highlight-display');
+      if (textarea && display) {
+        display.scrollTop = textarea.scrollTop;
+        display.scrollLeft = textarea.scrollLeft;
+      }
+    }
+
+    function loadTemplate(type) {
+      const code = STARTER_TEMPLATES[type] || STARTER_TEMPLATES.starter;
+      document.getElementById('python-editor').value = code;
+      syncEditor();
+      executePythonCode();
+    }
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#enjoyment-stars .star-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx < val);
+      });
+      document.getElementById('rating-error').classList.add('hidden');
+    }
+
+    // --- CLIENT-SIDE PYTHON PARSER & INTERPRETER ---
+    function parsePythonCode(code) {
+      const state = {
+        botName: 'Chatbot',
+        greeting: 'Hello!',
+        rules: [],
+        elseResponse: "I don't understand that yet!",
+        exitKeyword: 'bye',
+        exitResponse: 'Goodbye!',
+        hasVariables: false,
+        hasLoops: false,
+        hasConditionals: false,
+        syntaxOk: true,
+        errorMsg: ''
+      };
+
+      try {
+        const lines = code.split('\n');
+        
+        // 1. Detect Building Blocks
+        if (/=\s*["']/i.test(code)) state.hasVariables = true;
+        if (/while\b|for\b/i.test(code)) state.hasLoops = true;
+        if (/if\b|elif\b|else\b/i.test(code)) state.hasConditionals = true;
+
+        // 2. Parse Variable Assignments (bot_name = "...", greeting = "...")
+        for (let line of lines) {
+          const trimmed = line.trim();
+          if (trimmed.startsWith('#')) continue;
+
+          // bot_name = "..."
+          const varNameMatch = trimmed.match(/^([a-zA-Z_]\w*)\s*=\s*["']([^"']+)["']/);
+          if (varNameMatch) {
+            const varName = varNameMatch[1].toLowerCase();
+            const varVal = varNameMatch[2];
+            if (varName.includes('name') || varName === 'bot_name') {
+              state.botName = varVal;
+            } else if (varName.includes('greeting') || varName.includes('welcome')) {
+              state.greeting = varVal;
+            }
+          }
+        }
+
+        // 3. Parse If / Elif / Else Rules & Exit Loop Keywords
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (line.startsWith('#')) continue;
+
+          // Match: if user_input == "bye": or "bye" in user_input:
+          const ifMatch = line.match(/(?:if|elif)\s+([^:]+):/);
+          if (ifMatch) {
+            const conditionRaw = ifMatch[1];
+            // Extract string literals from condition
+            const strMatches = Array.from(conditionRaw.matchAll(/["']([^"']+)["']/g)).map(m => m[1]);
+            
+            // Check next lines for print("...") statement
+            let printResp = '';
+            for (let j = i + 1; j < Math.min(i + 4, lines.length); j++) {
+              const subLine = lines[j].trim();
+              const printMatch = subLine.match(/print\s*\(([^)]+)\)/);
+              if (printMatch) {
+                // Extract inner text
+                const pTextMatch = printMatch[1].match(/["']([^"']+)["']/);
+                if (pTextMatch) {
+                  printResp = pTextMatch[1];
+                } else if (printMatch[1].includes('+')) {
+                  // e.g. print(bot_name + ": " + "Goodbye!")
+                  const pParts = Array.from(printMatch[1].matchAll(/["']([^"']+)["']/g)).map(m => m[1]);
+                  printResp = pParts.join('');
+                }
+                break;
+              }
+            }
+
+            // Check if this condition is an exit condition (bye / quit / exit or break)
+            const isBreak = lines.slice(i, i + 4).some(l => l.trim() === 'break');
+            if (isBreak || strMatches.some(s => s.toLowerCase() === 'bye' || s.toLowerCase() === 'quit')) {
+              if (strMatches.length > 0) state.exitKeyword = strMatches[0].toLowerCase();
+              if (printResp) state.exitResponse = printResp;
+            } else if (strMatches.length > 0) {
+              state.rules.push({
+                keywords: strMatches.map(s => s.toLowerCase()),
+                response: printResp || "I hear you!"
+              });
+            }
+          }
+
+          // Match else:
+          if (line.startsWith('else:')) {
+            for (let j = i + 1; j < Math.min(i + 4, lines.length); j++) {
+              const subLine = lines[j].trim();
+              const printMatch = subLine.match(/print\s*\(([^)]+)\)/);
+              if (printMatch) {
+                const pTextMatch = printMatch[1].match(/["']([^"']+)["']/);
+                if (pTextMatch) {
+                  state.elseResponse = pTextMatch[1];
+                } else if (printMatch[1].includes('+')) {
+                  const pParts = Array.from(printMatch[1].matchAll(/["']([^"']+)["']/g)).map(m => m[1]);
+                  state.elseResponse = pParts.join('');
+                }
+                break;
+              }
+            }
+          }
+        }
+
+      } catch (err) {
+        state.syntaxOk = false;
+        state.errorMsg = err.message;
+      }
+
+      return state;
+    }
+
+    function executePythonCode() {
+      const code = document.getElementById('python-editor').value;
+      parsedState = parsePythonCode(code);
+
+      const banner = document.getElementById('parse-status-banner');
+      if (parsedState.syntaxOk) {
+        banner.className = 'mb-3 px-3 py-2 rounded-xl text-xs font-mono bg-emerald-950/90 border border-emerald-700 text-emerald-300 flex items-center justify-between';
+        banner.innerHTML = `<span>✅ Python Parsed: <strong>${parsedState.botName}</strong> loaded with ${parsedState.rules.length} rule branches!</span><span class="text-[10px] uppercase font-bold text-emerald-400">Execution OK</span>`;
+      } else {
+        banner.className = 'mb-3 px-3 py-2 rounded-xl text-xs font-mono bg-red-950/90 border border-red-800 text-red-300 flex items-center justify-between';
+        banner.innerHTML = `<span>⚠️ Syntax Check Warning: ${parsedState.errorMsg || 'Check your code quotes or syntax'}</span><span class="text-[10px] uppercase font-bold text-red-400">Syntax Warning</span>`;
+      }
+
+      // Update Building Block Checklist Cards
+      updateChecklistCards(parsedState);
+
+      // Start/Restart Chat Simulator
+      restartChatSimulator();
+    }
+
+    function updateChecklistCards(state) {
+      // Variables Card
+      const cardVars = document.getElementById('card-check-vars');
+      const badgeVars = document.getElementById('badge-vars');
+      if (state.hasVariables) {
+        cardVars.className = 'p-4 rounded-2xl border border-emerald-300 bg-emerald-50/70 flex items-start gap-3 transition-colors';
+        badgeVars.className = 'w-5 h-5 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5';
+        badgeVars.textContent = '✓';
+      } else {
+        cardVars.className = 'p-4 rounded-2xl border border-gray-200 bg-gray-50 flex items-start gap-3 transition-colors';
+        badgeVars.className = 'w-5 h-5 rounded-full bg-gray-300 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5';
+        badgeVars.textContent = '?';
+      }
+
+      // Loops Card
+      const cardLoops = document.getElementById('card-check-loops');
+      const badgeLoops = document.getElementById('badge-loops');
+      if (state.hasLoops) {
+        cardLoops.className = 'p-4 rounded-2xl border border-emerald-300 bg-emerald-50/70 flex items-start gap-3 transition-colors';
+        badgeLoops.className = 'w-5 h-5 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5';
+        badgeLoops.textContent = '✓';
+      } else {
+        cardLoops.className = 'p-4 rounded-2xl border border-gray-200 bg-gray-50 flex items-start gap-3 transition-colors';
+        badgeLoops.className = 'w-5 h-5 rounded-full bg-gray-300 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5';
+        badgeLoops.textContent = '?';
+      }
+
+      // Conditionals Card
+      const cardConds = document.getElementById('card-check-conds');
+      const badgeConds = document.getElementById('badge-conds');
+      if (state.hasConditionals) {
+        cardConds.className = 'p-4 rounded-2xl border border-emerald-300 bg-emerald-50/70 flex items-start gap-3 transition-colors';
+        badgeConds.className = 'w-5 h-5 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5';
+        badgeConds.textContent = '✓';
+      } else {
+        cardConds.className = 'p-4 rounded-2xl border border-gray-200 bg-gray-50 flex items-start gap-3 transition-colors';
+        badgeConds.className = 'w-5 h-5 rounded-full bg-gray-300 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5';
+        badgeConds.textContent = '?';
+      }
+    }
+
+    function appendChatMessage(sender, text) {
+      const box = document.getElementById('chat-messages');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
+
+      const inner = document.createElement('div');
+      inner.className = `max-w-[85%] p-3 text-xs shadow-sm ${sender === 'user' ? 'chat-bubble-user' : 'chat-bubble-bot'}`;
+      inner.textContent = text;
+
+      msgDiv.appendChild(inner);
+      box.appendChild(msgDiv);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function restartChatSimulator() {
+      isChatEnded = false;
+      document.getElementById('simulator-bot-title').textContent = `${parsedState.botName} Simulator`;
+      const box = document.getElementById('chat-messages');
+      box.innerHTML = '';
+      appendChatMessage('bot', `${parsedState.botName}: ${parsedState.greeting}`);
+    }
+
+    function sendChatMessage(ev) {
+      ev.preventDefault();
+      if (isChatEnded) return;
+
+      const input = document.getElementById('chat-user-input');
+      const userText = input.value.trim();
+      if (!userText) return;
+
+      appendChatMessage('user', userText);
+      input.value = '';
+
+      const lower = userText.toLowerCase();
+
+      setTimeout(() => {
+        // 1. Check Exit condition (loop break)
+        if (lower === parsedState.exitKeyword || lower.includes(parsedState.exitKeyword)) {
+          appendChatMessage('bot', `${parsedState.botName}: ${parsedState.exitResponse}`);
+          isChatEnded = true;
+          appendChatMessage('bot', `[System: Loop break executed — '${parsedState.exitKeyword}' terminated loop]`);
+          return;
+        }
+
+        // 2. Check Conditional Rules
+        let matched = false;
+        for (let rule of parsedState.rules) {
+          if (rule.keywords.some(kw => lower.includes(kw))) {
+            appendChatMessage('bot', `${parsedState.botName}: ${rule.response}`);
+            matched = true;
+            break;
+          }
+        }
+
+        // 3. Fallback Else
+        if (!matched) {
+          appendChatMessage('bot', `${parsedState.botName}: ${parsedState.elseResponse}`);
+        }
+      }, 250);
+    }
+
+    async function handleRegistration(ev) {
+      ev.preventDefault();
+      const nameEl = document.getElementById('reg-name');
+      const emailEl = document.getElementById('reg-email');
+      const nameErr = document.getElementById('reg-name-error');
+      const emailErr = document.getElementById('reg-email-error');
+      let ok = true;
+
+      nameEl.classList.remove('error'); nameErr.classList.add('hidden');
+      emailEl.classList.remove('error'); emailErr.classList.add('hidden');
+
+      if (!nameEl.value.trim()) { nameEl.classList.add('error'); nameErr.classList.remove('hidden'); ok = false; }
+      if (!emailEl.value.trim() || !validateEmail(emailEl.value.trim())) { emailEl.classList.add('error'); emailErr.classList.remove('hidden'); ok = false; }
+      if (!ok) return;
+
+      const btn = document.getElementById('reg-submit-btn');
+      btn.disabled = true;
+      document.getElementById('reg-btn-label').innerHTML = '<span class="spinner"></span> Starting\u2026';
+
+      studentName = nameEl.value.trim();
+      studentEmail = emailEl.value.trim();
+      saveStudentSession(studentName, studentEmail);
+
+      const overlay = document.getElementById('registration-overlay');
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.remove(), 450);
+    }
+
+    (function restoreSession() {
+      const { name, email } = getStudentSession();
+      if (name && email) {
+        studentName = name;
+        studentEmail = email;
+        const overlay = document.getElementById('registration-overlay');
+        if (overlay) overlay.remove();
+      }
+    })();
+
+    // Initialize on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      loadTemplate('blank');
+    });
+
+    async function submitExercise(ev) {
+      ev.preventDefault();
+      let ok = true;
+
+      const codeVal = document.getElementById('python-editor').value.trim();
+      const refDiff = document.getElementById('ref-diff').value.trim();
+      const refChallenge = document.getElementById('ref-challenge').value.trim();
+
+      document.getElementById('ref-diff').classList.toggle('error', !refDiff);
+      document.getElementById('ref-diff-error').classList.toggle('hidden', !!refDiff);
+      if (!refDiff) ok = false;
+
+      document.getElementById('ref-challenge').classList.toggle('error', !refChallenge);
+      document.getElementById('ref-challenge-error').classList.toggle('hidden', !!refChallenge);
+      if (!refChallenge) ok = false;
+
+      if (enjoymentRating === 0) {
+        document.getElementById('rating-error').classList.remove('hidden');
+        ok = false;
+      }
+
+      if (!ok) {
+        document.getElementById('form-error').classList.remove('hidden');
+        document.querySelector('[id$="-error"]:not(.hidden)')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      document.getElementById('form-error').classList.add('hidden');
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting\u2026';
+
+      const payload = {
+        student_name:           studentName,
+        student_email:          studentEmail,
+        python_code:            codeVal,
+        bot_name:               parsedState.botName || 'Chatbot',
+        used_variables:         parsedState.hasVariables,
+        used_conditionals:      parsedState.hasConditionals,
+        used_loops:             parsedState.hasLoops,
+        reflection_difference:  refDiff,
+        reflection_challenges:  refChallenge,
+        enjoyment_rating:       enjoymentRating,
+        submitted_at:           new Date().toISOString()
+      };
+
+      try {
+        await supabaseUpsert(TABLE, payload, 'student_email');
+        document.getElementById('success-name').textContent = studentName.split(' ')[0];
+        document.getElementById('success-screen').classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        console.error('[Week 12 Mini-Chatbot] Supabase error:', err.message);
+        btn.disabled = false;
+        document.getElementById('submit-label').textContent = 'Submit Python Chatbot Code \u2192';
+        if (err.message.includes('409') || err.message.includes('duplicate key')) {
+          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f You have already submitted your Python chatbot!';
+        } else {
+          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f Network error submitting exercise. Please try again.';
+        }
+        document.getElementById('form-error').classList.remove('hidden');
+      }
+    }
+  </script>
+
+</body>
+
+</html>

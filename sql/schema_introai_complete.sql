@@ -1811,3 +1811,184 @@ CREATE POLICY "auth_select_w10_proj_logs"
   TO authenticated
   USING (true);
 
+-- ── create_introai_week11_synthetic_media.sql ──────────────────────────────────
+CREATE TABLE IF NOT EXISTS introai_week11_synthetic_media (
+  id                             BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  student_name                   TEXT NOT NULL,
+  student_email                  TEXT NOT NULL,
+
+  -- Case 1: Cat Diving Olympics
+  cat_diving_choice              TEXT NOT NULL,
+  cat_diving_analysis            TEXT NOT NULL,
+
+  -- Case 2: Nicolas Cage Deepfake
+  cage_deepfake_choice           TEXT NOT NULL,
+  cage_deepfake_analysis         TEXT NOT NULL,
+
+  -- Case 3: AI Drake Song
+  drake_ai_choice                TEXT NOT NULL,
+  drake_ai_analysis              TEXT NOT NULL,
+
+  -- Case 4: Tom Cruise Deepfake
+  tom_cruise_realism_rating      SMALLINT NOT NULL CHECK (tom_cruise_realism_rating BETWEEN 1 AND 5),
+  tom_cruise_analysis            TEXT NOT NULL,
+
+  -- Reflections
+  ethical_risk_reflection        TEXT NOT NULL,
+  detection_strategy_reflection  TEXT NOT NULL,
+  enjoyment_rating               SMALLINT NOT NULL CHECK (enjoyment_rating BETWEEN 1 AND 5),
+
+  submitted_at                   TIMESTAMPTZ NOT NULL DEFAULT now(),
+
+  CONSTRAINT uq_w11_synthetic_media_email UNIQUE (student_email)
+);
+
+COMMENT ON TABLE introai_week11_synthetic_media
+  IS 'Week 11 Exercise: Deepfakes & Synthetic Media Audit';
+
+ALTER TABLE introai_week11_synthetic_media ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "anon_insert_w11_synthetic_media" ON introai_week11_synthetic_media;
+DROP POLICY IF EXISTS "anon_select_w11_synthetic_media" ON introai_week11_synthetic_media;
+DROP POLICY IF EXISTS "auth_select_w11_synthetic_media" ON introai_week11_synthetic_media;
+
+CREATE POLICY "anon_insert_w11_synthetic_media"
+  ON introai_week11_synthetic_media FOR INSERT TO anon WITH CHECK (true);
+
+CREATE POLICY "anon_select_w11_synthetic_media"
+  ON introai_week11_synthetic_media FOR SELECT TO anon USING (true);
+
+CREATE POLICY "auth_select_w11_synthetic_media"
+  ON introai_week11_synthetic_media FOR SELECT TO authenticated USING (true);
+
+-- ── create_introai_week11_what_would_you_do.sql ────────────────────────────────
+CREATE TABLE IF NOT EXISTS introai_week11_what_would_you_do (
+  id                        BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  student_name              TEXT NOT NULL,
+  student_email             TEXT NOT NULL,
+
+  -- Scenario 1: Classmate Prank
+  scenario_1_choice         TEXT NOT NULL,
+  scenario_1_analysis       TEXT NOT NULL,
+
+  -- Scenario 2: Politician vs Neighbor
+  scenario_2_choice         TEXT NOT NULL,
+  scenario_2_analysis       TEXT NOT NULL,
+
+  -- Scenario 3: Intent vs Impact
+  scenario_3_choice         TEXT NOT NULL,
+  scenario_3_analysis       TEXT NOT NULL,
+
+  -- Personal Rule & Reflection
+  personal_rule_reflection  TEXT NOT NULL,
+  enjoyment_rating          SMALLINT NOT NULL CHECK (enjoyment_rating BETWEEN 1 AND 5),
+
+  submitted_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+
+  CONSTRAINT uq_w11_wwyd_email UNIQUE (student_email)
+);
+
+COMMENT ON TABLE introai_week11_what_would_you_do
+  IS 'Week 11 Exercise 2: What Would You Do? Ethics Discussion';
+
+ALTER TABLE introai_week11_what_would_you_do ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "anon_insert_w11_wwyd" ON introai_week11_what_would_you_do;
+DROP POLICY IF EXISTS "anon_select_w11_wwyd" ON introai_week11_what_would_you_do;
+DROP POLICY IF EXISTS "auth_select_w11_wwyd" ON introai_week11_what_would_you_do;
+
+CREATE POLICY "anon_insert_w11_wwyd"
+  ON introai_week11_what_would_you_do FOR INSERT TO anon WITH CHECK (true);
+
+CREATE POLICY "anon_select_w11_wwyd"
+  ON introai_week11_what_would_you_do FOR SELECT TO anon USING (true);
+
+CREATE POLICY "auth_select_w11_wwyd"
+  ON introai_week11_what_would_you_do FOR SELECT TO authenticated USING (true);
+
+-- ── create_introai_week12_mini_chatbot.sql ─────────────────────────────────────
+CREATE TABLE IF NOT EXISTS introai_week12_mini_chatbot (
+  id                       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  student_name             TEXT NOT NULL,
+  student_email            TEXT NOT NULL,
+
+  -- Chatbot Python Code & Config
+  python_code              TEXT NOT NULL,
+  bot_name                 TEXT NOT NULL,
+  used_variables           BOOLEAN NOT NULL DEFAULT true,
+  used_conditionals        BOOLEAN NOT NULL DEFAULT true,
+  used_loops               BOOLEAN NOT NULL DEFAULT true,
+
+  -- Reflections
+  reflection_difference    TEXT NOT NULL,
+  reflection_challenges    TEXT NOT NULL,
+  enjoyment_rating         SMALLINT NOT NULL CHECK (enjoyment_rating BETWEEN 1 AND 5),
+
+  submitted_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
+
+  CONSTRAINT uq_w12_mini_chatbot_email UNIQUE (student_email)
+);
+
+COMMENT ON TABLE introai_week12_mini_chatbot
+  IS 'Week 12 Exercise: Build Your Own Mini-Chatbot';
+
+ALTER TABLE introai_week12_mini_chatbot ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "anon_insert_w12_mini_chatbot" ON introai_week12_mini_chatbot;
+DROP POLICY IF EXISTS "anon_select_w12_mini_chatbot" ON introai_week12_mini_chatbot;
+DROP POLICY IF EXISTS "auth_select_w12_mini_chatbot" ON introai_week12_mini_chatbot;
+
+CREATE POLICY "anon_insert_w12_mini_chatbot"
+  ON introai_week12_mini_chatbot FOR INSERT TO anon WITH CHECK (true);
+
+CREATE POLICY "anon_select_w12_mini_chatbot"
+  ON introai_week12_mini_chatbot FOR SELECT TO anon USING (true);
+
+CREATE POLICY "auth_select_w12_mini_chatbot"
+  ON introai_week12_mini_chatbot FOR SELECT TO authenticated USING (true);
+
+-- ── create_introai_week12_bot_vs_llm.sql ─────────────────────────────────────
+CREATE TABLE IF NOT EXISTS introai_week12_bot_vs_llm (
+  id                       BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  student_name             TEXT NOT NULL,
+  student_email            TEXT NOT NULL,
+
+  -- Scenario 1: Vending Machine
+  scenario_1_choice        TEXT NOT NULL,
+  scenario_1_analysis      TEXT NOT NULL,
+
+  -- Scenario 2: Customer Support Bot
+  scenario_2_choice        TEXT NOT NULL,
+  scenario_2_analysis      TEXT NOT NULL,
+
+  -- Scenario 3: Hybrid Systems
+  scenario_3_choice        TEXT NOT NULL,
+  scenario_3_analysis      TEXT NOT NULL,
+
+  -- System Architect Reflection
+  architect_reflection     TEXT NOT NULL,
+  enjoyment_rating         SMALLINT NOT NULL CHECK (enjoyment_rating BETWEEN 1 AND 5),
+
+  submitted_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
+
+  CONSTRAINT uq_w12_bot_vs_llm_email UNIQUE (student_email)
+);
+
+COMMENT ON TABLE introai_week12_bot_vs_llm
+  IS 'Week 12 Discussion: Rule-Based Bot vs. LLM Chatbot';
+
+ALTER TABLE introai_week12_bot_vs_llm ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "anon_insert_w12_bot_vs_llm" ON introai_week12_bot_vs_llm;
+DROP POLICY IF EXISTS "anon_select_w12_bot_vs_llm" ON introai_week12_bot_vs_llm;
+DROP POLICY IF EXISTS "auth_select_w12_bot_vs_llm" ON introai_week12_bot_vs_llm;
+
+CREATE POLICY "anon_insert_w12_bot_vs_llm"
+  ON introai_week12_bot_vs_llm FOR INSERT TO anon WITH CHECK (true);
+
+CREATE POLICY "anon_select_w12_bot_vs_llm"
+  ON introai_week12_bot_vs_llm FOR SELECT TO anon USING (true);
+
+CREATE POLICY "auth_select_w12_bot_vs_llm"
+  ON introai_week12_bot_vs_llm FOR SELECT TO authenticated USING (true);
+

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rule-Based Bot vs. LLM Chatbot — Intro to AI · Week 12</title>
+  <meta name="description"
+    content="Week 12 Discussion Exercise: Compare Rule-Based Chatbots against Large Language Models (LLMs) and evaluate which approach to use for real-world applications.">
+
+  <!-- Google Fonts Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Compiled Activity CSS -->
+  <link rel="stylesheet" href="../../assets/css/activity.css">
+  <style>
+    #registration-overlay { transition: opacity 0.4s ease; }
+    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
+    #registration-overlay .reg-card {
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+    }
+    #registration-overlay.hiding .reg-card {
+      transform: scale(0.95) translateY(-10px); opacity: 0;
+    }
+    .reg-input:focus {
+      outline: none; border-color: #0d9488;
+      box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+    }
+    .reg-input.error {
+      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+    }
+    .form-input:focus {
+      outline: none; border-color: #0d9488;
+      box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+    }
+    .form-input.error { border-color: #ef4444; }
+    .star-btn {
+      font-size: 26px;
+      cursor: pointer;
+      filter: grayscale(100%);
+      transition: filter 0.15s ease, transform 0.1s ease;
+    }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .stance-chip {
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .stance-chip.selected {
+      background-color: #0d9488;
+      color: #ffffff;
+      border-color: #0f766e;
+      box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.2);
+    }
+  </style>
+</head>
+
+<body class="bg-[#F0FDFA]/40 text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- REGISTRATION GATE -->
+  <div id="registration-overlay"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+    style="background: linear-gradient(135deg, #0f766e 0%, #0d9488 55%, #115e59 100%);">
+
+    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
+        style="background: radial-gradient(circle, #99f6e4, transparent);"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
+        style="background: radial-gradient(circle, #0d9488, transparent);"></div>
+    </div>
+
+    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center bg-teal-100 text-teal-600 shadow-sm">
+          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+        </div>
+        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 bg-teal-100 text-teal-800">
+          Week 12 · Discussion Activity
+        </div>
+        <h1 class="text-2xl font-black text-gray-900 tracking-tight">Rule-Based vs. LLM Chatbot ⚖️</h1>
+        <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">Enter your details to join the AI architecture discussion.</p>
+      </div>
+
+      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
+        <div class="space-y-4 mb-6">
+          <div>
+            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Full Name</label>
+            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Alex Morgan"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name.</p>
+          </div>
+          <div>
+            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
+            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. alex@school.edu"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
+          </div>
+        </div>
+        <button id="reg-submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-teal-600 to-emerald-700 hover:from-teal-700 hover:to-emerald-800">
+          <span id="reg-btn-label">Open Discussion Activity &#8594;</span>
+        </button>
+      </form>
+      <p class="text-center text-[10px] text-gray-400 font-medium mt-5">Saved to Intro to AI course portal.</p>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main-content" class="max-w-4xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-teal-200 pb-6">
+      <div>
+        <a href="index.html"
+          class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-teal-600 mb-3 hover:text-teal-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">
+          Rule-Based Bot vs. LLM Chatbot ⚖️
+        </h1>
+        <p class="text-gray-500 font-medium italic mt-1">Comparing Deterministic Code vs. Probabilistic Generative Models · Week 12</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-teal-50 border border-teal-200 text-teal-800 shadow-sm self-start md:self-auto">
+        Week 12
+      </div>
+    </header>
+
+    <!-- Side-by-Side Comparison Card (From Slide 1) -->
+    <div class="mb-10">
+      <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 bg-teal-100 text-teal-800">
+        COMPARE ARCHITECTURES
+      </div>
+      <h2 class="text-2xl font-black text-gray-900 mb-6">How Do They Work?</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Card 1: Rule-Based Bot -->
+        <div class="bg-white border-2 border-teal-200 rounded-3xl p-6 md:p-8 shadow-sm relative overflow-hidden flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-2xl bg-teal-500 flex items-center justify-center text-white mb-5 shadow-md">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-black text-gray-900 mb-3">Your Chatbot Today 🤖</h3>
+            <p class="text-sm text-gray-600 leading-relaxed">
+              Follows exact rules you wrote yourself using <strong>variables, loops, and conditionals</strong>. If the user input matches a condition, it gives the reply you coded.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-gray-100">
+            <span class="inline-flex items-center gap-1.5 text-xs font-bold text-teal-700 bg-teal-50 px-3 py-1.5 rounded-xl">
+              ✓ 100% Predictable · Never Hallucinates
+            </span>
+          </div>
+        </div>
+
+        <!-- Card 2: LLM Chatbot -->
+        <div class="bg-white border-2 border-orange-200 rounded-3xl p-6 md:p-8 shadow-sm relative overflow-hidden flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-2xl bg-orange-500 flex items-center justify-center text-white mb-5 shadow-md">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-black text-gray-900 mb-3">The Class 2 LLM Chatbot 🧠</h3>
+            <p class="text-sm text-gray-600 leading-relaxed">
+              Trained on massive datasets instead of following fixed rules. It can respond flexibly to things it has never seen before — which is also why it can make mistakes or hallucinate.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-gray-100">
+            <span class="inline-flex items-center gap-1.5 text-xs font-bold text-orange-700 bg-orange-50 px-3 py-1.5 rounded-xl">
+              ⚡ Highly Flexible · Risk of Hallucination
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DISCUSSION FORM (From Slide 2) -->
+    <form id="discussion-form" onsubmit="submitExercise(event)" novalidate>
+
+      <div class="mb-6">
+        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-2 bg-teal-100 text-teal-800">
+          DISCUSSION SCENARIOS
+        </div>
+        <h2 class="text-2xl font-black text-gray-900">Which Would You Use?</h2>
+        <p class="text-xs text-gray-500 mt-1">Analyze 3 real-world design prompts and justify your architecture choice.</p>
+      </div>
+
+      <!-- Scenario 1: Vending Machine -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-full bg-teal-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0">1</span>
+          <div>
+            <h3 class="text-base font-black text-gray-900">Scenario 1: The Vending Machine 🥤</h3>
+            <p class="text-xs text-gray-500">Same input must ALWAYS yield the exact same output</p>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-teal-50/60 border border-teal-100 text-xs text-gray-700 leading-relaxed mb-4">
+          <strong>Prompt:</strong> "A vending machine needs to give the same drink every time you press the same button. Rule-based code, or a trained AI model — which fits better, and why?"
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Select Your Architecture Stance <span class="text-red-500">*</span></label>
+            <div class="flex flex-wrap gap-2" id="sc1-chips">
+              <button type="button" onclick="selectStance('sc1', 'Rule-Based Code')" class="stance-chip px-3.5 py-2 rounded-xl border border-gray-200 bg-gray-50 text-xs font-bold text-gray-700">Rule-Based Code</button>
+              <button type="button" onclick="selectStance('sc1', 'Trained AI Model')" class="stance-chip px-3.5 py-2 rounded-xl border border-gray-200 bg-gray-50 text-xs font-bold text-gray-700">Trained AI Model</button>
+              <button type="button" onclick="selectStance('sc1', 'Hybrid System')" class="stance-chip px-3.5 py-2 rounded-xl border border-gray-200 bg-gray-50 text-xs font-bold text-gray-700">Hybrid System</button>
+            </div>
+            <p id="sc1-choice-error" class="hidden text-xs text-red-500 font-medium mt-1.5">Please select your stance choice.</p>
+          </div>
+
+          <div>
+            <label for="sc1-analysis" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              Explain Your Reasoning <span class="text-red-500">*</span>
+            </label>
+            <textarea id="sc1-analysis" rows="3"
+              placeholder="Why would a vending machine need deterministic precision vs probabilistic flexibility?"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="sc1-analysis-error" class="hidden text-xs text-red-500 font-medium mt-1">Please provide your analysis reasoning.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scenario 2: Customer Support Bot -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-full bg-teal-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0">2</span>
+          <div>
+            <h3 class="text-base font-black text-gray-900">Scenario 2: Customer Support Chatbot 🎧</h3>
+            <p class="text-xs text-gray-500">Handling unexpected questions in varied phrasing</p>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-teal-50/60 border border-teal-100 text-xs text-gray-700 leading-relaxed mb-4">
+          <strong>Prompt:</strong> "A customer support chatbot needs to answer questions it's never seen before, in different words. Which approach fits better here?"
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Select Your Architecture Stance <span class="text-red-500">*</span></label>
+            <div class="flex flex-wrap gap-2" id="sc2-chips">
+              <button type="button" onclick="selectStance('sc2', 'Rule-Based Code')" class="stance-chip px-3.5 py-2 rounded-xl border border-gray-200 bg-gray-50 text-xs font-bold text-gray-700">Rule-Based Code</button>
+              <button type="button" onclick="selectStance('sc2', 'Trained AI Model (LLM)')" class="stance-chip px-3.5 py-2 rounded-xl border border-gray-200 bg-gray-50 text-xs font-bold text-gray-700">Trained AI Model (LLM)</button>
+              <button type="button" onclick="selectStance('sc2', 'Hybrid System')" class="stance-chip px-3.5 py-2 rounded-xl border border-gray-200 bg-gray-50 text-xs font-bold text-gray-700">Hybrid System</button>
+            </div>
+            <p id="sc2-choice-error" class="hidden text-xs text-red-500 font-medium mt-1.5">Please select your stance choice.</p>
+          </div>
+
+          <div>
+            <label for="sc2-analysis" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              Explain Your Reasoning <span class="text-red-500">*</span>
+            </label>
+            <textarea id="sc2-analysis" rows="3"
+              placeholder="How do LLMs handle synonyms and phrasing variations compared to hardcoded if/else rules?"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="sc2-analysis-error" class="hidden text-xs text-red-500 font-medium mt-1">Please provide your analysis reasoning.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scenario 3: Combining Both (Hybrid Architecture) -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-full bg-teal-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0">3</span>
+          <div>
+            <h3 class="text-base font-black text-gray-900">Scenario 3: Combining Both (Hybrid AI) ⚙️</h3>
+            <p class="text-xs text-gray-500">Mixing strict rule guards with generative AI flexibility</p>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-teal-50/60 border border-teal-100 text-xs text-gray-700 leading-relaxed mb-4">
+          <strong>Prompt:</strong> "Could you combine both — rules for the parts that must always work the same way, and AI for the parts that need flexibility?"
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Select Your Architecture Stance <span class="text-red-500">*</span></label>
+            <div class="flex flex-wrap gap-2" id="sc3-chips">
+              <button type="button" onclick="selectStance('sc3', 'Yes, Hybrid is Best')" class="stance-chip px-3.5 py-2 rounded-xl border border-gray-200 bg-gray-50 text-xs font-bold text-gray-700">Yes, Hybrid is Best</button>
+              <button type="button" onclick="selectStance('sc3', 'Keep Them Separate')" class="stance-chip px-3.5 py-2 rounded-xl border border-gray-200 bg-gray-50 text-xs font-bold text-gray-700">Keep Them Separate</button>
+              <button type="button" onclick="selectStance('sc3', 'Depends on Application')" class="stance-chip px-3.5 py-2 rounded-xl border border-gray-200 bg-gray-50 text-xs font-bold text-gray-700">Depends on Application</button>
+            </div>
+            <p id="sc3-choice-error" class="hidden text-xs text-red-500 font-medium mt-1.5">Please select your stance choice.</p>
+          </div>
+
+          <div>
+            <label for="sc3-analysis" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              Give a Specific Example of a Hybrid System <span class="text-red-500">*</span>
+            </label>
+            <textarea id="sc3-analysis" rows="3"
+              placeholder="e.g. A banking app using rules for checking balances & transactions, but an LLM for answering general financial advice..."
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="sc3-analysis-error" class="hidden text-xs text-red-500 font-medium mt-1">Please provide an example hybrid system.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Architect Reflection Section -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-full text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-teal-600">🏛️</div>
+          <div>
+            <h2 class="text-lg font-black text-gray-900">System Architect Challenge</h2>
+            <p class="text-xs text-gray-500">Design a real system for your school or community</p>
+          </div>
+        </div>
+
+        <div class="space-y-5">
+          <div>
+            <label for="architect-reflection" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              If you were designing an AI assistant for your school, what specific tasks would you make rule-based and what tasks would you use an LLM for? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="architect-reflection" rows="3"
+              placeholder="e.g. Rule-based for bell schedules & office hours, LLM for tutoring homework questions..."
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="architect-error" class="hidden text-xs text-red-500 font-medium mt-1">Please answer the system architect reflection.</p>
+          </div>
+
+          <!-- Enjoyment stars -->
+          <div>
+            <label class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">How much did you enjoy this discussion activity?</label>
+            <div class="flex gap-1" id="enjoyment-stars" role="group" aria-label="Enjoyment rating">
+              <button type="button" class="star-btn" onclick="setRating(1)" aria-label="1 star">⭐</button>
+              <button type="button" class="star-btn" onclick="setRating(2)" aria-label="2 stars">⭐</button>
+              <button type="button" class="star-btn" onclick="setRating(3)" aria-label="3 stars">⭐</button>
+              <button type="button" class="star-btn" onclick="setRating(4)" aria-label="4 stars">⭐</button>
+              <button type="button" class="star-btn" onclick="setRating(5)" aria-label="5 stars">⭐</button>
+            </div>
+            <p id="rating-error" class="hidden text-xs text-red-500 font-medium mt-1">Please select an enjoyment rating.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Section -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-12">
+        <p id="form-error" class="hidden text-sm font-medium text-red-500 mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+              clip-rule="evenodd" />
+          </svg>
+          <span id="form-error-text">Please select stances and complete all scenario explanations.</span>
+        </p>
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-teal-600 to-emerald-700 hover:from-teal-700 hover:to-emerald-800">
+          <span id="submit-label">Submit Discussion Responses &#8594;</span>
+        </button>
+        <p class="text-center text-xs text-gray-400 font-medium mt-3">Results will load to the teacher dashboard.</p>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div id="success-screen" class="hidden fixed inset-0 z-[90] bg-[#F0FDFA] flex items-center justify-center p-4">
+    <div class="text-center max-w-md bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+      <div
+        class="w-20 h-20 mx-auto rounded-2xl mb-6 flex items-center justify-center bg-teal-100 text-teal-600 shadow-sm">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <div
+        class="inline-block px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 bg-teal-50 text-teal-800">
+        Discussion Submitted!
+      </div>
+      <h2 class="text-3xl font-black text-gray-900 mb-3 tracking-tight">
+        Great work, <span id="success-name" class="text-teal-600">Architect</span>!
+      </h2>
+      <p class="text-gray-500 mb-8 leading-relaxed text-sm">
+        Your AI architecture comparison and scenario analysis have been saved successfully.
+      </p>
+      <a href="index.html"
+        class="inline-flex items-center gap-2 text-white font-black py-3.5 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm bg-gradient-to-r from-teal-600 to-emerald-700 hover:from-teal-700 hover:to-emerald-800">
+        Return to Course Hub
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- Shared JS Utilities -->
+  <script src="../../assets/js/introai-shared.js"></script>
+
+  <script>
+    const TABLE = 'introai_week12_bot_vs_llm';
+
+    let studentName = '', studentEmail = '';
+    let enjoymentRating = 0;
+    const selectedStances = { sc1: '', sc2: '', sc3: '' };
+
+    function selectStance(scKey, choiceText) {
+      selectedStances[scKey] = choiceText;
+      const chipsContainer = document.getElementById(`${scKey}-chips`);
+      chipsContainer.querySelectorAll('.stance-chip').forEach(btn => {
+        btn.classList.toggle('selected', btn.textContent.trim() === choiceText);
+      });
+      document.getElementById(`${scKey}-choice-error`)?.classList.add('hidden');
+    }
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#enjoyment-stars .star-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx < val);
+      });
+      document.getElementById('rating-error').classList.add('hidden');
+    }
+
+    async function handleRegistration(ev) {
+      ev.preventDefault();
+      const nameEl = document.getElementById('reg-name');
+      const emailEl = document.getElementById('reg-email');
+      const nameErr = document.getElementById('reg-name-error');
+      const emailErr = document.getElementById('reg-email-error');
+      let ok = true;
+
+      nameEl.classList.remove('error'); nameErr.classList.add('hidden');
+      emailEl.classList.remove('error'); emailErr.classList.add('hidden');
+
+      if (!nameEl.value.trim()) { nameEl.classList.add('error'); nameErr.classList.remove('hidden'); ok = false; }
+      if (!emailEl.value.trim() || !validateEmail(emailEl.value.trim())) { emailEl.classList.add('error'); emailErr.classList.remove('hidden'); ok = false; }
+      if (!ok) return;
+
+      const btn = document.getElementById('reg-submit-btn');
+      btn.disabled = true;
+      document.getElementById('reg-btn-label').innerHTML = '<span class="spinner"></span> Starting\u2026';
+
+      studentName = nameEl.value.trim();
+      studentEmail = emailEl.value.trim();
+      saveStudentSession(studentName, studentEmail);
+
+      const overlay = document.getElementById('registration-overlay');
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.remove(), 450);
+    }
+
+    (function restoreSession() {
+      const { name, email } = getStudentSession();
+      if (name && email) {
+        studentName = name;
+        studentEmail = email;
+        const overlay = document.getElementById('registration-overlay');
+        if (overlay) overlay.remove();
+      }
+    })();
+
+    async function submitExercise(ev) {
+      ev.preventDefault();
+      let ok = true;
+
+      const sc1Ans = document.getElementById('sc1-analysis').value.trim();
+      const sc2Ans = document.getElementById('sc2-analysis').value.trim();
+      const sc3Ans = document.getElementById('sc3-analysis').value.trim();
+      const archAns = document.getElementById('architect-reflection').value.trim();
+
+      if (!selectedStances.sc1) { document.getElementById('sc1-choice-error').classList.remove('hidden'); ok = false; }
+      if (!sc1Ans) { document.getElementById('sc1-analysis').classList.add('error'); document.getElementById('sc1-analysis-error').classList.remove('hidden'); ok = false; }
+
+      if (!selectedStances.sc2) { document.getElementById('sc2-choice-error').classList.remove('hidden'); ok = false; }
+      if (!sc2Ans) { document.getElementById('sc2-analysis').classList.add('error'); document.getElementById('sc2-analysis-error').classList.remove('hidden'); ok = false; }
+
+      if (!selectedStances.sc3) { document.getElementById('sc3-choice-error').classList.remove('hidden'); ok = false; }
+      if (!sc3Ans) { document.getElementById('sc3-analysis').classList.add('error'); document.getElementById('sc3-analysis-error').classList.remove('hidden'); ok = false; }
+
+      if (!archAns) { document.getElementById('architect-reflection').classList.add('error'); document.getElementById('architect-error').classList.remove('hidden'); ok = false; }
+
+      if (enjoymentRating === 0) {
+        document.getElementById('rating-error').classList.remove('hidden');
+        ok = false;
+      }
+
+      if (!ok) {
+        document.getElementById('form-error').classList.remove('hidden');
+        document.querySelector('[id$="-error"]:not(.hidden)')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      document.getElementById('form-error').classList.add('hidden');
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting\u2026';
+
+      const payload = {
+        student_name:           studentName,
+        student_email:          studentEmail,
+        scenario_1_choice:      selectedStances.sc1,
+        scenario_1_analysis:    sc1Ans,
+        scenario_2_choice:      selectedStances.sc2,
+        scenario_2_analysis:    sc2Ans,
+        scenario_3_choice:      selectedStances.sc3,
+        scenario_3_analysis:    sc3Ans,
+        architect_reflection:   archAns,
+        enjoyment_rating:       enjoymentRating,
+        submitted_at:           new Date().toISOString()
+      };
+
+      try {
+        await supabaseUpsert(TABLE, payload, 'student_email');
+        document.getElementById('success-name').textContent = studentName.split(' ')[0];
+        document.getElementById('success-screen').classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        console.error('[Week 12 Bot vs LLM] Supabase error:', err.message);
+        btn.disabled = false;
+        document.getElementById('submit-label').textContent = 'Submit Discussion Responses \u2192';
+        if (err.message.includes('409') || err.message.includes('duplicate key')) {
+          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f You have already submitted your discussion responses!';
+        } else {
+          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f Network error submitting exercise. Please try again.';
+        }
+        document.getElementById('form-error').classList.remove('hidden');
+      }
+    }
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What Would You Do? — Intro to AI · Week 11</title>
+  <meta name="description"
+    content="Week 11 Discussion Exercise: What Would You Do? Explore ethical dilemmas around deepfakes, consent, parody vs. harassment, and intent vs. impact.">
+
+  <!-- Google Fonts Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Compiled Activity CSS -->
+  <link rel="stylesheet" href="../../assets/css/activity.css">
+  <style>
+    #registration-overlay { transition: opacity 0.4s ease; }
+    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
+    #registration-overlay .reg-card {
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+    }
+    #registration-overlay.hiding .reg-card {
+      transform: scale(0.95) translateY(-10px); opacity: 0;
+    }
+    .reg-input:focus {
+      outline: none; border-color: #c026d3;
+      box-shadow: 0 0 0 3px rgba(192, 38, 211, 0.15);
+    }
+    .reg-input.error {
+      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+    }
+    .form-input:focus {
+      outline: none; border-color: #c026d3;
+      box-shadow: 0 0 0 3px rgba(192, 38, 211, 0.1);
+    }
+    .form-input.error { border-color: #ef4444; }
+    .opt-btn {
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #374151;
+      background: #f9fafb;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: left;
+      width: 100%;
+    }
+    .opt-btn:hover {
+      border-color: #d946ef;
+      background: #fdf4ff;
+      color: #701a75;
+    }
+    .opt-btn.selected {
+      border-color: #c026d3 !important;
+      background: #fdf4ff !important;
+      color: #701a75 !important;
+      box-shadow: 0 0 0 3px rgba(192, 38, 211, 0.15);
+    }
+    .star-btn {
+      font-size: 26px;
+      cursor: pointer;
+      filter: grayscale(100%);
+      transition: filter 0.15s ease, transform 0.1s ease;
+    }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body class="bg-[#FDF4FF]/40 text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- REGISTRATION GATE -->
+  <div id="registration-overlay"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+    style="background: linear-gradient(135deg, #4a044e 0%, #a21caf 55%, #4a044e 100%);">
+
+    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
+        style="background: radial-gradient(circle, #f0abfc, transparent);"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
+        style="background: radial-gradient(circle, #c026d3, transparent);"></div>
+    </div>
+
+    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center bg-fuchsia-100 text-fuchsia-600 shadow-sm">
+          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+        </div>
+        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 bg-fuchsia-100 text-fuchsia-800">
+          Week 11 · Ethics Discussion
+        </div>
+        <h1 class="text-2xl font-black text-gray-900 tracking-tight">What Would You Do? 🎭</h1>
+        <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">Enter your details to explore real-world deepfake ethical dilemmas.</p>
+      </div>
+
+      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
+        <div class="space-y-4 mb-6">
+          <div>
+            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Full Name</label>
+            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Alex Morgan"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name.</p>
+          </div>
+          <div>
+            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
+            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. alex@school.edu"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
+          </div>
+        </div>
+        <button id="reg-submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-600 to-purple-700 hover:from-fuchsia-700 hover:to-purple-800">
+          <span id="reg-btn-label">Start Discussion &#8594;</span>
+        </button>
+      </form>
+      <p class="text-center text-[10px] text-gray-400 font-medium mt-5">Saved to Intro to AI course portal.</p>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main-content" class="max-w-3xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-fuchsia-200 pb-6">
+      <div>
+        <a href="index.html"
+          class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-fuchsia-600 mb-3 hover:text-fuchsia-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">
+          What Would You Do? 🎭
+        </h1>
+        <p class="text-gray-500 font-medium italic mt-1">Deepfake Dilemmas, Consent &amp; Intent · Week 11 · Exercise 2</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-fuchsia-50 border border-fuchsia-200 text-fuchsia-800 shadow-sm self-start md:self-auto">
+        Week 11
+      </div>
+    </header>
+
+    <!-- Brief Card -->
+    <div class="bg-gradient-to-br from-fuchsia-700 via-fuchsia-800 to-purple-900 text-white rounded-3xl p-6 md:p-8 mb-8 shadow-xl">
+      <h2 class="text-xl font-black mb-3 flex items-center gap-2">
+        <span>🤔 Discussion Brief (~10–15 Minutes)</span>
+      </h2>
+      <p class="text-sm text-fuchsia-100 leading-relaxed mb-4">
+        As generative AI tools make video and voice cloning easy for anyone, ethical boundaries become crucial. Examine 3 real-world scenarios below, take a stance on consent, intent vs. impact, and public vs. private figures, and explain your reasoning.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-3 border border-white/10 text-xs">
+          <div class="font-black text-fuchsia-200 mb-1">Scenario 1: Classmate Prank</div>
+          <div>Embarrassing joke videos &amp; consent</div>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-3 border border-white/10 text-xs">
+          <div class="font-black text-fuchsia-200 mb-1">Scenario 2: Parody vs Neighbor</div>
+          <div>Public figures vs private citizens</div>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-3 border border-white/10 text-xs">
+          <div class="font-black text-fuchsia-200 mb-1">Scenario 3: Intent vs Impact</div>
+          <div>Harmful impact vs "just a joke"</div>
+        </div>
+      </div>
+      <div class="bg-white/15 backdrop-blur-md rounded-2xl p-4 border border-white/20 text-xs leading-relaxed">
+        <strong>Goal:</strong> Select your position for each scenario, justify your reasoning, and define a personal rule of thumb for AI media.
+      </div>
+    </div>
+
+    <!-- MAIN FORM -->
+    <form id="wwyd-form" onsubmit="submitExercise(event)" novalidate>
+
+      <!-- Scenario 1 -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-full bg-fuchsia-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0">1</span>
+          <div>
+            <h2 class="text-lg font-black text-gray-900">Scenario 1: The Classmate Prank Video</h2>
+            <p class="text-xs text-gray-500">Joke videos, reactions &amp; consent boundaries</p>
+          </div>
+        </div>
+
+        <div class="bg-fuchsia-50 border border-fuchsia-200 rounded-2xl p-4 mb-5 text-sm text-fuchsia-950 leading-relaxed font-medium">
+          "A student makes a fake video of a classmate saying something embarrassing, just as a joke. Is that okay if the classmate laughs it off? What if they don't?"
+        </div>
+
+        <div class="mb-5">
+          <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-2.5">What is your stance? <span class="text-red-500">*</span></p>
+          <div id="s1-picker" class="space-y-3">
+            <button type="button" class="opt-btn" onclick="setChoice('s1Choice', 'Not Okay', this)">
+              🚫 <strong>Never Okay:</strong> Making synthetic videos of classmates without consent crosses an ethical line, regardless of how they react.
+            </button>
+            <button type="button" class="opt-btn" onclick="setChoice('s1Choice', 'Okay If They Laugh', this)">
+              😄 <strong>Okay If They Laugh It Off:</strong> If the friend finds it genuinely funny and no harm was intended, it is harmless fun between friends.
+            </button>
+            <button type="button" class="opt-btn" onclick="setChoice('s1Choice', 'Depends On Reaction', this)">
+              ⚖️ <strong>It Depends:</strong> It is fine initially, but becomes wrong immediately if the classmate feels hurt, targeted, or asks for it to be removed.
+            </button>
+          </div>
+          <p id="s1-choice-error" class="hidden text-xs text-red-500 font-medium mt-2">Please select your stance on Scenario 1.</p>
+        </div>
+
+        <div>
+          <label for="s1-analysis" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+            Explain Your Stance &amp; Edge Cases <span class="text-red-500">*</span>
+          </label>
+          <textarea id="s1-analysis" rows="3"
+            placeholder="Why did you choose this stance? What happens if the video gets reshared outside the friend group to people who don't know it's a joke?"
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+          <p id="s1-analysis-error" class="hidden text-xs text-red-500 font-medium mt-1">Please explain your reasoning for Scenario 1.</p>
+        </div>
+      </div>
+
+      <!-- Scenario 2 -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-full bg-fuchsia-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0">2</span>
+          <div>
+            <h2 class="text-lg font-black text-gray-900">Scenario 2: Politicians vs. Neighbors</h2>
+            <p class="text-xs text-gray-500">Public figures, satire &amp; private citizens</p>
+          </div>
+        </div>
+
+        <div class="bg-fuchsia-50 border border-fuchsia-200 rounded-2xl p-4 mb-5 text-sm text-fuchsia-950 leading-relaxed font-medium">
+          "A comedy show makes an obviously fake, silly video of a famous politician. Is that different from doing the same thing to your neighbor? Why?"
+        </div>
+
+        <div class="mb-5">
+          <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-2.5">What is your stance? <span class="text-red-500">*</span></p>
+          <div id="s2-picker" class="space-y-3">
+            <button type="button" class="opt-btn" onclick="setChoice('s2Choice', 'Different Rules', this)">
+              🏛️ <strong>Different Rules:</strong> Public figures and politicians expect parody and public commentary; private neighbors do not have public platforms to defend themselves.
+            </button>
+            <button type="button" class="opt-btn" onclick="setChoice('s2Choice', 'Same Rules', this)">
+              🤝 <strong>The Same Rules Apply:</strong> Deepfaking anyone's face/voice without permission violates basic personal rights, famous or not.
+            </button>
+            <button type="button" class="opt-btn" onclick="setChoice('s2Choice', 'Depends On Parody Clarity', this)">
+              🎭 <strong>Depends On Clarity:</strong> Parody is acceptable for anyone if it is obviously fake, but wrong if intended to deceive viewers.
+            </button>
+          </div>
+          <p id="s2-choice-error" class="hidden text-xs text-red-500 font-medium mt-2">Please select your stance on Scenario 2.</p>
+        </div>
+
+        <div>
+          <label for="s2-analysis" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+            Where Do You Draw the Line? <span class="text-red-500">*</span>
+          </label>
+          <textarea id="s2-analysis" rows="3"
+            placeholder="Explain why public figures should or shouldn't have different privacy expectations when it comes to AI-generated media..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+          <p id="s2-analysis-error" class="hidden text-xs text-red-500 font-medium mt-1">Please explain your reasoning for Scenario 2.</p>
+        </div>
+      </div>
+
+      <!-- Scenario 3 -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-full bg-fuchsia-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0">3</span>
+          <div>
+            <h2 class="text-lg font-black text-gray-900">Scenario 3: Intent vs. Impact</h2>
+            <p class="text-xs text-gray-500">Unintended consequences &amp; digital consent</p>
+          </div>
+        </div>
+
+        <div class="bg-fuchsia-50 border border-fuchsia-200 rounded-2xl p-4 mb-5 text-sm text-fuchsia-950 leading-relaxed font-medium">
+          "If someone posts a fake video of you without asking first, does it matter whether they meant to be mean?"
+        </div>
+
+        <div class="mb-5">
+          <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-2.5">What is your stance? <span class="text-red-500">*</span></p>
+          <div id="s3-picker" class="space-y-3">
+            <button type="button" class="opt-btn" onclick="setChoice('s3Choice', 'Intent Matters', this)">
+              💡 <strong>Intent Matters Most:</strong> A playful joke from a friend feels very different from deliberate bullying or malice.
+            </button>
+            <button type="button" class="opt-btn" onclick="setChoice('s3Choice', 'Impact Matters Most', this)">
+              💥 <strong>Impact Matters Most:</strong> Once published online, good intentions don't stop rumors, embarrassment, or reputation damage.
+            </button>
+            <button type="button" class="opt-btn" onclick="setChoice('s3Choice', 'Consent Matters Most', this)">
+              🔒 <strong>Consent Matters Most:</strong> Intent is irrelevant — publishing synthetic media of a real person requires prior permission, period.
+            </button>
+          </div>
+          <p id="s3-choice-error" class="hidden text-xs text-red-500 font-medium mt-2">Please select your stance on Scenario 3.</p>
+        </div>
+
+        <div>
+          <label for="s3-analysis" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+            Personal Reflection &amp; School Rules <span class="text-red-500">*</span>
+          </label>
+          <textarea id="s3-analysis" rows="3"
+            placeholder="How would you feel if a fake video of you circulated online? If you were writing a school policy for AI media creation, what rule would you set?"
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+          <p id="s3-analysis-error" class="hidden text-xs text-red-500 font-medium mt-1">Please share your reflection for Scenario 3.</p>
+        </div>
+      </div>
+
+      <!-- Synthesis Section -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-full text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-fuchsia-600">📌</div>
+          <div>
+            <h2 class="text-lg font-black text-gray-900">Your Golden Rule for AI Media</h2>
+            <p class="text-xs text-gray-500">Formulating a personal code of conduct</p>
+          </div>
+        </div>
+
+        <div class="space-y-5">
+          <div>
+            <label for="rule-reflection" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              Summary: In 1–2 sentences, state your personal "Golden Rule" before creating or sharing an AI-generated image/video/audio of any real person. <span class="text-red-500">*</span>
+            </label>
+            <textarea id="rule-reflection" rows="3"
+              placeholder="e.g. 'Never post an AI video of a real person without their explicit approval, and never use AI to imitate someone in a way that harms their reputation...'"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="rule-reflection-error" class="hidden text-xs text-red-500 font-medium mt-1">Please write your Golden Rule.</p>
+          </div>
+
+          <!-- Enjoyment stars -->
+          <div>
+            <label class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">How much did you enjoy this discussion exercise?</label>
+            <div class="flex gap-1" id="enjoyment-stars" role="group" aria-label="Enjoyment rating">
+              <button type="button" class="star-btn" onclick="setRating(1)" aria-label="1 star">⭐</button>
+              <button type="button" class="star-btn" onclick="setRating(2)" aria-label="2 stars">⭐</button>
+              <button type="button" class="star-btn" onclick="setRating(3)" aria-label="3 stars">⭐</button>
+              <button type="button" class="star-btn" onclick="setRating(4)" aria-label="4 stars">⭐</button>
+              <button type="button" class="star-btn" onclick="setRating(5)" aria-label="5 stars">⭐</button>
+            </div>
+            <p id="rating-error" class="hidden text-xs text-red-500 font-medium mt-1">Please select an enjoyment rating.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Section -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-12">
+        <p id="form-error" class="hidden text-sm font-medium text-red-500 mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+              clip-rule="evenodd" />
+          </svg>
+          <span id="form-error-text">Please complete all scenario stances and reflection answers.</span>
+        </p>
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-600 to-purple-700 hover:from-fuchsia-700 hover:to-purple-800">
+          <span id="submit-label">Submit Discussion Responses &#8594;</span>
+        </button>
+        <p class="text-center text-xs text-gray-400 font-medium mt-3">Results will load to the teacher dashboard.</p>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div id="success-screen" class="hidden fixed inset-0 z-[90] bg-[#FDF4FF] flex items-center justify-center p-4">
+    <div class="text-center max-w-md bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+      <div
+        class="w-20 h-20 mx-auto rounded-2xl mb-6 flex items-center justify-center bg-fuchsia-100 text-fuchsia-600 shadow-sm">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <div
+        class="inline-block px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 bg-fuchsia-50 text-fuchsia-800">
+        Discussion Submitted!
+      </div>
+      <h2 class="text-3xl font-black text-gray-900 mb-3 tracking-tight">
+        Great reflection, <span id="success-name" class="text-fuchsia-600">Student</span>!
+      </h2>
+      <p class="text-gray-500 mb-8 leading-relaxed text-sm">
+        Your stances and ethical analysis have been saved for class discussion.
+      </p>
+      <a href="index.html"
+        class="inline-flex items-center gap-2 text-white font-black py-3.5 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm bg-gradient-to-r from-fuchsia-600 to-purple-700 hover:from-fuchsia-700 hover:to-purple-800">
+        Return to Course Hub
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- Shared JS Utilities -->
+  <script src="../../assets/js/introai-shared.js"></script>
+
+  <script>
+    const TABLE = 'introai_week11_what_would_you_do';
+
+    let studentName = '', studentEmail = '';
+    let enjoymentRating = 0;
+
+    const choices = {
+      s1Choice: '',
+      s2Choice: '',
+      s3Choice: ''
+    };
+
+    const PICKER_IDS = {
+      s1Choice: 's1-picker',
+      s2Choice: 's2-picker',
+      s3Choice: 's3-picker'
+    };
+
+    const ERR_IDS = {
+      s1Choice: 's1-choice-error',
+      s2Choice: 's2-choice-error',
+      s3Choice: 's3-choice-error'
+    };
+
+    function setChoice(key, val, btn) {
+      choices[key] = val;
+      document.querySelectorAll('#' + PICKER_IDS[key] + ' .opt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById(ERR_IDS[key]).classList.add('hidden');
+    }
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#enjoyment-stars .star-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx < val);
+      });
+      document.getElementById('rating-error').classList.add('hidden');
+    }
+
+    async function handleRegistration(ev) {
+      ev.preventDefault();
+      const nameEl = document.getElementById('reg-name');
+      const emailEl = document.getElementById('reg-email');
+      const nameErr = document.getElementById('reg-name-error');
+      const emailErr = document.getElementById('reg-email-error');
+      let ok = true;
+
+      nameEl.classList.remove('error'); nameErr.classList.add('hidden');
+      emailEl.classList.remove('error'); emailErr.classList.add('hidden');
+
+      if (!nameEl.value.trim()) { nameEl.classList.add('error'); nameErr.classList.remove('hidden'); ok = false; }
+      if (!emailEl.value.trim() || !validateEmail(emailEl.value.trim())) { emailEl.classList.add('error'); emailErr.classList.remove('hidden'); ok = false; }
+      if (!ok) return;
+
+      const btn = document.getElementById('reg-submit-btn');
+      btn.disabled = true;
+      document.getElementById('reg-btn-label').innerHTML = '<span class="spinner"></span> Starting\u2026';
+
+      studentName = nameEl.value.trim();
+      studentEmail = emailEl.value.trim();
+      saveStudentSession(studentName, studentEmail);
+
+      const overlay = document.getElementById('registration-overlay');
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.remove(), 450);
+    }
+
+    (function restoreSession() {
+      const { name, email } = getStudentSession();
+      if (name && email) {
+        studentName = name;
+        studentEmail = email;
+        const overlay = document.getElementById('registration-overlay');
+        if (overlay) overlay.remove();
+      }
+    })();
+
+    async function submitExercise(ev) {
+      ev.preventDefault();
+      let ok = true;
+
+      // Validate choices
+      Object.keys(choices).forEach(key => {
+        if (!choices[key]) {
+          document.getElementById(ERR_IDS[key]).classList.remove('hidden');
+          ok = false;
+        }
+      });
+
+      // Validate textareas
+      const textFields = [
+        { id: 's1-analysis', errId: 's1-analysis-error' },
+        { id: 's2-analysis', errId: 's2-analysis-error' },
+        { id: 's3-analysis', errId: 's3-analysis-error' },
+        { id: 'rule-reflection', errId: 'rule-reflection-error' }
+      ];
+
+      textFields.forEach(f => {
+        const el = document.getElementById(f.id);
+        const val = el ? el.value.trim() : '';
+        if (el) el.classList.toggle('error', !val);
+        const errEl = document.getElementById(f.errId);
+        if (errEl) errEl.classList.toggle('hidden', !!val);
+        if (!val) ok = false;
+      });
+
+      if (enjoymentRating === 0) {
+        document.getElementById('rating-error').classList.remove('hidden');
+        ok = false;
+      }
+
+      if (!ok) {
+        document.getElementById('form-error').classList.remove('hidden');
+        document.querySelector('[id$="-error"]:not(.hidden)')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      document.getElementById('form-error').classList.add('hidden');
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting\u2026';
+
+      const payload = {
+        student_name: studentName,
+        student_email: studentEmail,
+        scenario_1_choice: choices.s1Choice,
+        scenario_1_analysis: document.getElementById('s1-analysis').value.trim(),
+        scenario_2_choice: choices.s2Choice,
+        scenario_2_analysis: document.getElementById('s2-analysis').value.trim(),
+        scenario_3_choice: choices.s3Choice,
+        scenario_3_analysis: document.getElementById('s3-analysis').value.trim(),
+        personal_rule_reflection: document.getElementById('rule-reflection').value.trim(),
+        enjoyment_rating: enjoymentRating,
+        submitted_at: new Date().toISOString()
+      };
+
+      try {
+        await supabaseUpsert(TABLE, payload, 'student_email');
+        document.getElementById('success-name').textContent = studentName.split(' ')[0];
+        document.getElementById('success-screen').classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        console.error('[Week 11 What Would You Do] Supabase error:', err.message);
+        btn.disabled = false;
+        document.getElementById('submit-label').textContent = 'Submit Discussion Responses \u2192';
+        if (err.message.includes('409') || err.message.includes('duplicate key')) {
+          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f You have already submitted this discussion exercise!';
+        } else {
+          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f Network error submitting exercise. Please try again.';
+        }
+        document.getElementById('form-error').classList.remove('hidden');
+      }
+    }
+  </script>
+
+</body>
+
+</html>

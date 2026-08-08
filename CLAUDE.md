@@ -1,8 +1,7 @@
-## Design System
-Always read DESIGN.md before making any visual or UI decisions.
-All font choices, colors, spacing, and aesthetic direction are defined there.
+## System & Architecture Guidelines
+Always reference `ARCHITECTURE.md` for page structure, asset pipelines (`activity.css`), shared state (`introai-shared.js`), and Supabase SQL schema standards.
+Always reference `design_language.md` for UI components, colors, typography, and aesthetic direction.
 Do not deviate without explicit user approval.
-In QA mode, flag any code that doesn't match DESIGN.md.
 
 ## Skill routing
 

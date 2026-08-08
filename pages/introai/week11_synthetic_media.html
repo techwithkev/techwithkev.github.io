@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deepfakes & Synthetic Media — Intro to AI · Week 11</title>
+  <meta name="description"
+    content="Week 11 Activity: Deepfakes & Synthetic Media. Analyze real vs AI-generated media across viral cat diving clips, Nicolas Cage deepfakes, AI Drake voice clones, and hyper-realistic Tom Cruise videos.">
+
+  <!-- Google Fonts Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+
+  <!-- Compiled Activity CSS -->
+  <link rel="stylesheet" href="../../assets/css/activity.css">
+  <style>
+    #registration-overlay {
+      transition: opacity 0.4s ease;
+    }
+
+    #registration-overlay.hiding {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #registration-overlay .reg-card {
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+    }
+
+    #registration-overlay.hiding .reg-card {
+      transform: scale(0.95) translateY(-10px);
+      opacity: 0;
+    }
+
+    .reg-input:focus {
+      outline: none;
+      border-color: #c026d3;
+      box-shadow: 0 0 0 3px rgba(192, 38, 211, 0.15);
+    }
+
+    .reg-input.error {
+      border-color: #ef4444;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #c026d3;
+      box-shadow: 0 0 0 3px rgba(192, 38, 211, 0.1);
+    }
+
+    .form-input.error {
+      border-color: #ef4444;
+    }
+
+    .opt-btn {
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #374151;
+      background: #f9fafb;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: center;
+      width: 100%;
+    }
+
+    .opt-btn:hover {
+      border-color: #d946ef;
+      background: #fdf4ff;
+      color: #701a75;
+    }
+
+    .opt-btn.selected {
+      border-color: #c026d3 !important;
+      background: #fdf4ff !important;
+      color: #701a75 !important;
+      box-shadow: 0 0 0 3px rgba(192, 38, 211, 0.15);
+    }
+
+    .star-btn {
+      font-size: 26px;
+      cursor: pointer;
+      filter: grayscale(100%);
+      transition: filter 0.15s ease, transform 0.1s ease;
+    }
+
+    .star-btn:hover {
+      transform: scale(1.15);
+    }
+
+    .star-btn.active {
+      filter: grayscale(0%);
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-[#FDF4FF]/40 text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- REGISTRATION GATE -->
+  <div id="registration-overlay" class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+    style="background: linear-gradient(135deg, #4a044e 0%, #a21caf 55%, #4a044e 100%);">
+
+    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
+        style="background: radial-gradient(circle, #f0abfc, transparent);"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
+        style="background: radial-gradient(circle, #c026d3, transparent);"></div>
+    </div>
+
+    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
+      <div class="text-center mb-8">
+        <div
+          class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center bg-fuchsia-100 text-fuchsia-600 shadow-sm">
+          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <div
+          class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 bg-fuchsia-100 text-fuchsia-800">
+          Week 11 · Media Audit
+        </div>
+        <h1 class="text-2xl font-black text-gray-900 tracking-tight">Deepfakes &amp; Synthetic Media 🕵️‍♂️</h1>
+        <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">Enter your details to begin investigating viral AI
+          videos and audio clones.</p>
+      </div>
+
+      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
+        <div class="space-y-4 mb-6">
+          <div>
+            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Full
+              Name</label>
+            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Alex Morgan"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all"
+              required />
+            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name.</p>
+          </div>
+          <div>
+            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email
+              Address</label>
+            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. alex@school.edu"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all"
+              required />
+            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
+          </div>
+        </div>
+        <button id="reg-submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-600 to-purple-700 hover:from-fuchsia-700 hover:to-purple-800">
+          <span id="reg-btn-label">Start Synthetic Media Audit &#8594;</span>
+        </button>
+      </form>
+      <p class="text-center text-[10px] text-gray-400 font-medium mt-5">Saved to Intro to AI course portal.</p>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main-content" class="max-w-3xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-fuchsia-200 pb-6">
+      <div>
+        <a href="index.html"
+          class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-fuchsia-600 mb-3 hover:text-fuchsia-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">
+          Deepfakes &amp; Synthetic Media 🎬
+        </h1>
+        <p class="text-gray-500 font-medium italic mt-1">AI Video, Voice Cloning &amp; Media Detection · Week 11</p>
+      </div>
+      <div
+        class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-fuchsia-50 border border-fuchsia-200 text-fuchsia-800 shadow-sm self-start md:self-auto">
+        Week 11
+      </div>
+    </header>
+
+    <!-- Brief Card -->
+    <div
+      class="bg-gradient-to-br from-fuchsia-700 via-fuchsia-800 to-purple-900 text-white rounded-3xl p-6 md:p-8 mb-8 shadow-xl">
+      <h2 class="text-xl font-black mb-3 flex items-center gap-2">
+        <span>🔍 Exercise Brief (~15–20 Minutes)</span>
+      </h2>
+      <p class="text-sm text-fuchsia-100 leading-relaxed mb-4">
+        As generative AI models advance, video, audio, and images can be synthetically created or manipulated with
+        uncanny realism. Today you'll audit 4 famous viral cases to spot synthetic artifacts, evaluate voice cloning
+        ethics, and outline a deepfake detection strategy.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-3 border border-white/10 text-xs">
+          <div class="font-black text-fuchsia-200 mb-1">1. Cat Diving</div>
+          <div>CGI physics &amp; visual artifact check</div>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-3 border border-white/10 text-xs">
+          <div class="font-black text-fuchsia-200 mb-1">2. Nick Cage</div>
+          <div>Face-swap alignment &amp; lighting</div>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-3 border border-white/10 text-xs">
+          <div class="font-black text-fuchsia-200 mb-1">3. AI Drake</div>
+          <div>Voice cloning &amp; musical copyright</div>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-3 border border-white/10 text-xs">
+          <div class="font-black text-fuchsia-200 mb-1">4. Tom Cruise</div>
+          <div>Hyper-real deepfakes &amp; policy solution</div>
+        </div>
+      </div>
+      <div class="bg-white/15 backdrop-blur-md rounded-2xl p-4 border border-white/20 text-xs leading-relaxed">
+        <strong>Goal:</strong> Watch each embedded media clip, make your classification, explain your evidence, and
+        answer the ethical reflection questions at the bottom.
+      </div>
+    </div>
+
+    <!-- MAIN FORM -->
+    <form id="synthetic-media-form" onsubmit="submitExercise(event)" novalidate>
+
+      <!-- Case Study 1: Cat Diving Olympics -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <span
+            class="w-8 h-8 rounded-full bg-fuchsia-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0">1</span>
+          <div>
+            <h2 class="text-lg font-black text-gray-900">Case 1: Cat Diving Olympics 🐈‍⬛</h2>
+            <p class="text-xs text-gray-500">Visual CGI &amp; Synthetic Motion Analysis</p>
+          </div>
+        </div>
+
+        <!-- Video Embed Container -->
+        <div class="aspect-video w-full rounded-2xl overflow-hidden shadow-md mb-2 bg-gray-900">
+          <iframe class="w-full h-full" src="https://www.youtube.com/embed/77xxXfKUBfc?rel=0"
+            title="Cat Diving Olympics video" frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+        </div>
+        <div
+          class="mb-5 flex items-center justify-between text-xs text-gray-500 bg-gray-50 px-3.5 py-2 rounded-xl border border-gray-200">
+          <span class="font-medium">▶️ Video player issue or Error 153?</span>
+          <a href="https://www.youtube.com/watch?v=77xxXfKUBfc" target="_blank" rel="noopener noreferrer"
+            class="font-bold text-fuchsia-600 hover:text-fuchsia-800 underline">Watch directly on YouTube ↗</a>
+        </div>
+
+        <div class="mb-5">
+          <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Classify this video clip: <span
+              class="text-red-500">*</span></p>
+          <div id="cat-picker" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <button type="button" class="opt-btn" onclick="setChoice('catDivingChoice', 'Real Animal Footage', this)">
+              🐾 <strong>Real Animal Footage</strong>
+              <div class="text-[11px] text-gray-500 font-normal mt-0.5">Authentic high-diving cat captured on camera
+              </div>
+            </button>
+            <button type="button" class="opt-btn"
+              onclick="setChoice('catDivingChoice', 'AI / CGI Synthetic Media', this)">
+              🤖 <strong>AI / CGI Synthetic Media</strong>
+              <div class="text-[11px] text-gray-500 font-normal mt-0.5">Computer-generated graphics or AI video
+                manipulation</div>
+            </button>
+          </div>
+          <p id="cat-choice-error" class="hidden text-xs text-red-500 font-medium mt-2">Please select your
+            classification choice.</p>
+        </div>
+
+        <div>
+          <label for="cat-analysis" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+            Visual Clues &amp; Physics Evidence <span class="text-red-500">*</span>
+          </label>
+          <textarea id="cat-analysis" rows="3"
+            placeholder="Describe specific visual indicators (e.g. fur texture, gravity/physics speed, water splash dynamics, or body flexibility) that influenced your decision..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"
+            required></textarea>
+          <p id="cat-analysis-error" class="hidden text-xs text-red-500 font-medium mt-1">Please provide your visual
+            analysis explanation.</p>
+        </div>
+      </div>
+
+      <!-- Case Study 2: Nicolas Cage Deepfakes -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <span
+            class="w-8 h-8 rounded-full bg-fuchsia-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0">2</span>
+          <div>
+            <h2 class="text-lg font-black text-gray-900">Case 2: Nicolas Cage Movie Face-Swaps 🎭</h2>
+            <p class="text-xs text-gray-500">Generative Deepfake Face Replacement</p>
+          </div>
+        </div>
+
+        <!-- Video Embed Container -->
+        <div class="aspect-video w-full rounded-2xl overflow-hidden shadow-md mb-2 bg-gray-900">
+          <iframe class="w-full h-full" src="https://www.youtube.com/embed/BU9YAHigNx8?rel=0"
+            title="Nick Cage Deepfake video" frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+        <div
+          class="mb-5 flex items-center justify-between text-xs text-gray-500 bg-gray-50 px-3.5 py-2 rounded-xl border border-gray-200">
+          <span class="font-medium">▶️ Video player issue or Error 153?</span>
+          <a href="https://www.youtube.com/watch?v=BU9YAHigNx8" target="_blank" rel="noopener noreferrer"
+            class="font-bold text-fuchsia-600 hover:text-fuchsia-800 underline">Watch directly on YouTube ↗</a>
+        </div>
+
+        <div class="mb-5">
+          <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Classify the face technology used:
+            <span class="text-red-500">*</span></p>
+          <div id="cage-picker" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <button type="button" class="opt-btn" onclick="setChoice('cageDeepfakeChoice', 'Real On-Set Acting', this)">
+              🎬 <strong>Real On-Set Acting</strong>
+              <div class="text-[11px] text-gray-500 font-normal mt-0.5">Original actor filmed naturally on set</div>
+            </button>
+            <button type="button" class="opt-btn"
+              onclick="setChoice('cageDeepfakeChoice', 'AI Neural Face-Swap (Deepfake)', this)">
+              🎭 <strong>AI Neural Face-Swap (Deepfake)</strong>
+              <div class="text-[11px] text-gray-500 font-normal mt-0.5">Deep neural network swapping facial features
+                onto original footage</div>
+            </button>
+          </div>
+          <p id="cage-choice-error" class="hidden text-xs text-red-500 font-medium mt-2">Please select your
+            classification choice.</p>
+        </div>
+
+        <div>
+          <label for="cage-analysis" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+            Face-Swap Artifacts &amp; Alignment Spotting <span class="text-red-500">*</span>
+          </label>
+          <textarea id="cage-analysis" rows="3"
+            placeholder="What facial clues or artifacts do you notice? (Look at lighting on skin vs background, eye blinking, jawline edges, or facial expression blending)..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"
+            required></textarea>
+          <p id="cage-analysis-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe the deepfake
+            facial artifacts you observed.</p>
+        </div>
+      </div>
+
+      <!-- Case Study 3: AI Drake Song -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <span
+            class="w-8 h-8 rounded-full bg-fuchsia-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0">3</span>
+          <div>
+            <h2 class="text-lg font-black text-gray-900">Case 3: AI Drake Song ("Heart on My Sleeve") 🎵</h2>
+            <p class="text-xs text-gray-500">Audio Voice Cloning &amp; Synthetic Vocals</p>
+          </div>
+        </div>
+
+        <!-- Video Embed Container -->
+        <div class="aspect-video w-full rounded-2xl overflow-hidden shadow-md mb-2 bg-gray-900">
+          <iframe class="w-full h-full" src="https://www.youtube.com/embed/gS3B-tK5rcM?rel=0"
+            title="AI Drake Song video" frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+        <div
+          class="mb-5 flex items-center justify-between text-xs text-gray-500 bg-gray-50 px-3.5 py-2 rounded-xl border border-gray-200">
+          <span class="font-medium">▶️ Video player issue or Error 153?</span>
+          <a href="https://www.youtube.com/watch?v=gS3B-tK5rcM" target="_blank" rel="noopener noreferrer"
+            class="font-bold text-fuchsia-600 hover:text-fuchsia-800 underline">Watch directly on YouTube ↗</a>
+        </div>
+
+        <div class="mb-5">
+          <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Classify the vocal origin: <span
+              class="text-red-500">*</span></p>
+          <div id="drake-picker" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <button type="button" class="opt-btn"
+              onclick="setChoice('drakeAiChoice', 'Authentic Artist Recording', this)">
+              🎤 <strong>Authentic Artist Recording</strong>
+              <div class="text-[11px] text-gray-500 font-normal mt-0.5">Recorded in studio by the real musical artist
+              </div>
+            </button>
+            <button type="button" class="opt-btn" onclick="setChoice('drakeAiChoice', 'AI Voice Clone Model', this)">
+              🤖 <strong>AI Voice Clone Model</strong>
+              <div class="text-[11px] text-gray-500 font-normal mt-0.5">Voice model trained on artist's past audio data
+                to synthesize new songs</div>
+            </button>
+          </div>
+          <p id="drake-choice-error" class="hidden text-xs text-red-500 font-medium mt-2">Please select your
+            classification choice.</p>
+        </div>
+
+        <div>
+          <label for="drake-analysis" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+            Voice Quality &amp; Artist Copyright Reflection <span class="text-red-500">*</span>
+          </label>
+          <textarea id="drake-analysis" rows="3"
+            placeholder="How convincing is the vocal timbre and cadence? Is it fair or ethical for fans to generate new songs using a singer's voice without permission?"
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"
+            required></textarea>
+          <p id="drake-analysis-error" class="hidden text-xs text-red-500 font-medium mt-1">Please provide your
+            reflection on AI voice cloning.</p>
+        </div>
+      </div>
+
+      <!-- Case Study 4: Tom Cruise Deepfake -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <span
+            class="w-8 h-8 rounded-full bg-fuchsia-600 text-white font-black text-sm flex items-center justify-center flex-shrink-0">4</span>
+          <div>
+            <h2 class="text-lg font-black text-gray-900">Case 4: Hyper-Real Tom Cruise Deepfake 🎬</h2>
+            <p class="text-xs text-gray-500">State-of-the-Art Generative Synthesis (@deeptomcruise)</p>
+          </div>
+        </div>
+
+        <!-- Video Embed Container -->
+        <div class="aspect-video w-full rounded-2xl overflow-hidden shadow-md mb-2 bg-gray-900">
+          <iframe class="w-full h-full" src="https://www.youtube.com/embed/nwOywe7xLhs?rel=0"
+            title="Tom Cruise Deepfake video" frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+        <div
+          class="mb-5 flex items-center justify-between text-xs text-gray-500 bg-gray-50 px-3.5 py-2 rounded-xl border border-gray-200">
+          <span class="font-medium">▶️ Video player issue or Error 153?</span>
+          <a href="https://www.youtube.com/watch?v=nwOywe7xLhs" target="_blank" rel="noopener noreferrer"
+            class="font-bold text-fuchsia-600 hover:text-fuchsia-800 underline">Watch directly on YouTube ↗</a>
+        </div>
+
+        <div class="mb-5">
+          <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Rate the visual realism of this
+            deepfake (1 = Obviously Fake, 5 = Indistinguishable): <span class="text-red-500">*</span></p>
+          <div id="cruise-realism-stars" class="flex gap-2 items-center" role="group" aria-label="Realism rating">
+            <button type="button" class="star-btn" onclick="setRealism(1)" aria-label="1 star">⭐</button>
+            <button type="button" class="star-btn" onclick="setRealism(2)" aria-label="2 stars">⭐</button>
+            <button type="button" class="star-btn" onclick="setRealism(3)" aria-label="3 stars">⭐</button>
+            <button type="button" class="star-btn" onclick="setRealism(4)" aria-label="4 stars">⭐</button>
+            <button type="button" class="star-btn" onclick="setRealism(5)" aria-label="5 stars">⭐</button>
+            <span id="realism-badge" class="ml-3 text-xs font-bold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">Not
+              rated</span>
+          </div>
+          <p id="cruise-realism-error" class="hidden text-xs text-red-500 font-medium mt-2">Please select a realism
+            rating from 1 to 5 stars.</p>
+        </div>
+
+        <div>
+          <label for="cruise-analysis" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+            Micro-Details Analysis <span class="text-red-500">*</span>
+          </label>
+          <textarea id="cruise-analysis" rows="3"
+            placeholder="This deepfake combines a physical impressionist actor with trained neural face models. What tiny micro-details (eye reflection, tooth alignment, skin pores, hair movements) reveal or hide its synthetic nature?"
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"
+            required></textarea>
+          <p id="cruise-analysis-error" class="hidden text-xs text-red-500 font-medium mt-1">Please answer the
+            micro-details analysis.</p>
+        </div>
+      </div>
+
+      <!-- Synthesis & Reflection Section -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <div
+            class="w-8 h-8 rounded-full text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-fuchsia-600">
+            💬</div>
+          <div>
+            <h2 class="text-lg font-black text-gray-900">Synthetic Media Ethics &amp; Solutions</h2>
+            <p class="text-xs text-gray-500">Critical thinking on deepfake proliferation</p>
+          </div>
+        </div>
+
+        <div class="space-y-5">
+          <div>
+            <label for="risk-reflection"
+              class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              1. Societal Risk: What is the biggest danger of hyper-realistic deepfakes in news, politics, or personal
+              privacy? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="risk-reflection" rows="3"
+              placeholder="Reflect on misinformation, fraud, loss of trust in digital evidence, or personal identity theft..."
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"
+              required></textarea>
+            <p id="risk-reflection-error" class="hidden text-xs text-red-500 font-medium mt-1">Please complete this
+              societal risk reflection.</p>
+          </div>
+
+          <div>
+            <label for="detection-reflection"
+              class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              2. Detection Strategy: If you were designing an AI Deepfake Detector app, what top 2 technical signals
+              would your algorithm analyze? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="detection-reflection" rows="3"
+              placeholder="e.g. digital watermarks, cryptographic provenance, frame-by-frame blinking frequency, lighting vector consistency, or audio spectrum anomalies..."
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"
+              required></textarea>
+            <p id="detection-reflection-error" class="hidden text-xs text-red-500 font-medium mt-1">Please complete your
+              detection strategy idea.</p>
+          </div>
+
+          <!-- Enjoyment stars -->
+          <div>
+            <label class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">How much did you enjoy
+              this activity?</label>
+            <div class="flex gap-1" id="enjoyment-stars" role="group" aria-label="Enjoyment rating">
+              <button type="button" class="star-btn" onclick="setRating(1)" aria-label="1 star">⭐</button>
+              <button type="button" class="star-btn" onclick="setRating(2)" aria-label="2 stars">⭐</button>
+              <button type="button" class="star-btn" onclick="setRating(3)" aria-label="3 stars">⭐</button>
+              <button type="button" class="star-btn" onclick="setRating(4)" aria-label="4 stars">⭐</button>
+              <button type="button" class="star-btn" onclick="setRating(5)" aria-label="5 stars">⭐</button>
+            </div>
+            <p id="rating-error" class="hidden text-xs text-red-500 font-medium mt-1">Please select an enjoyment rating.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Section -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-12">
+        <p id="form-error" class="hidden text-sm font-medium text-red-500 mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+              clip-rule="evenodd" />
+          </svg>
+          <span id="form-error-text">Please complete all required classification choices and reflection answers.</span>
+        </p>
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-600 to-purple-700 hover:from-fuchsia-700 hover:to-purple-800">
+          <span id="submit-label">Submit Media Audit &#8594;</span>
+        </button>
+        <p class="text-center text-xs text-gray-400 font-medium mt-3">Results will load to the teacher dashboard.</p>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div id="success-screen" class="hidden fixed inset-0 z-[90] bg-[#FDF4FF] flex items-center justify-center p-4">
+    <div class="text-center max-w-md bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+      <div
+        class="w-20 h-20 mx-auto rounded-2xl mb-6 flex items-center justify-center bg-fuchsia-100 text-fuchsia-600 shadow-sm">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <div
+        class="inline-block px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 bg-fuchsia-50 text-fuchsia-800">
+        Audit Submitted!
+      </div>
+      <h2 class="text-3xl font-black text-gray-900 mb-3 tracking-tight">
+        Awesome job, <span id="success-name" class="text-fuchsia-600">Student</span>!
+      </h2>
+      <p class="text-gray-500 mb-8 leading-relaxed text-sm">
+        Your synthetic media classifications and ethical reflection have been submitted successfully.
+      </p>
+      <a href="index.html"
+        class="inline-flex items-center gap-2 text-white font-black py-3.5 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm bg-gradient-to-r from-fuchsia-600 to-purple-700 hover:from-fuchsia-700 hover:to-purple-800">
+        Return to Course Hub
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- Shared JS Utilities -->
+  <script src="../../assets/js/introai-shared.js"></script>
+
+  <script>
+    const TABLE = 'introai_week11_synthetic_media';
+
+    let studentName = '', studentEmail = '';
+    let enjoymentRating = 0;
+    let tomCruiseRealismRating = 0;
+
+    const choices = {
+      catDivingChoice: '',
+      cageDeepfakeChoice: '',
+      drakeAiChoice: ''
+    };
+
+    const PICKER_IDS = {
+      catDivingChoice: 'cat-picker',
+      cageDeepfakeChoice: 'cage-picker',
+      drakeAiChoice: 'drake-picker'
+    };
+
+    const ERR_IDS = {
+      catDivingChoice: 'cat-choice-error',
+      cageDeepfakeChoice: 'cage-choice-error',
+      drakeAiChoice: 'drake-choice-error'
+    };
+
+    function setChoice(key, val, btn) {
+      choices[key] = val;
+      document.querySelectorAll('#' + PICKER_IDS[key] + ' .opt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById(ERR_IDS[key]).classList.add('hidden');
+    }
+
+    function setRealism(val) {
+      tomCruiseRealismRating = val;
+      document.querySelectorAll('#cruise-realism-stars .star-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx < val);
+      });
+      const badge = document.getElementById('realism-badge');
+      const labels = ['1 - Obviously Fake', '2 - Easily Detectable', '3 - Convincing', '4 - Very Realistic', '5 - Indistinguishable'];
+      badge.textContent = labels[val - 1] || 'Not rated';
+      badge.className = 'ml-3 text-xs font-bold px-3 py-1 rounded-full bg-fuchsia-100 text-fuchsia-900';
+      document.getElementById('cruise-realism-error').classList.add('hidden');
+    }
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#enjoyment-stars .star-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx < val);
+      });
+      document.getElementById('rating-error').classList.add('hidden');
+    }
+
+    async function handleRegistration(ev) {
+      ev.preventDefault();
+      const nameEl = document.getElementById('reg-name');
+      const emailEl = document.getElementById('reg-email');
+      const nameErr = document.getElementById('reg-name-error');
+      const emailErr = document.getElementById('reg-email-error');
+      let ok = true;
+
+      nameEl.classList.remove('error'); nameErr.classList.add('hidden');
+      emailEl.classList.remove('error'); emailErr.classList.add('hidden');
+
+      if (!nameEl.value.trim()) { nameEl.classList.add('error'); nameErr.classList.remove('hidden'); ok = false; }
+      if (!emailEl.value.trim() || !validateEmail(emailEl.value.trim())) { emailEl.classList.add('error'); emailErr.classList.remove('hidden'); ok = false; }
+      if (!ok) return;
+
+      const btn = document.getElementById('reg-submit-btn');
+      btn.disabled = true;
+      document.getElementById('reg-btn-label').innerHTML = '<span class="spinner"></span> Starting\u2026';
+
+      studentName = nameEl.value.trim();
+      studentEmail = emailEl.value.trim();
+      saveStudentSession(studentName, studentEmail);
+
+      const overlay = document.getElementById('registration-overlay');
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.remove(), 450);
+    }
+
+    (function restoreSession() {
+      const { name, email } = getStudentSession();
+      if (name && email) {
+        studentName = name;
+        studentEmail = email;
+        const overlay = document.getElementById('registration-overlay');
+        if (overlay) overlay.remove();
+      }
+    })();
+
+    async function submitExercise(ev) {
+      ev.preventDefault();
+      let ok = true;
+
+      // Validate choice pickers
+      Object.keys(choices).forEach(key => {
+        if (!choices[key]) {
+          document.getElementById(ERR_IDS[key]).classList.remove('hidden');
+          ok = false;
+        }
+      });
+
+      // Validate realism rating
+      if (tomCruiseRealismRating === 0) {
+        document.getElementById('cruise-realism-error').classList.remove('hidden');
+        ok = false;
+      }
+
+      // Validate textareas
+      const textFields = [
+        { id: 'cat-analysis', errId: 'cat-analysis-error' },
+        { id: 'cage-analysis', errId: 'cage-analysis-error' },
+        { id: 'drake-analysis', errId: 'drake-analysis-error' },
+        { id: 'cruise-analysis', errId: 'cruise-analysis-error' },
+        { id: 'risk-reflection', errId: 'risk-reflection-error' },
+        { id: 'detection-reflection', errId: 'detection-reflection-error' }
+      ];
+
+      textFields.forEach(f => {
+        const el = document.getElementById(f.id);
+        const val = el ? el.value.trim() : '';
+        if (el) el.classList.toggle('error', !val);
+        const errEl = document.getElementById(f.errId);
+        if (errEl) errEl.classList.toggle('hidden', !!val);
+        if (!val) ok = false;
+      });
+
+      if (enjoymentRating === 0) {
+        document.getElementById('rating-error').classList.remove('hidden');
+        ok = false;
+      }
+
+      if (!ok) {
+        document.getElementById('form-error').classList.remove('hidden');
+        document.querySelector('[id$="-error"]:not(.hidden)')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      document.getElementById('form-error').classList.add('hidden');
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting\u2026';
+
+      const payload = {
+        student_name: studentName,
+        student_email: studentEmail,
+        cat_diving_choice: choices.catDivingChoice,
+        cat_diving_analysis: document.getElementById('cat-analysis').value.trim(),
+        cage_deepfake_choice: choices.cageDeepfakeChoice,
+        cage_deepfake_analysis: document.getElementById('cage-analysis').value.trim(),
+        drake_ai_choice: choices.drakeAiChoice,
+        drake_ai_analysis: document.getElementById('drake-analysis').value.trim(),
+        tom_cruise_realism_rating: tomCruiseRealismRating,
+        tom_cruise_analysis: document.getElementById('cruise-analysis').value.trim(),
+        ethical_risk_reflection: document.getElementById('risk-reflection').value.trim(),
+        detection_strategy_reflection: document.getElementById('detection-reflection').value.trim(),
+        enjoyment_rating: enjoymentRating,
+        submitted_at: new Date().toISOString()
+      };
+
+      try {
+        await supabaseUpsert(TABLE, payload, 'student_email');
+        document.getElementById('success-name').textContent = studentName.split(' ')[0];
+        document.getElementById('success-screen').classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        console.error('[Week 11 Synthetic Media] Supabase error:', err.message);
+        btn.disabled = false;
+        document.getElementById('submit-label').textContent = 'Submit Media Audit \u2192';
+        if (err.message.includes('409') || err.message.includes('duplicate key')) {
+          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f You have already submitted this activity!';
+        } else {
+          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f Network error submitting exercise. Please try again.';
+        }
+        document.getElementById('form-error').classList.remove('hidden');
+      }
+    }
+  </script>
+
+</body>
+
+</html>
