@@ -4582,6 +4582,7 @@
     let ptData = [];     // introai_project_tracker rows
     let plData = [];     // introai_project_progress_logs rows
     let activeCohort = ''; // global cohort filter ('' = all)
+    let codeToCohorMap = {}; // access_code -> cohort mapping lookup
 
     // ════════════════════════════════════════════════════════════════════════════
     // SUPABASE INIT & AUTH
@@ -4799,7 +4800,7 @@
         checkErr(sm, 'sm'); checkErr(wwyd, 'wwyd'); checkErr(mcbot, 'mcbot'); checkErr(bvl, 'bvl');
 
         // Build access_code → cohort lookup from BOTH access_codes and test_access_codes
-        const codeToCohorMap = {};
+        codeToCohorMap = {};
         (codes && codes.data ? codes.data : []).forEach(c => {
           if (c.code) codeToCohorMap[c.code.toUpperCase()] = c.cohort || '';
         });
