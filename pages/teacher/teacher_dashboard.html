@@ -1667,6 +1667,12 @@
             </button>
 
             <div class="nav-section-label">Homework</div>
+            <button class="nav-item" onclick="showPage('hw-gradebook')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M1 3h14M1 7h14M1 11h14M5 1v14M10 1v14" />
+              </svg>
+              Full Class Gradebook 📊
+            </button>
             <button class="nav-item" onclick="showPage('hw-results')">
               <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
                 <path d="M3 4h10M3 8h10M3 12h6" />
@@ -1945,7 +1951,13 @@
           </div>
 
           <!-- Common Section -->
-          <div class="nav-section-label" style="margin-top:20px">Access</div>
+          <div class="nav-section-label" style="margin-top:20px">Access &amp; Controls</div>
+          <button class="nav-item" onclick="showPage('introai-exercise-control')">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M2 4h12M2 8h12M2 12h12M5 2v4M11 6v4M7 10v4" stroke-linecap="round" />
+            </svg>
+            Exercise Controls (by Cohort) 🎛️
+          </button>
           <button class="nav-item" onclick="showPage('codes')">
             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
               <rect x="3" y="7" width="10" height="8" rx="1.5" />
@@ -2095,6 +2107,45 @@
             </div>
             <div id="ai-insights-body" style="padding: 16px 20px; color: var(--text-muted); font-size: 13px; min-height: 60px; display:flex; align-items:center;">
               <span style="opacity:0.5">Click "Generate Insights" to get an AI-powered summary of your cohort's performance.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── HW FULL CLASS GRADEBOOK (MATRIX VIEW) ───────────────────────── -->
+        <div class="page" id="page-hw-gradebook">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Full Class Gradebook 📊</div>
+              <div class="page-subtitle">Comp AI Jr. grade matrix &mdash; Students as rows, Classes 1–16 as columns</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportGradebookCSV()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
+                </svg>
+                Export Matrix CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row" style="margin-bottom:16px;">
+              <label>Search Student:</label>
+              <input class="search-input" id="hw-gradebook-search" type="text" placeholder="Search by student name…" oninput="renderHWGradebookTable()" />
+              <span class="text-small text-muted" id="hw-gradebook-count"></span>
+            </div>
+            <div id="hw-gradebook-table-wrap">
+              <div class="loading">
+                <div class="spinner"></div><br>Building gradebook matrix&hellip;
+              </div>
             </div>
           </div>
         </div>
@@ -4413,6 +4464,47 @@
           </div>
         </div>
 
+        <!-- ══ INTRO TO AI: COHORT EXERCISE CONTROLS (Central Management) ══ -->
+        <div class="page" id="page-introai-exercise-control">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Exercise Controls by Cohort 🎛️</div>
+              <div class="page-subtitle">Centralized active/inactive exercise management per student cohort</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 8A6 6 0 1114 8"/><path d="M2 8l-2-2m2 2L0 10"/></svg>
+                Refresh
+              </button>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-bottom:20px; background:#0f172a; color:#fff; border-color:#334155;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+              <div>
+                <label style="font-size:11px; font-weight:800; text-transform:uppercase; color:#94a3b8; letter-spacing:0.5px; display:block; margin-bottom:6px;">Target Cohort to Control:</label>
+                <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                  <select id="exercise-control-cohort-select" class="form-input" style="background:#1e293b; color:#38bdf8; border-color:#475569; font-weight:800; min-width:220px;" onchange="changeControlCohort(this.value)">
+                    <option value="aijr">aijr (Default Cohort)</option>
+                  </select>
+                  <input type="text" id="exercise-control-custom-cohort" placeholder="Or enter new cohort ID..." style="background:#1e293b; color:#fff; border:1px solid #475569; padding:8px 12px; border-radius:8px; font-size:13px; font-weight:700;" />
+                  <button class="btn btn-teal" onclick="useCustomControlCohort()" style="padding:8px 14px; font-size:12px;">Load Cohort</button>
+                </div>
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn btn-mint" style="font-size:12px; padding:8px 12px;" onclick="batchSetCohortExercises(true)">🟢 Enable All</button>
+                <button class="btn btn-secondary" style="font-size:12px; padding:8px 12px; border-color:#ef4444; color:#ef4444;" onclick="batchSetCohortExercises(false)">🔴 Disable All</button>
+                <button class="btn btn-secondary" style="font-size:12px; padding:8px 12px;" onclick="batchSetWeeks(1, 6)">📅 Weeks 1–6 Only</button>
+                <button class="btn btn-secondary" style="font-size:12px; padding:8px 12px;" onclick="batchSetWeeks(1, 12)">📅 Weeks 1–12 Only</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="cohort-exercise-controls-list" style="display:flex; flex-direction:column; gap:16px;">
+            <div class="loading"><div class="spinner"></div><br>Loading exercise controls&hellip;</div>
+          </div>
+        </div>
+
       </main>
     </div>
   </div>
@@ -4804,6 +4896,7 @@
         populateFilters();
         renderOverview();
         renderHWTable();
+        renderHWGradebookTable();
         renderClassTiles();
         renderExamTable();
         renderExamStudentSelect();
@@ -4843,6 +4936,8 @@
         renderWWYDPage();
         renderMCBOTPage();
         renderBVLPage();
+        await loadCohortExercises();
+        renderExerciseControls();
 
         const now = new Date();
         document.getElementById('last-refresh').textContent = 'Updated ' + now.toLocaleTimeString();
@@ -5131,6 +5226,187 @@
       </tr>`).join('')}
     </tbody>
   </table>`;
+    }
+
+    // ════════════════════════════════════════════════════════════════════════════
+    // FULL CLASS GRADEBOOK MATRIX TABLE (STUDENTS AS ROWS, CLASSES AS COLUMNS)
+    // ════════════════════════════════════════════════════════════════════════════
+    function renderHWGradebookTable() {
+      const search = (document.getElementById('hw-gradebook-search')?.value || '').toLowerCase();
+      
+      // Filter hwData by active cohort if set
+      const source = activeCohort ? hwData.filter(r => r.cohort === activeCohort) : hwData;
+
+      // Group submissions by unique student (using name trimmed)
+      const studentMap = {};
+      source.forEach(r => {
+        const name = (r.student_name || '').trim();
+        if (!name) return;
+        if (search && !name.toLowerCase().includes(search)) return;
+
+        if (!studentMap[name]) {
+          studentMap[name] = {
+            name: r.student_name,
+            email: r.student_email || '',
+            cohort: r.cohort || '',
+            submissions: {}
+          };
+        }
+        studentMap[name].submissions[r.class_number] = r;
+      });
+
+      const students = Object.values(studentMap).sort((a, b) => a.name.localeCompare(b.name));
+      const maxClass = 16;
+      const classList = [];
+      for (let i = 1; i <= maxClass; i++) classList.push(i);
+
+      const countEl = document.getElementById('hw-gradebook-count');
+      if (countEl) countEl.textContent = students.length + ' student' + (students.length !== 1 ? 's' : '');
+
+      const wrapEl = document.getElementById('hw-gradebook-table-wrap');
+      if (!wrapEl) return;
+
+      if (!students.length) {
+        wrapEl.innerHTML = '<div class="empty-state"><p>No matching student homework records found.</p></div>';
+        return;
+      }
+
+      // Compute class averages for tfoot
+      const classStats = {};
+      classList.forEach(c => { classStats[c] = { totalScore: 0, count: 0 }; });
+
+      students.forEach(s => {
+        classList.forEach(c => {
+          const sub = s.submissions[c];
+          if (sub && sub.score != null) {
+            classStats[c].totalScore += Number(sub.score);
+            classStats[c].count++;
+          }
+        });
+      });
+
+      const tableHtml = `
+        <div style="overflow-x:auto; max-width:100%; border:1px solid var(--border); border-radius:10px;">
+          <table class="data-table" style="font-size:12px; border-collapse:collapse; min-width:1100px; margin:0;">
+            <thead>
+              <tr style="background:#f8fafc;">
+                <th style="position:sticky; left:0; background:#f8fafc; z-index:3; border-right:2px solid var(--border); min-width:180px; padding:10px 14px;">Student Name</th>
+                <th style="min-width:70px; text-align:center;">Cohort</th>
+                ${classList.map(c => `<th style="text-align:center; min-width:60px; padding:8px 4px;">Class ${c}</th>`).join('')}
+                <th style="text-align:center; min-width:85px; background:#f1f5f9; border-left:2px solid var(--border);">Completed</th>
+                <th style="text-align:center; min-width:85px; background:#f1f5f9;">Avg Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${students.map(s => {
+                let completed = 0;
+                let sumScores = 0;
+
+                const cells = classList.map(c => {
+                  const sub = s.submissions[c];
+                  if (sub) {
+                    completed++;
+                    sumScores += Number(sub.score || 0);
+
+                    const scoreVal = sub.score != null ? sub.score : '✓';
+                    const pct = sub.score <= 20 ? (sub.score / 20) * 100 : (sub.score || 0);
+                    const clsBadge = pct >= 75 ? 'badge-green' : pct >= 50 ? 'badge-gold' : 'badge-red';
+
+                    return `
+                      <td style="text-align:center; padding:6px 2px;" title="Class ${c}: ${sub.score || 0}/20 (Submitted: ${fmtDate(sub.submitted_at)})">
+                        <span class="badge ${clsBadge}" style="cursor:pointer; font-size:10px; padding:3px 7px; font-weight:700;" onclick="showSubmissionDetail('hw', ${sub.id})">
+                          ${scoreVal}
+                        </span>
+                      </td>
+                    `;
+                  } else {
+                    return `<td style="text-align:center; color:var(--gray); font-size:11px;">—</td>`;
+                  }
+                }).join('');
+
+                const avgPct = completed > 0 ? Math.round((sumScores / (completed * 20)) * 100) : null;
+                const avgBadge = avgPct !== null
+                  ? `<span class="badge ${avgPct >= 75 ? 'badge-green' : avgPct >= 50 ? 'badge-gold' : 'badge-red'}" style="font-size:11px; font-weight:800;">${avgPct}%</span>`
+                  : '<span style="color:var(--gray)">—</span>';
+
+                return `
+                  <tr class="clickable-row">
+                    <td style="position:sticky; left:0; background:var(--panel-bg, #fff); z-index:2; border-right:2px solid var(--border); font-weight:700; padding:10px 14px;">
+                      <strong>${esc(s.name)}</strong>
+                      ${s.email ? `<br><span style="font-size:10px; color:var(--gray); font-weight:normal;">${esc(s.email)}</span>` : ''}
+                    </td>
+                    <td style="text-align:center;"><span class="badge badge-gray" style="font-size:9px;">${esc(s.cohort || '—')}</span></td>
+                    ${cells}
+                    <td style="text-align:center; font-weight:800; background:#f8fafc; border-left:2px solid var(--border);">${completed} / ${maxClass}</td>
+                    <td style="text-align:center; background:#f8fafc;">${avgBadge}</td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+            <tfoot>
+              <tr style="background:#f1f5f9; font-weight:700; border-top:2px solid var(--border);">
+                <td style="position:sticky; left:0; background:#f1f5f9; z-index:3; border-right:2px solid var(--border); padding:10px 14px;">Class Averages:</td>
+                <td style="text-align:center;">—</td>
+                ${classList.map(c => {
+                  const stat = classStats[c];
+                  if (!stat || stat.count === 0) return `<td style="text-align:center; color:var(--gray); font-size:10px;">—</td>`;
+                  const avg = Math.round((stat.totalScore / stat.count) * 10) / 10;
+                  return `<td style="text-align:center; font-size:10px; color:var(--navy); padding:8px 2px;" title="${stat.count} submissions">${avg}<br><span style="font-size:8px; color:var(--gray);">(${stat.count})</span></td>`;
+                }).join('')}
+                <td style="text-align:center; background:#e2e8f0;">—</td>
+                <td style="text-align:center; background:#e2e8f0;">—</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      `;
+
+      wrapEl.innerHTML = tableHtml;
+    }
+
+    function exportGradebookCSV() {
+      const source = activeCohort ? hwData.filter(r => r.cohort === activeCohort) : hwData;
+      const studentMap = {};
+      source.forEach(r => {
+        const name = (r.student_name || '').trim();
+        if (!name) return;
+        if (!studentMap[name]) {
+          studentMap[name] = { name: r.student_name, cohort: r.cohort || '', submissions: {} };
+        }
+        studentMap[name].submissions[r.class_number] = r;
+      });
+
+      const students = Object.values(studentMap).sort((a, b) => a.name.localeCompare(b.name));
+      const classList = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
+
+      const headerRow = ['student_name', 'cohort', ...classList.map(c => `class_${c}_score`), 'completed_count', 'average_score_pct'];
+      const rows = [headerRow];
+
+      students.forEach(s => {
+        let completed = 0;
+        let sumScores = 0;
+        const row = [s.name, s.cohort];
+
+        classList.forEach(c => {
+          const sub = s.submissions[c];
+          if (sub) {
+            completed++;
+            sumScores += Number(sub.score || 0);
+            row.push(sub.score != null ? sub.score : '✓');
+          } else {
+            row.push('');
+          }
+        });
+
+        const avgPct = completed > 0 ? Math.round((sumScores / (completed * 20)) * 100) : '';
+        row.push(completed, avgPct);
+        rows.push(row);
+      });
+
+      const csv = rows.map(r => r.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'compjr_gradebook_matrix.csv'; a.click();
+      toast('Exported compjr_gradebook_matrix.csv');
     }
 
     // ════════════════════════════════════════════════════════════════════════════
@@ -9732,6 +10008,233 @@
         </tr>`).join('')}
       </tbody>
     </table>`;
+    }
+
+    // ════════════════════════════════════════════════════════════════════════════
+    // COHORT EXERCISE CONTROLS & VISIBILITY MANAGEMENT
+    // ════════════════════════════════════════════════════════════════════════════
+    const INTROAI_EXERCISES_REGISTRY = [
+      { id: 'week01_is_it_ai', title: 'Is it AI? Sorting App', week: 1, category: 'Fundamentals', page: 'week01_is_it_ai.html' },
+      { id: 'week01_ai_self_assessment', title: 'AI Self-Assessment Survey', week: 1, category: 'Fundamentals', page: 'week01_ai_self_assessment.html' },
+      { id: 'week01_ai_scavenger_hunt', title: 'AI Scavenger Hunt', week: 1, category: 'Fundamentals', page: 'week01_ai_scavenger_hunt.html' },
+      { id: 'week01_intro_to_chatbots', title: 'Intro to Chatbots', week: 1, category: 'Fundamentals', page: 'week01_intro_to_chatbots.html' },
+
+      { id: 'week02_creative_prompting', title: 'Creative Prompting Lab', week: 2, category: 'Prompting', page: 'week02_creative_prompting.html' },
+      { id: 'week02_persona_detective', title: 'Persona Detective', week: 2, category: 'Prompting', page: 'week02_persona_detective.html' },
+      { id: 'week02_co_writer_story', title: 'AI Co-Writer Story Engine', week: 2, category: 'Prompting', page: 'week02_co_writer_story.html' },
+
+      { id: 'week03_prompt_comparison', title: 'Prompt Comparison Lab', week: 3, category: 'Generative Media', page: 'week03_prompt_comparison.html' },
+      { id: 'week03_ai_pictionary', title: 'AI Pictionary Cliché Challenge', week: 3, category: 'Generative Media', page: 'week03_ai_pictionary.html' },
+
+      { id: 'week04_music_generation', title: 'Generative Music Creation', week: 4, category: 'Audio & Music', page: 'week04_music_generation.html' },
+      { id: 'week04_instrument_swap', title: 'Instrument Swap Challenge', week: 4, category: 'Audio & Music', page: 'week04_instrument_swap.html' },
+
+      { id: 'week05_train_your_model', title: 'Teachable Machine Model Training', week: 5, category: 'Machine Learning', page: 'week05_train_your_model.html' },
+
+      { id: 'week06_be_the_algorithm', title: 'Be the Algorithm', week: 6, category: 'Algorithms', page: 'week06_be_the_algorithm.html' },
+      { id: 'week06_analyze_your_feed', title: 'Analyze Your Feed', week: 6, category: 'Algorithms', page: 'week06_analyze_your_feed.html' },
+      { id: 'week06_design_a_recommender', title: 'Design a Recommender System', week: 6, category: 'Algorithms', page: 'week06_design_a_recommender.html' },
+      { id: 'week06_knowledge_check', title: 'Mid-Course Knowledge Check Quiz', week: 6, category: 'Algorithms', page: 'week06_knowledge_check.html' },
+
+      { id: 'week07_spot_the_bias', title: 'Spot the Bias', week: 7, category: 'Data & Ethics', page: 'week07_spot_the_bias.html' },
+      { id: 'week07_data_audit', title: 'Data Audit', week: 7, category: 'Data & Ethics', page: 'week07_data_audit.html' },
+      { id: 'week07_build_dataset', title: 'Build Your Own Dataset', week: 7, category: 'Data & Ethics', page: 'week07_build_dataset.html' },
+      { id: 'data_detective', title: 'Data Detective Investigation', week: 7, category: 'Data & Ethics', page: 'data_detective.html' },
+
+      { id: 'week08_bias_card_twist', title: 'The Bias Card Twist', week: 8, category: 'Responsible AI', page: 'week08_bias_card_twist.html' },
+      { id: 'week08_bias_detective_stations', title: 'Bias Detective Stations', week: 8, category: 'Responsible AI', page: 'week08_bias_detective_stations.html' },
+      { id: 'week08_fix_the_dataset', title: 'Fix the Dataset', week: 8, category: 'Responsible AI', page: 'week08_fix_the_dataset.html' },
+      { id: 'week08_promise_vs_problem', title: 'Promise vs Problem Placemat', week: 8, category: 'Responsible AI', page: 'week08_promise_vs_problem.html' },
+      { id: 'week08_mini_ethics_trial', title: 'Mini Ethics Trial & AI Judge', week: 8, category: 'Responsible AI', page: 'week08_mini_ethics_trial.html' },
+
+      { id: 'week09_npc_logic', title: 'NPC Logic: Guard AI', week: 9, category: 'Logic & Pitch', page: 'week09_npc_logic.html' },
+      { id: 'week09_ai_feature_pitch', title: 'AI Feature Pitch', week: 9, category: 'Logic & Pitch', page: 'week09_ai_feature_pitch.html' },
+      { id: 'week09_project_brief', title: 'Kickoff Task: Project Brief', week: 9, category: 'Final Project', page: 'week09_project_brief.html' },
+      { id: 'week09_poc_brainstormer', title: 'Final Project POC Brainstormer', week: 9, category: 'Final Project', page: 'week09_poc_brainstormer.html' },
+
+      { id: 'week10_ai_design_sprint', title: 'AI Design Tool Sprint', week: 10, category: 'Design & Prototyping', page: 'week10_ai_design_sprint.html' },
+      { id: 'week10_mockup_critique', title: 'Mockup Critique', week: 10, category: 'Design & Prototyping', page: 'week10_mockup_critique.html' },
+
+      { id: 'week11_synthetic_media', title: 'Synthetic Media & Deepfakes Audit', week: 11, category: 'Synthetic Media', page: 'week11_synthetic_media.html' },
+      { id: 'week11_what_would_you_do', title: 'What Would You Do? Ethics Discussion', week: 11, category: 'Synthetic Media', page: 'week11_what_would_you_do.html' },
+
+      { id: 'week12_mini_chatbot', title: 'Build Your Own Mini-Chatbot (Python IDE)', week: 12, category: 'Chatbot Programming', page: 'week12_mini_chatbot.html' },
+      { id: 'week12_bot_vs_llm', title: 'Rule-Based Bot vs. LLM Chatbot', week: 12, category: 'Chatbot Programming', page: 'week12_bot_vs_llm.html' }
+    ];
+
+    let currentControlCohort = 'aijr';
+    let cohortExercisesMap = {};
+
+    async function loadCohortExercises() {
+      try {
+        const res = await sb.from('introai_cohort_exercises').select('*').limit(10000);
+        if (res && res.data) {
+          cohortExercisesMap = {};
+          res.data.forEach(r => {
+            cohortExercisesMap[`${r.cohort.toLowerCase()}:${r.exercise_id}`] = r.is_active;
+          });
+        }
+      } catch (e) {
+        console.error('Error loading cohort exercises:', e);
+      }
+    }
+
+    function changeControlCohort(val) {
+      if (!val) return;
+      currentControlCohort = val.trim();
+      renderExerciseControls();
+    }
+
+    function useCustomControlCohort() {
+      const input = document.getElementById('exercise-control-custom-cohort');
+      const val = input ? input.value.trim() : '';
+      if (val) {
+        currentControlCohort = val;
+        renderExerciseControls();
+        toast('Loaded control view for cohort: ' + val);
+      }
+    }
+
+    function renderExerciseControls() {
+      const cohort = currentControlCohort.toLowerCase();
+      const selectEl = document.getElementById('exercise-control-cohort-select');
+      if (selectEl) {
+        const cohorts = Array.from(new Set(['aijr', ...Object.values(codeToCohorMap || {})])).filter(Boolean);
+        if (!cohorts.includes(cohort)) cohorts.push(cohort);
+        selectEl.innerHTML = cohorts.map(c => `<option value="${esc(c)}" ${c === cohort ? 'selected' : ''}>${esc(c)} ${c==='aijr'?'(Default)':''}</option>`).join('');
+      }
+
+      const container = document.getElementById('cohort-exercise-controls-list');
+      if (!container) return;
+
+      const byWeek = {};
+      INTROAI_EXERCISES_REGISTRY.forEach(ex => {
+        const w = ex.week;
+        if (!byWeek[w]) byWeek[w] = [];
+        byWeek[w].push(ex);
+      });
+
+      let html = '';
+      Object.keys(byWeek).sort((a,b)=>+a-+b).forEach(weekNum => {
+        const items = byWeek[weekNum];
+        const activeCount = items.filter(ex => {
+          const key = `${cohort}:${ex.id}`;
+          return cohortExercisesMap[key] !== false;
+        }).length;
+
+        html += `
+          <div class="panel" style="margin-bottom:0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:8px;">
+              <div>
+                <span style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--teal); letter-spacing:0.5px;">Week ${weekNum} Exercises</span>
+                <span style="font-size:12px; color:var(--gray); margin-left:8px;">(${activeCount} / ${items.length} Active for cohort '<strong>${esc(cohort)}</strong>')</span>
+              </div>
+              <div style="display:flex; gap:6px;">
+                <button class="btn btn-mint" style="padding:4px 10px; font-size:11px;" onclick="toggleWeekExercises(${weekNum}, true)">Enable Week ${weekNum}</button>
+                <button class="btn btn-secondary" style="padding:4px 10px; font-size:11px; border-color:#fca5a5; color:#dc2626;" onclick="toggleWeekExercises(${weekNum}, false)">Disable Week ${weekNum}</button>
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap:12px;">
+              ${items.map(ex => {
+                const key = `${cohort}:${ex.id}`;
+                const isActive = cohortExercisesMap[key] !== false;
+                const bg = isActive ? '#f0fdf4' : '#fef2f2';
+                const border = isActive ? '#bbf7d0' : '#fecaca';
+                const statusColor = isActive ? '#166534' : '#991b1b';
+                const statusLabel = isActive ? '✅ Active (Visible)' : '🔒 Inactive (Hidden)';
+
+                return `
+                  <div style="background:${bg}; border:1px solid ${border}; border-radius:10px; padding:12px; display:flex; justify-content:space-between; align-items:center; transition:all 0.2s;">
+                    <div>
+                      <div style="font-size:13px; font-weight:800; color:var(--navy);">${esc(ex.title)}</div>
+                      <div style="font-size:11px; color:var(--gray); margin-top:2px;">
+                        <span class="badge badge-teal" style="font-size:9px;">${esc(ex.category)}</span>
+                        <a href="../introai/${ex.page}" target="_blank" style="color:var(--teal); font-weight:700; margin-left:6px;" onclick="event.stopPropagation();">Preview Page ↗</a>
+                      </div>
+                    </div>
+                    <div style="text-align:right;">
+                      <label style="display:inline-block; cursor:pointer;">
+                        <input type="checkbox" ${isActive ? 'checked' : ''} onchange="toggleSingleExercise('${ex.id}', this.checked)" style="transform:scale(1.4); cursor:pointer; accent-color:var(--teal);" />
+                      </label>
+                      <div style="font-size:10px; font-weight:800; color:${statusColor}; margin-top:6px;">${statusLabel}</div>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    async function toggleSingleExercise(exerciseId, isActive) {
+      const cohort = currentControlCohort.toLowerCase();
+      cohortExercisesMap[`${cohort}:${exerciseId}`] = isActive;
+      renderExerciseControls();
+
+      try {
+        const payload = { cohort, exercise_id: exerciseId, is_active: isActive, updated_at: new Date().toISOString() };
+        await sb.from('introai_cohort_exercises').upsert(payload, { onConflict: 'cohort,exercise_id' });
+        toast(`${isActive ? 'Enabled' : 'Disabled'} ${exerciseId} for ${cohort}`);
+      } catch (err) {
+        console.error('Error saving exercise active status:', err);
+        toast('Error saving exercise status');
+      }
+    }
+
+    async function batchSetCohortExercises(isActive) {
+      const cohort = currentControlCohort.toLowerCase();
+      const promises = INTROAI_EXERCISES_REGISTRY.map(ex => {
+        cohortExercisesMap[`${cohort}:${ex.id}`] = isActive;
+        return sb.from('introai_cohort_exercises').upsert({
+          cohort,
+          exercise_id: ex.id,
+          is_active: isActive,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'cohort,exercise_id' });
+      });
+
+      renderExerciseControls();
+      await Promise.all(promises);
+      toast(`${isActive ? 'Enabled' : 'Disabled'} all exercises for ${cohort}`);
+    }
+
+    async function batchSetWeeks(startW, endW) {
+      const cohort = currentControlCohort.toLowerCase();
+      const promises = INTROAI_EXERCISES_REGISTRY.map(ex => {
+        const active = ex.week >= startW && ex.week <= endW;
+        cohortExercisesMap[`${cohort}:${ex.id}`] = active;
+        return sb.from('introai_cohort_exercises').upsert({
+          cohort,
+          exercise_id: ex.id,
+          is_active: active,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'cohort,exercise_id' });
+      });
+
+      renderExerciseControls();
+      await Promise.all(promises);
+      toast(`Updated '${cohort}': Weeks ${startW}–${endW} set active`);
+    }
+
+    async function toggleWeekExercises(weekNum, isActive) {
+      const cohort = currentControlCohort.toLowerCase();
+      const items = INTROAI_EXERCISES_REGISTRY.filter(ex => ex.week === weekNum);
+      const promises = items.map(ex => {
+        cohortExercisesMap[`${cohort}:${ex.id}`] = isActive;
+        return sb.from('introai_cohort_exercises').upsert({
+          cohort,
+          exercise_id: ex.id,
+          is_active: isActive,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'cohort,exercise_id' });
+      });
+
+      renderExerciseControls();
+      await Promise.all(promises);
+      toast(`Week ${weekNum} ${isActive ? 'enabled' : 'disabled'} for ${cohort}`);
     }
 
     // ════════════════════════════════════════════════════════════════════════════

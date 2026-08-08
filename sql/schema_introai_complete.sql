@@ -1992,3 +1992,32 @@ CREATE POLICY "anon_select_w12_bot_vs_llm"
 CREATE POLICY "auth_select_w12_bot_vs_llm"
   ON introai_week12_bot_vs_llm FOR SELECT TO authenticated USING (true);
 
+
+-- ── create_introai_cohort_exercises.sql ─────────────────────────────────────
+CREATE TABLE IF NOT EXISTS introai_cohort_exercises (
+  id           BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  cohort       TEXT NOT NULL DEFAULT 'aijr',       -- e.g. 'aijr', 'fall2024', 'sat_10am'
+  exercise_id  TEXT NOT NULL,                      -- e.g. 'week01_is_it_ai', 'week11_synthetic_media'
+  is_active    BOOLEAN NOT NULL DEFAULT true,
+  updated_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT uq_cohort_exercise UNIQUE (cohort, exercise_id)
+);
+
+COMMENT ON TABLE introai_cohort_exercises
+  IS 'Stores active/inactive visibility toggles for Intro to AI exercises per cohort';
+
+ALTER TABLE introai_cohort_exercises ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "anon_select_cohort_exercises" ON introai_cohort_exercises;
+DROP POLICY IF EXISTS "anon_all_cohort_exercises" ON introai_cohort_exercises;
+DROP POLICY IF EXISTS "auth_all_cohort_exercises" ON introai_cohort_exercises;
+
+CREATE POLICY "anon_select_cohort_exercises"
+  ON introai_cohort_exercises FOR SELECT TO anon USING (true);
+
+CREATE POLICY "anon_all_cohort_exercises"
+  ON introai_cohort_exercises FOR ALL TO anon USING (true) WITH CHECK (true);
+
+CREATE POLICY "auth_all_cohort_exercises"
+  ON introai_cohort_exercises FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
