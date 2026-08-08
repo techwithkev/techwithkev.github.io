@@ -1914,6 +1914,34 @@
               </svg>
               W10–15: Tracker &amp; Build Check-Ins
             </button>
+
+            <div class="nav-section-label" style="margin-top:20px">Week 11 &mdash; Deepfakes &amp; Ethics</div>
+            <button class="nav-item" onclick="showPage('introai-synthetic-media')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M15 10l-4 4-6-6 4-4 6 6zM2 14l3-1-2-2-1 3z" stroke-linecap="round" />
+              </svg>
+              W11 Ex1: Synthetic Media
+            </button>
+            <button class="nav-item" onclick="showPage('introai-what-would-you-do')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M8 14A6 6 0 108 2a6 6 0 000 12zM8 6v4M8 12h.01" stroke-linecap="round" />
+              </svg>
+              W11 Ex2: What Would You Do?
+            </button>
+
+            <div class="nav-section-label" style="margin-top:20px">Week 12 &mdash; Chatbot Programming</div>
+            <button class="nav-item" onclick="showPage('introai-mini-chatbot')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" stroke-linecap="round" />
+              </svg>
+              W12 Ex1: Build a Mini-Chatbot
+            </button>
+            <button class="nav-item" onclick="showPage('introai-bot-vs-llm')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2" stroke-linecap="round" />
+              </svg>
+              W12 Ex2: Bot vs. LLM Chatbot
+            </button>
           </div>
 
           <!-- Common Section -->
@@ -4217,6 +4245,174 @@
           </div>
         </div>
 
+        <!-- ══ INTRO TO AI: SYNTHETIC MEDIA (W11 Ex 1) ══ -->
+        <div class="page" id="page-introai-synthetic-media">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Synthetic Media &amp; Deepfakes — Week 11 Exercise 1 🎥</div>
+              <div class="page-subtitle">Media audit, real vs AI analysis &amp; personal golden rules</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 8A6 6 0 1114 8"/><path d="M2 8l-2-2m2 2L0 10"/></svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('sm')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 1v9M4 7l4 4 4-4"/><path d="M2 13h12"/></svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card gold">
+              <div class="stat-label">Total Audits</div>
+              <div class="stat-value" id="sm-stat-count">—</div>
+              <div class="stat-sub">Submitted case study analyses</div>
+            </div>
+            <div class="stat-card teal">
+              <div class="stat-label">Avg Enjoyment</div>
+              <div class="stat-value" id="sm-stat-enjoy">—</div>
+              <div class="stat-sub">Out of 5 stars</div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="filter-row">
+              <label>Search:</label>
+              <input class="search-input" id="sm-search" type="text" placeholder="Student name, rule..." oninput="renderSMTable()" />
+              <span class="text-small text-muted" id="sm-count"></span>
+            </div>
+            <div id="sm-table-wrap">
+              <div class="loading"><div class="spinner"></div><br>Loading Synthetic Media submissions&hellip;</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ INTRO TO AI: WHAT WOULD YOU DO? (W11 Ex 2) ══ -->
+        <div class="page" id="page-introai-what-would-you-do">
+          <div class="page-header">
+            <div>
+              <div class="page-title">What Would You Do? Ethics Discussion — Week 11 Exercise 2 ⚖️</div>
+              <div class="page-subtitle">Ethical dilemmas: pranks, politicians vs neighbors, intent vs impact</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 8A6 6 0 1114 8"/><path d="M2 8l-2-2m2 2L0 10"/></svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('wwyd')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 1v9M4 7l4 4 4-4"/><path d="M2 13h12"/></svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card gold">
+              <div class="stat-label">Total Discussions</div>
+              <div class="stat-value" id="wwyd-stat-count">—</div>
+              <div class="stat-sub">Submitted ethics responses</div>
+            </div>
+            <div class="stat-card teal">
+              <div class="stat-label">Avg Enjoyment</div>
+              <div class="stat-value" id="wwyd-stat-enjoy">—</div>
+              <div class="stat-sub">Out of 5 stars</div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="filter-row">
+              <label>Search:</label>
+              <input class="search-input" id="wwyd-search" type="text" placeholder="Student name, stance, rule..." oninput="renderWWYDTable()" />
+              <span class="text-small text-muted" id="wwyd-count"></span>
+            </div>
+            <div id="wwyd-table-wrap">
+              <div class="loading"><div class="spinner"></div><br>Loading Ethics Discussion submissions&hellip;</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ INTRO TO AI: BUILD A MINI-CHATBOT (W12 Ex 1) ══ -->
+        <div class="page" id="page-introai-mini-chatbot">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Build a Mini-Chatbot — Week 12 Exercise 1 🤖</div>
+              <div class="page-subtitle">Python chatbot scripts, building blocks (variables/loops/conditionals) &amp; reflections</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 8A6 6 0 1114 8"/><path d="M2 8l-2-2m2 2L0 10"/></svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('mcbot')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 1v9M4 7l4 4 4-4"/><path d="M2 13h12"/></svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card gold">
+              <div class="stat-label">Total Chatbots</div>
+              <div class="stat-value" id="mcbot-stat-count">—</div>
+              <div class="stat-sub">Submitted Python chatbot scripts</div>
+            </div>
+            <div class="stat-card teal">
+              <div class="stat-label">Avg Enjoyment</div>
+              <div class="stat-value" id="mcbot-stat-enjoy">—</div>
+              <div class="stat-sub">Out of 5 stars</div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="filter-row">
+              <label>Search:</label>
+              <input class="search-input" id="mcbot-search" type="text" placeholder="Student name, bot name, code..." oninput="renderMCBOTTable()" />
+              <span class="text-small text-muted" id="mcbot-count"></span>
+            </div>
+            <div id="mcbot-table-wrap">
+              <div class="loading"><div class="spinner"></div><br>Loading Mini-Chatbot submissions&hellip;</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ INTRO TO AI: BOT VS LLM CHATBOT (W12 Ex 2) ══ -->
+        <div class="page" id="page-introai-bot-vs-llm">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Rule-Based Bot vs. LLM Chatbot — Week 12 Exercise 2 🏛️</div>
+              <div class="page-subtitle">Deterministic code vs probabilistic models, vending machine vs support bot, hybrid AI</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 8A6 6 0 1114 8"/><path d="M2 8l-2-2m2 2L0 10"/></svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('bvl')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 1v9M4 7l4 4 4-4"/><path d="M2 13h12"/></svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card gold">
+              <div class="stat-label">Total Comparisons</div>
+              <div class="stat-value" id="bvl-stat-count">—</div>
+              <div class="stat-sub">Submitted AI architecture responses</div>
+            </div>
+            <div class="stat-card teal">
+              <div class="stat-label">Avg Enjoyment</div>
+              <div class="stat-value" id="bvl-stat-enjoy">—</div>
+              <div class="stat-sub">Out of 5 stars</div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="filter-row">
+              <label>Search:</label>
+              <input class="search-input" id="bvl-search" type="text" placeholder="Student name, stance, design..." oninput="renderBVLTable()" />
+              <span class="text-small text-muted" id="bvl-count"></span>
+            </div>
+            <div id="bvl-table-wrap">
+              <div class="loading"><div class="spinner"></div><br>Loading Bot vs LLM submissions&hellip;</div>
+            </div>
+          </div>
+        </div>
+
       </main>
     </div>
   </div>
@@ -4283,6 +4479,10 @@
     let pocData = [];    // introai_week09_poc_brainstormer rows
     let adsData = [];    // introai_week10_ai_design_sprint rows
     let mcData = [];     // introai_week10_mockup_critique rows
+    let smData = [];     // introai_week11_synthetic_media rows
+    let wwydData = [];   // introai_week11_what_would_you_do rows
+    let mcbotData = [];  // introai_week12_mini_chatbot rows
+    let bvlData = [];    // introai_week12_bot_vs_llm rows
     let ptData = [];     // introai_project_tracker rows
     let plData = [];     // introai_project_progress_logs rows
     let activeCohort = ''; // global cohort filter ('' = all)
@@ -4384,7 +4584,7 @@
     async function loadAll() {
       document.getElementById('last-refresh').textContent = 'Refreshing…';
       try {
-        const [hw, exam, codes, sa, sh, cb, cp, pd, ws, ap, pc, mg, isSwap, tm, bta, ayf, dsr, kc, stb, da, bd, dd, testSub, testCodes, bct, bds, ftd, pvp, met, caioOld, nl, fp, pb, poc, pt, pl, ads, mc] = await Promise.all([
+        const [hw, exam, codes, sa, sh, cb, cp, pd, ws, ap, pc, mg, isSwap, tm, bta, ayf, dsr, kc, stb, da, bd, dd, testSub, testCodes, bct, bds, ftd, pvp, met, caioOld, nl, fp, pb, poc, pt, pl, ads, mc, sm, wwyd, mcbot, bvl] = await Promise.all([
           sb.from('homework_submissions').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('caio_final_exam_results').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('access_codes').select('*').order('created_at', { ascending: false }).limit(10000),
@@ -4422,7 +4622,11 @@
           sb.from('introai_project_tracker').select('*').order('updated_at', { ascending: false }).limit(10000),
           sb.from('introai_project_progress_logs').select('*').order('logged_at', { ascending: false }).limit(10000),
           sb.from('introai_week10_ai_design_sprint').select('*').order('submitted_at', { ascending: false }).limit(10000),
-          sb.from('introai_week10_mockup_critique').select('*').order('submitted_at', { ascending: false }).limit(10000)
+          sb.from('introai_week10_mockup_critique').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('introai_week11_synthetic_media').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('introai_week11_what_would_you_do').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('introai_week12_mini_chatbot').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('introai_week12_bot_vs_llm').select('*').order('submitted_at', { ascending: false }).limit(10000)
         ]);
 
         function checkErr(res, name) {
@@ -4439,6 +4643,7 @@
         checkErr(bds, 'bds'); checkErr(ftd, 'ftd'); checkErr(pvp, 'pvp'); checkErr(met, 'met');
         checkErr(nl, 'nl'); checkErr(fp, 'fp'); checkErr(pb, 'pb'); checkErr(poc, 'poc');
         checkErr(pt, 'pt'); checkErr(pl, 'pl'); checkErr(ads, 'ads'); checkErr(mc, 'mc');
+        checkErr(sm, 'sm'); checkErr(wwyd, 'wwyd'); checkErr(mcbot, 'mcbot'); checkErr(bvl, 'bvl');
 
         // Build access_code → cohort lookup from BOTH access_codes and test_access_codes
         const codeToCohorMap = {};
@@ -4589,8 +4794,12 @@
         plData = pl ? (pl.data || []) : [];
         adsData = ads ? (ads.data || []) : [];
         mcData = mc ? (mc.data || []) : [];
+        smData = sm ? (sm.data || []) : [];
+        wwydData = wwyd ? (wwyd.data || []) : [];
+        mcbotData = mcbot ? (mcbot.data || []) : [];
+        bvlData = bvl ? (bvl.data || []) : [];
 
-        console.log(`Loaded: ${hwData.length} hw, ${examData.length} exam, ${codesData.length} codes, ${saData.length} SA, ${shData.length} SH, ${cbData.length} CB, ${cpData.length} CP, ${pdData.length} PD, ${wsData.length} WS, ${apData.length} AP, ${pcData.length} PC, ${mgData.length} MG, ${isData.length} IS, ${tmData.length} TM, ${btaData.length} BTA, ${ayfData.length} AYF, ${dsrData.length} DSR, ${kcData.length} KC, ${stbData.length} STB, ${daData.length} DA, ${bdData.length} BD, ${ddData.length} DD, ${bctData.length} BCT, ${bdsData.length} BDS, ${ftdData.length} FTD, ${pvpData.length} PVP, ${metData.length} MET, ${nlData.length} NL, ${fpData.length} FP, ${pbData.length} PB, ${pocData.length} POC, ${ptData.length} PT, ${plData.length} PL, ${adsData.length} ADS, ${mcData.length} MC rows`);
+        console.log(`Loaded: ${hwData.length} hw, ${examData.length} exam, ${codesData.length} codes, ${saData.length} SA, ${shData.length} SH, ${cbData.length} CB, ${cpData.length} CP, ${pdData.length} PD, ${wsData.length} WS, ${apData.length} AP, ${pcData.length} PC, ${mgData.length} MG, ${isData.length} IS, ${tmData.length} TM, ${btaData.length} BTA, ${ayfData.length} AYF, ${dsrData.length} DSR, ${kcData.length} KC, ${stbData.length} STB, ${daData.length} DA, ${bdData.length} BD, ${ddData.length} DD, ${bctData.length} BCT, ${bdsData.length} BDS, ${ftdData.length} FTD, ${pvpData.length} PVP, ${metData.length} MET, ${nlData.length} NL, ${fpData.length} FP, ${pbData.length} PB, ${pocData.length} POC, ${ptData.length} PT, ${plData.length} PL, ${adsData.length} ADS, ${mcData.length} MC, ${smData.length} SM, ${wwydData.length} WWYD, ${mcbotData.length} MCBOT, ${bvlData.length} BVL rows`);
 
         populateFilters();
         renderOverview();
@@ -4630,6 +4839,10 @@
         renderPTPage();
         renderADSPage();
         renderMCPage();
+        renderSMPage();
+        renderWWYDPage();
+        renderMCBOTPage();
+        renderBVLPage();
 
         const now = new Date();
         document.getElementById('last-refresh').textContent = 'Updated ' + now.toLocaleTimeString();
@@ -5382,6 +5595,18 @@
       } else if (type === 'mc') {
         r = mcData.find(x => String(x.id) === String(id));
         title = (r?.student_name || "Detail View") + " — Mockup Critique Detail";
+      } else if (type === 'sm') {
+        r = smData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Synthetic Media Audit Detail";
+      } else if (type === 'wwyd') {
+        r = wwydData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — What Would You Do? Ethics Detail";
+      } else if (type === 'mcbot') {
+        r = mcbotData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Build a Mini-Chatbot Detail";
+      } else if (type === 'bvl') {
+        r = bvlData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Bot vs. LLM Chatbot Detail";
       }
 
       if (!r) return;
@@ -6036,6 +6261,91 @@
 
           <div class="field-label" style="margin-top:12px;">Class Share Takeaway</div>
           <div class="field-value" style="background:#f8fafc; font-weight:600;">${esc(r.class_share_takeaway || '—')}</div>
+        `;
+      } else if (type === 'sm') {
+        bodyHtml = `
+          <div style="padding:14px; background:#f0fdfa; border-radius:12px; border:1px solid #ccfbf1; margin-bottom:16px;">
+            <div style="font-size:12px; font-weight:700; color:#115e59; text-transform:uppercase;">Synthetic Media &amp; Deepfakes Audit</div>
+            <div style="font-size:14px; font-weight:800; color:#0f766e; margin-top:4px;">Student: ${esc(r.student_name)} (${esc(r.student_email)})</div>
+            <div style="font-size:12px; color:#134e4a; margin-top:2px;">Enjoyment Rating: ${r.enjoyment_rating || 0}/5 ⭐ | Submitted: ${fmtDate(r.submitted_at)}</div>
+          </div>
+
+          <div class="field-label" style="margin-top:12px;">Case Study 1: Cat Diving Olympics 🐱</div>
+          <div class="field-value"><strong>Verdict:</strong> <span class="badge badge-teal">${esc(r.case_study_1_real_or_ai || '—')}</span><br><strong>Analysis:</strong> ${esc(r.case_study_1_analysis || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">Case Study 2: Nicolas Cage Deepfake 🎬</div>
+          <div class="field-value"><strong>Verdict:</strong> <span class="badge badge-teal">${esc(r.case_study_2_real_or_ai || '—')}</span><br><strong>Analysis:</strong> ${esc(r.case_study_2_analysis || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">Case Study 3: AI Drake Song 🎵</div>
+          <div class="field-value"><strong>Verdict:</strong> <span class="badge badge-teal">${esc(r.case_study_3_real_or_ai || '—')}</span><br><strong>Analysis:</strong> ${esc(r.case_study_3_analysis || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">Case Study 4: Tom Cruise TikTok Deepfake 🕶️</div>
+          <div class="field-value"><strong>Verdict:</strong> <span class="badge badge-teal">${esc(r.case_study_4_real_or_ai || '—')}</span><br><strong>Analysis:</strong> ${esc(r.case_study_4_analysis || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px; color:#0d9488;">🌟 Personal Golden Rule of Media Verification</div>
+          <div class="field-value" style="background:#f0fdfa; border-color:#ccfbf1; font-weight:600;">${esc(r.personal_rule_reflection || '—')}</div>
+        `;
+      } else if (type === 'wwyd') {
+        bodyHtml = `
+          <div style="padding:14px; background:#f0fdfa; border-radius:12px; border:1px solid #ccfbf1; margin-bottom:16px;">
+            <div style="font-size:12px; font-weight:700; color:#115e59; text-transform:uppercase;">What Would You Do? Ethics Discussion</div>
+            <div style="font-size:14px; font-weight:800; color:#0f766e; margin-top:4px;">Student: ${esc(r.student_name)} (${esc(r.student_email)})</div>
+            <div style="font-size:12px; color:#134e4a; margin-top:2px;">Enjoyment Rating: ${r.enjoyment_rating || 0}/5 ⭐ | Submitted: ${fmtDate(r.submitted_at)}</div>
+          </div>
+
+          <div class="field-label" style="margin-top:12px;">Scenario 1: Classmate Prank Video</div>
+          <div class="field-value"><strong>Stance:</strong> <span class="badge badge-teal">${esc(r.scenario_1_choice || '—')}</span><br><strong>Analysis:</strong> ${esc(r.scenario_1_analysis || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">Scenario 2: Politician vs. Neighbor Deepfake</div>
+          <div class="field-value"><strong>Stance:</strong> <span class="badge badge-teal">${esc(r.scenario_2_choice || '—')}</span><br><strong>Analysis:</strong> ${esc(r.scenario_2_analysis || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">Scenario 3: Intent vs. Impact</div>
+          <div class="field-value"><strong>Stance:</strong> <span class="badge badge-teal">${esc(r.scenario_3_choice || '—')}</span><br><strong>Analysis:</strong> ${esc(r.scenario_3_analysis || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px; color:#0d9488;">🌟 Personal Golden Rule of AI Creation</div>
+          <div class="field-value" style="background:#f0fdfa; border-color:#ccfbf1; font-weight:600;">${esc(r.personal_rule_reflection || '—')}</div>
+        `;
+      } else if (type === 'mcbot') {
+        bodyHtml = `
+          <div style="padding:14px; background:#1e1e1e; color:#fff; border-radius:12px; border:1px solid #334155; margin-bottom:16px;">
+            <div style="font-size:12px; font-weight:700; color:#2dd4bf; text-transform:uppercase;">Build a Mini-Chatbot — Python Code</div>
+            <div style="font-size:18px; font-weight:800; color:#9cdcfe; margin-top:4px;">🤖 ${esc(r.bot_name || 'Chatbot')}</div>
+            <div style="font-size:11px; color:#cbd5e1; margin-top:4px;">Student: ${esc(r.student_name)} (${esc(r.student_email)}) | Enjoyment: ${r.enjoyment_rating || 0}/5⭐</div>
+            <div style="display:flex; gap:6px; margin-top:8px;">
+              ${r.used_variables ? '<span class="badge badge-teal">📦 Variables</span>' : ''}
+              ${r.used_conditionals ? '<span class="badge badge-teal">🔀 Conditionals</span>' : ''}
+              ${r.used_loops ? '<span class="badge badge-teal">🔄 Loops</span>' : ''}
+            </div>
+          </div>
+
+          <div class="field-label" style="margin-top:12px;">Submitted Python Code Script</div>
+          <pre style="background:#0f172a; color:#38bdf8; font-family:'DM Mono',monospace; font-size:12px; padding:14px; border-radius:10px; overflow-x:auto; white-space:pre-wrap; border:1px solid #1e293b;">${esc(r.python_code || '# No code submitted')}</pre>
+
+          <div class="field-label" style="margin-top:14px;">1. Rule-Based Chatbot vs LLM (ChatGPT) Difference</div>
+          <div class="field-value">${esc(r.reflection_difference || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">2. Logic Challenges &amp; Future Improvements</div>
+          <div class="field-value">${esc(r.reflection_challenges || '—')}</div>
+        `;
+      } else if (type === 'bvl') {
+        bodyHtml = `
+          <div style="padding:14px; background:#fff7ed; border-radius:12px; border:1px solid #fed7aa; margin-bottom:16px;">
+            <div style="font-size:12px; font-weight:700; color:#c2410c; text-transform:uppercase;">Rule-Based Bot vs. LLM Chatbot Architecture</div>
+            <div style="font-size:14px; font-weight:800; color:#9a3412; margin-top:4px;">Student: ${esc(r.student_name)} (${esc(r.student_email)})</div>
+            <div style="font-size:12px; color:#c2410c; margin-top:2px;">Enjoyment Rating: ${r.enjoyment_rating || 0}/5 ⭐ | Submitted: ${fmtDate(r.submitted_at)}</div>
+          </div>
+
+          <div class="field-label" style="margin-top:12px;">Scenario 1: Vending Machine 🥤</div>
+          <div class="field-value"><strong>Stance:</strong> <span class="badge badge-gold">${esc(r.scenario_1_choice || '—')}</span><br><strong>Reasoning:</strong> ${esc(r.scenario_1_analysis || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">Scenario 2: Customer Support Chatbot 🎧</div>
+          <div class="field-value"><strong>Stance:</strong> <span class="badge badge-gold">${esc(r.scenario_2_choice || '—')}</span><br><strong>Reasoning:</strong> ${esc(r.scenario_2_analysis || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">Scenario 3: Combining Both (Hybrid System) ⚙️</div>
+          <div class="field-value"><strong>Stance:</strong> <span class="badge badge-gold">${esc(r.scenario_3_choice || '—')}</span><br><strong>Hybrid Example:</strong> ${esc(r.scenario_3_analysis || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px; color:#ea580c;">🏛️ System Architect School AI Assistant Plan</div>
+          <div class="field-value" style="background:#fff7ed; border-color:#fed7aa; font-weight:600;">${esc(r.architect_reflection || '—')}</div>
         `;
       }
 
@@ -9166,6 +9476,256 @@
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
           <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('mc', ${r.id})">View</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+    }
+
+    // ── Week 11 Exercise 1: Synthetic Media & Deepfakes ──
+    function renderSMPage() {
+      if (!smData.length) {
+        document.getElementById('sm-stat-count').textContent = '0';
+        document.getElementById('sm-stat-enjoy').textContent = '—';
+        renderSMTable();
+        return;
+      }
+      document.getElementById('sm-stat-count').textContent = smData.length;
+      const avg = (smData.reduce((s, r) => s + (parseInt(r.enjoyment_rating) || 0), 0) / smData.length).toFixed(1);
+      document.getElementById('sm-stat-enjoy').textContent = avg + ' / 5';
+      renderSMTable();
+    }
+
+    function renderSMTable() {
+      const search = (document.getElementById('sm-search')?.value || '').toLowerCase();
+      let rows = smData.filter(r =>
+        !search || (r.student_name || '').toLowerCase().includes(search) || (r.personal_rule_reflection || '').toLowerCase().includes(search)
+      );
+
+      document.getElementById('sm-count').textContent = rows.length + ' audit' + (rows.length !== 1 ? 's' : '');
+      if (!rows.length) {
+        document.getElementById('sm-table-wrap').innerHTML = '<div class="empty-state"><p>No matching Synthetic Media submissions.</p></div>';
+        return;
+      }
+
+      function starRating(v) {
+        if (!v) return '<span style="color:var(--gray)">—</span>';
+        const stars = '★'.repeat(v) + '☆'.repeat(5 - v);
+        const col = v >= 4 ? '#059669' : v >= 3 ? '#d97706' : '#dc2626';
+        return `<span style="color:${col};font-size:14px">${stars}</span>`;
+      }
+
+      document.getElementById('sm-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student</th>
+        <th>Case Study 1</th>
+        <th>Case Study 2</th>
+        <th>Case Study 3</th>
+        <th>Case Study 4</th>
+        <th>Golden Rule Takeaway</th>
+        <th>Enjoyment</th>
+        <th>Submitted</th>
+        <th>Detail</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr class="clickable-row" onclick="showSubmissionDetail('sm', ${r.id})">
+          <td><strong>${esc(r.student_name)}</strong><br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
+          <td><span class="badge badge-teal">${esc(r.case_study_1_real_or_ai || '—')}</span></td>
+          <td><span class="badge badge-teal">${esc(r.case_study_2_real_or_ai || '—')}</span></td>
+          <td><span class="badge badge-teal">${esc(r.case_study_3_real_or_ai || '—')}</span></td>
+          <td><span class="badge badge-teal">${esc(r.case_study_4_real_or_ai || '—')}</span></td>
+          <td style="font-size:11px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.personal_rule_reflection)}">${esc(r.personal_rule_reflection || '—')}</td>
+          <td>${starRating(r.enjoyment_rating)}</td>
+          <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('sm', ${r.id})">View</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+    }
+
+    // ── Week 11 Exercise 2: What Would You Do? Ethics Discussion ──
+    function renderWWYDPage() {
+      if (!wwydData.length) {
+        document.getElementById('wwyd-stat-count').textContent = '0';
+        document.getElementById('wwyd-stat-enjoy').textContent = '—';
+        renderWWYDTable();
+        return;
+      }
+      document.getElementById('wwyd-stat-count').textContent = wwydData.length;
+      const avg = (wwydData.reduce((s, r) => s + (parseInt(r.enjoyment_rating) || 0), 0) / wwydData.length).toFixed(1);
+      document.getElementById('wwyd-stat-enjoy').textContent = avg + ' / 5';
+      renderWWYDTable();
+    }
+
+    function renderWWYDTable() {
+      const search = (document.getElementById('wwyd-search')?.value || '').toLowerCase();
+      let rows = wwydData.filter(r =>
+        !search || (r.student_name || '').toLowerCase().includes(search) || (r.personal_rule_reflection || '').toLowerCase().includes(search)
+      );
+
+      document.getElementById('wwyd-count').textContent = rows.length + ' response' + (rows.length !== 1 ? 's' : '');
+      if (!rows.length) {
+        document.getElementById('wwyd-table-wrap').innerHTML = '<div class="empty-state"><p>No matching Ethics Discussion submissions.</p></div>';
+        return;
+      }
+
+      function starRating(v) {
+        if (!v) return '<span style="color:var(--gray)">—</span>';
+        const stars = '★'.repeat(v) + '☆'.repeat(5 - v);
+        const col = v >= 4 ? '#059669' : v >= 3 ? '#d97706' : '#dc2626';
+        return `<span style="color:${col};font-size:14px">${stars}</span>`;
+      }
+
+      document.getElementById('wwyd-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student</th>
+        <th>Scenario 1 (Prank)</th>
+        <th>Scenario 2 (Politician)</th>
+        <th>Scenario 3 (Intent/Impact)</th>
+        <th>Personal Golden Rule</th>
+        <th>Enjoyment</th>
+        <th>Submitted</th>
+        <th>Detail</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr class="clickable-row" onclick="showSubmissionDetail('wwyd', ${r.id})">
+          <td><strong>${esc(r.student_name)}</strong><br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
+          <td style="font-size:11px;max-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span class="badge badge-teal">${esc(r.scenario_1_choice || '—')}</span></td>
+          <td style="font-size:11px;max-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span class="badge badge-teal">${esc(r.scenario_2_choice || '—')}</span></td>
+          <td style="font-size:11px;max-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span class="badge badge-teal">${esc(r.scenario_3_choice || '—')}</span></td>
+          <td style="font-size:11px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.personal_rule_reflection)}">${esc(r.personal_rule_reflection || '—')}</td>
+          <td>${starRating(r.enjoyment_rating)}</td>
+          <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('wwyd', ${r.id})">View</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+    }
+
+    // ── Week 12 Exercise 1: Build a Mini-Chatbot ──
+    function renderMCBOTPage() {
+      if (!mcbotData.length) {
+        document.getElementById('mcbot-stat-count').textContent = '0';
+        document.getElementById('mcbot-stat-enjoy').textContent = '—';
+        renderMCBOTTable();
+        return;
+      }
+      document.getElementById('mcbot-stat-count').textContent = mcbotData.length;
+      const avg = (mcbotData.reduce((s, r) => s + (parseInt(r.enjoyment_rating) || 0), 0) / mcbotData.length).toFixed(1);
+      document.getElementById('mcbot-stat-enjoy').textContent = avg + ' / 5';
+      renderMCBOTTable();
+    }
+
+    function renderMCBOTTable() {
+      const search = (document.getElementById('mcbot-search')?.value || '').toLowerCase();
+      let rows = mcbotData.filter(r =>
+        !search || (r.student_name || '').toLowerCase().includes(search) || (r.bot_name || '').toLowerCase().includes(search) || (r.python_code || '').toLowerCase().includes(search)
+      );
+
+      document.getElementById('mcbot-count').textContent = rows.length + ' chatbot' + (rows.length !== 1 ? 's' : '');
+      if (!rows.length) {
+        document.getElementById('mcbot-table-wrap').innerHTML = '<div class="empty-state"><p>No matching Mini-Chatbot submissions.</p></div>';
+        return;
+      }
+
+      function starRating(v) {
+        if (!v) return '<span style="color:var(--gray)">—</span>';
+        const stars = '★'.repeat(v) + '☆'.repeat(5 - v);
+        const col = v >= 4 ? '#059669' : v >= 3 ? '#d97706' : '#dc2626';
+        return `<span style="color:${col};font-size:14px">${stars}</span>`;
+      }
+
+      document.getElementById('mcbot-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student</th>
+        <th>Bot Name</th>
+        <th>Building Blocks</th>
+        <th>Code Preview</th>
+        <th>Enjoyment</th>
+        <th>Submitted</th>
+        <th>Detail</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr class="clickable-row" onclick="showSubmissionDetail('mcbot', ${r.id})">
+          <td><strong>${esc(r.student_name)}</strong><br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
+          <td style="font-size:12px;font-weight:700;color:var(--teal)">🤖 ${esc(r.bot_name || 'Chatbot')}</td>
+          <td>
+            <div style="display:flex;gap:4px;">
+              ${r.used_variables ? '<span class="badge badge-teal" style="font-size:9px">Vars</span>' : ''}
+              ${r.used_conditionals ? '<span class="badge badge-gold" style="font-size:9px">Conds</span>' : ''}
+              ${r.used_loops ? '<span class="badge badge-green" style="font-size:9px">Loops</span>' : ''}
+            </div>
+          </td>
+          <td style="font-size:11px;font-family:'DM Mono',monospace;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.python_code)}">${esc(r.python_code || '—')}</td>
+          <td>${starRating(r.enjoyment_rating)}</td>
+          <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('mcbot', ${r.id})">View</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+    }
+
+    // ── Week 12 Exercise 2: Rule-Based Bot vs. LLM Chatbot ──
+    function renderBVLPage() {
+      if (!bvlData.length) {
+        document.getElementById('bvl-stat-count').textContent = '0';
+        document.getElementById('bvl-stat-enjoy').textContent = '—';
+        renderBVLTable();
+        return;
+      }
+      document.getElementById('bvl-stat-count').textContent = bvlData.length;
+      const avg = (bvlData.reduce((s, r) => s + (parseInt(r.enjoyment_rating) || 0), 0) / bvlData.length).toFixed(1);
+      document.getElementById('bvl-stat-enjoy').textContent = avg + ' / 5';
+      renderBVLTable();
+    }
+
+    function renderBVLTable() {
+      const search = (document.getElementById('bvl-search')?.value || '').toLowerCase();
+      let rows = bvlData.filter(r =>
+        !search || (r.student_name || '').toLowerCase().includes(search) || (r.architect_reflection || '').toLowerCase().includes(search)
+      );
+
+      document.getElementById('bvl-count').textContent = rows.length + ' comparison' + (rows.length !== 1 ? 's' : '');
+      if (!rows.length) {
+        document.getElementById('bvl-table-wrap').innerHTML = '<div class="empty-state"><p>No matching Bot vs LLM submissions.</p></div>';
+        return;
+      }
+
+      function starRating(v) {
+        if (!v) return '<span style="color:var(--gray)">—</span>';
+        const stars = '★'.repeat(v) + '☆'.repeat(5 - v);
+        const col = v >= 4 ? '#059669' : v >= 3 ? '#d97706' : '#dc2626';
+        return `<span style="color:${col};font-size:14px">${stars}</span>`;
+      }
+
+      document.getElementById('bvl-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student</th>
+        <th>Scenario 1 (Vending)</th>
+        <th>Scenario 2 (Support)</th>
+        <th>Scenario 3 (Hybrid)</th>
+        <th>Architect Plan</th>
+        <th>Enjoyment</th>
+        <th>Submitted</th>
+        <th>Detail</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr class="clickable-row" onclick="showSubmissionDetail('bvl', ${r.id})">
+          <td><strong>${esc(r.student_name)}</strong><br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
+          <td style="font-size:11px;max-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span class="badge badge-gold">${esc(r.scenario_1_choice || '—')}</span></td>
+          <td style="font-size:11px;max-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span class="badge badge-gold">${esc(r.scenario_2_choice || '—')}</span></td>
+          <td style="font-size:11px;max-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span class="badge badge-gold">${esc(r.scenario_3_choice || '—')}</span></td>
+          <td style="font-size:11px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.architect_reflection)}">${esc(r.architect_reflection || '—')}</td>
+          <td>${starRating(r.enjoyment_rating)}</td>
+          <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('bvl', ${r.id})">View</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
