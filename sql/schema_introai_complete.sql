@@ -1640,6 +1640,24 @@ CREATE TABLE IF NOT EXISTS introai_project_tracker (
   overall_progress_pct    SMALLINT NOT NULL DEFAULT 10 CHECK (overall_progress_pct BETWEEN 0 AND 100),
   current_status          TEXT NOT NULL DEFAULT 'Planning & Ideation',
 
+  -- Project Definition Details (from project_definition.html Q1-Q14)
+  project_type            TEXT,
+  one_sentence            TEXT,
+  ai_tools                TEXT, -- JSON array string or comma-separated tools
+  audience                TEXT,
+  problem_solved          TEXT,
+  how_used                TEXT,
+  core_feature            TEXT,
+  feature_1               TEXT,
+  feature_2               TEXT,
+  feature_3               TEXT,
+  success_looks_like      TEXT,
+  limitations             TEXT,
+  responsible_checks      TEXT, -- JSON array string
+  responsible_choice      TEXT,
+  elevator_pitch          TEXT,
+  most_excited            TEXT,
+
   created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
 

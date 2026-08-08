@@ -148,18 +148,37 @@
               required />
           </div>
           <div>
+            <label for="reg-proj-type" class="block text-[11px] font-black uppercase tracking-widest text-gray-500 mb-1">Project Type</label>
+            <select id="reg-proj-type" class="reg-input w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 transition-all">
+              <option value="Chatbot / Agent">Chatbot / Intelligent Agent</option>
+              <option value="Image / Art Generator">Image / Digital Art Generator</option>
+              <option value="Interactive Game">Interactive Game</option>
+              <option value="Web App / Tool">Web Application / Productivity Tool</option>
+              <option value="Creative Writing / Media">Creative Content / Story / Media</option>
+              <option value="Other">Other / Multimodal Project</option>
+            </select>
+          </div>
+          <div>
             <label for="reg-proj-goal"
-              class="block text-[11px] font-black uppercase tracking-widest text-gray-500 mb-1">One-Sentence Project
-              Goal</label>
+              class="block text-[11px] font-black uppercase tracking-widest text-gray-500 mb-1">One-Sentence Pitch (Q2)</label>
             <textarea id="reg-proj-goal" rows="2"
-              placeholder="e.g. An AI app that identifies recyclables using Teachable Machine and generates custom tips."
+              placeholder="e.g. My project uses AI to identify recyclables for high school students in order to reduce waste."
               class="reg-input w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 transition-all"
               required></textarea>
           </div>
           <div>
+            <label for="reg-audience" class="block text-[11px] font-black uppercase tracking-widest text-gray-500 mb-1">Target Audience (Q4)</label>
+            <input id="reg-audience" type="text" placeholder="e.g. High school biology students, indie gamers"
+              class="reg-input w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 transition-all" />
+          </div>
+          <div>
+            <label for="reg-core-feature" class="block text-[11px] font-black uppercase tracking-widest text-gray-500 mb-1">Core Feature (Q7)</label>
+            <input id="reg-core-feature" type="text" placeholder="e.g. Real-time webcam image classification & tips"
+              class="reg-input w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 transition-all" />
+          </div>
+          <div>
             <label for="reg-proj-url"
-              class="block text-[11px] font-black uppercase tracking-widest text-gray-500 mb-1">Project Demo / Repo URL
-              (Optional)</label>
+              class="block text-[11px] font-black uppercase tracking-widest text-gray-500 mb-1">Project Demo / Repo URL (Optional)</label>
             <input id="reg-proj-url" type="url" placeholder="https://..."
               class="reg-input w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 transition-all" />
           </div>
@@ -253,6 +272,77 @@
         </div>
       </div>
     </header>
+
+      <!-- PROJECT BLUEPRINT & DEFINITION CARD (INCORPORATED FROM project_definition.html) -->
+      <div id="blueprint-card" class="bg-white border border-emerald-200 rounded-3xl p-6 shadow-sm mb-8">
+        <div class="flex items-center justify-between border-b border-gray-100 pb-4 mb-4 flex-wrap gap-2">
+          <div class="flex items-center gap-2">
+            <span class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-sm">📌</span>
+            <div>
+              <h2 class="text-lg font-black text-gray-900 leading-tight">Project Blueprint &amp; Pitch Definition</h2>
+              <p class="text-xs text-gray-500">Core architecture, audience, responsible AI checks &amp; showcase pitch</p>
+            </div>
+          </div>
+          <button type="button" onclick="openBlueprintModal()" class="px-3.5 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1.5">
+            <span>✏️ Edit Blueprint</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <!-- Overview & Audience -->
+          <div class="bg-gray-50/70 p-4 rounded-2xl border border-gray-100 space-y-2">
+            <div>
+              <span class="text-[10px] font-black uppercase tracking-widest text-purple-600 block">Project Type &amp; One-Sentence Pitch</span>
+              <p id="bp-display-pitch" class="text-gray-900 font-semibold mt-0.5">—</p>
+            </div>
+            <div>
+              <span class="text-[10px] font-black uppercase tracking-widest text-gray-400 block">Target Audience &amp; Problem Solved</span>
+              <p id="bp-display-audience" class="text-gray-700 font-medium mt-0.5">—</p>
+            </div>
+            <div>
+              <span class="text-[10px] font-black uppercase tracking-widest text-gray-400 block">Primary AI Tools</span>
+              <div id="bp-display-tools" class="flex flex-wrap gap-1.5 mt-1">
+                <span class="text-gray-400 font-mono text-[11px]">—</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Core Feature & Additional Roadmap -->
+          <div class="bg-gray-50/70 p-4 rounded-2xl border border-gray-100 space-y-2">
+            <div>
+              <span class="text-[10px] font-black uppercase tracking-widest text-emerald-600 block">Core Feature (Must Work)</span>
+              <p id="bp-display-core" class="text-gray-900 font-semibold mt-0.5">—</p>
+            </div>
+            <div>
+              <span class="text-[10px] font-black uppercase tracking-widest text-gray-400 block">Feature Priorities (F1 / F2 / F3)</span>
+              <p id="bp-display-roadmap" class="text-gray-700 font-medium mt-0.5">—</p>
+            </div>
+            <div>
+              <span class="text-[10px] font-black uppercase tracking-widest text-gray-400 block">Scope Limitations</span>
+              <p id="bp-display-limitations" class="text-gray-600 italic mt-0.5">—</p>
+            </div>
+          </div>
+
+          <!-- Responsible AI & Showcase -->
+          <div class="md:col-span-2 bg-purple-50/40 p-4 rounded-2xl border border-purple-100 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <span class="text-[10px] font-black uppercase tracking-widest text-purple-700 block">Responsible AI Checks &amp; Safeguards</span>
+              <div id="bp-display-responsible-checks" class="flex flex-wrap gap-1.5 mt-1 mb-1.5">
+                <span class="text-gray-400 font-mono text-[11px]">—</span>
+              </div>
+              <p id="bp-display-responsible-choice" class="text-purple-950 font-medium text-[11px]">—</p>
+            </div>
+            <div>
+              <span class="text-[10px] font-black uppercase tracking-widest text-purple-700 block">30-Second Showcase Elevator Pitch</span>
+              <p id="bp-display-elevator" class="text-purple-950 font-medium text-[11px] italic mt-1">—</p>
+              <div class="mt-2 text-[10px] text-purple-800">
+                <strong>Most Excited to Demo:</strong> <span id="bp-display-excited">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
 
     <!-- BUILD CHECK-IN 1 BANNER -->
     <div class="bg-gradient-to-br from-emerald-900 via-teal-900 to-emerald-950 text-white rounded-3xl p-6 md:p-7 mb-8 shadow-xl border border-emerald-700/40">
@@ -466,7 +556,23 @@
       projectGoal: '',
       projectUrl: '',
       progressPct: 10,
-      currentStatus: 'Planning & Ideation'
+      currentStatus: 'Planning & Ideation',
+      projectType: 'Chatbot / Agent',
+      oneSentence: '',
+      aiTools: [],
+      audience: '',
+      problemSolved: '',
+      howUsed: '',
+      coreFeature: '',
+      feature1: '',
+      feature2: '',
+      feature3: '',
+      successLooksLike: '',
+      limitations: '',
+      responsibleChecks: [],
+      responsibleChoice: '',
+      elevatorPitch: '',
+      mostExcited: ''
     };
     let progressLogs = [];
 
@@ -509,6 +615,10 @@
       btn.disabled = true;
       document.getElementById('reg-btn-label').innerHTML = '<span class="spinner"></span> Creating…';
 
+      const projType = document.getElementById('reg-proj-type')?.value || 'Chatbot / Agent';
+      const audience = document.getElementById('reg-audience')?.value.trim() || '';
+      const coreFeature = document.getElementById('reg-core-feature')?.value.trim() || '';
+
       const payload = {
         student_name: name,
         student_email: email,
@@ -516,6 +626,10 @@
         project_name: projName,
         project_goal: projGoal,
         project_url: projUrl || null,
+        project_type: projType,
+        one_sentence: projGoal,
+        audience: audience,
+        core_feature: coreFeature,
         overall_progress_pct: 10,
         current_status: 'Planning & Ideation',
         updated_at: new Date().toISOString()
@@ -540,7 +654,11 @@
           projectGoal: projGoal,
           projectUrl: projUrl,
           progressPct: 10,
-          currentStatus: 'Planning & Ideation'
+          currentStatus: 'Planning & Ideation',
+          projectType: projType,
+          oneSentence: projGoal,
+          audience: audience,
+          coreFeature: coreFeature
         };
 
         saveSession();
@@ -592,7 +710,23 @@
           projectGoal: data.project_goal,
           projectUrl: data.project_url || '',
           progressPct: data.overall_progress_pct || 10,
-          currentStatus: data.current_status || 'In Progress'
+          currentStatus: data.current_status || 'In Progress',
+          projectType: data.project_type || 'Chatbot / Agent',
+          oneSentence: data.one_sentence || data.project_goal || '',
+          aiTools: data.ai_tools || [],
+          audience: data.audience || '',
+          problemSolved: data.problem_solved || '',
+          howUsed: data.how_used || '',
+          coreFeature: data.core_feature || '',
+          feature1: data.feature_1 || '',
+          feature2: data.feature_2 || '',
+          feature3: data.feature_3 || '',
+          successLooksLike: data.success_looks_like || '',
+          limitations: data.limitations || '',
+          responsibleChecks: data.responsible_checks || [],
+          responsibleChoice: data.responsible_choice || '',
+          elevatorPitch: data.elevator_pitch || '',
+          mostExcited: data.most_excited || ''
         };
 
         saveSession();
@@ -642,7 +776,182 @@
       } else {
         urlBtn.classList.add('hidden');
       }
+
+      // Render Blueprint Card
+      const pType = currentStudent.projectType || 'Project';
+      const oneSent = currentStudent.oneSentence || currentStudent.projectGoal || 'No description provided yet.';
+      document.getElementById('bp-display-pitch').innerHTML = `<span class="px-2 py-0.5 bg-purple-100 text-purple-800 font-bold rounded text-[10px] mr-1.5">${esc(pType)}</span> ${esc(oneSent)}`;
+
+      const aud = currentStudent.audience || 'General Users';
+      const prob = currentStudent.problemSolved ? ` — ${currentStudent.problemSolved}` : '';
+      document.getElementById('bp-display-audience').textContent = aud + prob;
+
+      let tools = currentStudent.aiTools;
+      if (typeof tools === 'string' && tools) {
+        try { tools = JSON.parse(tools); } catch(e) {}
+      }
+      tools = Array.isArray(tools) ? tools : [];
+      const toolsEl = document.getElementById('bp-display-tools');
+      if (tools && tools.length) {
+        toolsEl.innerHTML = tools.map(t => `<span class="px-2 py-0.5 bg-gray-200 text-gray-800 rounded-md font-mono text-[10px] font-bold">${esc(t)}</span>`).join('');
+      } else {
+        toolsEl.innerHTML = '<span class="text-gray-400 italic text-[11px]">No AI tools specified</span>';
+      }
+
+      document.getElementById('bp-display-core').textContent = currentStudent.coreFeature || 'Core feature definition pending';
+
+      const roadmapParts = [];
+      if (currentStudent.feature1) roadmapParts.push(`F1: ${currentStudent.feature1}`);
+      if (currentStudent.feature2) roadmapParts.push(`F2: ${currentStudent.feature2}`);
+      if (currentStudent.feature3) roadmapParts.push(`F3: ${currentStudent.feature3}`);
+      document.getElementById('bp-display-roadmap').textContent = roadmapParts.length ? roadmapParts.join(' | ') : 'Roadmap features pending';
+
+      document.getElementById('bp-display-limitations').textContent = currentStudent.limitations || 'None specified';
+
+      let checks = currentStudent.responsibleChecks;
+      if (typeof checks === 'string' && checks) {
+        try { checks = JSON.parse(checks); } catch(e) { checks = []; }
+      }
+      checks = Array.isArray(checks) ? checks : [];
+      const checksEl = document.getElementById('bp-display-responsible-checks');
+      if (checks && checks.length) {
+        checksEl.innerHTML = checks.map(c => `<span class="px-2 py-0.5 bg-purple-100 text-purple-800 rounded-md font-mono text-[10px] font-bold">✓ ${esc(c)}</span>`).join('');
+      } else {
+        checksEl.innerHTML = '<span class="text-purple-400 italic text-[11px]">No checks recorded</span>';
+      }
+
+      document.getElementById('bp-display-responsible-choice').textContent = currentStudent.responsibleChoice ? `Safeguard: ${currentStudent.responsibleChoice}` : 'No safeguard specified yet';
+
+      document.getElementById('bp-display-elevator').textContent = currentStudent.elevatorPitch ? `"${currentStudent.elevatorPitch}"` : 'Elevator pitch pending';
+      document.getElementById('bp-display-excited').textContent = currentStudent.mostExcited || 'Key AI features';
     }
+
+    function openBlueprintModal() {
+      document.getElementById('bp-proj-type').value = currentStudent.projectType || 'Chatbot / Agent';
+      document.getElementById('bp-one-sentence').value = currentStudent.oneSentence || currentStudent.projectGoal || '';
+      
+      let toolsVal = currentStudent.aiTools;
+      if (typeof toolsVal === 'string' && toolsVal) {
+        try { toolsVal = JSON.parse(toolsVal); } catch(e) {}
+      }
+      document.getElementById('bp-ai-tools').value = Array.isArray(toolsVal) ? toolsVal.join(', ') : (toolsVal || '');
+
+      document.getElementById('bp-audience').value = currentStudent.audience || '';
+      document.getElementById('bp-problem-solved').value = currentStudent.problemSolved || '';
+      document.getElementById('bp-how-used').value = currentStudent.howUsed || '';
+      document.getElementById('bp-core-feature').value = currentStudent.coreFeature || '';
+      document.getElementById('bp-f1').value = currentStudent.feature1 || '';
+      document.getElementById('bp-f2').value = currentStudent.feature2 || '';
+      document.getElementById('bp-f3').value = currentStudent.feature3 || '';
+      document.getElementById('bp-success').value = currentStudent.successLooksLike || '';
+      document.getElementById('bp-limitations').value = currentStudent.limitations || '';
+      document.getElementById('bp-responsible-choice').value = currentStudent.responsibleChoice || '';
+      document.getElementById('bp-elevator').value = currentStudent.elevatorPitch || '';
+      document.getElementById('bp-excited').value = currentStudent.mostExcited || '';
+
+      let checks = currentStudent.responsibleChecks;
+      if (typeof checks === 'string' && checks) {
+        try { checks = JSON.parse(checks); } catch(e) { checks = []; }
+      }
+      checks = Array.isArray(checks) ? checks : [];
+
+      document.getElementById('bp-check-bias').checked = checks.includes('Bias & Fairness');
+      document.getElementById('bp-check-accuracy').checked = checks.includes('Factual Accuracy');
+      document.getElementById('bp-check-privacy').checked = checks.includes('Privacy & Data Safety');
+      document.getElementById('bp-check-transparency').checked = checks.includes('Transparency');
+      document.getElementById('bp-check-copyright').checked = checks.includes('IP & Copyright');
+
+      document.getElementById('blueprint-modal').classList.remove('hidden');
+    }
+
+    function closeBlueprintModal() {
+      document.getElementById('blueprint-modal').classList.add('hidden');
+    }
+
+    async function saveBlueprintData(ev) {
+      ev.preventDefault();
+      const pType = document.getElementById('bp-proj-type').value;
+      const oneSentence = document.getElementById('bp-one-sentence').value.trim();
+      const toolsStr = document.getElementById('bp-ai-tools').value.trim();
+      const toolsArr = toolsStr ? toolsStr.split(',').map(s=>s.trim()).filter(Boolean) : [];
+      const audience = document.getElementById('bp-audience').value.trim();
+      const problemSolved = document.getElementById('bp-problem-solved').value.trim();
+      const howUsed = document.getElementById('bp-how-used').value.trim();
+      const coreFeature = document.getElementById('bp-core-feature').value.trim();
+      const f1 = document.getElementById('bp-f1').value.trim();
+      const f2 = document.getElementById('bp-f2').value.trim();
+      const f3 = document.getElementById('bp-f3').value.trim();
+      const success = document.getElementById('bp-success').value.trim();
+      const limitations = document.getElementById('bp-limitations').value.trim();
+      const responsibleChoice = document.getElementById('bp-responsible-choice').value.trim();
+      const elevator = document.getElementById('bp-elevator').value.trim();
+      const excited = document.getElementById('bp-excited').value.trim();
+
+      const checksArr = [];
+      if (document.getElementById('bp-check-bias').checked) checksArr.push('Bias & Fairness');
+      if (document.getElementById('bp-check-accuracy').checked) checksArr.push('Factual Accuracy');
+      if (document.getElementById('bp-check-privacy').checked) checksArr.push('Privacy & Data Safety');
+      if (document.getElementById('bp-check-transparency').checked) checksArr.push('Transparency');
+      if (document.getElementById('bp-check-copyright').checked) checksArr.push('IP & Copyright');
+
+      currentStudent.projectType = pType;
+      currentStudent.oneSentence = oneSentence;
+      currentStudent.aiTools = toolsArr;
+      currentStudent.audience = audience;
+      currentStudent.problemSolved = problemSolved;
+      currentStudent.howUsed = howUsed;
+      currentStudent.coreFeature = coreFeature;
+      currentStudent.feature1 = f1;
+      currentStudent.feature2 = f2;
+      currentStudent.feature3 = f3;
+      currentStudent.successLooksLike = success;
+      currentStudent.limitations = limitations;
+      currentStudent.responsibleChecks = checksArr;
+      currentStudent.responsibleChoice = responsibleChoice;
+      currentStudent.elevatorPitch = elevator;
+      currentStudent.mostExcited = excited;
+
+      if (oneSentence) currentStudent.projectGoal = oneSentence;
+
+      saveSession();
+      updateDashboardUI();
+      closeBlueprintModal();
+
+      if (currentStudent.email) {
+        const payload = {
+          student_email: currentStudent.email,
+          project_type: pType,
+          one_sentence: oneSentence,
+          ai_tools: JSON.stringify(toolsArr),
+          audience: audience,
+          problem_solved: problemSolved,
+          how_used: howUsed,
+          core_feature: coreFeature,
+          feature_1: f1,
+          feature_2: f2,
+          feature_3: f3,
+          success_looks_like: success,
+          limitations: limitations,
+          responsible_checks: JSON.stringify(checksArr),
+          responsible_choice: responsibleChoice,
+          elevator_pitch: elevator,
+          most_excited: excited,
+          updated_at: new Date().toISOString()
+        };
+        try {
+          await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_TRACKER}?student_email=eq.${encodeURIComponent(currentStudent.email)}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': SUPABASE_KEY,
+              'Authorization': `Bearer ${SUPABASE_KEY}`
+            },
+            body: JSON.stringify(payload)
+          });
+        } catch(e) { console.error(e); }
+      }
+    }
+
 
     async function fetchLogs() {
       if (!currentStudent.email) return;
@@ -824,6 +1133,144 @@
       }
     }
   </script>
+
+  <!-- EDIT BLUEPRINT MODAL (INCORPORATED FROM project_definition.html Q1-Q14) -->
+  <div id="blueprint-modal" class="hidden fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-3xl my-8 p-6 md:p-8 max-h-[90vh] overflow-y-auto border border-purple-200">
+      <div class="flex items-center justify-between border-b border-gray-100 pb-4 mb-6">
+        <div>
+          <span class="text-[10px] font-black uppercase tracking-widest text-purple-600">Final Project Definition</span>
+          <h2 class="text-2xl font-black text-gray-900 tracking-tight">Edit Project <span class="text-purple-600">Blueprint 📌</span></h2>
+        </div>
+        <button type="button" onclick="closeBlueprintModal()" class="w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold flex items-center justify-center transition-colors">✕</button>
+      </div>
+
+      <form id="blueprint-form" onsubmit="saveBlueprintData(event)" class="space-y-6 text-xs">
+        <!-- Q1 & Q2: Type & Pitch -->
+        <div class="bg-gray-50 p-4 rounded-2xl space-y-3 border border-gray-200">
+          <h3 class="font-bold text-gray-900 text-sm">1. Project Overview &amp; Type</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label for="bp-proj-type" class="block font-black text-gray-500 uppercase tracking-widest text-[10px] mb-1">Q1. Project Type</label>
+              <select id="bp-proj-type" class="w-full p-2.5 rounded-xl border border-gray-200 bg-white font-medium">
+                <option value="Chatbot / Agent">Chatbot / Intelligent Agent</option>
+                <option value="Image / Art Generator">Image / Digital Art Generator</option>
+                <option value="Interactive Game">Interactive Game</option>
+                <option value="Web App / Tool">Web Application / Productivity Tool</option>
+                <option value="Creative Writing / Media">Creative Content / Story / Media</option>
+                <option value="Other">Other / Multimodal Project</option>
+              </select>
+            </div>
+            <div>
+              <label for="bp-one-sentence" class="block font-black text-gray-500 uppercase tracking-widest text-[10px] mb-1">Q2. One-Sentence Description</label>
+              <input id="bp-one-sentence" type="text" placeholder="My project uses AI to [do what] for [whom] in order to [solve what problem]..." class="w-full p-2.5 rounded-xl border border-gray-200 bg-white font-medium" />
+            </div>
+          </div>
+          <div>
+            <label for="bp-ai-tools" class="block font-black text-gray-500 uppercase tracking-widest text-[10px] mb-1">Q3. Primary AI Tools (Comma-separated)</label>
+            <input id="bp-ai-tools" type="text" placeholder="e.g. OpenAI Assistants API, Midjourney, Teachable Machine, ElevenLabs" class="w-full p-2.5 rounded-xl border border-gray-200 bg-white font-medium" />
+          </div>
+        </div>
+
+        <!-- Q4-Q6: Audience & Need -->
+        <div class="bg-gray-50 p-4 rounded-2xl space-y-3 border border-gray-200">
+          <h3 class="font-bold text-gray-900 text-sm">2. Target Audience &amp; Human Need</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label for="bp-audience" class="block font-black text-gray-500 uppercase tracking-widest text-[10px] mb-1">Q4. Target Audience</label>
+              <input id="bp-audience" type="text" placeholder="e.g. High school biology students, indie gamers" class="w-full p-2.5 rounded-xl border border-gray-200 bg-white font-medium" />
+            </div>
+            <div>
+              <label for="bp-problem-solved" class="block font-black text-gray-500 uppercase tracking-widest text-[10px] mb-1">Q5. Specific Problem Addressed</label>
+              <input id="bp-problem-solved" type="text" placeholder="What pain point or desire does this fulfill?" class="w-full p-2.5 rounded-xl border border-gray-200 bg-white font-medium" />
+            </div>
+          </div>
+          <div>
+            <label for="bp-how-used" class="block font-black text-gray-500 uppercase tracking-widest text-[10px] mb-1">Q6. User Workflow &amp; Interaction</label>
+            <textarea id="bp-how-used" rows="2" placeholder="Describe how users interact with your project from start to finish..." class="w-full p-2.5 rounded-xl border border-gray-200 bg-white font-medium"></textarea>
+          </div>
+        </div>
+
+        <!-- Q7-Q10: Features & Scope -->
+        <div class="bg-gray-50 p-4 rounded-2xl space-y-3 border border-gray-200">
+          <h3 class="font-bold text-gray-900 text-sm">3. Features &amp; Scope Boundaries</h3>
+          <div>
+            <label for="bp-core-feature" class="block font-black text-gray-500 uppercase tracking-widest text-[10px] mb-1">Q7. Absolute Core Feature (Must Work)</label>
+            <input id="bp-core-feature" type="text" placeholder="Single most important capability delivering value" class="w-full p-2.5 rounded-xl border border-gray-200 bg-white font-medium" />
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+            <div>
+              <label for="bp-f1" class="block font-black text-purple-600 uppercase tracking-widest text-[10px] mb-1">Q8. Feature 1 (High)</label>
+              <input id="bp-f1" type="text" placeholder="Priority feature 1" class="w-full p-2 rounded-xl border border-gray-200 bg-white font-medium" />
+            </div>
+            <div>
+              <label for="bp-f2" class="block font-black text-purple-600 uppercase tracking-widest text-[10px] mb-1">Feature 2 (Medium)</label>
+              <input id="bp-f2" type="text" placeholder="Priority feature 2" class="w-full p-2 rounded-xl border border-gray-200 bg-white font-medium" />
+            </div>
+            <div>
+              <label for="bp-f3" class="block font-black text-purple-600 uppercase tracking-widest text-[10px] mb-1">Feature 3 (Stretch)</label>
+              <input id="bp-f3" type="text" placeholder="Priority feature 3" class="w-full p-2 rounded-xl border border-gray-200 bg-white font-medium" />
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label for="bp-success" class="block font-black text-gray-500 uppercase tracking-widest text-[10px] mb-1">Q9. Initial Success Definition</label>
+              <input id="bp-success" type="text" placeholder="What does a working finished state look like?" class="w-full p-2.5 rounded-xl border border-gray-200 bg-white font-medium" />
+            </div>
+            <div>
+              <label for="bp-limitations" class="block font-black text-gray-500 uppercase tracking-widest text-[10px] mb-1">Q10. Known Scope Limitations</label>
+              <input id="bp-limitations" type="text" placeholder="What will your project NOT do?" class="w-full p-2.5 rounded-xl border border-gray-200 bg-white font-medium" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Q11-Q14: Responsible AI & Pitch -->
+        <div class="bg-gray-50 p-4 rounded-2xl space-y-3 border border-gray-200">
+          <h3 class="font-bold text-gray-900 text-sm">4. Responsible Design &amp; Showcase Pitch</h3>
+          <div>
+            <label class="block font-black text-gray-500 uppercase tracking-widest text-[10px] mb-2">Q11. Responsible Considerations Checked</label>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <label class="flex items-center gap-2 p-2 bg-white rounded-xl border border-gray-200 cursor-pointer font-medium text-[11px]">
+                <input type="checkbox" id="bp-check-bias" value="Bias & Fairness" class="accent-purple-600"> Bias &amp; Fairness
+              </label>
+              <label class="flex items-center gap-2 p-2 bg-white rounded-xl border border-gray-200 cursor-pointer font-medium text-[11px]">
+                <input type="checkbox" id="bp-check-accuracy" value="Factual Accuracy" class="accent-purple-600"> Factual Accuracy
+              </label>
+              <label class="flex items-center gap-2 p-2 bg-white rounded-xl border border-gray-200 cursor-pointer font-medium text-[11px]">
+                <input type="checkbox" id="bp-check-privacy" value="Privacy & Data Safety" class="accent-purple-600"> Privacy &amp; Data Safety
+              </label>
+              <label class="flex items-center gap-2 p-2 bg-white rounded-xl border border-gray-200 cursor-pointer font-medium text-[11px]">
+                <input type="checkbox" id="bp-check-transparency" value="Transparency" class="accent-purple-600"> Transparency
+              </label>
+              <label class="flex items-center gap-2 p-2 bg-white rounded-xl border border-gray-200 cursor-pointer font-medium text-[11px]">
+                <input type="checkbox" id="bp-check-copyright" value="IP & Copyright" class="accent-purple-600"> IP &amp; Copyright
+              </label>
+            </div>
+          </div>
+          <div>
+            <label for="bp-responsible-choice" class="block font-black text-gray-500 uppercase tracking-widest text-[10px] mb-1">Q12. Design Safeguard Choice</label>
+            <input id="bp-responsible-choice" type="text" placeholder="Specific design choice made to address responsible AI..." class="w-full p-2.5 rounded-xl border border-gray-200 bg-white font-medium" />
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label for="bp-elevator" class="block font-black text-gray-500 uppercase tracking-widest text-[10px] mb-1">Q13. 30-Second Elevator Pitch</label>
+              <textarea id="bp-elevator" rows="2" placeholder="2-3 compelling sentences describing value..." class="w-full p-2.5 rounded-xl border border-gray-200 bg-white font-medium"></textarea>
+            </div>
+            <div>
+              <label for="bp-excited" class="block font-black text-gray-500 uppercase tracking-widest text-[10px] mb-1">Q14. Most Excited Showcase Highlight</label>
+              <textarea id="bp-excited" rows="2" placeholder="What part of the AI logic or UX will stand out most?" class="w-full p-2.5 rounded-xl border border-gray-200 bg-white font-medium"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-2">
+          <button type="button" onclick="closeBlueprintModal()" class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-xs transition-colors">Cancel</button>
+          <button type="submit" class="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-black rounded-xl text-xs shadow-md transition-all">Save Blueprint Definition →</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
 </body>
 
 </html>
