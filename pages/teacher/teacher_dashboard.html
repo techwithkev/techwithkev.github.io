@@ -4645,38 +4645,47 @@
 
     function getCohortsForCurriculum(curr) {
       curr = curr || activeCurriculum;
-      if (curr === 'intro-ai') {
-        const cohorts = new Set(['aijr']);
-        const introTables = [
-          saData, shData, cbData, cpData, pdData, wsData, apData, pcData, mgData, isData,
-          tmData, btaData, ayfData, dsrData, kcData, stbData, daData, bdData, ddData,
-          bctData, bdsData, ftdData, pvpData, metData, nlData, fpData, pbData, pocData,
-          ptData, plData, adsData, mcData, smData, wwydData, mcbotData, bvlData
-        ];
-        introTables.forEach(arr => {
-          if (Array.isArray(arr)) {
-            arr.forEach(r => { if (r && r.cohort) cohorts.add(String(r.cohort).toLowerCase()); });
-          }
-        });
-        if (typeof cohortExercisesMap === 'object') {
-          Object.keys(cohortExercisesMap).forEach(key => {
-            const parts = key.split(':');
-            if (parts[0]) cohorts.add(parts[0].toLowerCase());
-          });
+      const allCohorts = new Set(['aijr']);
+
+      // Collect from Comp Jr sources
+      hwData.forEach(r => { if (r && r.cohort) allCohorts.add(r.cohort); });
+      examData.forEach(r => { if (r && r.cohort) allCohorts.add(r.cohort); });
+      codesData.forEach(r => { if (r && r.cohort) allCohorts.add(r.cohort); });
+
+      // Collect from Intro AI sources
+      const introTables = [
+        saData, shData, cbData, cpData, pdData, wsData, apData, pcData, mgData, isData,
+        tmData, btaData, ayfData, dsrData, kcData, stbData, daData, bdData, ddData,
+        bctData, bdsData, ftdData, pvpData, metData, nlData, fpData, pbData, pocData,
+        ptData, plData, adsData, mcData, smData, wwydData, mcbotData, bvlData
+      ];
+      introTables.forEach(arr => {
+        if (Array.isArray(arr)) {
+          arr.forEach(r => { if (r && r.cohort) allCohorts.add(r.cohort); });
         }
-        return Array.from(cohorts).sort();
-      } else {
-        const cohorts = new Set();
-        hwData.forEach(r => { if (r && r.cohort) cohorts.add(r.cohort); });
-        examData.forEach(r => { if (r && r.cohort) cohorts.add(r.cohort); });
-        codesData.forEach(r => {
-          if (r && r.cohort && r.cohort.toLowerCase() !== 'aijr') cohorts.add(r.cohort);
+      });
+      if (typeof cohortExercisesMap === 'object') {
+        Object.keys(cohortExercisesMap).forEach(key => {
+          const parts = key.split(':');
+          if (parts[0]) allCohorts.add(parts[0]);
         });
-        if (cohorts.size === 0) {
-          hwData.forEach(r => { if (r && r.cohort) cohorts.add(r.cohort); });
-        }
-        return Array.from(cohorts).sort();
       }
+
+      const result = [];
+      allCohorts.forEach(c => {
+        const cLower = String(c).toLowerCase();
+        // Cohorts starting with intai_ or introai_ belong to Intro to AI
+        const isIntroCohort = cLower.startsWith('intai_') || cLower.startsWith('introai_') || cLower.startsWith('intai');
+
+        if (curr === 'intro-ai') {
+          if (isIntroCohort) result.push(c);
+        } else {
+          // comp-jr includes aijr and all non-intai cohorts
+          if (!isIntroCohort) result.push(c);
+        }
+      });
+
+      return Array.from(new Set(result)).sort();
     }
 
     function showPage(id) {
