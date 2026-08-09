@@ -7124,6 +7124,7 @@
           <th title="AI & Society">E</th>
           <th>Overall</th>
           <th>Submitted</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -7138,6 +7139,7 @@
           <td>${ratingBadge(r.avg_section_e)}</td>
           <td>${ratingBadge(r.overall_avg)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('sa', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('sa', ${r.id}, saData, renderSAPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -7222,7 +7224,7 @@
     <table class="data-table">
       <thead>
         <tr>
-          <th>Student</th><th>Tool</th><th>Category</th><th>AI Spots</th><th>Surprised?</th><th>Submitted</th>
+          <th>Student</th><th>Tool</th><th>Category</th><th>AI Spots</th><th>Surprised?</th><th>Submitted</th><th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -7234,6 +7236,7 @@
           <td style="font-family:'DM Mono',monospace;font-weight:700;color:var(--teal)">${r.instance_count || '—'}</td>
           <td>${surprisedBadge(r.surprised)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('sh', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('sh', ${r.id}, shData, renderSHPage)">Delete</button></td>
         </tr>
         <tr class="clickable-row" onclick="showSubmissionDetail('sh', ${r.id})" style="background:#fafafa;border-top:none">
           <td colspan="6" style="padding:8px 16px 12px;font-size:11px;color:#64748b;line-height:1.6">
@@ -7341,7 +7344,7 @@
     <table class="data-table">
       <thead>
         <tr>
-          <th>Student</th><th>Chatbot</th><th>Def. vs Class</th><th>Factual Q Accuracy</th><th>Summary Quality</th><th>Impression</th><th>Submitted</th>
+          <th>Student</th><th>Chatbot</th><th>Def. vs Class</th><th>Factual Q Accuracy</th><th>Summary Quality</th><th>Impression</th><th>Submitted</th><th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -7354,6 +7357,7 @@
           <td style="font-size:11px">${esc(r.t3_summary_quality || '—')}</td>
           <td>${impBadge(r.overall_impression)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showCBDetail(${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('cb', ${r.id}, cbData, renderCBPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -7479,7 +7483,7 @@
     <table class="data-table">
       <thead>
         <tr>
-          <th>Student</th><th>Chatbot</th><th>Constraints</th><th>Lines</th><th>Refined?</th><th>Submitted</th>
+          <th>Student</th><th>Chatbot</th><th>Constraints</th><th>Lines</th><th>Refined?</th><th>Submitted</th><th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -7496,6 +7500,7 @@
           <td style="font-family:'DM Mono',monospace;font-weight:700">${r.actual_line_count}</td>
           <td>${r.refined_prompt ? '<span style="color:var(--teal);font-weight:600">Yes</span>' : '<span style="color:var(--gray)">No</span>'}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showCPDetail(${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('cp', ${r.id}, cpData, renderCPPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -7628,7 +7633,7 @@
     <table class="data-table">
       <thead>
         <tr>
-          <th>Student</th><th>Secret Persona</th><th>Chatbot</th><th>Guessed?</th><th>Time (s)</th><th>Submitted</th>
+          <th>Student</th><th>Secret Persona</th><th>Chatbot</th><th>Guessed?</th><th>Time (s)</th><th>Submitted</th><th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -7642,6 +7647,7 @@
           </td>
           <td style="font-family:'DM Mono',monospace;font-weight:700">${r.guess_time_seconds != null ? r.guess_time_seconds + 's' : '—'}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showPDDetail(${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('pd', ${r.id}, pdData, renderPDPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -7850,7 +7856,7 @@
     <table class="data-table">
       <thead><tr>
         <th>Student</th><th>Clich&eacute;</th><th>AI Tool</th><th>Prompt</th>
-        <th>Image</th><th>Guessed?</th><th>Submitted</th>
+        <th>Image</th><th>Guessed?</th><th>Submitted</th><th>Actions</th>
       </tr></thead>
       <tbody>
         ${rows.map(r => `
@@ -7862,6 +7868,7 @@
           <td>${r.generated_image_url ? `<a href="${esc(r.generated_image_url)}" target="_blank" onclick="event.stopPropagation();" style="color:var(--teal);font-size:11px;font-weight:600">View ↗</a>` : '<span style="color:var(--gray);font-size:11px">—</span>'}</td>
           <td>${r.was_guessed === true ? '<span class="badge badge-green">✓ Yes</span>' : r.was_guessed === false ? '<span class="badge badge-red">✗ No</span>' : '<span class="badge badge-gray">—</span>'}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('ap', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('ap', ${r.id}, apData, renderAPPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -7933,6 +7940,7 @@
         <th>Takeaway</th>
         <th>Enjoyment</th>
         <th>Submitted</th>
+        <th>Actions</th>
       </tr></thead>
       <tbody>
         ${rows.map(r => `
@@ -7959,6 +7967,7 @@
           <td style="max-width:180px;font-size:11px;color:#475569" title="${esc(r.big_takeaway)}">${esc((r.big_takeaway || '').substring(0, 80))}${(r.big_takeaway || '').length > 80 ? '…' : ''}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('pc', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('pc', ${r.id}, pcData, renderPCPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -8033,6 +8042,7 @@
         <th>Takeaway</th>
         <th>Enjoyment</th>
         <th>Submitted</th>
+        <th>Actions</th>
       </tr></thead>
       <tbody>
         ${rows.map(r => `
@@ -8044,6 +8054,7 @@
           <td style="max-width:180px;font-size:11px;color:#475569" title="${esc(r.big_takeaway)}">${esc((r.big_takeaway || '').substring(0, 80))}${(r.big_takeaway || '').length > 80 ? '…' : ''}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('mg', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('mg', ${r.id}, mgData, renderMGPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -8114,6 +8125,7 @@
         <th>Observations</th>
         <th>Enjoyment</th>
         <th>Submitted</th>
+        <th>Actions</th>
       </tr></thead>
       <tbody>
         ${rows.map(r => `
@@ -8126,6 +8138,7 @@
           <td style="max-width:180px;font-size:11px;color:#475569" title="${esc(r.observations)}">${esc((r.observations || '').substring(0, 80))}${(r.observations || '').length > 80 ? '…' : ''}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('is', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('is', ${r.id}, isData, renderISPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -8197,6 +8210,7 @@
         <th>Model Link</th>
         <th>Enjoyment</th>
         <th>Submitted</th>
+        <th>Actions</th>
       </tr></thead>
       <tbody>
         ${rows.map(r => `
@@ -8209,6 +8223,7 @@
           <td>${r.model_url ? `<a href="${esc(r.model_url)}" target="_blank" onclick="event.stopPropagation();" style="color:var(--teal);font-size:11px;font-weight:600">Model ↗</a>` : '<span style="color:var(--gray);font-size:11px">—</span>'}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('tm', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('tm', ${r.id}, tmData, renderTMPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -8574,7 +8589,40 @@
       if (!confirm(`Delete submission from "${label}"?\n\nThis cannot be undone.`)) return;
 
       const tableMap = {
+        sa:    'introai_week01_self_assessment',
+        sh:    'introai_week01_scavenger_hunt',
+        cb:    'introai_week01_chatbots',
+        cp:    'introai_week02_creative_prompting',
+        pd:    'introai_week02_persona_detective',
+        ap:    'introai_week03_ai_pictionary',
+        pc:    'introai_week03_prompt_comparison',
+        mg:    'introai_week04_music_generation',
+        is:    'introai_week04_instrument_swap',
+        tm:    'introai_week05_train_your_model',
+        bta:   'introai_week06_be_the_algorithm',
+        ayf:   'introai_week06_analyze_your_feed',
+        dsr:   'introai_week06_design_a_recommender',
+        kc:    'introai_week06_knowledge_check',
+        stb:   'introai_week07_spot_the_bias',
+        da:    'introai_week07_data_audit',
+        bd:    'introai_week07_build_dataset',
+        dd:    'introai_week07_data_detective',
+        bct:   'introai_week08_bias_card_twist',
+        bds:   'introai_week08_bias_detective_stations',
+        ftd:   'introai_week08_fix_the_dataset',
+        pvp:   'introai_week08_promise_vs_problem',
+        met:   'introai_week08_mini_ethics_trial',
+        nl:    'introai_week09_npc_logic',
+        fp:    'introai_week09_ai_feature_pitch',
+        pb:    'introai_week09_project_brief',
+        poc:   'introai_week09_poc_brainstormer',
+        pt:    'introai_project_tracker',
+        ads:   'introai_week10_ai_design_sprint',
+        mc:    'introai_week10_mockup_critique',
+        sm:    'introai_week11_synthetic_media',
+        wwyd:  'introai_week11_what_would_you_do',
         mcbot: 'introai_week12_mini_chatbot',
+        bvl:   'introai_week12_bot_vs_llm',
       };
       const tableName = tableMap[tableKey];
       if (!tableName) { toast('Unknown table: ' + tableKey); return; }
@@ -8759,7 +8807,7 @@
           <td style="font-size:11px;color:#475569">${esc(r.profile_a_key_param || '—')}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
-          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('bta', ${r.id})">View</button></td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('bta', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('bta', ${r.id}, btaData, renderBTAPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -8828,7 +8876,7 @@
           <td><span class="badge ${r.filter_bubble_status?.includes('Yes') ? 'badge-red' : 'badge-green'}">${esc(r.filter_bubble_status || '—')}</span></td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
-          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('ayf', ${r.id})">View</button>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('ayf', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('ayf', ${r.id}, ayfData, renderAYFPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -8894,7 +8942,7 @@
           <td style="font-size:11px;font-family:'DM Mono',monospace;color:var(--teal);max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.flowchart_summary)}">${esc(r.flowchart_summary || '—')}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
-          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('dsr', ${r.id})">View</button></td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('dsr', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('dsr', ${r.id}, dsrData, renderDSRPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -8962,7 +9010,7 @@
             <td style="font-size:11px;max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.reflection_surprising)}">${esc(r.reflection_surprising || '—')}</td>
             <td>${starRating(r.enjoyment_rating)}</td>
             <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
-            <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('kc', ${r.id})">View</button></td>
+            <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('kc', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('kc', ${r.id}, kcData, renderKCPage)">Delete</button></td>
           </tr>`;
         }).join('')}
       </tbody>
@@ -9026,7 +9074,7 @@
           <td style="font-size:11px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.final_reflection)}">${esc(r.final_reflection || '—')}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
-          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('stb', ${r.id})">View</button></td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('stb', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('stb', ${r.id}, stbData, renderSTBPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -9093,7 +9141,7 @@
           <td style="font-size:11px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.surprising_app_reflection)}">${esc(r.surprising_app_reflection || '—')}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
-          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('da', ${r.id})">View</button></td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('da', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('da', ${r.id}, daData, renderDAPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -9168,7 +9216,7 @@
             <td style="font-size:11px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.dataset_bias_reflection)}">${esc(r.dataset_bias_reflection || '—')}</td>
             <td>${starRating(r.enjoyment_rating)}</td>
             <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
-            <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('bd', ${r.id})">View</button></td>
+            <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('bd', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('bd', ${r.id}, bdData, renderBDPage)">Delete</button></td>
           </tr>`;
         }).join('')}
       </tbody>
@@ -9240,7 +9288,7 @@
           <td style="font-size:11px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.ai_prediction_usecase)}">${esc(r.ai_prediction_usecase || '—')}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
-          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('dd', ${r.id})">View</button></td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('dd', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('dd', ${r.id}, ddData, renderDDPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -9299,7 +9347,7 @@
           <td style="font-size:11px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.what_breaks)}">${esc(r.what_breaks || '—')}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
-          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('bct', ${r.id})">View</button></td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('bct', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('bct', ${r.id}, bctData, renderBCTPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -9358,7 +9406,7 @@
           <td style="font-size:11px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.favorite_station_share)}">${esc(r.favorite_station_share || '—')}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
-          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('bds', ${r.id})">View</button></td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('bds', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('bds', ${r.id}, bdsData, renderBDSPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -9415,7 +9463,7 @@
           <td style="font-size:11px;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.changes_explanation)}">${esc(r.changes_explanation || '—')}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
-          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('ftd', ${r.id})">View</button></td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('ftd', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('ftd', ${r.id}, ftdData, renderFTDPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -9474,7 +9522,7 @@
           <td style="font-size:11px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.debrief_reflection)}">${esc(r.debrief_reflection || '—')}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
-          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('pvp', ${r.id})">View</button></td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('pvp', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('pvp', ${r.id}, pvpData, renderPVPPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -9533,7 +9581,7 @@
           <td style="font-size:11px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.verdict_ruling)}">${esc(r.verdict_ruling || '—')}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
-          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('met', ${r.id})">View</button></td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('met', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('met', ${r.id}, metData, renderMETPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -9594,7 +9642,7 @@
           <td><span class="badge badge-teal">${esc(r.search_time_limit || '—')}</span></td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
-          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('nl', ${r.id})">View</button></td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('nl', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('nl', ${r.id}, nlData, renderNLPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -9655,7 +9703,7 @@
           <td><span class="badge badge-gold">${esc(r.gameplay_pillar || '—')}</span></td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
-          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('fp', ${r.id})">View</button></td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('fp', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('fp', ${r.id}, fpData, renderFPPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -9716,7 +9764,7 @@
           <td style="font-size:11px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.definition_of_done)}">${esc(r.definition_of_done || '—')}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
-          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('pb', ${r.id})">View</button></td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('pb', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('pb', ${r.id}, pbData, renderPBPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -9779,7 +9827,7 @@
           <td style="font-size:11px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.mvp_scope)}">${esc(r.mvp_scope || '—')}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
-          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('poc', ${r.id})">View</button></td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('poc', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('poc', ${r.id}, pocData, renderPOCPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -9851,7 +9899,7 @@
           </td>
           <td><span class="badge badge-gold">${logsCount} update${logsCount !== 1 ? 's' : ''}</span></td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.updated_at || r.created_at)}</td>
-          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('pt', ${r.id})">View Blueprint</button></td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('pt', ${r.id})">View Blueprint</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('pt', ${r.id}, ptData, renderPTPage)">Delete</button></td>
         </tr>`;
         }).join('')}
       </tbody>
@@ -9913,7 +9961,7 @@
           <td style="font-size:11px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.key_choice_justification)}">${esc(r.key_choice_justification || '—')}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
-          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('ads', ${r.id})">View</button></td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('ads', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('ads', ${r.id}, adsData, renderADSPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -9974,7 +10022,7 @@
           <td style="font-size:11px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.class_share_takeaway)}">${esc(r.class_share_takeaway || '—')}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
-          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('mc', ${r.id})">View</button></td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('mc', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('mc', ${r.id}, mcData, renderMCPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -10037,7 +10085,7 @@
           <td style="font-size:11px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.detection_strategy_reflection || r.ethical_risk_reflection)}">${esc(r.detection_strategy_reflection || r.ethical_risk_reflection || '—')}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
-          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('sm', ${r.id})">View</button></td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('sm', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('sm', ${r.id}, smData, renderSMPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -10098,7 +10146,7 @@
           <td style="font-size:11px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.personal_rule_reflection)}">${esc(r.personal_rule_reflection || '—')}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
-          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('wwyd', ${r.id})">View</button></td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('wwyd', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('wwyd', ${r.id}, wwydData, renderWWYDPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
@@ -10227,7 +10275,7 @@
           <td style="font-size:11px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.architect_reflection)}">${esc(r.architect_reflection || '—')}</td>
           <td>${starRating(r.enjoyment_rating)}</td>
           <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
-          <td><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('bvl', ${r.id})">View</button></td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('bvl', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('bvl', ${r.id}, bvlData, renderBVLPage)">Delete</button></td>
         </tr>`).join('')}
       </tbody>
     </table>`;
