@@ -8628,8 +8628,11 @@
       if (!tableName) { toast('Unknown table: ' + tableKey); return; }
 
       try {
-        const { error } = await sb.from(tableName).delete().eq('id', id);
+        const { data, error } = await sb.from(tableName).delete().eq('id', id).select();
         if (error) throw error;
+        if (!data || data.length === 0) {
+          throw new Error('Supabase RLS policy blocked DELETE. Please run the SQL migration script in Supabase SQL editor.');
+        }
         // Remove from local array in-place
         const idx = dataArrayRef.findIndex(r => String(r.id) === String(id));
         if (idx !== -1) dataArrayRef.splice(idx, 1);
