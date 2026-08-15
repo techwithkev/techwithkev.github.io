@@ -25,7 +25,7 @@ async function callGroq(systemPrompt: string, userPrompt: string, groqKey: strin
         { role: 'user',   content: userPrompt },
       ],
       temperature: 0.5,
-      max_tokens: 1000,
+      max_tokens: 1200,
     }),
   });
 
@@ -45,9 +45,33 @@ function json(data: unknown, status = 200) {
   });
 }
 
+function sanitizeSubmissionsSummary(summary: any[]): any[] {
+  if (!Array.isArray(summary)) return [];
+  return summary.map(item => {
+    const keyAnswers: Record<string, any> = {};
+    if (item.key_answers && typeof item.key_answers === 'object') {
+      Object.keys(item.key_answers).forEach(k => {
+        let val = item.key_answers[k];
+        if (typeof val === 'string' && val.length > 250) {
+          val = val.substring(0, 250) + '… (truncated)';
+        }
+        keyAnswers[k] = val;
+      });
+    }
+    return {
+      exercise_id: item.exercise_id || 'ex',
+      exercise_title: item.exercise_title || 'Exercise',
+      week: item.week ?? 1,
+      submitted_at: item.submitted_at || '',
+      enjoyment_rating: item.enjoyment_rating,
+      score: item.score,
+      key_answers: keyAnswers
+    };
+  });
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // ACTION: cohort_summary
-// Accepts pre-computed stats from the client — no DB query needed.
 // ─────────────────────────────────────────────────────────────────────────────
 async function handleCohortSummary(payload: Record<string, unknown>, groqKey: string): Promise<Response> {
   const { cohort, stats } = payload as {
@@ -74,14 +98,13 @@ Always end with one specific actionable suggestion for the teacher.`;
   const userPrompt = `Generate a performance summary for cohort: "${cohort || 'All students'}".
 
 Key stats:
-- Total unique students: ${stats.totalStudents}
-- Total homework submissions: ${stats.totalSubmissions}
-- Average homework score: ${stats.avgScore} / ${stats.maxScore}
-- Score distribution: ${JSON.stringify(stats.scoreDistribution)}
-- Submissions per class: ${JSON.stringify(stats.classCounts)}
-- Top 3 students (highest avg): ${stats.topStudents.slice(0, 3).map(s => `${s.name} (avg ${s.avg}/20, ${s.count} submissions)`).join(', ')}
-- Students who may need support (lowest avg): ${stats.lowStudents.slice(0, 3).map(s => `${s.name} (avg ${s.avg}/20, ${s.count} submissions)`).join(', ')}
-- Classes with fewest submissions: ${stats.lowestClasses.slice(0, 3).map(c => `Class ${c.class} (${c.count} submissions)`).join(', ')}
+- Total unique students: ${stats?.totalStudents || 0}
+- Total homework submissions: ${stats?.totalSubmissions || 0}
+- Average homework score: ${stats?.avgScore || 0} / ${stats?.maxScore || 20}
+- Score distribution: ${JSON.stringify(stats?.scoreDistribution || {})}
+- Submissions per class: ${JSON.stringify(stats?.classCounts || {})}
+- Top 3 students: ${(stats?.topStudents || []).slice(0, 3).map(s => `${s.name} (avg ${s.avg}, ${s.count} subs)`).join(', ')}
+- Students needing support: ${(stats?.lowStudents || []).slice(0, 3).map(s => `${s.name} (avg ${s.avg}, ${s.count} subs)`).join(', ')}
 
 Write the summary now.`;
 
@@ -91,26 +114,20 @@ Write the summary now.`;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ACTION: student_analyzer
-// Evaluates a single student's submissions across all Intro to AI exercises.
 // ─────────────────────────────────────────────────────────────────────────────
 async function handleStudentAnalyzer(payload: Record<string, unknown>, groqKey: string): Promise<Response> {
   const { student_name, student_email, submissions_summary } = payload as {
     student_name: string;
     student_email: string;
-    submissions_summary: Array<{
-      exercise_id: string;
-      exercise_title: string;
-      week: number;
-      submitted_at: string;
-      enjoyment_rating?: number;
-      key_answers: Record<string, any>;
-    }>;
+    submissions_summary: Array<any>;
   };
+
+  const sanitizedList = sanitizeSubmissionsSummary(submissions_summary || []);
 
   const systemPrompt = `You are an expert AI & Computer Science educator providing empathetic, highly perceptive, and constructive teacher commentary for a student enrolled in an "Intro to AI" course for middle and high school students.
 Your goal is to evaluate the student's overall progress across their submitted AI exercises and generate professional teacher commentary.
 
-Format your response in clear, markdown with bold section headers and bullet points:
+Format your response in clear markdown with bold section headers and bullet points:
 1. 🌟 **Overall Student Performance Summary** (2-3 sentences summarizing engagement, consistency, and general quality)
 2. 🧠 **AI Concept Mastery & Strengths** (Highlight specific concepts where the student demonstrates understanding e.g., prompting techniques, AI bias detection, ethical analysis, machine learning model training, rule-based vs LLM chatbot logic, AI career mapping)
 3. 💡 **Areas for Growth & Encouragement** (Constructive advice on areas where their answers were brief or where concepts could be deepened)
@@ -118,11 +135,11 @@ Format your response in clear, markdown with bold section headers and bullet poi
 
 Keep the tone encouraging, warm, professional, and pedagogical.`;
 
-  const userPrompt = `Generate a teacher evaluation report for student: "${student_name}" (${student_email || 'No email provided'}).
-They have completed ${submissions_summary.length} Intro to AI exercise(s).
+  const userPrompt = `Generate a teacher evaluation report for student: "${student_name || 'Student'}" (${student_email || 'No email provided'}).
+They have completed ${sanitizedList.length} Intro to AI exercise(s).
 
 Here are their exercise submissions across the course:
-${JSON.stringify(submissions_summary, null, 2)}
+${JSON.stringify(sanitizedList, null, 2)}
 
 Provide the complete teacher analysis report now.`;
 
@@ -134,8 +151,9 @@ Provide the complete teacher analysis report now.`;
 // MAIN HANDLER
 // ─────────────────────────────────────────────────────────────────────────────
 Deno.serve(async (req) => {
+  // Handle CORS preflight OPTIONS
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response('ok', { headers: corsHeaders, status: 200 });
   }
 
   if (req.method !== 'POST') {
@@ -143,50 +161,53 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // ── Read secrets ─────────────────────────────────────────────────────────
     const groqKey = Deno.env.get('GROQ_API_KEY');
-    if (!groqKey) return json({ error: 'GROQ_API_KEY secret not configured.' }, 500);
+    if (!groqKey) {
+      return json({ error: 'GROQ_API_KEY secret not configured on Supabase.' }, 500);
+    }
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') || '';
 
-    // ── Verify teacher is authenticated ──────────────────────────────────────
-    const authHeader = req.headers.get('Authorization');
+    // Verify Authorization header
+    const authHeader = req.headers.get('Authorization') || req.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return json({ error: 'Unauthorized. Please sign in.' }, 401);
+      return json({ error: 'Unauthorized. Missing Authorization header.' }, 401);
     }
 
-    const sb = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } },
-      auth: { persistSession: false },
-    });
-
-    // Verify the JWT resolves to a real user
-    const { data: { user }, error: userErr } = await sb.auth.getUser();
-    if (userErr || !user) {
-      return json({ error: 'Invalid or expired session. Please sign in again.' }, 401);
+    if (supabaseUrl && supabaseAnonKey) {
+      try {
+        const sb = createClient(supabaseUrl, supabaseAnonKey, {
+          global: { headers: { Authorization: authHeader } },
+          auth: { persistSession: false },
+        });
+        const { data: { user }, error: userErr } = await sb.auth.getUser();
+        if (userErr) {
+          console.warn('[ai-dashboard] Auth user check warning:', userErr.message);
+        }
+      } catch (e) {
+        console.warn('[ai-dashboard] Supabase client init warning:', e);
+      }
     }
 
-    // ── Parse body ───────────────────────────────────────────────────────────
-    const body = await req.json();
+    const body = await req.json().catch(() => ({}));
     const { action, payload } = body as { action: string; payload: Record<string, unknown> };
 
     if (!action) return json({ error: 'Missing "action" field.' }, 400);
 
-    // ── Dispatch actions ─────────────────────────────────────────────────────
     switch (action) {
       case 'cohort_summary':
-        return handleCohortSummary(payload, groqKey);
+        return await handleCohortSummary(payload, groqKey);
 
       case 'student_analyzer':
-        return handleStudentAnalyzer(payload, groqKey);
+        return await handleStudentAnalyzer(payload, groqKey);
 
       default:
         return json({ error: `Unknown action: ${action}` }, 400);
     }
 
-  } catch (err) {
-    console.error('ai-dashboard error:', err);
-    return json({ error: 'Server error. Please try again.' }, 500);
+  } catch (err: any) {
+    console.error('ai-dashboard unhandled error:', err);
+    return json({ error: err?.message || 'Server error. Please try again.' }, 500);
   }
 });

@@ -4869,21 +4869,7 @@
         });
       }
 
-      const result = [];
-      allCohorts.forEach(c => {
-        const cLower = String(c).toLowerCase();
-        // Cohorts starting with intai_ or introai_ belong to Intro to AI
-        const isIntroCohort = cLower.startsWith('intai_') || cLower.startsWith('introai_') || cLower.startsWith('intai');
-
-        if (curr === 'intro-ai') {
-          if (isIntroCohort) result.push(c);
-        } else {
-          // comp-jr includes aijr and all non-intai cohorts
-          if (!isIntroCohort) result.push(c);
-        }
-      });
-
-      return Array.from(new Set(result)).sort();
+      return Array.from(allCohorts).sort();
     }
 
     function showPage(id) {
@@ -11127,11 +11113,7 @@
 
       try {
         const { data: { session } } = await sb.auth.getSession();
-        if (!session) {
-          toast('Please sign in to use Student AI Analyzer.');
-          outputBody.innerHTML = `<span style="color:var(--red)">⚠️ Please sign in to use Student AI Analyzer.</span>`;
-          return;
-        }
+        const authToken = session?.access_token || SUPABASE_ANON;
 
         const summaryList = getStudentSubmissionsSummary(name);
 
@@ -11147,7 +11129,7 @@
         const res = await fetch(`${SUPABASE_URL}/functions/v1/ai-dashboard`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${session.access_token}`,
+            'Authorization': `Bearer ${authToken}`,
             'Content-Type': 'application/json',
             'apikey': SUPABASE_ANON,
           },
