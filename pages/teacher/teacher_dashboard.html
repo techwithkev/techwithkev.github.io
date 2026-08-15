@@ -4669,7 +4669,7 @@
               <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; background:rgba(255,255,255,0.06); padding:16px; border-radius:14px; border:1px solid rgba(255,255,255,0.1);">
                 <div style="flex:1; min-width:180px;">
                   <label style="font-size:11px; font-weight:800; color:#93c5fd; text-transform:uppercase; display:block; margin-bottom:6px;">Filter by Cohort 🏫:</label>
-                  <select id="student-analyzer-cohort-select" class="form-input" style="background:#0f172a; color:#38bdf8; border-color:#475569; font-weight:800; width:100%;" onchange="populateStudentAnalyzerSelect()">
+                  <select id="student-analyzer-cohort-select" class="form-input" style="background:#0f172a; color:#38bdf8; border-color:#475569; font-weight:800; width:100%;" onchange="populateStudentAnalyzerSelect(true)">
                     <option value="ALL">All Cohorts</option>
                   </select>
                 </div>
@@ -5291,6 +5291,7 @@
       renderClassTiles();
       renderExamTable();
       renderCodesTable();
+      populateStudentAnalyzerSelect();
     }
 
     // ════════════════════════════════════════════════════════════════════════════
@@ -10933,7 +10934,7 @@
       { key: 'exam', title: 'Midterm / Final Exam', week: 0, dataRef: () => examData }
     ];
 
-    function populateStudentAnalyzerSelect() {
+    function populateStudentAnalyzerSelect(userChangedCohort = false) {
       const cohortFilterEl = document.getElementById('student-analyzer-cohort-select');
       const selectEl = document.getElementById('student-analyzer-select');
       if (!selectEl) return;
@@ -10987,18 +10988,43 @@
 
       // 2. Populate #student-analyzer-cohort-select dynamically
       if (cohortFilterEl) {
-        const currentCohortVal = cohortFilterEl.value || 'ALL';
         const uniqueCohorts = new Set(['aijr']);
-        studentCohortMap.forEach(cSet => cSet.forEach(c => uniqueCohorts.add(c)));
+        
+        // Include cohorts from curriculum definitions
+        getCohortsForCurriculum('intro-ai').forEach(c => {
+          if (c) uniqueCohorts.add(c.toLowerCase());
+        });
+        if (activeCohort) uniqueCohorts.add(activeCohort.toLowerCase());
 
-        let cohortOptions = `<option value="ALL">All Cohorts (${uniqueCohorts.size})</option>`;
-        Array.from(uniqueCohorts).sort().forEach(c => {
+        // Include cohorts from student submissions
+        studentCohortMap.forEach(cSet => cSet.forEach(c => uniqueCohorts.add(c.toLowerCase())));
+
+        const sortedCohorts = Array.from(uniqueCohorts).sort();
+        let cohortOptions = `<option value="ALL">All Cohorts (${sortedCohorts.length})</option>`;
+        sortedCohorts.forEach(c => {
           cohortOptions += `<option value="${esc(c)}">Cohort: ${esc(c.toUpperCase())}</option>`;
         });
         cohortFilterEl.innerHTML = cohortOptions;
-        if (currentCohortVal && Array.from(cohortFilterEl.options).some(o => o.value === currentCohortVal)) {
-          cohortFilterEl.value = currentCohortVal;
+
+        // Sync with global activeCohort if teacher hasn't manually changed the local dropdown
+        const prevVal = cohortFilterEl.dataset.currentVal;
+        let desiredCohort = 'ALL';
+        if (userChangedCohort) {
+          desiredCohort = cohortFilterEl.value || 'ALL';
+        } else if (activeCohort) {
+          desiredCohort = activeCohort;
+        } else if (prevVal) {
+          desiredCohort = prevVal;
         }
+
+        desiredCohort = desiredCohort.toLowerCase();
+        const matchingOption = Array.from(cohortFilterEl.options).find(o => o.value.toLowerCase() === desiredCohort);
+        if (matchingOption) {
+          cohortFilterEl.value = matchingOption.value;
+        } else {
+          cohortFilterEl.value = 'ALL';
+        }
+        cohortFilterEl.dataset.currentVal = cohortFilterEl.value;
       }
 
       // 3. Filter / Group Students for #student-analyzer-select
@@ -11013,8 +11039,12 @@
           return cSet && cSet.has(targetCohort);
         });
 
-        selectEl.innerHTML = `<option value="">-- Choose a Student from '${targetCohort.toUpperCase()}' (${filtered.length} Students) --</option>` +
-          filtered.map(s => `<option value="${esc(s.name)}">${esc(s.name)}${s.email ? ' (' + esc(s.email) + ')' : ''} — ${s.count} submission${s.count !== 1 ? 's' : ''}</option>`).join('');
+        if (filtered.length === 0) {
+          selectEl.innerHTML = `<option value="">-- No Students Have Submitted in '${targetCohort.toUpperCase()}' Yet --</option>`;
+        } else {
+          selectEl.innerHTML = `<option value="">-- Choose a Student from '${targetCohort.toUpperCase()}' (${filtered.length} Students) --</option>` +
+            filtered.map(s => `<option value="${esc(s.name)}">${esc(s.name)}${s.email ? ' (' + esc(s.email) + ')' : ''} — ${s.count} submission${s.count !== 1 ? 's' : ''}</option>`).join('');
+        }
       } else {
         // Group by primary cohort using <optgroup>
         const cohortGroups = new Map();
