@@ -4667,7 +4667,13 @@
               </div>
 
               <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; background:rgba(255,255,255,0.06); padding:16px; border-radius:14px; border:1px solid rgba(255,255,255,0.1);">
-                <div style="flex:1; min-width:240px;">
+                <div style="flex:1; min-width:180px;">
+                  <label style="font-size:11px; font-weight:800; color:#93c5fd; text-transform:uppercase; display:block; margin-bottom:6px;">Filter by Cohort 🏫:</label>
+                  <select id="student-analyzer-cohort-select" class="form-input" style="background:#0f172a; color:#38bdf8; border-color:#475569; font-weight:800; width:100%;" onchange="populateStudentAnalyzerSelect()">
+                    <option value="ALL">All Cohorts</option>
+                  </select>
+                </div>
+                <div style="flex:2; min-width:240px;">
                   <label style="font-size:11px; font-weight:800; color:#93c5fd; text-transform:uppercase; display:block; margin-bottom:6px;">Select Student:</label>
                   <select id="student-analyzer-select" class="form-input" style="background:#0f172a; color:#fff; border-color:#475569; font-weight:700; width:100%;">
                     <option value="">-- Choose a Student --</option>
@@ -10941,11 +10947,35 @@
       { key: 'exam', title: 'Midterm / Final Exam', week: 0, dataRef: () => examData }
     ];
 
+    function populateStudentAnalyzerCohortSelect() {
+      const cohortSelectEl = document.getElementById('student-analyzer-cohort-select');
+      if (!cohortSelectEl) return;
+
+      const cohorts = getCohortsForCurriculum('intro-ai');
+      const currentVal = cohortSelectEl.value || 'ALL';
+
+      let optionsHtml = `<option value="ALL">All Cohorts (${cohorts.length})</option>`;
+      cohorts.forEach(c => {
+        optionsHtml += `<option value="${esc(c)}">Cohort: ${esc(c)}</option>`;
+      });
+
+      cohortSelectEl.innerHTML = optionsHtml;
+      if (currentVal && Array.from(cohortSelectEl.options).some(o => o.value === currentVal)) {
+        cohortSelectEl.value = currentVal;
+      }
+    }
+
     function populateStudentAnalyzerSelect() {
+      populateStudentAnalyzerCohortSelect();
+
       const selectEl = document.getElementById('student-analyzer-select');
+      const cohortFilterEl = document.getElementById('student-analyzer-cohort-select');
       if (!selectEl) return;
 
-      const studentMap = new Map(); // name/email -> { name, email, count }
+      const targetCohort = (cohortFilterEl ? cohortFilterEl.value : 'ALL').toLowerCase();
+
+      // Map student_key -> { name, email, count, cohortMap: Map<cohort, count> }
+      const studentMap = new Map();
 
       ALL_INTROAI_DATASETS.forEach(ds => {
         const arr = ds.dataRef();
@@ -10955,19 +10985,50 @@
           const email = (r.student_email || r.email || '').trim();
           if (!name && !email) return;
 
+          const rawCohort = (r.cohort || (r.access_code ? codeToCohorMap[r.access_code.toUpperCase()] : '') || 'aijr').toLowerCase();
           const key = (name || email).toLowerCase();
+
           if (!studentMap.has(key)) {
-            studentMap.set(key, { name: name || email, email, count: 0 });
+            studentMap.set(key, { name: name || email, email, count: 0, cohortMap: new Map() });
           }
-          studentMap.get(key).count++;
+
+          const record = studentMap.get(key);
+          record.count++;
+          record.cohortMap.set(rawCohort, (record.cohortMap.get(rawCohort) || 0) + 1);
         });
       });
 
       const students = Array.from(studentMap.values()).sort((a, b) => a.name.localeCompare(b.name));
       const currentVal = selectEl.value;
 
-      selectEl.innerHTML = `<option value="">-- Choose a Student (${students.length} Total) --</option>` +
-        students.map(s => `<option value="${esc(s.name)}">${esc(s.name)}${s.email ? ' (' + esc(s.email) + ')' : ''} — ${s.count} submission${s.count !== 1 ? 's' : ''}</option>`).join('');
+      if (targetCohort !== 'all') {
+        // Filter by selected cohort
+        const filtered = students.filter(s => s.cohortMap.has(targetCohort));
+        selectEl.innerHTML = `<option value="">-- Choose a Student from '${targetCohort}' (${filtered.length} Students) --</option>` +
+          filtered.map(s => `<option value="${esc(s.name)}">${esc(s.name)}${s.email ? ' (' + esc(s.email) + ')' : ''} — ${s.cohortMap.get(targetCohort)} sub${s.cohortMap.get(targetCohort) !== 1 ? 's' : ''}</option>`).join('');
+      } else {
+        // Group by cohort using <optgroup>
+        const cohortGroups = new Map();
+        students.forEach(s => {
+          s.cohortMap.forEach((cnt, ch) => {
+            if (!cohortGroups.has(ch)) cohortGroups.set(ch, []);
+            cohortGroups.get(ch).push({ ...s, cohortCount: cnt });
+          });
+        });
+
+        let optionsHtml = `<option value="">-- Choose a Student (${students.length} Total Students) --</option>`;
+
+        Array.from(cohortGroups.keys()).sort().forEach(ch => {
+          const groupStudents = cohortGroups.get(ch).sort((a, b) => a.name.localeCompare(b.name));
+          optionsHtml += `<optgroup label="── Cohort: ${esc(ch.toUpperCase())} (${groupStudents.length} Students) ──">`;
+          groupStudents.forEach(s => {
+            optionsHtml += `<option value="${esc(s.name)}">${esc(s.name)}${s.email ? ' (' + esc(s.email) + ')' : ''} — ${s.cohortCount} sub${s.cohortCount !== 1 ? 's' : ''}</option>`;
+          });
+          optionsHtml += `</optgroup>`;
+        });
+
+        selectEl.innerHTML = optionsHtml;
+      }
 
       if (currentVal) selectEl.value = currentVal;
     }
