@@ -1993,6 +1993,12 @@
           </button>
 
           <div class="nav-section-label" style="margin-top:20px">AI Assistance &amp; Tools</div>
+          <button class="nav-item" onclick="showPage('student-management')">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M10 4a2 2 0 11-4 0 2 2 0 014 0zM3 13a4 4 0 018 0H3zm7.5-6a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm2.5 6a3.5 3.5 0 00-3.5-3.5H9" stroke-linecap="round" />
+            </svg>
+            Student Roster 👥
+          </button>
           <button class="nav-item" onclick="showPage('introai-student-analyzer')">
             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
               <path d="M8 8a3 3 0 100-6 3 3 0 000 6zm-5 7a5 5 0 0110 0H3z" stroke-linecap="round" />
@@ -4704,6 +4710,50 @@
           </div>
         </div>
 
+        <!-- ══ INTRO TO AI: STUDENT ROSTER & MANAGEMENT ══ -->
+        <div class="page" id="page-student-management">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Student Roster &amp; Management 👥</div>
+              <div class="page-subtitle">View student rosters with first &amp; last names, emails, cohorts, and overall exercise completion progress</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="exportStudentRosterCSV()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 2v8m0 0l-3-3m3 3l3-3M2 13h12"/></svg>
+                Export Roster CSV
+              </button>
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 8A6 6 0 1114 8"/><path d="M2 8l-2-2m2 2L0 10"/></svg>
+                Refresh
+              </button>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-bottom:20px;">
+            <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
+              <div style="flex:1; min-width:200px;">
+                <label style="font-size:11px; font-weight:800; color:var(--gray); text-transform:uppercase; display:block; margin-bottom:6px;">Filter by Cohort:</label>
+                <select id="student-mgmt-cohort-filter" class="form-input" style="width:100%;" onchange="populateStudentManagementTable()">
+                  <option value="ALL">All Cohorts</option>
+                </select>
+              </div>
+              <div style="flex:2; min-width:240px;">
+                <label style="font-size:11px; font-weight:800; color:var(--gray); text-transform:uppercase; display:block; margin-bottom:6px;">Search Student Name or Email:</label>
+                <input type="text" id="student-mgmt-search" class="form-input" placeholder="Search first name, last name, or email..." style="width:100%;" oninput="populateStudentManagementTable()">
+              </div>
+              <div style="align-self:flex-end; padding-bottom:8px;">
+                <span class="badge badge-indigo" id="student-mgmt-count">0 students</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div id="student-mgmt-table-wrap">
+              <div class="loading"><div class="spinner"></div><br>Loading student roster&hellip;</div>
+            </div>
+          </div>
+        </div>
+
       </main>
     </div>
   </div>
@@ -5292,6 +5342,7 @@
       renderExamTable();
       renderCodesTable();
       populateStudentAnalyzerSelect();
+      populateStudentManagementTable();
     }
 
     // ════════════════════════════════════════════════════════════════════════════
@@ -11072,6 +11123,316 @@
       }
 
       if (currentVal) selectEl.value = currentVal;
+    }
+
+    // ════════════════════════════════════════════════════════════════════════════
+    // STUDENT ROSTER & MANAGEMENT
+    // ════════════════════════════════════════════════════════════════════════════
+    function parseStudentName(fullName) {
+      const clean = (fullName || '').trim();
+      if (!clean) return { firstName: '—', lastName: '—' };
+      const parts = clean.split(/\s+/);
+      if (parts.length === 1) return { firstName: parts[0], lastName: '—' };
+      const lastName = parts.pop();
+      const firstName = parts.join(' ');
+      return { firstName, lastName };
+    }
+
+    function populateStudentManagementCohortSelect() {
+      const filterEl = document.getElementById('student-mgmt-cohort-filter');
+      if (!filterEl) return;
+
+      const cohorts = getCohortsForCurriculum('intro-ai');
+      const currentVal = filterEl.value || 'ALL';
+
+      let optionsHtml = `<option value="ALL">All Cohorts (${cohorts.length})</option>`;
+      cohorts.forEach(c => {
+        optionsHtml += `<option value="${esc(c)}">Cohort: ${esc(c.toUpperCase())}</option>`;
+      });
+
+      filterEl.innerHTML = optionsHtml;
+      if (currentVal && Array.from(filterEl.options).some(o => o.value === currentVal)) {
+        filterEl.value = currentVal;
+      }
+    }
+
+    function populateStudentManagementTable() {
+      populateStudentManagementCohortSelect();
+
+      const cohortFilterEl = document.getElementById('student-mgmt-cohort-filter');
+      const searchEl = document.getElementById('student-mgmt-search');
+      const tableWrap = document.getElementById('student-mgmt-table-wrap');
+      const countEl = document.getElementById('student-mgmt-count');
+      if (!tableWrap) return;
+
+      const targetCohort = (cohortFilterEl ? cohortFilterEl.value : 'ALL').toLowerCase();
+      const query = (searchEl ? searchEl.value : '').trim().toLowerCase();
+
+      // Aggregate student submissions
+      const studentMap = new Map();
+
+      ALL_INTROAI_DATASETS.forEach(ds => {
+        const arr = ds.dataRef();
+        if (!Array.isArray(arr)) return;
+
+        arr.forEach(r => {
+          const name = (r.student_name || r.name || '').trim();
+          const email = (r.student_email || r.email || '').trim();
+          if (!name && !email) return;
+
+          const key = (email || name).toLowerCase();
+          const rawCohort = (r.cohort || (r.access_code ? codeToCohorMap[r.access_code.toUpperCase()] : '') || 'aijr').toLowerCase();
+
+          if (!studentMap.has(key)) {
+            studentMap.set(key, {
+              name: name || email,
+              email: email || '—',
+              cohortSet: new Set(),
+              exercisesMap: new Map(),
+              lastActive: '—'
+            });
+          }
+
+          const record = studentMap.get(key);
+          if (rawCohort) record.cohortSet.add(rawCohort);
+
+          const submittedAt = r.submitted_at || r.updated_at || r.logged_at || '—';
+          record.exercisesMap.set(ds.key, {
+            key: ds.key,
+            title: ds.title,
+            week: ds.week,
+            submitted_at: submittedAt
+          });
+
+          if (submittedAt !== '—') {
+            if (record.lastActive === '—' || new Date(submittedAt) > new Date(record.lastActive)) {
+              record.lastActive = submittedAt;
+            }
+          }
+        });
+      });
+
+      studentMap.forEach(r => {
+        if (r.cohortSet.size === 0) r.cohortSet.add('aijr');
+      });
+
+      let studentList = Array.from(studentMap.values());
+
+      if (targetCohort !== 'all') {
+        studentList = studentList.filter(s => s.cohortSet.has(targetCohort));
+      }
+
+      if (query) {
+        studentList = studentList.filter(s =>
+          s.name.toLowerCase().includes(query) ||
+          s.email.toLowerCase().includes(query)
+        );
+      }
+
+      studentList.sort((a, b) => a.name.localeCompare(b.name));
+
+      if (countEl) countEl.textContent = `${studentList.length} student${studentList.length !== 1 ? 's' : ''}`;
+
+      if (!studentList.length) {
+        tableWrap.innerHTML = `<div class="empty-state"><p>No students match the selected cohort and search filters.</p></div>`;
+        return;
+      }
+
+      const totalExercises = ALL_INTROAI_DATASETS.length;
+
+      let html = `
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Email</th>
+              <th>Cohort(s)</th>
+              <th>Completed Exercises</th>
+              <th>Progress</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      studentList.forEach(s => {
+        const { firstName, lastName } = parseStudentName(s.name);
+        const completedCount = s.exercisesMap.size;
+        const pct = Math.round((completedCount / totalExercises) * 100);
+        const cohortBadges = Array.from(s.cohortSet).map(c => `<span class="badge badge-teal" style="font-size:10px; margin-right:4px;">${esc(c.toUpperCase())}</span>`).join('');
+        const progressColor = pct >= 80 ? 'var(--teal)' : pct >= 50 ? 'var(--amber)' : '#6366f1';
+
+        html += `
+          <tr>
+            <td><strong>${esc(firstName)}</strong></td>
+            <td><strong>${esc(lastName)}</strong></td>
+            <td><span class="text-mono" style="font-size:12px; color:var(--gray);">${esc(s.email)}</span></td>
+            <td>${cohortBadges}</td>
+            <td>
+              <strong style="color:${progressColor};">${completedCount}</strong> / ${totalExercises} completed
+            </td>
+            <td style="min-width:140px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <div style="flex:1; background:#e2e8f0; height:8px; border-radius:4px; overflow:hidden;">
+                  <div style="width:${pct}%; background:${progressColor}; height:100%; border-radius:4px;"></div>
+                </div>
+                <span style="font-size:11px; font-weight:700; color:var(--gray);">${pct}%</span>
+              </div>
+            </td>
+            <td>
+              <div style="display:flex; gap:6px;">
+                <button class="btn btn-secondary" style="font-size:11px; padding:4px 8px; font-weight:700;" onclick="openStudentExerciseModal('${esc(s.name)}')">📋 View Exercises</button>
+                <button class="btn btn-teal" style="font-size:11px; padding:4px 8px; font-weight:700;" onclick="analyzeStudentByName('${esc(s.name)}')">🎓 AI Analysis</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table>`;
+      tableWrap.innerHTML = html;
+    }
+
+    function openStudentExerciseModal(studentName) {
+      if (!studentName) return;
+      const query = studentName.trim().toLowerCase();
+      document.getElementById('modal-title').textContent = `Exercise Completion Matrix: ${studentName}`;
+
+      let completedMap = new Map();
+      ALL_INTROAI_DATASETS.forEach(ds => {
+        const arr = ds.dataRef();
+        if (!Array.isArray(arr)) return;
+        arr.forEach(r => {
+          const sName = (r.student_name || r.name || '').trim().toLowerCase();
+          const sEmail = (r.student_email || r.email || '').trim().toLowerCase();
+          if (sName === query || sEmail === query || (query.length > 2 && (sName.includes(query) || sEmail.includes(query)))) {
+            completedMap.set(ds.key, r.submitted_at || r.updated_at || r.logged_at || 'Done');
+          }
+        });
+      });
+
+      let bodyHtml = `
+        <div style="margin-bottom:14px; padding:10px 14px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; display:flex; justify-between; align-items:center;">
+          <span style="font-size:13px; color:#475569;">Progress: <strong style="color:#0f172a;">${completedMap.size} of ${ALL_INTROAI_DATASETS.length} Exercises Completed</strong> (${Math.round((completedMap.size / ALL_INTROAI_DATASETS.length) * 100)}%)</span>
+          <button class="btn btn-teal" style="font-size:11px; padding:4px 10px; font-weight:700;" onclick="analyzeStudentByName('${esc(studentName)}')">Run Groq AI Analysis 🎓🤖</button>
+        </div>
+        <table class="data-table" style="font-size:12px;">
+          <thead>
+            <tr>
+              <th>Week</th>
+              <th>Exercise Title</th>
+              <th>Status</th>
+              <th>Completed Date</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      ALL_INTROAI_DATASETS.forEach(ds => {
+        const isDone = completedMap.has(ds.key);
+        const dateStr = completedMap.get(ds.key) || '—';
+        bodyHtml += `
+          <tr>
+            <td><span class="badge badge-gray" style="font-size:10px;">W${ds.week}</span></td>
+            <td><strong>${esc(ds.title)}</strong></td>
+            <td>
+              ${isDone ? '<span class="badge badge-green">✅ Completed</span>' : '<span class="badge badge-gray" style="opacity:0.6;">⏳ Pending</span>'}
+            </td>
+            <td class="text-mono" style="font-size:11px; color:#64748b;">${esc(dateStr)}</td>
+          </tr>
+        `;
+      });
+
+      bodyHtml += `</tbody></table>`;
+      document.getElementById('modal-body').innerHTML = bodyHtml;
+      openModal();
+    }
+
+    function exportStudentRosterCSV() {
+      const cohortFilterEl = document.getElementById('student-mgmt-cohort-filter');
+      const targetCohort = (cohortFilterEl ? cohortFilterEl.value : 'ALL').toLowerCase();
+
+      const studentMap = new Map();
+
+      ALL_INTROAI_DATASETS.forEach(ds => {
+        const arr = ds.dataRef();
+        if (!Array.isArray(arr)) return;
+
+        arr.forEach(r => {
+          const name = (r.student_name || r.name || '').trim();
+          const email = (r.student_email || r.email || '').trim();
+          if (!name && !email) return;
+
+          const key = (email || name).toLowerCase();
+          const rawCohort = (r.cohort || (r.access_code ? codeToCohorMap[r.access_code.toUpperCase()] : '') || 'aijr').toLowerCase();
+
+          if (!studentMap.has(key)) {
+            studentMap.set(key, {
+              name: name || email,
+              email: email || '—',
+              cohortSet: new Set(),
+              exercisesMap: new Map(),
+              lastActive: '—'
+            });
+          }
+
+          const record = studentMap.get(key);
+          if (rawCohort) record.cohortSet.add(rawCohort);
+
+          const submittedAt = r.submitted_at || r.updated_at || r.logged_at || '—';
+          record.exercisesMap.set(ds.key, ds.title);
+
+          if (submittedAt !== '—' && (record.lastActive === '—' || new Date(submittedAt) > new Date(record.lastActive))) {
+            record.lastActive = submittedAt;
+          }
+        });
+      });
+
+      let studentList = Array.from(studentMap.values());
+      if (targetCohort !== 'all') {
+        studentList = studentList.filter(s => s.cohortSet.has(targetCohort));
+      }
+      studentList.sort((a, b) => a.name.localeCompare(b.name));
+
+      if (!studentList.length) {
+        toast('No student records to export.');
+        return;
+      }
+
+      const totalExercises = ALL_INTROAI_DATASETS.length;
+      const headers = ['First Name', 'Last Name', 'Full Name', 'Email', 'Cohorts', 'Completed Count', 'Total Exercises', 'Completion Pct', 'Last Active', 'Completed Exercises List'];
+
+      const rows = studentList.map(s => {
+        const { firstName, lastName } = parseStudentName(s.name);
+        const completedCount = s.exercisesMap.size;
+        const pct = Math.round((completedCount / totalExercises) * 100) + '%';
+        const cohorts = Array.from(s.cohortSet).join('; ');
+        const exerciseTitles = Array.from(s.exercisesMap.values()).join('; ');
+
+        return [
+          `"${firstName.replace(/"/g, '""')}"`,
+          `"${lastName.replace(/"/g, '""')}"`,
+          `"${s.name.replace(/"/g, '""')}"`,
+          `"${s.email.replace(/"/g, '""')}"`,
+          `"${cohorts.replace(/"/g, '""')}"`,
+          completedCount,
+          totalExercises,
+          `"${pct}"`,
+          `"${s.lastActive}"`,
+          `"${exerciseTitles.replace(/"/g, '""')}"`
+        ].join(',');
+      });
+
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `introai_student_roster_${targetCohort}_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast('📋 Student Roster CSV exported!');
     }
 
     function getStudentSubmissionsSummary(studentQuery) {
