@@ -10947,72 +10947,97 @@
       { key: 'exam', title: 'Midterm / Final Exam', week: 0, dataRef: () => examData }
     ];
 
-    function populateStudentAnalyzerCohortSelect() {
-      const cohortSelectEl = document.getElementById('student-analyzer-cohort-select');
-      if (!cohortSelectEl) return;
-
-      const cohorts = getCohortsForCurriculum('intro-ai');
-      const currentVal = cohortSelectEl.value || 'ALL';
-
-      let optionsHtml = `<option value="ALL">All Cohorts (${cohorts.length})</option>`;
-      cohorts.forEach(c => {
-        optionsHtml += `<option value="${esc(c)}">Cohort: ${esc(c)}</option>`;
-      });
-
-      cohortSelectEl.innerHTML = optionsHtml;
-      if (currentVal && Array.from(cohortSelectEl.options).some(o => o.value === currentVal)) {
-        cohortSelectEl.value = currentVal;
-      }
-    }
-
     function populateStudentAnalyzerSelect() {
-      populateStudentAnalyzerCohortSelect();
-
-      const selectEl = document.getElementById('student-analyzer-select');
       const cohortFilterEl = document.getElementById('student-analyzer-cohort-select');
+      const selectEl = document.getElementById('student-analyzer-select');
       if (!selectEl) return;
 
-      const targetCohort = (cohortFilterEl ? cohortFilterEl.value : 'ALL').toLowerCase();
+      // 1. Build a global Student -> Cohorts map across ALL tables (HW, Exams, Access Codes, Exercises)
+      const studentCohortMap = new Map(); // studentKey -> Set of cohorts
+      const studentMap = new Map();       // studentKey -> { name, email, count }
 
-      // Map student_key -> { name, email, count, cohortMap: Map<cohort, count> }
-      const studentMap = new Map();
+      function registerStudent(nameRaw, emailRaw, cohortRaw) {
+        const name = (nameRaw || '').trim();
+        const email = (emailRaw || '').trim();
+        if (!name && !email) return;
 
+        const key = (email || name).toLowerCase();
+        if (!studentMap.has(key)) {
+          studentMap.set(key, { name: name || email, email, count: 0 });
+        }
+        if (!studentCohortMap.has(key)) {
+          studentCohortMap.set(key, new Set());
+        }
+
+        const ch = (cohortRaw || '').toString().trim().toLowerCase();
+        if (ch) {
+          studentCohortMap.get(key).add(ch);
+        }
+      }
+
+      // Scan HW, Exam, Access Codes
+      (hwData || []).forEach(r => registerStudent(r.student_name, r.student_email || r.email, r.cohort || (r.access_code ? codeToCohorMap[(r.access_code).toUpperCase()] : '')));
+      (examData || []).forEach(r => registerStudent(r.student_name, r.student_email || r.email, r.cohort || (r.access_code ? codeToCohorMap[(r.access_code).toUpperCase()] : '')));
+      (codesData || []).forEach(r => { if (r.code) registerStudent(r.student_name || r.name, r.student_email || r.email, r.cohort); });
+
+      // Scan all Intro AI Exercise Datasets
       ALL_INTROAI_DATASETS.forEach(ds => {
         const arr = ds.dataRef();
         if (!Array.isArray(arr)) return;
         arr.forEach(r => {
-          const name = (r.student_name || r.name || '').trim();
-          const email = (r.student_email || r.email || '').trim();
-          if (!name && !email) return;
-
-          const rawCohort = (r.cohort || (r.access_code ? codeToCohorMap[r.access_code.toUpperCase()] : '') || 'aijr').toLowerCase();
-          const key = (name || email).toLowerCase();
-
-          if (!studentMap.has(key)) {
-            studentMap.set(key, { name: name || email, email, count: 0, cohortMap: new Map() });
+          const ch = r.cohort || (r.access_code ? codeToCohorMap[(r.access_code).toUpperCase()] : '');
+          registerStudent(r.student_name || r.name, r.student_email || r.email, ch);
+          const key = ((r.student_email || r.email) || (r.student_name || r.name) || '').trim().toLowerCase();
+          if (key && studentMap.has(key)) {
+            studentMap.get(key).count++;
           }
-
-          const record = studentMap.get(key);
-          record.count++;
-          record.cohortMap.set(rawCohort, (record.cohortMap.get(rawCohort) || 0) + 1);
         });
       });
 
+      // Default cohort to 'aijr' for students with no explicit cohort
+      studentCohortMap.forEach((cSet) => {
+        if (cSet.size === 0) cSet.add('aijr');
+      });
+
+      // 2. Populate #student-analyzer-cohort-select dynamically
+      if (cohortFilterEl) {
+        const currentCohortVal = cohortFilterEl.value || 'ALL';
+        const uniqueCohorts = new Set(['aijr']);
+        studentCohortMap.forEach(cSet => cSet.forEach(c => uniqueCohorts.add(c)));
+
+        let cohortOptions = `<option value="ALL">All Cohorts (${uniqueCohorts.size})</option>`;
+        Array.from(uniqueCohorts).sort().forEach(c => {
+          cohortOptions += `<option value="${esc(c)}">Cohort: ${esc(c.toUpperCase())}</option>`;
+        });
+        cohortFilterEl.innerHTML = cohortOptions;
+        if (currentCohortVal && Array.from(cohortFilterEl.options).some(o => o.value === currentCohortVal)) {
+          cohortFilterEl.value = currentCohortVal;
+        }
+      }
+
+      // 3. Filter / Group Students for #student-analyzer-select
+      const targetCohort = (cohortFilterEl ? cohortFilterEl.value : 'ALL').toLowerCase();
       const students = Array.from(studentMap.values()).sort((a, b) => a.name.localeCompare(b.name));
       const currentVal = selectEl.value;
 
       if (targetCohort !== 'all') {
-        // Filter by selected cohort
-        const filtered = students.filter(s => s.cohortMap.has(targetCohort));
-        selectEl.innerHTML = `<option value="">-- Choose a Student from '${targetCohort}' (${filtered.length} Students) --</option>` +
-          filtered.map(s => `<option value="${esc(s.name)}">${esc(s.name)}${s.email ? ' (' + esc(s.email) + ')' : ''} — ${s.cohortMap.get(targetCohort)} sub${s.cohortMap.get(targetCohort) !== 1 ? 's' : ''}</option>`).join('');
+        const filtered = students.filter(s => {
+          const key = (s.email || s.name).toLowerCase();
+          const cSet = studentCohortMap.get(key);
+          return cSet && cSet.has(targetCohort);
+        });
+
+        selectEl.innerHTML = `<option value="">-- Choose a Student from '${targetCohort.toUpperCase()}' (${filtered.length} Students) --</option>` +
+          filtered.map(s => `<option value="${esc(s.name)}">${esc(s.name)}${s.email ? ' (' + esc(s.email) + ')' : ''} — ${s.count} submission${s.count !== 1 ? 's' : ''}</option>`).join('');
       } else {
-        // Group by cohort using <optgroup>
+        // Group by primary cohort using <optgroup>
         const cohortGroups = new Map();
         students.forEach(s => {
-          s.cohortMap.forEach((cnt, ch) => {
+          const key = (s.email || s.name).toLowerCase();
+          const cSet = studentCohortMap.get(key) || new Set(['aijr']);
+          cSet.forEach(ch => {
             if (!cohortGroups.has(ch)) cohortGroups.set(ch, []);
-            cohortGroups.get(ch).push({ ...s, cohortCount: cnt });
+            cohortGroups.get(ch).push(s);
           });
         });
 
@@ -11022,7 +11047,7 @@
           const groupStudents = cohortGroups.get(ch).sort((a, b) => a.name.localeCompare(b.name));
           optionsHtml += `<optgroup label="── Cohort: ${esc(ch.toUpperCase())} (${groupStudents.length} Students) ──">`;
           groupStudents.forEach(s => {
-            optionsHtml += `<option value="${esc(s.name)}">${esc(s.name)}${s.email ? ' (' + esc(s.email) + ')' : ''} — ${s.cohortCount} sub${s.cohortCount !== 1 ? 's' : ''}</option>`;
+            optionsHtml += `<option value="${esc(s.name)}">${esc(s.name)}${s.email ? ' (' + esc(s.email) + ')' : ''} — ${s.count} submission${s.count !== 1 ? 's' : ''}</option>`;
           });
           optionsHtml += `</optgroup>`;
         });
