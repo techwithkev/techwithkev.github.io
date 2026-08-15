@@ -1960,6 +1960,14 @@
               </svg>
               W12 Ex2: Bot vs. LLM Chatbot
             </button>
+
+            <div class="nav-section-label" style="margin-top:20px">Week 13 &mdash; AI Career Mapping</div>
+            <button class="nav-item" onclick="showPage('introai-ai-career-mapping')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M2 13.255A23.931 23.931 0 018 15c3.183 0 6.22-.62 9-1.745M12 6V4a2 2 0 00-2-2H6a2 2 0 00-2 2v2m4 6h.01M3 20h10a2 2 0 002-2V8a2 2 0 00-2-2H3a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" />
+              </svg>
+              W13 Ex1: AI Career Mapping
+            </button>
           </div>
 
           <!-- Common Section -->
@@ -4480,6 +4488,56 @@
           </div>
         </div>
 
+        <!-- ══ INTRO TO AI: AI CAREER MAPPING (W13 Ex 1) ══ -->
+        <div class="page" id="page-introai-ai-career-mapping">
+          <div class="page-header">
+            <div>
+              <div class="page-title">AI Career Mapping — Week 13 Exercise 1 💼</div>
+              <div class="page-subtitle">Research AI careers, daily roles, required skills/classes, and personal connections</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M2 8A6 6 0 1114 8" />
+                  <path d="M2 8l-2-2m2 2L0 10" />
+                </svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('acm')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M8 1v9M4 7l4 4 4-4" />
+                  <path d="M2 13h12" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card teal">
+              <div class="stat-label">Total Submissions</div>
+              <div class="stat-value" id="acm-stat-count">—</div>
+              <div class="stat-sub">AI career mapping exercises</div>
+            </div>
+            <div class="stat-card gold">
+              <div class="stat-label">Avg Enjoyment</div>
+              <div class="stat-value" id="acm-stat-enjoy">—</div>
+              <div class="stat-sub">Out of 5 stars</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Search:</label>
+              <input class="search-input" id="acm-search" type="text" placeholder="Student name, career, skills..." oninput="renderACMTable()" />
+              <span class="text-small text-muted" id="acm-count"></span>
+            </div>
+            <div id="acm-table-wrap">
+              <div class="loading"><div class="spinner"></div><br>Loading AI Career Mapping responses&hellip;</div>
+            </div>
+          </div>
+        </div>
+
         <!-- ══ INTRO TO AI: COHORT EXERCISE CONTROLS (Central Management) ══ -->
         <div class="page" id="page-introai-exercise-control">
           <div class="page-header">
@@ -4591,6 +4649,7 @@
     let wwydData = [];   // introai_week11_what_would_you_do rows
     let mcbotData = [];  // introai_week12_mini_chatbot rows
     let bvlData = [];    // introai_week12_bot_vs_llm rows
+    let acmData = [];    // introai_week13_ai_career_mapping rows
     let ptData = [];     // introai_project_tracker rows
     let plData = [];     // introai_project_progress_logs rows
     let activeCohort = ''; // global cohort filter ('' = all)
@@ -4792,7 +4851,8 @@
           sb.from('introai_week11_synthetic_media').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('introai_week11_what_would_you_do').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('introai_week12_mini_chatbot').select('*').order('submitted_at', { ascending: false }).limit(10000),
-          sb.from('introai_week12_bot_vs_llm').select('*').order('submitted_at', { ascending: false }).limit(10000)
+          sb.from('introai_week12_bot_vs_llm').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('introai_week13_ai_career_mapping').select('*').order('submitted_at', { ascending: false }).limit(10000)
         ]);
 
         function checkErr(res, name) {
@@ -4809,7 +4869,7 @@
         checkErr(bds, 'bds'); checkErr(ftd, 'ftd'); checkErr(pvp, 'pvp'); checkErr(met, 'met');
         checkErr(nl, 'nl'); checkErr(fp, 'fp'); checkErr(pb, 'pb'); checkErr(poc, 'poc');
         checkErr(pt, 'pt'); checkErr(pl, 'pl'); checkErr(ads, 'ads'); checkErr(mc, 'mc');
-        checkErr(sm, 'sm'); checkErr(wwyd, 'wwyd'); checkErr(mcbot, 'mcbot'); checkErr(bvl, 'bvl');
+        checkErr(sm, 'sm'); checkErr(wwyd, 'wwyd'); checkErr(mcbot, 'mcbot'); checkErr(bvl, 'bvl'); checkErr(acm, 'acm');
 
         // Build access_code → cohort lookup from BOTH access_codes and test_access_codes
         codeToCohorMap = {};
@@ -4964,8 +5024,9 @@
         wwydData = wwyd ? (wwyd.data || []) : [];
         mcbotData = mcbot ? (mcbot.data || []) : [];
         bvlData = bvl ? (bvl.data || []) : [];
+        acmData = acm ? (acm.data || []) : [];
 
-        console.log(`Loaded: ${hwData.length} hw, ${examData.length} exam, ${codesData.length} codes, ${saData.length} SA, ${shData.length} SH, ${cbData.length} CB, ${cpData.length} CP, ${pdData.length} PD, ${wsData.length} WS, ${apData.length} AP, ${pcData.length} PC, ${mgData.length} MG, ${isData.length} IS, ${tmData.length} TM, ${btaData.length} BTA, ${ayfData.length} AYF, ${dsrData.length} DSR, ${kcData.length} KC, ${stbData.length} STB, ${daData.length} DA, ${bdData.length} BD, ${ddData.length} DD, ${bctData.length} BCT, ${bdsData.length} BDS, ${ftdData.length} FTD, ${pvpData.length} PVP, ${metData.length} MET, ${nlData.length} NL, ${fpData.length} FP, ${pbData.length} PB, ${pocData.length} POC, ${ptData.length} PT, ${plData.length} PL, ${adsData.length} ADS, ${mcData.length} MC, ${smData.length} SM, ${wwydData.length} WWYD, ${mcbotData.length} MCBOT, ${bvlData.length} BVL rows`);
+        console.log(`Loaded: ${hwData.length} hw, ${examData.length} exam, ${codesData.length} codes, ${saData.length} SA, ${shData.length} SH, ${cbData.length} CB, ${cpData.length} CP, ${pdData.length} PD, ${wsData.length} WS, ${apData.length} AP, ${pcData.length} PC, ${mgData.length} MG, ${isData.length} IS, ${tmData.length} TM, ${btaData.length} BTA, ${ayfData.length} AYF, ${dsrData.length} DSR, ${kcData.length} KC, ${stbData.length} STB, ${daData.length} DA, ${bdData.length} BD, ${ddData.length} DD, ${bctData.length} BCT, ${bdsData.length} BDS, ${ftdData.length} FTD, ${pvpData.length} PVP, ${metData.length} MET, ${nlData.length} NL, ${fpData.length} FP, ${pbData.length} PB, ${pocData.length} POC, ${ptData.length} PT, ${plData.length} PL, ${adsData.length} ADS, ${mcData.length} MC, ${smData.length} SM, ${wwydData.length} WWYD, ${mcbotData.length} MCBOT, ${bvlData.length} BVL, ${acmData.length} ACM rows`);
 
         populateFilters();
         renderOverview();
@@ -5010,6 +5071,7 @@
         renderWWYDPage();
         renderMCBOTPage();
         renderBVLPage();
+        renderACMPage();
         await loadCohortExercises();
         renderExerciseControls();
 
@@ -6005,6 +6067,9 @@
       } else if (type === 'bvl') {
         r = bvlData.find(x => String(x.id) === String(id));
         title = (r?.student_name || "Detail View") + " — Bot vs. LLM Chatbot Detail";
+      } else if (type === 'acm') {
+        r = acmData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — AI Career Mapping Detail";
       }
 
       if (!r) return;
@@ -6811,6 +6876,32 @@
 
           <div class="field-label" style="margin-top:12px; color:#ea580c;">🏛️ System Architect School AI Assistant Plan</div>
           <div class="field-value" style="background:#fff7ed; border-color:#fed7aa; font-weight:600;">${esc(r.architect_reflection || '—')}</div>
+        `;
+      } else if (type === 'acm') {
+        bodyHtml = `
+          <div style="padding:14px; background:#f0fdfa; border-radius:12px; border:1px solid #99f6e4; margin-bottom:16px;">
+            <div style="font-size:12px; font-weight:700; color:#0f766e; text-transform:uppercase;">AI Career Mapping Profile</div>
+            <div style="font-size:14px; font-weight:800; color:#115e59; margin-top:4px;">Student: ${esc(r.student_name)} (${esc(r.student_email)})</div>
+            <div style="font-size:12px; color:#0f766e; margin-top:2px;">Enjoyment Rating: ${r.enjoyment_rating || 0}/5 ⭐ | Submitted: ${fmtDate(r.submitted_at)}</div>
+          </div>
+
+          <div class="field-label" style="margin-top:12px;">Chosen Career Path &amp; Job Title 🎯</div>
+          <div class="field-value">
+            <span class="badge badge-teal">${esc(r.selected_career_category || '—')}</span><br>
+            <strong style="font-size:14px; color:#0f766e; display:block; margin-top:4px;">${esc(r.career_title || '—')}</strong>
+          </div>
+
+          <div class="field-label" style="margin-top:12px;">1. Typical Day in This Career 🔍</div>
+          <div class="field-value">${esc(r.typical_day_desc || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">2. Required Skills, Subjects &amp; Classes 📚</div>
+          <div class="field-value">${esc(r.required_skills_classes || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">3. Personal Connection (Matches What You Already Enjoy) 💡</div>
+          <div class="field-value" style="background:#f0fdfa; border-color:#99f6e4; font-weight:600;">${esc(r.personal_connection || '—')}</div>
+
+          <div class="field-label" style="margin-top:12px;">4. Surprising Discovery During Research 😲</div>
+          <div class="field-value">${esc(r.surprising_discovery || '—')}</div>
         `;
       }
 
@@ -8623,6 +8714,7 @@
         wwyd:  'introai_week11_what_would_you_do',
         mcbot: 'introai_week12_mini_chatbot',
         bvl:   'introai_week12_bot_vs_llm',
+        acm:   'introai_week13_ai_career_mapping',
       };
       const tableName = tableMap[tableKey];
       if (!tableName) { toast('Unknown table: ' + tableKey); return; }
@@ -10284,6 +10376,67 @@
     </table>`;
     }
 
+    // ── Week 13 Exercise 1: AI Career Mapping ──
+    function renderACMPage() {
+      if (!acmData.length) {
+        document.getElementById('acm-stat-count').textContent = '0';
+        document.getElementById('acm-stat-enjoy').textContent = '—';
+        renderACMTable();
+        return;
+      }
+      document.getElementById('acm-stat-count').textContent = acmData.length;
+      const avg = (acmData.reduce((s, r) => s + (parseInt(r.enjoyment_rating) || 0), 0) / acmData.length).toFixed(1);
+      document.getElementById('acm-stat-enjoy').textContent = avg + ' / 5';
+      renderACMTable();
+    }
+
+    function renderACMTable() {
+      const search = (document.getElementById('acm-search')?.value || '').toLowerCase();
+      let rows = acmData.filter(r =>
+        !search || (r.student_name || '').toLowerCase().includes(search) || (r.career_title || '').toLowerCase().includes(search) || (r.personal_connection || '').toLowerCase().includes(search)
+      );
+
+      document.getElementById('acm-count').textContent = rows.length + ' response' + (rows.length !== 1 ? 's' : '');
+      if (!rows.length) {
+        document.getElementById('acm-table-wrap').innerHTML = '<div class="empty-state"><p>No matching AI Career Mapping responses.</p></div>';
+        return;
+      }
+
+      function starRating(v) {
+        if (!v) return '<span style="color:var(--gray)">—</span>';
+        const stars = '★'.repeat(v) + '☆'.repeat(5 - v);
+        const col = v >= 4 ? '#059669' : v >= 3 ? '#d97706' : '#dc2626';
+        return `<span style="color:${col};font-size:14px">${stars}</span>`;
+      }
+
+      document.getElementById('acm-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student</th>
+        <th>Career Category</th>
+        <th>Job Title</th>
+        <th>Personal Connection</th>
+        <th>Surprising Discovery</th>
+        <th>Enjoyment</th>
+        <th>Submitted</th>
+        <th>Actions</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr class="clickable-row" onclick="showSubmissionDetail('acm', ${r.id})">
+          <td><strong>${esc(r.student_name)}</strong><br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
+          <td><span class="badge badge-teal">${esc(r.selected_career_category || '—')}</span></td>
+          <td><strong style="color:var(--teal);font-size:12px">${esc(r.career_title || '—')}</strong></td>
+          <td style="font-size:11px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.personal_connection)}">${esc(r.personal_connection || '—')}</td>
+          <td style="font-size:11px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(r.surprising_discovery)}">${esc(r.surprising_discovery || '—')}</td>
+          <td>${starRating(r.enjoyment_rating)}</td>
+          <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td style="white-space:nowrap"><button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('acm', ${r.id})">View</button><button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('acm', ${r.id}, acmData, renderACMPage)">Delete</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+    }
+
     // ════════════════════════════════════════════════════════════════════════════
     // COHORT EXERCISE CONTROLS & VISIBILITY MANAGEMENT
     // ════════════════════════════════════════════════════════════════════════════
@@ -10333,7 +10486,8 @@
       { id: 'week11_what_would_you_do', title: 'What Would You Do? Ethics Discussion', week: 11, category: 'Synthetic Media', page: 'week11_what_would_you_do.html' },
 
       { id: 'week12_mini_chatbot', title: 'Build Your Own Mini-Chatbot (Python IDE)', week: 12, category: 'Chatbot Programming', page: 'week12_mini_chatbot.html' },
-      { id: 'week12_bot_vs_llm', title: 'Rule-Based Bot vs. LLM Chatbot', week: 12, category: 'Chatbot Programming', page: 'week12_bot_vs_llm.html' }
+      { id: 'week12_bot_vs_llm', title: 'Rule-Based Bot vs. LLM Chatbot', week: 12, category: 'Chatbot Programming', page: 'week12_bot_vs_llm.html' },
+      { id: 'week13_ai_career_mapping', title: 'AI Career Mapping', week: 13, category: 'AI Career Mapping', page: 'week13_ai_career_mapping.html' }
     ];
 
     let currentControlCohort = 'aijr';
