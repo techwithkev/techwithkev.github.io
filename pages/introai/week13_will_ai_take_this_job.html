@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>“Will AI Take This Job?” Analysis — Intro to AI · Week 13</title>
+  <meta name="description"
+    content="Week 13 Exercise 2: Will AI Take This Job Analysis. Analyze 3 jobs for AI automation difficulty, human vs AI tasks, rank 10-year change likelihood, and defend your ranking.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    #registration-overlay { transition: opacity 0.4s ease; }
+    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
+    #registration-overlay .reg-card {
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
+    }
+    #registration-overlay.hiding .reg-card {
+      transform: scale(0.95) translateY(-10px); opacity: 0;
+    }
+    .reg-input:focus {
+      outline: none; border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+    }
+    .reg-input.error {
+      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+    }
+    .form-input:focus {
+      outline: none; border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+    }
+    .form-input.error { border-color: #ef4444; }
+    .opt-btn {
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .opt-btn:hover { transform: translateY(-1px); }
+    .opt-btn.selected {
+      border-color: #6366f1 !important;
+      background: #eeef2ff !important;
+      color: #3730a3 !important;
+      font-weight: 700;
+    }
+    .star-btn {
+      font-size: 24px;
+      cursor: pointer;
+      filter: grayscale(100%);
+      transition: filter 0.15s ease, transform 0.1s ease;
+    }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body class="bg-[#EEF2FF]/30 text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- REGISTRATION GATE -->
+  <div id="registration-overlay"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+    style="background: linear-gradient(135deg, #1e1b4b 0%, #3730a3 55%, #4338ca 100%);">
+
+    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
+        style="background: radial-gradient(circle, #c7d2fe, transparent);"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
+        style="background: radial-gradient(circle, #6366f1, transparent);"></div>
+    </div>
+
+    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center bg-indigo-100 text-indigo-600 shadow-sm">
+          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2" />
+          </svg>
+        </div>
+        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 bg-indigo-100 text-indigo-800">
+          Week 13 · Exercise 2
+        </div>
+        <h1 class="text-2xl font-black text-gray-900 tracking-tight">“Will AI Take This Job?”</h1>
+        <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">Analyze 3 jobs for automation risk, human vs. AI capabilities, and rank 10-year changes.</p>
+      </div>
+
+      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
+        <div class="space-y-4 mb-6">
+          <div>
+            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Your Full Name</label>
+            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Jordan Lee"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name.</p>
+          </div>
+          <div>
+            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
+            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. jordan@school.edu"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
+          </div>
+        </div>
+        <button id="reg-submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800">
+          <span id="reg-btn-label">Start Job Automation Analysis &#8594;</span>
+        </button>
+      </form>
+      <p class="text-center text-[10px] text-gray-400 font-medium mt-5">Saved to the Intro to AI student roster.</p>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main-content" class="max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-indigo-200 pb-6">
+      <div>
+        <a href="index.html"
+          class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-indigo-600 mb-3 hover:text-indigo-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">“Will AI Take This Job?” 🤖</h1>
+        <p class="text-gray-500 font-medium italic mt-1">Automation Risk, Human vs. AI Tasks &amp; 10-Year Ranking · Week 13 · Exercise 2</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-indigo-50 border border-indigo-200 text-indigo-800 shadow-sm self-start md:self-auto">
+        Week 13
+      </div>
+    </header>
+
+    <!-- Brief Card (matches user slide layout) -->
+    <div class="rounded-3xl p-6 md:p-8 mb-8 border bg-gradient-to-br from-indigo-950 via-indigo-900 to-slate-900 text-white shadow-xl">
+      <div class="flex items-center justify-between flex-wrap gap-2 mb-3">
+        <span class="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 text-[10px] font-black uppercase tracking-widest">
+          EXERCISE 2
+        </span>
+        <span class="text-indigo-300 text-xs font-mono font-bold">Group / Individual Analysis</span>
+      </div>
+
+      <h2 class="text-2xl font-black text-white tracking-tight mb-4">“Will AI Take This Job?” Analysis 🤖</h2>
+
+      <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10 text-xs text-indigo-100 leading-relaxed mb-4 space-y-2.5">
+        <div class="flex items-start gap-2.5">
+          <span class="text-indigo-300 font-bold">•</span>
+          <span><strong>Individually or in groups, pick 3 jobs</strong> from the list your teacher provides — or ones you're curious about.</span>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <span class="text-indigo-300 font-bold">•</span>
+          <span><strong>For each:</strong> is it hard or easy to automate? What parts could AI help with, and what parts probably still need a human?</span>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <span class="text-indigo-300 font-bold">•</span>
+          <span><strong>Rank your 3 jobs</strong> from most to least likely to change a lot in the next 10 years.</span>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <span class="text-indigo-300 font-bold">•</span>
+          <span><strong>Prepare one sentence to defend your ranking.</strong></span>
+        </div>
+      </div>
+
+      <!-- Quick Job Sample Chips -->
+      <div class="bg-white/5 rounded-2xl p-3.5 border border-white/10">
+        <span class="text-[10px] font-black uppercase tracking-widest text-indigo-300 block mb-2">💡 Quick Job Ideas (Click to copy into inputs):</span>
+        <div class="flex flex-wrap gap-1.5">
+          <button type="button" onclick="quickFillJob('Graphic Designer')" class="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-medium transition-all">🎨 Graphic Designer</button>
+          <button type="button" onclick="quickFillJob('Radiologist / Doctor')" class="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-medium transition-all">🩺 Radiologist</button>
+          <button type="button" onclick="quickFillJob('High School Teacher')" class="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-medium transition-all">👩‍🏫 Teacher</button>
+          <button type="button" onclick="quickFillJob('Software Engineer')" class="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-medium transition-all">💻 Software Developer</button>
+          <button type="button" onclick="quickFillJob('Chef / Cook')" class="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-medium transition-all">🍳 Chef</button>
+          <button type="button" onclick="quickFillJob('Journalist / Reporter')" class="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-medium transition-all">📰 Journalist</button>
+          <button type="button" onclick="quickFillJob('Paralegal / Legal Assistant')" class="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-medium transition-all">⚖️ Paralegal</button>
+          <button type="button" onclick="quickFillJob('Electrician')" class="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-medium transition-all">⚡ Electrician</button>
+          <button type="button" onclick="quickFillJob('Customer Support Agent')" class="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-medium transition-all">🎧 Customer Support</button>
+          <button type="button" onclick="quickFillJob('Truck Driver')" class="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white rounded-lg text-xs font-medium transition-all">🚚 Truck Driver</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN FORM -->
+    <form id="will_ai_take_this_job-form" onsubmit="submitExercise(event)" novalidate>
+
+      <!-- Step 1: Job 1 Analysis -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center justify-between mb-5">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-indigo-600">1</div>
+            <h2 class="text-lg font-black text-gray-900">Job #1 Analysis</h2>
+          </div>
+          <span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 font-bold text-xs rounded-full">First Job</span>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label for="job1-title" class="block text-xs font-black uppercase tracking-widest text-gray-600 mb-1.5">
+              Job Title / Profession: <span class="text-red-500">*</span>
+            </label>
+            <input id="job1-title" type="text" placeholder="e.g. Graphic Designer, Software Engineer..." oninput="updateRankOptions()"
+              class="form-input w-full p-3.5 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="job1-title-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter the title for Job 1.</p>
+          </div>
+
+          <div>
+            <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Automation Difficulty: <span class="text-red-500">*</span></p>
+            <div id="job1-diff-picker" class="grid grid-cols-3 gap-2">
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl p-2.5 text-center text-xs font-bold text-gray-700 bg-gray-50" onclick="setDiff('job1', 'Easy to Automate', this)">⚡ Easy to Automate</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl p-2.5 text-center text-xs font-bold text-gray-700 bg-gray-50" onclick="setDiff('job1', 'Moderate Automation', this)">⚖️ Moderate</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl p-2.5 text-center text-xs font-bold text-gray-700 bg-gray-50" onclick="setDiff('job1', 'Hard to Automate', this)">🛡️ Hard to Automate</button>
+            </div>
+            <p id="job1-diff-error" class="hidden text-xs text-red-500 font-medium mt-1">Please pick automation difficulty for Job 1.</p>
+          </div>
+
+          <div>
+            <label for="job1-ai-helpful" class="block text-xs font-black uppercase tracking-widest text-indigo-900 mb-1.5">
+              What parts could AI help with? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="job1-ai-helpful" rows="2" placeholder="e.g. Generating rough drafts, color palette ideas, removing image backgrounds..."
+              class="form-input w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="job1-ai-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe parts AI could help with.</p>
+          </div>
+
+          <div>
+            <label for="job1-human-req" class="block text-xs font-black uppercase tracking-widest text-indigo-900 mb-1.5">
+              What parts probably still need a human? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="job1-human-req" rows="2" placeholder="e.g. Understanding client brand vision, emotional storytelling, final creative review..."
+              class="form-input w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="job1-human-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe parts that still need a human.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Job 2 Analysis -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center justify-between mb-5">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-indigo-600">2</div>
+            <h2 class="text-lg font-black text-gray-900">Job #2 Analysis</h2>
+          </div>
+          <span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 font-bold text-xs rounded-full">Second Job</span>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label for="job2-title" class="block text-xs font-black uppercase tracking-widest text-gray-600 mb-1.5">
+              Job Title / Profession: <span class="text-red-500">*</span>
+            </label>
+            <input id="job2-title" type="text" placeholder="e.g. Radiologist, High School Teacher..." oninput="updateRankOptions()"
+              class="form-input w-full p-3.5 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="job2-title-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter the title for Job 2.</p>
+          </div>
+
+          <div>
+            <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Automation Difficulty: <span class="text-red-500">*</span></p>
+            <div id="job2-diff-picker" class="grid grid-cols-3 gap-2">
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl p-2.5 text-center text-xs font-bold text-gray-700 bg-gray-50" onclick="setDiff('job2', 'Easy to Automate', this)">⚡ Easy to Automate</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl p-2.5 text-center text-xs font-bold text-gray-700 bg-gray-50" onclick="setDiff('job2', 'Moderate Automation', this)">⚖️ Moderate</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl p-2.5 text-center text-xs font-bold text-gray-700 bg-gray-50" onclick="setDiff('job2', 'Hard to Automate', this)">🛡️ Hard to Automate</button>
+            </div>
+            <p id="job2-diff-error" class="hidden text-xs text-red-500 font-medium mt-1">Please pick automation difficulty for Job 2.</p>
+          </div>
+
+          <div>
+            <label for="job2-ai-helpful" class="block text-xs font-black uppercase tracking-widest text-indigo-900 mb-1.5">
+              What parts could AI help with? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="job2-ai-helpful" rows="2" placeholder="e.g. Scanning X-ray scans for anomalies, flagging tumor risks automatically..."
+              class="form-input w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="job2-ai-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe parts AI could help with.</p>
+          </div>
+
+          <div>
+            <label for="job2-human-req" class="block text-xs font-black uppercase tracking-widest text-indigo-900 mb-1.5">
+              What parts probably still need a human? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="job2-human-req" rows="2" placeholder="e.g. Patient consultations, delivering sensitive medical news, complex diagnosis verification..."
+              class="form-input w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="job2-human-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe parts that still need a human.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Job 3 Analysis -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center justify-between mb-5">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-indigo-600">3</div>
+            <h2 class="text-lg font-black text-gray-900">Job #3 Analysis</h2>
+          </div>
+          <span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 font-bold text-xs rounded-full">Third Job</span>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label for="job3-title" class="block text-xs font-black uppercase tracking-widest text-gray-600 mb-1.5">
+              Job Title / Profession: <span class="text-red-500">*</span>
+            </label>
+            <input id="job3-title" type="text" placeholder="e.g. Electrician, Chef..." oninput="updateRankOptions()"
+              class="form-input w-full p-3.5 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="job3-title-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter the title for Job 3.</p>
+          </div>
+
+          <div>
+            <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Automation Difficulty: <span class="text-red-500">*</span></p>
+            <div id="job3-diff-picker" class="grid grid-cols-3 gap-2">
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl p-2.5 text-center text-xs font-bold text-gray-700 bg-gray-50" onclick="setDiff('job3', 'Easy to Automate', this)">⚡ Easy to Automate</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl p-2.5 text-center text-xs font-bold text-gray-700 bg-gray-50" onclick="setDiff('job3', 'Moderate Automation', this)">⚖️ Moderate</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl p-2.5 text-center text-xs font-bold text-gray-700 bg-gray-50" onclick="setDiff('job3', 'Hard to Automate', this)">🛡️ Hard to Automate</button>
+            </div>
+            <p id="job3-diff-error" class="hidden text-xs text-red-500 font-medium mt-1">Please pick automation difficulty for Job 3.</p>
+          </div>
+
+          <div>
+            <label for="job3-ai-helpful" class="block text-xs font-black uppercase tracking-widest text-indigo-900 mb-1.5">
+              What parts could AI help with? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="job3-ai-helpful" rows="2" placeholder="e.g. Generating wiring schematics, calculating circuit load math, ordering replacement parts..."
+              class="form-input w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="job3-ai-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe parts AI could help with.</p>
+          </div>
+
+          <div>
+            <label for="job3-human-req" class="block text-xs font-black uppercase tracking-widest text-indigo-900 mb-1.5">
+              What parts probably still need a human? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="job3-human-req" rows="2" placeholder="e.g. Physical hands-on wiring in tight spaces, safety inspection on site, troubleshooting physical shorts..."
+              class="form-input w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="job3-human-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe parts that still need a human.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: 10-Year Ranking & Defense -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-full text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-indigo-600">4</div>
+          <h2 class="text-lg font-black text-gray-900">10-Year Change Ranking &amp; Defense 🏆</h2>
+        </div>
+
+        <div class="space-y-4 mb-5">
+          <p class="text-xs font-black uppercase tracking-widest text-gray-500">Rank your 3 jobs from MOST to LEAST likely to change a lot in the next 10 years: <span class="text-red-500">*</span></p>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-3.5">
+              <label for="rank-1" class="block text-xs font-black uppercase text-indigo-900 mb-1">🥇 #1 Most Change</label>
+              <select id="rank-1" class="form-input w-full p-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold text-gray-900" required>
+                <option value="">-- Select Job --</option>
+              </select>
+              <p id="rank-1-error" class="hidden text-xs text-red-500 font-medium mt-1">Select rank #1.</p>
+            </div>
+
+            <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-3.5">
+              <label for="rank-2" class="block text-xs font-black uppercase text-indigo-900 mb-1">🥈 #2 Moderate Change</label>
+              <select id="rank-2" class="form-input w-full p-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold text-gray-900" required>
+                <option value="">-- Select Job --</option>
+              </select>
+              <p id="rank-2-error" class="hidden text-xs text-red-500 font-medium mt-1">Select rank #2.</p>
+            </div>
+
+            <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-3.5">
+              <label for="rank-3" class="block text-xs font-black uppercase text-indigo-900 mb-1">🥉 #3 Least Change</label>
+              <select id="rank-3" class="form-input w-full p-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold text-gray-900" required>
+                <option value="">-- Select Job --</option>
+              </select>
+              <p id="rank-3-error" class="hidden text-xs text-red-500 font-medium mt-1">Select rank #3.</p>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label for="ranking-defense" class="block text-xs font-black uppercase tracking-widest text-indigo-950 mb-1.5">
+            Prepare ONE sentence to defend your ranking: <span class="text-red-500">*</span>
+          </label>
+          <textarea id="ranking-defense" rows="3"
+            placeholder="e.g. Graphic design will change most because generative vision tools process images in seconds, while electric wiring requires physical dexterity that robots cannot easily replicate."
+            class="form-input w-full p-3.5 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+          <p id="defense-error" class="hidden text-xs text-red-500 font-medium mt-1">Please provide a 1-sentence defense of your ranking.</p>
+        </div>
+      </div>
+
+      <!-- Reflection & Rating -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-full text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-indigo-600">⭐</div>
+          <h2 class="text-lg font-black text-gray-900">Activity Rating</h2>
+        </div>
+        <div>
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">How much did you enjoy this job automation analysis?</label>
+          <div class="flex gap-2" id="enjoyment-stars" role="group" aria-label="Enjoyment rating">
+            <button type="button" class="star-btn" data-val="1" onclick="setRating(1)" aria-label="1 star">⭐</button>
+            <button type="button" class="star-btn" data-val="2" onclick="setRating(2)" aria-label="2 stars">⭐</button>
+            <button type="button" class="star-btn" data-val="3" onclick="setRating(3)" aria-label="3 stars">⭐</button>
+            <button type="button" class="star-btn" data-val="4" onclick="setRating(4)" aria-label="4 stars">⭐</button>
+            <button type="button" class="star-btn" data-val="5" onclick="setRating(5)" aria-label="5 stars">⭐</button>
+          </div>
+          <p id="rating-error" class="hidden text-xs text-red-500 font-medium mt-2">Please select an enjoyment rating.</p>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-12">
+        <p id="form-error" class="hidden text-sm font-medium text-red-500 mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+          <span id="form-error-text">Please complete all required fields.</span>
+        </p>
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800">
+          <span id="submit-label">Submit Automation Analysis &#8594;</span>
+        </button>
+        <p class="text-center text-xs text-gray-400 font-medium mt-3">Results will load to the teacher dashboard.</p>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div id="success-screen"
+    class="hidden fixed inset-0 z-[90] bg-[#EEF2FF] flex items-center justify-center p-4">
+    <div class="text-center max-w-md bg-white rounded-3xl shadow-xl p-8 border border-indigo-100">
+      <div class="w-20 h-20 mx-auto rounded-2xl mb-6 flex items-center justify-center bg-indigo-100 text-indigo-600 shadow-sm">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <div class="inline-block px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 bg-indigo-50 text-indigo-800">
+        Analysis Submitted!
+      </div>
+      <h2 class="text-3xl font-black text-gray-900 mb-3 tracking-tight">
+        Awesome job, <span id="success-name" class="text-indigo-600"></span>!
+      </h2>
+      <p class="text-gray-500 mb-8 leading-relaxed text-sm">
+        Your job automation analysis &amp; defense sentence have been submitted. Get ready to defend your ranking in class!
+      </p>
+      <a href="index.html"
+        class="inline-flex items-center gap-2 text-white font-black py-3.5 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm bg-gradient-to-r from-indigo-600 to-indigo-700">
+        Return to Course Hub
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+    const TABLE = 'introai_week13_will_ai_take_this_job';
+
+    let studentName = '', studentEmail = '';
+    const difficulties = { job1: '', job2: '', job3: '' };
+    let enjoymentRating = 0;
+
+    function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+    function quickFillJob(jobName) {
+      const j1 = document.getElementById('job1-title');
+      const j2 = document.getElementById('job2-title');
+      const j3 = document.getElementById('job3-title');
+      if (!j1.value.trim()) j1.value = jobName;
+      else if (!j2.value.trim()) j2.value = jobName;
+      else if (!j3.value.trim()) j3.value = jobName;
+      else j1.value = jobName;
+      updateRankOptions();
+    }
+
+    function updateRankOptions() {
+      const t1 = document.getElementById('job1-title').value.trim() || 'Job #1';
+      const t2 = document.getElementById('job2-title').value.trim() || 'Job #2';
+      const t3 = document.getElementById('job3-title').value.trim() || 'Job #3';
+
+      ['rank-1', 'rank-2', 'rank-3'].forEach(id => {
+        const sel = document.getElementById(id);
+        const cur = sel.value;
+        sel.innerHTML = `
+          <option value="">-- Select Job --</option>
+          <option value="${t1}">${t1}</option>
+          <option value="${t2}">${t2}</option>
+          <option value="${t3}">${t3}</option>
+        `;
+        if (cur && [t1, t2, t3].includes(cur)) sel.value = cur;
+      });
+    }
+
+    function setDiff(jobKey, val, btn) {
+      difficulties[jobKey] = val;
+      document.querySelectorAll(`#${jobKey}-diff-picker .opt-btn`).forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById(`${jobKey}-diff-error`).classList.add('hidden');
+    }
+
+    async function handleRegistration(ev) {
+      ev.preventDefault();
+      const nameEl = document.getElementById('reg-name');
+      const emailEl = document.getElementById('reg-email');
+      const nameErr = document.getElementById('reg-name-error');
+      const emailErr = document.getElementById('reg-email-error');
+      let ok = true;
+
+      nameEl.classList.remove('error'); nameErr.classList.add('hidden');
+      emailEl.classList.remove('error'); emailErr.classList.add('hidden');
+
+      if (!nameEl.value.trim()) { nameEl.classList.add('error'); nameErr.classList.remove('hidden'); ok = false; }
+      if (!emailEl.value.trim() || !validateEmail(emailEl.value.trim())) { emailEl.classList.add('error'); emailErr.classList.remove('hidden'); ok = false; }
+      if (!ok) return;
+
+      const btn = document.getElementById('reg-submit-btn');
+      btn.disabled = true;
+      document.getElementById('reg-btn-label').innerHTML = '<span class="spinner"></span> Starting\u2026';
+
+      studentName = nameEl.value.trim();
+      studentEmail = emailEl.value.trim();
+      sessionStorage.setItem('introai_w13_will_ai_take_this_job_name', studentName);
+      sessionStorage.setItem('introai_w13_will_ai_take_this_job_email', studentEmail);
+
+      const overlay = document.getElementById('registration-overlay');
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.remove(), 450);
+    }
+
+    (function restoreSession() {
+      const n = sessionStorage.getItem('introai_w13_will_ai_take_this_job_name');
+      const e = sessionStorage.getItem('introai_w13_will_ai_take_this_job_email');
+      if (n && e) {
+        studentName = n; studentEmail = e;
+        document.getElementById('registration-overlay').remove();
+      }
+      updateRankOptions();
+    })();
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#enjoyment-stars .star-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx < val);
+      });
+      document.getElementById('rating-error').classList.add('hidden');
+    }
+
+    async function supabaseInsert(payload) {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?on_conflict=student_email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'resolution=merge-duplicates,return=minimal'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!resp.ok) { const t = await resp.text(); throw new Error(`HTTP ${resp.status}: ${t}`); }
+    }
+
+    async function submitExercise(ev) {
+      ev.preventDefault();
+      let ok = true;
+
+      // Validate inputs for Jobs 1, 2, 3
+      ['job1', 'job2', 'job3'].forEach(k => {
+        const titleEl = document.getElementById(`${k}-title`);
+        const titleVal = titleEl ? titleEl.value.trim() : '';
+        titleEl.classList.toggle('error', !titleVal);
+        document.getElementById(`${k}-title-error`).classList.toggle('hidden', !!titleVal);
+        if (!titleVal) ok = false;
+
+        if (!difficulties[k]) {
+          document.getElementById(`${k}-diff-error`).classList.remove('hidden'); ok = false;
+        }
+
+        const helpEl = document.getElementById(`${k}-ai-helpful`);
+        const helpVal = helpEl ? helpEl.value.trim() : '';
+        helpEl.classList.toggle('error', !helpVal);
+        document.getElementById(`${k}-ai-error`).classList.toggle('hidden', !!helpVal);
+        if (!helpVal) ok = false;
+
+        const humanEl = document.getElementById(`${k}-human-req`);
+        const humanVal = humanEl ? humanEl.value.trim() : '';
+        humanEl.classList.toggle('error', !humanVal);
+        document.getElementById(`${k}-human-error`).classList.toggle('hidden', !!humanVal);
+        if (!humanVal) ok = false;
+      });
+
+      // Validate rankings
+      ['rank-1', 'rank-2', 'rank-3'].forEach(rId => {
+        const rEl = document.getElementById(rId);
+        const rVal = rEl ? rEl.value.trim() : '';
+        rEl.classList.toggle('error', !rVal);
+        document.getElementById(`${rId}-error`).classList.toggle('hidden', !!rVal);
+        if (!rVal) ok = false;
+      });
+
+      // Validate defense sentence
+      const defEl = document.getElementById('ranking-defense');
+      const defVal = defEl ? defEl.value.trim() : '';
+      defEl.classList.toggle('error', !defVal);
+      document.getElementById('defense-error').classList.toggle('hidden', !!defVal);
+      if (!defVal) ok = false;
+
+      if (enjoymentRating === 0) {
+        document.getElementById('rating-error').classList.remove('hidden'); ok = false;
+      }
+
+      if (!ok) {
+        document.getElementById('form-error').classList.remove('hidden');
+        document.querySelector('.error, [id$="-error"]:not(.hidden)')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      document.getElementById('form-error').classList.add('hidden');
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting\u2026';
+
+      const payload = {
+        student_name:              studentName,
+        student_email:             studentEmail,
+        job1_title:                document.getElementById('job1-title').value.trim(),
+        job1_automation_difficulty: difficulties.job1,
+        job1_ai_helpful_tasks:     document.getElementById('job1-ai-helpful').value.trim(),
+        job1_human_required_tasks: document.getElementById('job1-human-req').value.trim(),
+
+        job2_title:                document.getElementById('job2-title').value.trim(),
+        job2_automation_difficulty: difficulties.job2,
+        job2_ai_helpful_tasks:     document.getElementById('job2-ai-helpful').value.trim(),
+        job2_human_required_tasks: document.getElementById('job2-human-req').value.trim(),
+
+        job3_title:                document.getElementById('job3-title').value.trim(),
+        job3_automation_difficulty: difficulties.job3,
+        job3_ai_helpful_tasks:     document.getElementById('job3-ai-helpful').value.trim(),
+        job3_human_required_tasks: document.getElementById('job3-human-req').value.trim(),
+
+        rank_1_job:                document.getElementById('rank-1').value.trim(),
+        rank_2_job:                document.getElementById('rank-2').value.trim(),
+        rank_3_job:                document.getElementById('rank-3').value.trim(),
+        ranking_defense_sentence:  defVal,
+
+        enjoyment_rating:          enjoymentRating,
+        submitted_at:              new Date().toISOString(),
+      };
+
+      try {
+        await supabaseInsert(payload);
+        document.getElementById('success-name').textContent = studentName.split(' ')[0];
+        document.getElementById('success-screen').classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        console.error('[Week 13 Will AI Take This Job] Supabase error:', err.message);
+        btn.disabled = false;
+        document.getElementById('submit-label').textContent = 'Submit Automation Analysis \u2192';
+        if (err.message.includes('409') || err.message.includes('duplicate key')) {
+          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f You have already submitted this activity!';
+        } else {
+          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f Network error submitting activity. Please try again.';
+        }
+        document.getElementById('form-error').classList.remove('hidden');
+      }
+    }
+  </script>
+
+</body>
+</html>
