@@ -35,10 +35,22 @@ DROP POLICY IF EXISTS "anon_update_w09_project_brief" ON introai_week09_project_
 DROP POLICY IF EXISTS "anon_all_w09_project_brief" ON introai_week09_project_brief;
 DROP POLICY IF EXISTS "auth_select_w09_project_brief" ON introai_week09_project_brief;
 
--- Allow anonymous students to SELECT, INSERT, and UPDATE (for upsert & retrieval)
-CREATE POLICY "anon_all_w09_project_brief"
+-- Allow anonymous students to INSERT, SELECT, and UPDATE own submission (for upsert & retrieval) — never DELETE
+CREATE POLICY "anon_insert_w09_project_brief"
   ON introai_week09_project_brief
-  FOR ALL
+  FOR INSERT
+  TO anon
+  WITH CHECK (true);
+
+CREATE POLICY "anon_select_w09_project_brief"
+  ON introai_week09_project_brief
+  FOR SELECT
+  TO anon
+  USING (true);
+
+CREATE POLICY "anon_update_w09_project_brief"
+  ON introai_week09_project_brief
+  FOR UPDATE
   TO anon
   USING (true)
   WITH CHECK (true);

@@ -37,10 +37,22 @@ DROP POLICY IF EXISTS "anon_update_w09_poc_brainstormer" ON introai_week09_poc_b
 DROP POLICY IF EXISTS "anon_all_w09_poc_brainstormer" ON introai_week09_poc_brainstormer;
 DROP POLICY IF EXISTS "auth_select_w09_poc_brainstormer" ON introai_week09_poc_brainstormer;
 
--- Allow anonymous students to SELECT, INSERT, and UPDATE (for upsert & retrieval)
-CREATE POLICY "anon_all_w09_poc_brainstormer"
+-- Allow anonymous students to INSERT, SELECT, and UPDATE own submission (for upsert & retrieval) — never DELETE
+CREATE POLICY "anon_insert_w09_poc_brainstormer"
   ON introai_week09_poc_brainstormer
-  FOR ALL
+  FOR INSERT
+  TO anon
+  WITH CHECK (true);
+
+CREATE POLICY "anon_select_w09_poc_brainstormer"
+  ON introai_week09_poc_brainstormer
+  FOR SELECT
+  TO anon
+  USING (true);
+
+CREATE POLICY "anon_update_w09_poc_brainstormer"
+  ON introai_week09_poc_brainstormer
+  FOR UPDATE
   TO anon
   USING (true)
   WITH CHECK (true);

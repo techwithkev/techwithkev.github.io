@@ -46,10 +46,22 @@ DROP POLICY IF EXISTS "anon_update_w10_mockup_critique" ON introai_week10_mockup
 DROP POLICY IF EXISTS "anon_all_w10_mockup_critique" ON introai_week10_mockup_critique;
 DROP POLICY IF EXISTS "auth_select_w10_mockup_critique" ON introai_week10_mockup_critique;
 
--- Allow anonymous students to SELECT, INSERT, and UPDATE (for upsert & retrieval)
-CREATE POLICY "anon_all_w10_mockup_critique"
+-- Allow anonymous students to INSERT, SELECT, and UPDATE own submission (for upsert & retrieval) — never DELETE
+CREATE POLICY "anon_insert_w10_mockup_critique"
   ON introai_week10_mockup_critique
-  FOR ALL
+  FOR INSERT
+  TO anon
+  WITH CHECK (true);
+
+CREATE POLICY "anon_select_w10_mockup_critique"
+  ON introai_week10_mockup_critique
+  FOR SELECT
+  TO anon
+  USING (true);
+
+CREATE POLICY "anon_update_w10_mockup_critique"
+  ON introai_week10_mockup_critique
+  FOR UPDATE
   TO anon
   USING (true)
   WITH CHECK (true);

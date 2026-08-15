@@ -1298,10 +1298,22 @@ DROP POLICY IF EXISTS "anon_update_w09_ai_feature_pitch" ON introai_week09_ai_fe
 DROP POLICY IF EXISTS "anon_all_w09_ai_feature_pitch" ON introai_week09_ai_feature_pitch;
 DROP POLICY IF EXISTS "auth_select_w09_ai_feature_pitch" ON introai_week09_ai_feature_pitch;
 
--- Allow anonymous students to SELECT, INSERT, and UPDATE (for upsert & retrieval)
-CREATE POLICY "anon_all_w09_ai_feature_pitch"
+-- Allow anonymous students to INSERT, SELECT, and UPDATE own submission (for upsert & retrieval) — never DELETE
+CREATE POLICY "anon_insert_w09_ai_feature_pitch"
   ON introai_week09_ai_feature_pitch
-  FOR ALL
+  FOR INSERT
+  TO anon
+  WITH CHECK (true);
+
+CREATE POLICY "anon_select_w09_ai_feature_pitch"
+  ON introai_week09_ai_feature_pitch
+  FOR SELECT
+  TO anon
+  USING (true);
+
+CREATE POLICY "anon_update_w09_ai_feature_pitch"
+  ON introai_week09_ai_feature_pitch
+  FOR UPDATE
   TO anon
   USING (true)
   WITH CHECK (true);
@@ -1364,10 +1376,22 @@ DROP POLICY IF EXISTS "anon_update_w09_npc_logic" ON introai_week09_npc_logic;
 DROP POLICY IF EXISTS "anon_all_w09_npc_logic" ON introai_week09_npc_logic;
 DROP POLICY IF EXISTS "auth_select_w09_npc_logic" ON introai_week09_npc_logic;
 
--- Allow anonymous students to SELECT, INSERT, and UPDATE (for upsert & retrieval)
-CREATE POLICY "anon_all_w09_npc_logic"
+-- Allow anonymous students to INSERT, SELECT, and UPDATE own submission (for upsert & retrieval) — never DELETE
+CREATE POLICY "anon_insert_w09_npc_logic"
   ON introai_week09_npc_logic
-  FOR ALL
+  FOR INSERT
+  TO anon
+  WITH CHECK (true);
+
+CREATE POLICY "anon_select_w09_npc_logic"
+  ON introai_week09_npc_logic
+  FOR SELECT
+  TO anon
+  USING (true);
+
+CREATE POLICY "anon_update_w09_npc_logic"
+  ON introai_week09_npc_logic
+  FOR UPDATE
   TO anon
   USING (true)
   WITH CHECK (true);
@@ -1418,12 +1442,27 @@ DROP POLICY IF EXISTS "anon_insert_w09_poc_brainstormer" ON introai_week09_poc_b
 DROP POLICY IF EXISTS "anon_select_w09_poc_brainstormer" ON introai_week09_poc_brainstormer;
 DROP POLICY IF EXISTS "anon_update_w09_poc_brainstormer" ON introai_week09_poc_brainstormer;
 DROP POLICY IF EXISTS "anon_all_w09_poc_brainstormer" ON introai_week09_poc_brainstormer;
+DROP POLICY IF EXISTS "anon_insert_w09_poc_brainstormer" ON introai_week09_poc_brainstormer;
+DROP POLICY IF EXISTS "anon_select_w09_poc_brainstormer" ON introai_week09_poc_brainstormer;
+DROP POLICY IF EXISTS "anon_update_w09_poc_brainstormer" ON introai_week09_poc_brainstormer;
 DROP POLICY IF EXISTS "auth_select_w09_poc_brainstormer" ON introai_week09_poc_brainstormer;
 
--- Allow anonymous students to SELECT, INSERT, and UPDATE (for upsert & retrieval)
-CREATE POLICY "anon_all_w09_poc_brainstormer"
+-- Allow anonymous students to INSERT, SELECT, and UPDATE own submission (for upsert & retrieval) — never DELETE
+CREATE POLICY "anon_insert_w09_poc_brainstormer"
   ON introai_week09_poc_brainstormer
-  FOR ALL
+  FOR INSERT
+  TO anon
+  WITH CHECK (true);
+
+CREATE POLICY "anon_select_w09_poc_brainstormer"
+  ON introai_week09_poc_brainstormer
+  FOR SELECT
+  TO anon
+  USING (true);
+
+CREATE POLICY "anon_update_w09_poc_brainstormer"
+  ON introai_week09_poc_brainstormer
+  FOR UPDATE
   TO anon
   USING (true)
   WITH CHECK (true);
@@ -1474,10 +1513,22 @@ DROP POLICY IF EXISTS "anon_update_w09_project_brief" ON introai_week09_project_
 DROP POLICY IF EXISTS "anon_all_w09_project_brief" ON introai_week09_project_brief;
 DROP POLICY IF EXISTS "auth_select_w09_project_brief" ON introai_week09_project_brief;
 
--- Allow anonymous students to SELECT, INSERT, and UPDATE (for upsert & retrieval)
-CREATE POLICY "anon_all_w09_project_brief"
+-- Allow anonymous students to INSERT, SELECT, and UPDATE own submission (for upsert & retrieval) — never DELETE
+CREATE POLICY "anon_insert_w09_project_brief"
   ON introai_week09_project_brief
-  FOR ALL
+  FOR INSERT
+  TO anon
+  WITH CHECK (true);
+
+CREATE POLICY "anon_select_w09_project_brief"
+  ON introai_week09_project_brief
+  FOR SELECT
+  TO anon
+  USING (true);
+
+CREATE POLICY "anon_update_w09_project_brief"
+  ON introai_week09_project_brief
+  FOR UPDATE
   TO anon
   USING (true)
   WITH CHECK (true);
@@ -1541,10 +1592,22 @@ DROP POLICY IF EXISTS "anon_update_w10_ai_design_sprint" ON introai_week10_ai_de
 DROP POLICY IF EXISTS "anon_all_w10_ai_design_sprint" ON introai_week10_ai_design_sprint;
 DROP POLICY IF EXISTS "auth_select_w10_ai_design_sprint" ON introai_week10_ai_design_sprint;
 
--- Allow anonymous students to SELECT, INSERT, and UPDATE (for upsert & retrieval)
-CREATE POLICY "anon_all_w10_ai_design_sprint"
+-- Allow anonymous students to INSERT, SELECT, and UPDATE own submission (for upsert & retrieval) — never DELETE
+CREATE POLICY "anon_insert_w10_ai_design_sprint"
   ON introai_week10_ai_design_sprint
-  FOR ALL
+  FOR INSERT
+  TO anon
+  WITH CHECK (true);
+
+CREATE POLICY "anon_select_w10_ai_design_sprint"
+  ON introai_week10_ai_design_sprint
+  FOR SELECT
+  TO anon
+  USING (true);
+
+CREATE POLICY "anon_update_w10_ai_design_sprint"
+  ON introai_week10_ai_design_sprint
+  FOR UPDATE
   TO anon
   USING (true)
   WITH CHECK (true);
@@ -1606,10 +1669,22 @@ DROP POLICY IF EXISTS "anon_update_w10_mockup_critique" ON introai_week10_mockup
 DROP POLICY IF EXISTS "anon_all_w10_mockup_critique" ON introai_week10_mockup_critique;
 DROP POLICY IF EXISTS "auth_select_w10_mockup_critique" ON introai_week10_mockup_critique;
 
--- Allow anonymous students to SELECT, INSERT, and UPDATE (for upsert & retrieval)
-CREATE POLICY "anon_all_w10_mockup_critique"
+-- Allow anonymous students to INSERT, SELECT, and UPDATE own submission (for upsert & retrieval) — never DELETE
+CREATE POLICY "anon_insert_w10_mockup_critique"
   ON introai_week10_mockup_critique
-  FOR ALL
+  FOR INSERT
+  TO anon
+  WITH CHECK (true);
+
+CREATE POLICY "anon_select_w10_mockup_critique"
+  ON introai_week10_mockup_critique
+  FOR SELECT
+  TO anon
+  USING (true);
+
+CREATE POLICY "anon_update_w10_mockup_critique"
+  ON introai_week10_mockup_critique
+  FOR UPDATE
   TO anon
   USING (true)
   WITH CHECK (true);
@@ -1795,11 +1870,28 @@ COMMENT ON TABLE introai_project_progress_logs
 ALTER TABLE introai_project_tracker ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "anon_all_w10_proj_tracker" ON introai_project_tracker;
+DROP POLICY IF EXISTS "anon_insert_w10_proj_tracker" ON introai_project_tracker;
+DROP POLICY IF EXISTS "anon_select_w10_proj_tracker" ON introai_project_tracker;
+DROP POLICY IF EXISTS "anon_update_w10_proj_tracker" ON introai_project_tracker;
 DROP POLICY IF EXISTS "auth_select_w10_proj_tracker" ON introai_project_tracker;
 
-CREATE POLICY "anon_all_w10_proj_tracker"
+-- Written via upsert (on_conflict=student_email) and a direct student_email-keyed
+-- PATCH from the check-in pages, so anon needs UPDATE in addition to INSERT/SELECT — never DELETE.
+CREATE POLICY "anon_insert_w10_proj_tracker"
   ON introai_project_tracker
-  FOR ALL
+  FOR INSERT
+  TO anon
+  WITH CHECK (true);
+
+CREATE POLICY "anon_select_w10_proj_tracker"
+  ON introai_project_tracker
+  FOR SELECT
+  TO anon
+  USING (true);
+
+CREATE POLICY "anon_update_w10_proj_tracker"
+  ON introai_project_tracker
+  FOR UPDATE
   TO anon
   USING (true)
   WITH CHECK (true);
@@ -1814,14 +1906,22 @@ CREATE POLICY "auth_select_w10_proj_tracker"
 ALTER TABLE introai_project_progress_logs ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "anon_all_w10_proj_logs" ON introai_project_progress_logs;
+DROP POLICY IF EXISTS "anon_insert_w10_proj_logs" ON introai_project_progress_logs;
+DROP POLICY IF EXISTS "anon_select_w10_proj_logs" ON introai_project_progress_logs;
 DROP POLICY IF EXISTS "auth_select_w10_proj_logs" ON introai_project_progress_logs;
 
-CREATE POLICY "anon_all_w10_proj_logs"
+-- Append-only check-in log (one new row per check-in, never revised) — anon gets INSERT + SELECT only.
+CREATE POLICY "anon_insert_w10_proj_logs"
   ON introai_project_progress_logs
-  FOR ALL
+  FOR INSERT
   TO anon
-  USING (true)
   WITH CHECK (true);
+
+CREATE POLICY "anon_select_w10_proj_logs"
+  ON introai_project_progress_logs
+  FOR SELECT
+  TO anon
+  USING (true);
 
 CREATE POLICY "auth_select_w10_proj_logs"
   ON introai_project_progress_logs

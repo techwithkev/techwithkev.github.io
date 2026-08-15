@@ -175,19 +175,22 @@ Deno.serve(async (req) => {
       return json({ error: 'Unauthorized. Missing Authorization header.' }, 401);
     }
 
-    if (supabaseUrl && supabaseAnonKey) {
-      try {
-        const sb = createClient(supabaseUrl, supabaseAnonKey, {
-          global: { headers: { Authorization: authHeader } },
-          auth: { persistSession: false },
-        });
-        const { data: { user }, error: userErr } = await sb.auth.getUser();
-        if (userErr) {
-          console.warn('[ai-dashboard] Auth user check warning:', userErr.message);
-        }
-      } catch (e) {
-        console.warn('[ai-dashboard] Supabase client init warning:', e);
+    if (!supabaseUrl || !supabaseAnonKey) {
+      return json({ error: 'Server auth misconfigured.' }, 500);
+    }
+
+    try {
+      const sb = createClient(supabaseUrl, supabaseAnonKey, {
+        global: { headers: { Authorization: authHeader } },
+        auth: { persistSession: false },
+      });
+      const { data: { user }, error: userErr } = await sb.auth.getUser();
+      if (userErr || !user) {
+        return json({ error: 'Unauthorized. Please sign in.' }, 401);
       }
+    } catch (e) {
+      console.warn('[ai-dashboard] Supabase client init warning:', e);
+      return json({ error: 'Unauthorized. Please sign in.' }, 401);
     }
 
     const body = await req.json().catch(() => ({}));

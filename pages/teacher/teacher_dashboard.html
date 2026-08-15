@@ -11504,7 +11504,11 @@
 
       try {
         const { data: { session } } = await sb.auth.getSession();
-        const authToken = session?.access_token || SUPABASE_ANON;
+        if (!session) {
+          toast('Please sign in to use Student AI Analyzer.');
+          outputBody.innerHTML = `<span style="color:var(--red)">⚠️ Please sign in to use Student AI Analyzer.</span>`;
+          return;
+        }
 
         const summaryList = getStudentSubmissionsSummary(name);
 
@@ -11520,7 +11524,7 @@
         const res = await fetch(`${SUPABASE_URL}/functions/v1/ai-dashboard`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${authToken}`,
+            'Authorization': `Bearer ${session.access_token}`,
             'Content-Type': 'application/json',
             'apikey': SUPABASE_ANON,
           },

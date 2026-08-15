@@ -48,10 +48,22 @@ DROP POLICY IF EXISTS "anon_update_w10_ai_design_sprint" ON introai_week10_ai_de
 DROP POLICY IF EXISTS "anon_all_w10_ai_design_sprint" ON introai_week10_ai_design_sprint;
 DROP POLICY IF EXISTS "auth_select_w10_ai_design_sprint" ON introai_week10_ai_design_sprint;
 
--- Allow anonymous students to SELECT, INSERT, and UPDATE (for upsert & retrieval)
-CREATE POLICY "anon_all_w10_ai_design_sprint"
+-- Allow anonymous students to INSERT, SELECT, and UPDATE own submission (for upsert & retrieval) — never DELETE
+CREATE POLICY "anon_insert_w10_ai_design_sprint"
   ON introai_week10_ai_design_sprint
-  FOR ALL
+  FOR INSERT
+  TO anon
+  WITH CHECK (true);
+
+CREATE POLICY "anon_select_w10_ai_design_sprint"
+  ON introai_week10_ai_design_sprint
+  FOR SELECT
+  TO anon
+  USING (true);
+
+CREATE POLICY "anon_update_w10_ai_design_sprint"
+  ON introai_week10_ai_design_sprint
+  FOR UPDATE
   TO anon
   USING (true)
   WITH CHECK (true);
