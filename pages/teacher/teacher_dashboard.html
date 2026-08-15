@@ -1991,6 +1991,14 @@
             </svg>
             Access Codes
           </button>
+
+          <div class="nav-section-label" style="margin-top:20px">AI Assistance &amp; Tools</div>
+          <button class="nav-item" onclick="showPage('introai-student-analyzer')">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M8 8a3 3 0 100-6 3 3 0 000 6zm-5 7a5 5 0 0110 0H3z" stroke-linecap="round" />
+            </svg>
+            Student AI Analyzer 🎓
+          </button>
         </div>
 
         <div class="sidebar-footer">
@@ -4635,6 +4643,61 @@
           </div>
         </div>
 
+        <!-- ══ INTRO TO AI: STUDENT ANALYZER HELPER (Groq LLM) ══ -->
+        <div class="page" id="page-introai-student-analyzer">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Student AI Progress &amp; Feedback Analyzer 🎓🤖</div>
+              <div class="page-subtitle">Generate automated teacher evaluation commentary across all submitted Intro to AI exercises using Groq LLM</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 8A6 6 0 1114 8"/><path d="M2 8l-2-2m2 2L0 10"/></svg>
+                Refresh
+              </button>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-bottom:20px; background:linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); color:#fff; border-color:#4338ca;">
+            <div style="display:flex; flex-direction:column; gap:14px;">
+              <div>
+                <span class="badge badge-indigo" style="font-size:10px; font-weight:800; background:rgba(255,255,255,0.15); color:#c7d2fe; padding:4px 8px; border-radius:6px; text-transform:uppercase; letter-spacing:0.5px;">Teacher AI Assistant</span>
+                <h3 style="font-size:18px; font-weight:800; color:#fff; margin-top:6px;">Select a Student to Analyze</h3>
+                <p style="font-size:12px; color:#c7d2fe; margin-top:2px;">Scans all 36+ Intro to AI exercises, homeworks, and exams completed by this student to generate personalized report card feedback and pedagogical commentary.</p>
+              </div>
+
+              <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; background:rgba(255,255,255,0.06); padding:16px; border-radius:14px; border:1px solid rgba(255,255,255,0.1);">
+                <div style="flex:1; min-width:240px;">
+                  <label style="font-size:11px; font-weight:800; color:#93c5fd; text-transform:uppercase; display:block; margin-bottom:6px;">Select Student:</label>
+                  <select id="student-analyzer-select" class="form-input" style="background:#0f172a; color:#fff; border-color:#475569; font-weight:700; width:100%;">
+                    <option value="">-- Choose a Student --</option>
+                  </select>
+                </div>
+                <button id="student-analyzer-run-btn" class="btn btn-mint" style="padding:12px 20px; font-size:13px; font-weight:800; margin-top:18px;" onclick="runStudentAnalyzer()">
+                  ✨ Analyze Student Progress 🤖
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div id="student-analyzer-output-panel" class="panel" style="display:none; background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; padding-bottom:16px; border-bottom:1px solid #f1f5f9; margin-bottom:20px;">
+              <div>
+                <span class="badge badge-teal" id="analyzer-output-student-badge">Student Report</span>
+                <h3 style="font-size:20px; font-weight:800; color:#0f172a; margin-top:4px;" id="analyzer-output-student-title">Teacher Evaluation Report</h3>
+                <div style="font-size:12px; color:#64748b; margin-top:2px;" id="analyzer-output-submissions-count">Analyzed 0 submissions</div>
+              </div>
+              <button class="btn btn-secondary" onclick="copyAnalyzerReport()" style="font-size:12px;">
+                📋 Copy Report Card Comment
+              </button>
+            </div>
+
+            <div id="analyzer-output-body" style="font-size:14px; line-height:1.7; color:#334155;">
+              <!-- Groq AI commentary rendered here -->
+            </div>
+          </div>
+        </div>
+
       </main>
     </div>
   </div>
@@ -5134,6 +5197,7 @@
         renderWAIPage();
         await loadCohortExercises();
         renderExerciseControls();
+        populateStudentAnalyzerSelect();
 
         const now = new Date();
         document.getElementById('last-refresh').textContent = 'Updated ' + now.toLocaleTimeString();
@@ -6137,7 +6201,12 @@
 
       if (!r) return;
       document.getElementById('modal-title').textContent = title;
-      let bodyHtml = '';
+      let bodyHtml = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding:10px 14px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px;">
+          <span style="font-size:12px; color:#475569;">Student: <strong style="color:#0f172a;">${esc(r.student_name || r.name || 'Student')}</strong> (${esc(r.student_email || 'No email')})</span>
+          <button class="btn btn-teal" style="font-size:11px; padding:4px 10px; font-weight:700;" onclick="analyzeStudentByName('${esc(r.student_name || r.name)}')">Analyze ${esc(r.student_name || r.name)} with AI 🎓🤖</button>
+        </div>
+      `;
 
       if (type === 'hw') {
         let qDetail = r.question_detail;
@@ -10826,6 +10895,246 @@
       renderExerciseControls();
       await Promise.all(promises);
       toast(`Week ${weekNum} ${isActive ? 'enabled' : 'disabled'} for ${cohort}`);
+    }
+
+    // ════════════════════════════════════════════════════════════════════════════
+    // STUDENT AI PROGRESS ANALYZER HELPER (GROQ LLM)
+    // ════════════════════════════════════════════════════════════════════════════
+    const ALL_INTROAI_DATASETS = [
+      { key: 'sa', title: 'Self-Assessment', week: 1, dataRef: () => saData },
+      { key: 'sh', title: 'Scavenger Hunt', week: 1, dataRef: () => shData },
+      { key: 'cb', title: 'Intro to Chatbots', week: 1, dataRef: () => cbData },
+      { key: 'cp', title: 'Creative Prompting', week: 2, dataRef: () => cpData },
+      { key: 'pd', title: 'Persona Detective', week: 2, dataRef: () => pdData },
+      { key: 'ap', title: 'AI Pictionary', week: 3, dataRef: () => apData },
+      { key: 'pc', title: 'Prompt Comparison', week: 3, dataRef: () => pcData },
+      { key: 'mg', title: 'Music Generation', week: 4, dataRef: () => mgData },
+      { key: 'is', title: 'Instrument Swap', week: 4, dataRef: () => isData },
+      { key: 'tm', title: 'Train Your Model', week: 5, dataRef: () => tmData },
+      { key: 'bta', title: 'Be the Algorithm', week: 6, dataRef: () => btaData },
+      { key: 'ayf', title: 'Analyze Your Feed', week: 6, dataRef: () => ayfData },
+      { key: 'dsr', title: 'Design a Recommender', week: 6, dataRef: () => dsrData },
+      { key: 'kc', title: 'Knowledge Check Quiz', week: 6, dataRef: () => kcData },
+      { key: 'stb', title: 'Spot the Bias', week: 7, dataRef: () => stbData },
+      { key: 'da', title: 'Data Audit', week: 7, dataRef: () => daData },
+      { key: 'bd', title: 'Build Your Own Dataset', week: 7, dataRef: () => bdData },
+      { key: 'dd', title: 'Data Detective', week: 7, dataRef: () => ddData },
+      { key: 'bct', title: 'Bias Card Twist', week: 8, dataRef: () => bctData },
+      { key: 'bds', title: 'Bias Detective Stations', week: 8, dataRef: () => bdsData },
+      { key: 'ftd', title: 'Fix the Dataset', week: 8, dataRef: () => ftdData },
+      { key: 'pvp', title: 'Promise vs Problem', week: 8, dataRef: () => pvpData },
+      { key: 'met', title: 'Mini Ethics Trial', week: 8, dataRef: () => metData },
+      { key: 'nl', title: 'NPC Logic: Guard AI', week: 9, dataRef: () => nlData },
+      { key: 'fp', title: 'AI Feature Pitch', week: 9, dataRef: () => fpData },
+      { key: 'pb', title: 'Kickoff Project Brief', week: 9, dataRef: () => pbData },
+      { key: 'poc', title: 'POC Brainstormer', week: 9, dataRef: () => pocData },
+      { key: 'pt', title: 'Project Progress Tracker', week: 10, dataRef: () => ptData },
+      { key: 'ads', title: 'AI Design Sprint', week: 10, dataRef: () => adsData },
+      { key: 'mc', title: 'Mockup Critique', week: 10, dataRef: () => mcData },
+      { key: 'sm', title: 'Synthetic Media Audit', week: 11, dataRef: () => smData },
+      { key: 'wwyd', title: 'What Would You Do? Ethics', week: 11, dataRef: () => wwydData },
+      { key: 'mcbot', title: 'Build a Mini-Chatbot', week: 12, dataRef: () => mcbotData },
+      { key: 'bvl', title: 'Bot vs LLM Chatbot', week: 12, dataRef: () => bvlData },
+      { key: 'acm', title: 'AI Career Mapping', week: 13, dataRef: () => acmData },
+      { key: 'wai', title: 'Will AI Take This Job?', week: 13, dataRef: () => waiData },
+      { key: 'hw', title: 'Weekly Homework Quiz', week: 0, dataRef: () => hwData },
+      { key: 'exam', title: 'Midterm / Final Exam', week: 0, dataRef: () => examData }
+    ];
+
+    function populateStudentAnalyzerSelect() {
+      const selectEl = document.getElementById('student-analyzer-select');
+      if (!selectEl) return;
+
+      const studentMap = new Map(); // name/email -> { name, email, count }
+
+      ALL_INTROAI_DATASETS.forEach(ds => {
+        const arr = ds.dataRef();
+        if (!Array.isArray(arr)) return;
+        arr.forEach(r => {
+          const name = (r.student_name || r.name || '').trim();
+          const email = (r.student_email || r.email || '').trim();
+          if (!name && !email) return;
+
+          const key = (name || email).toLowerCase();
+          if (!studentMap.has(key)) {
+            studentMap.set(key, { name: name || email, email, count: 0 });
+          }
+          studentMap.get(key).count++;
+        });
+      });
+
+      const students = Array.from(studentMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+      const currentVal = selectEl.value;
+
+      selectEl.innerHTML = `<option value="">-- Choose a Student (${students.length} Total) --</option>` +
+        students.map(s => `<option value="${esc(s.name)}">${esc(s.name)}${s.email ? ' (' + esc(s.email) + ')' : ''} — ${s.count} submission${s.count !== 1 ? 's' : ''}</option>`).join('');
+
+      if (currentVal) selectEl.value = currentVal;
+    }
+
+    function getStudentSubmissionsSummary(studentQuery) {
+      if (!studentQuery) return [];
+      const query = studentQuery.trim().toLowerCase();
+      const summaryList = [];
+
+      ALL_INTROAI_DATASETS.forEach(ds => {
+        const data = ds.dataRef();
+        if (!Array.isArray(data)) return;
+
+        data.forEach(r => {
+          const sName = (r.student_name || r.name || '').trim().toLowerCase();
+          const sEmail = (r.student_email || r.email || '').trim().toLowerCase();
+
+          if (sName === query || sEmail === query || (query.length > 2 && (sName.includes(query) || sEmail.includes(query)))) {
+            const keyAnswers = {};
+            Object.keys(r).forEach(k => {
+              if (['id', 'student_name', 'student_email', 'access_code', 'cohort'].includes(k)) return;
+              if (r[k] !== null && r[k] !== undefined && r[k] !== '') {
+                keyAnswers[k] = r[k];
+              }
+            });
+
+            summaryList.push({
+              exercise_id: ds.key,
+              exercise_title: ds.title,
+              week: ds.week,
+              submitted_at: r.submitted_at || r.updated_at || r.logged_at || '—',
+              enjoyment_rating: r.enjoyment_rating,
+              score: r.score ?? r.auto_score ?? null,
+              key_answers: keyAnswers
+            });
+          }
+        });
+      });
+
+      return summaryList;
+    }
+
+    async function runStudentAnalyzer(targetName) {
+      const selectEl = document.getElementById('student-analyzer-select');
+      const name = targetName || (selectEl ? selectEl.value : '');
+
+      if (!name) {
+        toast('Please select or specify a student to analyze.');
+        return;
+      }
+
+      showPage('introai-student-analyzer');
+
+      const runBtn = document.getElementById('student-analyzer-run-btn');
+      const outputPanel = document.getElementById('student-analyzer-output-panel');
+      const outputBody = document.getElementById('analyzer-output-body');
+      const outputBadge = document.getElementById('analyzer-output-student-badge');
+      const outputTitle = document.getElementById('analyzer-output-student-title');
+      const outputCount = document.getElementById('analyzer-output-submissions-count');
+
+      outputPanel.style.display = 'block';
+      outputBadge.textContent = 'Analyzing...';
+      outputTitle.textContent = `Student Evaluation: ${name}`;
+      outputCount.textContent = 'Scanning student submissions across all exercises...';
+      outputBody.innerHTML = `<div class="loading" style="padding:30px 0;"><div class="spinner"></div><br>✨ Groq AI is analyzing ${esc(name)}'s exercise responses...</div>`;
+
+      if (runBtn) {
+        runBtn.disabled = true;
+        runBtn.innerHTML = `<div class="spinner" style="width:12px;height:12px;border-width:2px;margin:0"></div> Thinking…`;
+      }
+
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) {
+          toast('Please sign in to use Student AI Analyzer.');
+          outputBody.innerHTML = `<span style="color:var(--red)">⚠️ Please sign in to use Student AI Analyzer.</span>`;
+          return;
+        }
+
+        const summaryList = getStudentSubmissionsSummary(name);
+
+        if (!summaryList.length) {
+          outputBadge.textContent = 'No Submissions Found';
+          outputCount.textContent = '0 exercises found';
+          outputBody.innerHTML = `<div style="padding:20px; text-align:center; color:var(--gray)">No submissions found for student <strong>"${esc(name)}"</strong>. Ensure the student has submitted at least one exercise.</div>`;
+          return;
+        }
+
+        outputCount.textContent = `Analyzed ${summaryList.length} submission${summaryList.length !== 1 ? 's' : ''} across Intro to AI`;
+
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/ai-dashboard`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON,
+          },
+          body: JSON.stringify({
+            action: 'student_analyzer',
+            payload: {
+              student_name: name,
+              student_email: summaryList[0]?.key_answers?.student_email || '',
+              submissions_summary: summaryList
+            },
+          }),
+        });
+
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(`Edge function returned ${res.status}: ${errText}`);
+        }
+
+        const resData = await res.json();
+        if (resData.error) throw new Error(resData.error);
+
+        const rawMarkdown = resData.analysis || '(No commentary generated)';
+
+        const htmlContent = rawMarkdown
+          .replace(/^### (.*$)/gim, '<h3 style="font-size:16px; font-weight:800; color:#1e1b4b; margin-top:16px; margin-bottom:6px;">$1</h3>')
+          .replace(/^## (.*$)/gim, '<h2 style="font-size:18px; font-weight:800; color:#312e81; margin-top:18px; margin-bottom:8px; border-bottom:1px solid #e0e7ff; padding-bottom:4px;">$1</h2>')
+          .replace(/^# (.*$)/gim, '<h1 style="font-size:20px; font-weight:800; color:#1e1b4b; margin-top:20px; margin-bottom:10px;">$1</h1>')
+          .replace(/\*\*(.*?)\*\*/g, '<strong style="color:#0f172a;">$1</strong>')
+          .replace(/\*(.*?)\*/g, '<em>$1</em>')
+          .replace(/^\s*[\-\*]\s+(.*$)/gim, '<li style="margin-bottom:4px; margin-left:20px;">$1</li>')
+          .replace(/\n\n/g, '<br><br>');
+
+        outputBadge.textContent = 'Analysis Complete';
+        outputBody.innerHTML = `<div style="background:#f8fafc; border:1px solid #e2e8f0; padding:20px; border-radius:12px;">${htmlContent}</div>`;
+        outputPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      } catch (err) {
+        console.error('Student analyzer error:', err);
+        outputBadge.textContent = 'Error';
+        outputBody.innerHTML = `<span style="color:var(--red)">⚠️ Error analyzing student: ${esc(err.message)}</span>`;
+        toast('Error: ' + err.message);
+      } finally {
+        if (runBtn) {
+          runBtn.disabled = false;
+          runBtn.innerHTML = `✨ Analyze Student Progress 🤖`;
+        }
+      }
+    }
+
+    function analyzeStudentByName(name) {
+      if (!name) return;
+      closeModal();
+      const selectEl = document.getElementById('student-analyzer-select');
+      if (selectEl) {
+        for (let i = 0; i < selectEl.options.length; i++) {
+          if (selectEl.options[i].value.toLowerCase() === name.toLowerCase()) {
+            selectEl.selectedIndex = i;
+            break;
+          }
+        }
+      }
+      runStudentAnalyzer(name);
+    }
+
+    function copyAnalyzerReport() {
+      const body = document.getElementById('analyzer-output-body');
+      if (!body) return;
+      const text = body.innerText || body.textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        toast('📋 Report card comment copied to clipboard!');
+      }).catch(err => {
+        toast('Copy failed: ' + err.message);
+      });
     }
 
     // ════════════════════════════════════════════════════════════════════════════

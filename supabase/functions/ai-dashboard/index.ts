@@ -25,7 +25,7 @@ async function callGroq(systemPrompt: string, userPrompt: string, groqKey: strin
         { role: 'user',   content: userPrompt },
       ],
       temperature: 0.5,
-      max_tokens: 600,
+      max_tokens: 1000,
     }),
   });
 
@@ -90,6 +90,47 @@ Write the summary now.`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// ACTION: student_analyzer
+// Evaluates a single student's submissions across all Intro to AI exercises.
+// ─────────────────────────────────────────────────────────────────────────────
+async function handleStudentAnalyzer(payload: Record<string, unknown>, groqKey: string): Promise<Response> {
+  const { student_name, student_email, submissions_summary } = payload as {
+    student_name: string;
+    student_email: string;
+    submissions_summary: Array<{
+      exercise_id: string;
+      exercise_title: string;
+      week: number;
+      submitted_at: string;
+      enjoyment_rating?: number;
+      key_answers: Record<string, any>;
+    }>;
+  };
+
+  const systemPrompt = `You are an expert AI & Computer Science educator providing empathetic, highly perceptive, and constructive teacher commentary for a student enrolled in an "Intro to AI" course for middle and high school students.
+Your goal is to evaluate the student's overall progress across their submitted AI exercises and generate professional teacher commentary.
+
+Format your response in clear, markdown with bold section headers and bullet points:
+1. 🌟 **Overall Student Performance Summary** (2-3 sentences summarizing engagement, consistency, and general quality)
+2. 🧠 **AI Concept Mastery & Strengths** (Highlight specific concepts where the student demonstrates understanding e.g., prompting techniques, AI bias detection, ethical analysis, machine learning model training, rule-based vs LLM chatbot logic, AI career mapping)
+3. 💡 **Areas for Growth & Encouragement** (Constructive advice on areas where their answers were brief or where concepts could be deepened)
+4. 📝 **Teacher Comment for Report Card / 1-on-1 Feedback** (A ready-to-use, polished 2-sentence teacher comment for report cards or parent communications)
+
+Keep the tone encouraging, warm, professional, and pedagogical.`;
+
+  const userPrompt = `Generate a teacher evaluation report for student: "${student_name}" (${student_email || 'No email provided'}).
+They have completed ${submissions_summary.length} Intro to AI exercise(s).
+
+Here are their exercise submissions across the course:
+${JSON.stringify(submissions_summary, null, 2)}
+
+Provide the complete teacher analysis report now.`;
+
+  const analysis = await callGroq(systemPrompt, userPrompt, groqKey);
+  return json({ analysis });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // MAIN HANDLER
 // ─────────────────────────────────────────────────────────────────────────────
 Deno.serve(async (req) => {
@@ -110,7 +151,6 @@ Deno.serve(async (req) => {
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
 
     // ── Verify teacher is authenticated ──────────────────────────────────────
-    // The browser sends the Supabase session JWT in the Authorization header.
     const authHeader = req.headers.get('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return json({ error: 'Unauthorized. Please sign in.' }, 401);
@@ -137,6 +177,9 @@ Deno.serve(async (req) => {
     switch (action) {
       case 'cohort_summary':
         return handleCohortSummary(payload, groqKey);
+
+      case 'student_analyzer':
+        return handleStudentAnalyzer(payload, groqKey);
 
       default:
         return json({ error: `Unknown action: ${action}` }, 400);
