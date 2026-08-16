@@ -1,5 +1,7 @@
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Migration: Fix anon FOR ALL regression from 20260809_allow_delete_exercise_submissions.sql
+--            (and any older FOR ALL TO anon policy left over from original
+--            table creation, under whatever name it was originally given)
 -- Date: 2026-08-15
 -- Context:
 --   20260809_allow_delete_exercise_submissions.sql granted "FOR ALL TO anon"
@@ -11,11 +13,28 @@
 --   The anon key is public (embedded in every student page), so this let
 --   anyone issue raw REST DELETE calls against any of these tables.
 --
---   This migration drops the anon "FOR ALL" policies and replaces them with
---   scoped policies per table, based on how each table is actually written to
+--   Separately: 8 of these 36 tables (introai_week09_*, introai_week10_*,
+--   introai_project_tracker, introai_project_progress_logs) were ALSO created
+--   with a "FOR ALL TO anon" policy baked in from the start, under a SHORT
+--   policy name (e.g. "anon_all_w09_npc_logic") — a different name than the
+--   one 20260809 uses (e.g. "anon_all_introai_week09_npc_logic"). A migration
+--   that only drops the 20260809-style name would leave that original policy
+--   live. Rather than hardcode every legacy name, this migration looks up
+--   pg_policies directly and drops ANY existing policy on each table that
+--   grants "FOR ALL" to "anon", whatever it's named.
+--
+--   Also: not every table in the 36-table list necessarily exists in every
+--   environment (e.g. introai_week07_build_dataset caused the original run
+--   of this fix to fail with "relation does not exist" — which also means
+--   20260809 itself may never have successfully applied, since Postgres
+--   DO blocks are atomic and would have rolled back on the same error).
+--   Each table is existence-checked before being touched, matching the
+--   defensive pattern already used in 20260804_fix_rls_week09_week10.sql.
+--
+--   This migration replaces every anon "FOR ALL" policy found with scoped
+--   policies per table, based on how each table is actually written to
 --   client-side (checked against every page in pages/introai/ and
---   pages/aijr/ that writes to these tables — see PAGES_INSERT_ONLY vs
---   PAGES_UPSERT below):
+--   pages/aijr/ that writes to these tables):
 --
 --   • INSERT_ONLY tables: written via plain POST (supabaseInsert /
 --     sb.insert()), never re-submitted. anon gets INSERT + SELECT only.
@@ -34,6 +53,7 @@
 DO $$
 DECLARE
   t TEXT;
+  pol RECORD;
   insert_only_tables TEXT[] := ARRAY[
     'introai_week01_self_assessment',
     'introai_week01_scavenger_hunt',
@@ -79,7 +99,20 @@ DECLARE
   ];
 BEGIN
   FOREACH t IN ARRAY insert_only_tables LOOP
-    EXECUTE format('DROP POLICY IF EXISTS %I ON %I;', 'anon_all_' || t, t);
+    IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = t) THEN
+      RAISE NOTICE 'Skipping %, table does not exist', t;
+      CONTINUE;
+    END IF;
+
+    -- Drop ANY existing policy that grants FOR ALL to anon, whatever it's named
+    FOR pol IN
+      SELECT policyname FROM pg_policies
+      WHERE schemaname = 'public' AND tablename = t AND cmd = 'ALL' AND 'anon' = ANY(roles)
+    LOOP
+      EXECUTE format('DROP POLICY %I ON %I;', pol.policyname, t);
+    END LOOP;
+
+    -- Drop and recreate the scoped policies (idempotent re-run safe)
     EXECUTE format('DROP POLICY IF EXISTS %I ON %I;', 'anon_insert_' || t, t);
     EXECUTE format('DROP POLICY IF EXISTS %I ON %I;', 'anon_select_' || t, t);
     EXECUTE format('DROP POLICY IF EXISTS %I ON %I;', 'anon_update_' || t, t);
@@ -89,7 +122,18 @@ BEGIN
   END LOOP;
 
   FOREACH t IN ARRAY upsert_tables LOOP
-    EXECUTE format('DROP POLICY IF EXISTS %I ON %I;', 'anon_all_' || t, t);
+    IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = t) THEN
+      RAISE NOTICE 'Skipping %, table does not exist', t;
+      CONTINUE;
+    END IF;
+
+    FOR pol IN
+      SELECT policyname FROM pg_policies
+      WHERE schemaname = 'public' AND tablename = t AND cmd = 'ALL' AND 'anon' = ANY(roles)
+    LOOP
+      EXECUTE format('DROP POLICY %I ON %I;', pol.policyname, t);
+    END LOOP;
+
     EXECUTE format('DROP POLICY IF EXISTS %I ON %I;', 'anon_insert_' || t, t);
     EXECUTE format('DROP POLICY IF EXISTS %I ON %I;', 'anon_select_' || t, t);
     EXECUTE format('DROP POLICY IF EXISTS %I ON %I;', 'anon_update_' || t, t);
