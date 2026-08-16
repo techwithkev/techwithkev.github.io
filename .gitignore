@@ -11,3 +11,7 @@ node_modules/
 # activity.css is intentionally committed — it is the built Tailwind output
 # served by GitHub Pages. Re-generate it with: npm run build:css
 pages/.DS_Store
+
+# Playwright test artifacts
+test-results/
+playwright-report/

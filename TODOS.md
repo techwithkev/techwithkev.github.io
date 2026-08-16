@@ -55,13 +55,6 @@ These are placeholder values in the code that need real IDs before the funnel is
   Cons: None significant — this is a documentation-only change.
   Context: Found via outside-voice cross-check during the pages/ architecture review. Likely the simplest fix in this whole list — probably just add `pages/python/` as a Category B subfolder (or a lightweight Category D) in ARCHITECTURE.md §1's table.
 
-- [ ] **Stand up a test framework (Playwright) and write a first regression test for the ai-dashboard auth check.**
-  What: Add Playwright (fits best — these are static HTML pages with real user interactions, not isolated units). First test: assert the `ai-dashboard` Supabase edge function rejects requests without a valid authenticated session (the exact bug fixed in this review — see `supabase/functions/ai-dashboard/index.ts` and `pages/teacher/teacher_dashboard.html`'s Student AI Analyzer).
-  Why: The repo has zero test infrastructure (`package.json`'s test script is a stub) across ~90 pages handling live student data and a paid LLM-backed endpoint. The auth-bypass fix in this review has no automated protection against silently regressing on the next refactor.
-  Pros: Closes the highest-stakes untested path first; establishes the framework for broader coverage later without committing to "add 100% coverage" as a vague, unscoped goal.
-  Cons: New tooling/CI dependency; half-day-ish setup cost before the first test even runs.
-  Context: Found during the pages/ architecture Test Review. Scope deliberately kept to framework + one regression test, not full coverage — broader test coverage is a natural follow-up once the framework exists.
-
 - [ ] **Review `introai_cohort_exercises`'s `FOR ALL TO anon` policy.**
   What: `sql/exercises/create_introai_cohort_exercises.sql:29-30` grants anon `FOR ALL` (not just INSERT/SELECT/UPDATE) on `introai_cohort_exercises`, the same anti-pattern just fixed on the 36 exercise-submission tables — but this table stores cohort exercise active/inactive toggles, not student submissions, so the blast radius (anyone can toggle which exercises are active) is much smaller than the DELETE-all-student-data risk just closed.
   Why: Same root pattern (`FOR ALL TO anon`) the rest of this review closed everywhere else it was found — left open here only because it's out of scope for the specific 36-table fix and lower severity.
