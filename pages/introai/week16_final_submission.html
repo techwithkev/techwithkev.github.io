@@ -432,7 +432,7 @@
       "5/5 — Outstanding & Inspiring! 🚀"
     ];
 
-    function validateEmail(e) { return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(e.trim()); }
+    function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim()); }
     function validateUrl(u) { return /^https?:\/\/.+/i.test(u.trim()); }
 
     function updatePreviewBtn(inputId, btnId) {
@@ -459,7 +459,7 @@
       emailEl.classList.remove('error'); emailErr.classList.add('hidden');
 
       if (!nameEl.value.trim()) { nameEl.classList.add('error'); nameErr.classList.remove('hidden'); ok = false; }
-      if (!emailEl.value.trim() || !validateEmail(emailEl.value)) { emailEl.classList.add('error'); emailErr.classList.remove('hidden'); ok = false; }
+      if (!emailEl.value.trim() || !validateEmail(emailEl.value.trim())) { emailEl.classList.add('error'); emailErr.classList.remove('hidden'); ok = false; }
       if (!ok) return;
 
       const btn = document.getElementById('reg-submit-btn');
