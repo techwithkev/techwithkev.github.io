@@ -1974,6 +1974,14 @@
               </svg>
               W13 Ex2: Will AI Take This Job?
             </button>
+
+            <div class="nav-section-label" style="margin-top:20px">Week 16 &mdash; Showcase</div>
+            <button class="nav-item" onclick="showPage('introai-final-submission')">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M8 1.75l2.25 4.56 5.03.73-3.64 3.55.86 5.01L8 13.25l-4.5 2.35.86-5.01L.72 7.04l5.03-.73L8 1.75z" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              W16: Final Project &amp; Slides 🎓
+            </button>
           </div>
 
           <!-- Common Section -->
@@ -4608,6 +4616,50 @@
           </div>
         </div>
 
+        <!-- ══ INTRO TO AI: FINAL PROJECT & PRESENTATION SUBMISSION (Week 16) ══ -->
+        <div class="page" id="page-introai-final-submission">
+          <div class="page-header">
+            <div>
+              <div class="page-title">Final Project &amp; Presentation Submission — Week 16 🎓🚀</div>
+              <div class="page-subtitle">Student presentation slide links, final project links, project overviews, and course reflections</div>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-secondary" onclick="loadAll()">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 8A6 6 0 1114 8"/><path d="M2 8l-2-2m2 2L0 10"/></svg>
+                Refresh
+              </button>
+              <button class="btn btn-mint" onclick="exportCSV('finalSub')">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 1v9M4 7l4 4 4-4"/><path d="M2 13h12"/></svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid" style="margin-bottom:20px">
+            <div class="stat-card indigo">
+              <div class="stat-label">Total Submissions</div>
+              <div class="stat-value" id="finalSub-stat-count">—</div>
+              <div class="stat-sub">Final project submissions</div>
+            </div>
+            <div class="stat-card gold">
+              <div class="stat-label">Avg Enjoyment</div>
+              <div class="stat-value" id="finalSub-stat-enjoy">—</div>
+              <div class="stat-sub">Out of 5 stars</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="filter-row">
+              <label>Search:</label>
+              <input class="search-input" id="finalSub-search" type="text" placeholder="Student name, title, summary, key learnings..." oninput="renderFinalSubTable()" />
+              <span class="text-small text-muted" id="finalSub-count"></span>
+            </div>
+            <div id="finalSub-table-wrap">
+              <div class="loading"><div class="spinner"></div><br>Loading Final Submissions&hellip;</div>
+            </div>
+          </div>
+        </div>
+
         <!-- ══ INTRO TO AI: COHORT EXERCISE CONTROLS (Central Management) ══ -->
         <div class="page" id="page-introai-exercise-control">
           <div class="page-header">
@@ -4826,6 +4878,7 @@
     let bvlData = [];    // introai_week12_bot_vs_llm rows
     let acmData = [];    // introai_week13_ai_career_mapping rows
     let waiData = [];    // introai_week13_will_ai_take_this_job rows
+    let finalSubData = []; // introai_week16_final_submission rows
     let ptData = [];     // introai_project_tracker rows
     let plData = [];     // introai_project_progress_logs rows
     let activeCohort = ''; // global cohort filter ('' = all)
@@ -4905,7 +4958,7 @@
         saData, shData, cbData, cpData, pdData, wsData, apData, pcData, mgData, isData,
         tmData, btaData, ayfData, dsrData, kcData, stbData, daData, bdData, ddData,
         bctData, bdsData, ftdData, pvpData, metData, nlData, fpData, pbData, pocData,
-        ptData, plData, adsData, mcData, smData, wwydData, mcbotData, bvlData
+        ptData, plData, adsData, mcData, smData, wwydData, mcbotData, bvlData, acmData, waiData, finalSubData
       ];
       introTables.forEach(arr => {
         if (Array.isArray(arr)) {
@@ -5015,7 +5068,8 @@
           sb.from('introai_week12_mini_chatbot').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('introai_week12_bot_vs_llm').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('introai_week13_ai_career_mapping').select('*').order('submitted_at', { ascending: false }).limit(10000),
-          sb.from('introai_week13_will_ai_take_this_job').select('*').order('submitted_at', { ascending: false }).limit(10000)
+          sb.from('introai_week13_will_ai_take_this_job').select('*').order('submitted_at', { ascending: false }).limit(10000),
+          sb.from('introai_week16_final_submission').select('*').order('submitted_at', { ascending: false }).limit(10000)
         ]);
 
         function checkErr(res, name) {
@@ -5032,7 +5086,7 @@
         checkErr(bds, 'bds'); checkErr(ftd, 'ftd'); checkErr(pvp, 'pvp'); checkErr(met, 'met');
         checkErr(nl, 'nl'); checkErr(fp, 'fp'); checkErr(pb, 'pb'); checkErr(poc, 'poc');
         checkErr(pt, 'pt'); checkErr(pl, 'pl'); checkErr(ads, 'ads'); checkErr(mc, 'mc');
-        checkErr(sm, 'sm'); checkErr(wwyd, 'wwyd'); checkErr(mcbot, 'mcbot'); checkErr(bvl, 'bvl'); checkErr(acm, 'acm'); checkErr(wai, 'wai');
+        checkErr(sm, 'sm'); checkErr(wwyd, 'wwyd'); checkErr(mcbot, 'mcbot'); checkErr(bvl, 'bvl'); checkErr(acm, 'acm'); checkErr(wai, 'wai'); checkErr(finalSub, 'finalSub');
 
         // Build access_code → cohort lookup from BOTH access_codes and test_access_codes
         codeToCohorMap = {};
@@ -5189,8 +5243,9 @@
         bvlData = bvl ? (bvl.data || []) : [];
         acmData = acm ? (acm.data || []) : [];
         waiData = wai ? (wai.data || []) : [];
+        finalSubData = finalSub ? (finalSub.data || []) : [];
 
-        console.log(`Loaded: ${hwData.length} hw, ${examData.length} exam, ${codesData.length} codes, ${saData.length} SA, ${shData.length} SH, ${cbData.length} CB, ${cpData.length} CP, ${pdData.length} PD, ${wsData.length} WS, ${apData.length} AP, ${pcData.length} PC, ${mgData.length} MG, ${isData.length} IS, ${tmData.length} TM, ${btaData.length} BTA, ${ayfData.length} AYF, ${dsrData.length} DSR, ${kcData.length} KC, ${stbData.length} STB, ${daData.length} DA, ${bdData.length} BD, ${ddData.length} DD, ${bctData.length} BCT, ${bdsData.length} BDS, ${ftdData.length} FTD, ${pvpData.length} PVP, ${metData.length} MET, ${nlData.length} NL, ${fpData.length} FP, ${pbData.length} PB, ${pocData.length} POC, ${ptData.length} PT, ${plData.length} PL, ${adsData.length} ADS, ${mcData.length} MC, ${smData.length} SM, ${wwydData.length} WWYD, ${mcbotData.length} MCBOT, ${bvlData.length} BVL, ${acmData.length} ACM, ${waiData.length} WAI rows`);
+        console.log(`Loaded: ${hwData.length} hw, ${examData.length} exam, ${codesData.length} codes, ${saData.length} SA, ${shData.length} SH, ${cbData.length} CB, ${cpData.length} CP, ${pdData.length} PD, ${wsData.length} WS, ${apData.length} AP, ${pcData.length} PC, ${mgData.length} MG, ${isData.length} IS, ${tmData.length} TM, ${btaData.length} BTA, ${ayfData.length} AYF, ${dsrData.length} DSR, ${kcData.length} KC, ${stbData.length} STB, ${daData.length} DA, ${bdData.length} BD, ${ddData.length} DD, ${bctData.length} BCT, ${bdsData.length} BDS, ${ftdData.length} FTD, ${pvpData.length} PVP, ${metData.length} MET, ${nlData.length} NL, ${fpData.length} FP, ${pbData.length} PB, ${pocData.length} POC, ${ptData.length} PT, ${plData.length} PL, ${adsData.length} ADS, ${mcData.length} MC, ${smData.length} SM, ${wwydData.length} WWYD, ${mcbotData.length} MCBOT, ${bvlData.length} BVL, ${acmData.length} ACM, ${waiData.length} WAI, ${finalSubData.length} finalSub rows`);
 
         populateFilters();
         renderOverview();
@@ -5237,6 +5292,7 @@
         renderBVLPage();
         renderACMPage();
         renderWAIPage();
+        renderFinalSubPage();
         await loadCohortExercises();
         renderExerciseControls();
         populateStudentAnalyzerSelect();
@@ -6241,6 +6297,9 @@
       } else if (type === 'wai') {
         r = waiData.find(x => String(x.id) === String(id));
         title = (r?.student_name || "Detail View") + " — “Will AI Take This Job?” Detail";
+      } else if (type === 'finalSub') {
+        r = finalSubData.find(x => String(x.id) === String(id));
+        title = (r?.student_name || "Detail View") + " — Final Project & Presentation Submission Detail";
       }
 
       if (!r) return;
@@ -7107,6 +7166,46 @@
               <div style="font-size:10px; color:#334155; margin-top:2px;"><strong>Human:</strong> ${esc(r.job3_human_required_tasks || '—')}</div>
             </div>
           </div>
+      } else if (type === 'finalSub') {
+        bodyHtml = `
+          <div style="padding:14px; background:#faf5ff; border-radius:12px; border:1px solid #f0abfc; margin-bottom:16px;">
+            <div style="font-size:12px; font-weight:700; color:#86198f; text-transform:uppercase;">Final Project &amp; Presentation Submission</div>
+            <div style="font-size:14px; font-weight:800; color:#4c1d95; margin-top:4px;">Student: ${esc(r.student_name)} (${esc(r.student_email)})</div>
+            <div style="font-size:12px; color:#86198f; margin-top:2px;">Enjoyment Rating: ${r.enjoyment_rating || 0}/5 ⭐ | Submitted: ${fmtDate(r.submitted_at)}</div>
+          </div>
+
+          <div style="margin-bottom:12px;">
+            <span style="font-size:11px; font-weight:800; color:#475569; text-transform:uppercase; display:block;">Project Title &amp; Team</span>
+            <div style="font-size:14px; font-weight:800; color:#0f172a; margin-top:2px;">${esc(r.project_title)} <span style="font-size:11px; color:#64748b; font-weight:500;">(Team: ${esc(r.team_members || 'Solo')})</span></div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:16px;">
+            <div style="padding:10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px;">
+              <div style="font-size:11px; font-weight:800; color:#475569; margin-bottom:4px;">Presentation Link (Deck / Slides)</div>
+              ${r.presentation_link ? `<a href="${esc(r.presentation_link)}" target="_blank" style="color:#c026d3; font-family:monospace; font-weight:700; word-break:break-all;">${esc(r.presentation_link)} ↗</a>` : '<span style="color:#94a3b8;">Not provided</span>'}
+            </div>
+            <div style="padding:10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px;">
+              <div style="font-size:11px; font-weight:800; color:#475569; margin-bottom:4px;">Final Project Link (Live Demo / Repo / Model)</div>
+              ${r.project_link ? `<a href="${esc(r.project_link)}" target="_blank" style="color:#7e22ce; font-family:monospace; font-weight:700; word-break:break-all;">${esc(r.project_link)} ↗</a>` : '<span style="color:#94a3b8;">None provided</span>'}
+            </div>
+          </div>
+
+          <div style="margin-bottom:12px;">
+            <span style="font-size:11px; font-weight:800; color:#475569; text-transform:uppercase; display:block;">Project Overview &amp; AI Tools Used</span>
+            <div style="font-size:12px; color:#1e293b; margin-top:3px; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0; white-space:pre-wrap;">${esc(r.project_summary || '—')}</div>
+          </div>
+
+          <div style="margin-bottom:12px;">
+            <span style="font-size:11px; font-weight:800; color:#475569; text-transform:uppercase; display:block;">Biggest Key Learning / AI Insight</span>
+            <div style="font-size:12px; color:#1e293b; margin-top:3px; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0; white-space:pre-wrap;">${esc(r.key_learnings || '—')}</div>
+          </div>
+
+          <div style="margin-bottom:12px;">
+            <span style="font-size:11px; font-weight:800; color:#475569; text-transform:uppercase; display:block;">Proudest Accomplishment or Challenge Overcome</span>
+            <div style="font-size:12px; color:#1e293b; margin-top:3px; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0; white-space:pre-wrap;">${esc(r.proudest_accomplishment || '—')}</div>
+          </div>
+        `;
+      }
 
           <div class="field-label" style="margin-top:12px;">🏆 10-Year Change Ranking</div>
           <div class="field-value" style="display:flex; gap:12px; flex-wrap:wrap;">
@@ -10712,6 +10811,73 @@
     </table>`;
     }
 
+    function renderFinalSubPage() {
+      if (!finalSubData) return;
+      document.getElementById('finalSub-stat-count').textContent = finalSubData.length;
+      const avg = finalSubData.length ? (finalSubData.reduce((s, r) => s + (parseInt(r.enjoyment_rating) || 0), 0) / finalSubData.length).toFixed(1) : '—';
+      document.getElementById('finalSub-stat-enjoy').textContent = avg !== '—' ? avg + ' / 5' : '—';
+      renderFinalSubTable();
+    }
+
+    function renderFinalSubTable() {
+      const search = (document.getElementById('finalSub-search')?.value || '').toLowerCase();
+      let rows = finalSubData.filter(r =>
+        !search ||
+        (r.student_name || '').toLowerCase().includes(search) ||
+        (r.student_email || '').toLowerCase().includes(search) ||
+        (r.project_title || '').toLowerCase().includes(search) ||
+        (r.project_summary || '').toLowerCase().includes(search) ||
+        (r.key_learnings || '').toLowerCase().includes(search)
+      );
+
+      document.getElementById('finalSub-count').textContent = rows.length + ' response' + (rows.length !== 1 ? 's' : '');
+      if (!rows.length) {
+        document.getElementById('finalSub-table-wrap').innerHTML = '<div class="empty-state"><p>No matching Final Submissions found.</p></div>';
+        return;
+      }
+
+      function starRating(v) {
+        if (!v) return '<span style="color:var(--gray)">—</span>';
+        const stars = '★'.repeat(v) + '☆'.repeat(5 - v);
+        const col = v >= 4 ? '#059669' : v >= 3 ? '#d97706' : '#dc2626';
+        return `<span style="color:${col};font-size:14px">${stars}</span>`;
+      }
+
+      document.getElementById('finalSub-table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead><tr>
+        <th>Student</th>
+        <th>Project Title</th>
+        <th>Team</th>
+        <th>Presentation Link</th>
+        <th>Project Link</th>
+        <th>Enjoyment</th>
+        <th>Submitted</th>
+        <th>Actions</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `
+        <tr class="clickable-row" onclick="showSubmissionDetail('finalSub', ${r.id})">
+          <td><strong>${esc(r.student_name)}</strong><br><span style="font-size:10px;color:var(--gray)">${esc(r.student_email)}</span></td>
+          <td><strong>${esc(r.project_title)}</strong></td>
+          <td><span class="badge badge-gray">${esc(r.team_members || 'Solo')}</span></td>
+          <td>
+            ${r.presentation_link ? `<a href="${esc(r.presentation_link)}" target="_blank" class="badge badge-indigo" onclick="event.stopPropagation()">Slides ↗</a>` : '<span style="color:var(--gray)">—</span>'}
+          </td>
+          <td>
+            ${r.project_link ? `<a href="${esc(r.project_link)}" target="_blank" class="badge badge-teal" onclick="event.stopPropagation()">Demo ↗</a>` : '<span style="color:var(--gray)">N/A</span>'}
+          </td>
+          <td>${starRating(r.enjoyment_rating)}</td>
+          <td style="font-size:11px;color:var(--gray)">${fmtDate(r.submitted_at)}</td>
+          <td style="white-space:nowrap">
+            <button class="btn btn-secondary" style="padding:4px 8px;font-size:11px" onclick="event.stopPropagation();showSubmissionDetail('finalSub', ${r.id})">View</button>
+            <button class="btn btn-danger" style="padding:4px 8px;font-size:11px;margin-left:4px" onclick="event.stopPropagation();deleteSubmission('finalSub', ${r.id}, finalSubData, renderFinalSubPage)">Delete</button>
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+    }
+
     // ════════════════════════════════════════════════════════════════════════════
     // COHORT EXERCISE CONTROLS & VISIBILITY MANAGEMENT
     // ════════════════════════════════════════════════════════════════════════════
@@ -10763,7 +10929,8 @@
       { id: 'week12_mini_chatbot', title: 'Build Your Own Mini-Chatbot (Python IDE)', week: 12, category: 'Chatbot Programming', page: 'week12_mini_chatbot.html' },
       { id: 'week12_bot_vs_llm', title: 'Rule-Based Bot vs. LLM Chatbot', week: 12, category: 'Chatbot Programming', page: 'week12_bot_vs_llm.html' },
       { id: 'week13_ai_career_mapping', title: 'AI Career Mapping', week: 13, category: 'AI Career Mapping', page: 'week13_ai_career_mapping.html' },
-      { id: 'week13_will_ai_take_this_job', title: '“Will AI Take This Job?” Analysis', week: 13, category: 'AI Career Mapping', page: 'week13_will_ai_take_this_job.html' }
+      { id: 'week13_will_ai_take_this_job', title: '“Will AI Take This Job?” Analysis', week: 13, category: 'AI Career Mapping', page: 'week13_will_ai_take_this_job.html' },
+      { id: 'week16_final_submission', title: 'Final Project & Presentation Submission', week: 16, category: 'Final Showcase', page: 'week16_final_submission.html' }
     ];
 
     let currentControlCohort = 'aijr';
@@ -10981,6 +11148,7 @@
       { key: 'bvl', title: 'Bot vs LLM Chatbot', week: 12, dataRef: () => bvlData },
       { key: 'acm', title: 'AI Career Mapping', week: 13, dataRef: () => acmData },
       { key: 'wai', title: 'Will AI Take This Job?', week: 13, dataRef: () => waiData },
+      { key: 'finalSub', title: 'Final Project & Presentation Submission', week: 16, dataRef: () => finalSubData },
       { key: 'hw', title: 'Weekly Homework Quiz', week: 0, dataRef: () => hwData },
       { key: 'exam', title: 'Midterm / Final Exam', week: 0, dataRef: () => examData }
     ];
