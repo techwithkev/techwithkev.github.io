@@ -48,20 +48,6 @@ These are placeholder values in the code that need real IDs before the funnel is
   Cons: 7 files with live student-facing forms and zero test coverage — needs individual verification per file, not a blind find-replace.
   Context: Found during the pages/ architecture review (introai/aijr) and its outside-voice cross-check (python/). `week13_ai_career_mapping.html` and `week13_will_ai_take_this_job.html` were also fixed for the separate Tailwind-CDN violation in this same pass (see commit history) — worth doing this migration in the same follow-up session since both are the same two "newest, least-conformant" pages.
 
-- [ ] **Add `pages/python/` to ARCHITECTURE.md's page-category system.**
-  What: ARCHITECTURE.md §1 defines only Category A (marketing), B (`pages/introai/`, `pages/aijr/`), and C (`pages/teacher/`) — `pages/python/` (2 pages: `python_functions.html`, `python_conditionals_loops.html`) isn't mentioned anywhere in the doc, so there's no documented standard to check it against (found when the outside-voice cross-check pointed out the architecture review never sampled this folder).
-  Why: Undocumented categories are exactly how drift like the raw-key duplication above happens unnoticed — there's no checklist to violate if the folder isn't in the doc.
-  Pros: Closes the doc-coverage gap; both files already independently follow most of Category B's conventions (compiled CSS, no CDN Tailwind) so this is likely just formalizing existing practice, not inventing new rules.
-  Cons: None significant — this is a documentation-only change.
-  Context: Found via outside-voice cross-check during the pages/ architecture review. Likely the simplest fix in this whole list — probably just add `pages/python/` as a Category B subfolder (or a lightweight Category D) in ARCHITECTURE.md §1's table.
-
-- [ ] **Review `introai_cohort_exercises`'s `FOR ALL TO anon` policy.**
-  What: `sql/exercises/create_introai_cohort_exercises.sql:29-30` grants anon `FOR ALL` (not just INSERT/SELECT/UPDATE) on `introai_cohort_exercises`, the same anti-pattern just fixed on the 36 exercise-submission tables — but this table stores cohort exercise active/inactive toggles, not student submissions, so the blast radius (anyone can toggle which exercises are active) is much smaller than the DELETE-all-student-data risk just closed.
-  Why: Same root pattern (`FOR ALL TO anon`) the rest of this review closed everywhere else it was found — left open here only because it's out of scope for the specific 36-table fix and lower severity.
-  Pros: Consistent RLS posture across the whole schema.
-  Cons: Genuinely low severity (config toggle, not student data) — may not be worth a dedicated pass on its own.
-  Context: Noticed while auditing sql/ for other instances of the just-fixed anti-pattern; not independently investigated for what breaks if scoped down (unlike the 36 tables, which were checked against actual page write patterns first).
-
 - [ ] **Add cohort-scoped server-side filtering to `teacher_dashboard.html`'s `loadAll()`.**
   What: `loadAll()` fires 44 parallel Supabase queries (`teacher_dashboard.html:4974-5018`), each `.select('*')...limit(10000)` with no server-side filter — the entire database loads into the browser on every page load/refresh, then gets filtered to the selected cohort client-side in JS. Add `.eq()`/`.in()` filters scoped to the selected cohort at the query level.
   Why: Not urgent at current scale (properly parallelized via `Promise.all`, not sequential N+1) but doesn't scale — every added cohort/table grows every future load, and there's no caching between manual refreshes.

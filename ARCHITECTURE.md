@@ -10,14 +10,14 @@ The codebase is divided into **three distinct page categories**, each with defin
 
 ```
 techwithkev.github.io/
-├── index.md, courses.md, pricing.md      ── Category A: Jekyll Marketing Site
-├── pages/introai/, pages/aijr/           ── Category B: Interactive Student Activity Pages
-└── pages/teacher/                        ── Category C: Teacher Dashboards & Tools
+├── index.md, courses.md, pricing.md          ── Category A: Jekyll Marketing Site
+├── pages/introai/, pages/aijr/, pages/python/ ── Category B: Interactive Student Activity Pages
+└── pages/teacher/                            ── Category C: Teacher Dashboards & Tools
 ```
 
 | Property | Category A: Marketing Site | Category B: Student Activity Pages | Category C: Teacher Dashboards |
 |---|---|---|---|
-| **Location** | Root (`/*.md`, `/_layouts/`) | `pages/introai/*.html`, `pages/aijr/*.html` | `pages/teacher/*.html` |
+| **Location** | Root (`/*.md`, `/_layouts/`) | `pages/introai/*.html`, `pages/aijr/*.html`, `pages/python/*.html` | `pages/teacher/*.html` |
 | **Engine** | Jekyll (`_layouts/default.html`) | Standalone HTML5 Pages | Standalone HTML5 Pages |
 | **CSS Source** | `assets/css/main.css` | `assets/css/activity.css` (Tailwind CLI) | `assets/css/activity.css` (Tailwind CLI) |
 | **Primary Font** | Space Grotesk / Inter | Outfit / JetBrains Mono | DM Sans / DM Mono / Outfit |
@@ -34,7 +34,7 @@ techwithkev.github.io/
 - **CSS / JS:** Managed by Jekyll compilation from `assets/css/main.scss`. Do **not** link `activity.css` or Tailwind CDN directly in marketing pages.
 
 ### Category B: Student Activity Pages
-- **File Format:** Standalone HTML files in `pages/introai/` or `pages/aijr/`.
+- **File Format:** Standalone HTML files in `pages/introai/`, `pages/aijr/`, or `pages/python/`.
 - **Styling:** Compiled CSS (`../../assets/css/activity.css`). **NEVER load `https://cdn.tailwindcss.com`**.
 - **Shared Utilities:** Standard import `../../assets/js/introai-shared.js`.
 - **Navigation:** Header must include a back-link to the course hub (`index.html`) or home site.
@@ -43,7 +43,7 @@ techwithkev.github.io/
 
 ## 3. Standardized Activity Page Boilerplate
 
-All new student activity pages (`pages/introai/` or `pages/aijr/`) **MUST** use this exact `<head>` and script import structure:
+All new student activity pages (`pages/introai/`, `pages/aijr/`, or `pages/python/`) **MUST** use this exact `<head>` and script import structure:
 
 ```html
 <!DOCTYPE html>

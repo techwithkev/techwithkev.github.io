@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Final Project & Presentation Submission — Intro to AI · Week 16</title>
+  <meta name="description"
+    content="Week 16 Showcase: Final Project & Presentation Submission for Introduction to AI. Store links to your presentation deck, final project demo, and reflections.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/activity.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    #registration-overlay { transition: opacity 0.4s ease; }
+    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
+    #registration-overlay .reg-card {
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
+    }
+    #registration-overlay.hiding .reg-card {
+      transform: scale(0.95) translateY(-10px); opacity: 0;
+    }
+    .reg-input:focus {
+      outline: none; border-color: #c026d3;
+      box-shadow: 0 0 0 3px rgba(192, 38, 211, 0.15);
+    }
+    .reg-input.error {
+      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+    }
+    .form-input:focus {
+      outline: none; border-color: #c026d3;
+      box-shadow: 0 0 0 3px rgba(192, 38, 211, 0.15);
+    }
+    .form-input.error { border-color: #ef4444; }
+    .star-btn {
+      font-size: 28px;
+      cursor: pointer;
+      filter: grayscale(100%);
+      transition: filter 0.15s ease, transform 0.1s ease;
+    }
+    .star-btn:hover { transform: scale(1.2); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body class="bg-[#FAF5FF] text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- REGISTRATION & RETRIEVAL GATE -->
+  <div id="registration-overlay"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+    style="background: linear-gradient(135deg, #4c1d95 0%, #a21caf 55%, #701a75 100%);">
+
+    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
+        style="background: radial-gradient(circle, #f0abfc, transparent);"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
+        style="background: radial-gradient(circle, #c026d3, transparent);"></div>
+    </div>
+
+    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-9 max-h-[90vh] overflow-y-auto">
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 mx-auto rounded-2xl mb-3 flex items-center justify-center bg-fuchsia-100 text-fuchsia-600 shadow-sm">
+          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0v6" />
+          </svg>
+        </div>
+        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-1.5 bg-fuchsia-100 text-fuchsia-800">
+          Week 16 · Grand Showcase
+        </div>
+        <h1 class="text-2xl font-black text-gray-900 tracking-tight">Final Project &amp; <span class="text-fuchsia-600">Presentation Submission</span></h1>
+        <p class="text-xs text-gray-500 mt-1 leading-relaxed">Enter your registered student name and email address to submit your final project &amp; slides.</p>
+      </div>
+
+      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
+        <div class="space-y-4 mb-6">
+          <div>
+            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Full Name</label>
+            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Alex Morgan"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name.</p>
+          </div>
+          <div>
+            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
+            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. alex@school.edu"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email address.</p>
+          </div>
+        </div>
+        <button id="reg-submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-700 hover:to-purple-700">
+          <span id="reg-btn-label">Begin Final Submission &#8594;</span>
+        </button>
+      </form>
+      <p class="text-center text-[10px] text-gray-400 font-medium mt-5">Stored securely in the Intro to AI student repository.</p>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main-content" class="max-w-3xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <!-- Navigation & Header -->
+    <header class="mb-8 border-b border-fuchsia-200 pb-6">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
+        <div>
+          <a href="index.html"
+            class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-fuchsia-600 mb-3 hover:text-fuchsia-800 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            Back to Course Hub
+          </a>
+          <h1 class="text-3xl md:text-4xl font-black tracking-tight text-gray-900">
+            Final Project &amp; <span class="text-fuchsia-600">Presentation Submission 🎓🚀</span>
+          </h1>
+          <p class="text-gray-500 font-medium text-sm mt-1">Introduction to AI · Week 16 Showcase &amp; Presentation Link Registry</p>
+        </div>
+        <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-fuchsia-100 border border-fuchsia-200 text-fuchsia-800 shadow-sm self-start md:self-auto flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-fuchsia-500 animate-pulse"></span>
+          Week 16 Showcase
+        </div>
+      </div>
+    </header>
+
+    <!-- Showcase Overview Brief Card -->
+    <div class="rounded-3xl p-6 md:p-7 mb-8 border bg-gradient-to-r from-purple-900 via-fuchsia-900 to-purple-950 text-white shadow-xl border-fuchsia-700/40">
+      <div class="flex items-start gap-4">
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 bg-fuchsia-500/30 border border-fuchsia-400/40 text-fuchsia-200 shadow-inner">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="px-2.5 py-0.5 rounded-full bg-fuchsia-500/20 text-fuchsia-300 border border-fuchsia-400/30 text-[10px] font-black uppercase tracking-widest">
+              Class 16 Final Checklist
+            </span>
+          </div>
+          <h2 class="text-xl font-black text-white mb-2">Welcome to the Final Showcase! 🎉</h2>
+          <p class="text-xs text-fuchsia-100/90 leading-relaxed mb-4">
+            Congratulations on reaching Week 16! Use this form to submit your presentation slides and your final project link (if applicable) so your instructor and classmates can review your work.
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+            <div class="bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/10 flex items-center gap-2.5">
+              <span class="text-base">📊</span>
+              <div>
+                <strong class="block text-white text-[11px]">1. Presentation Link</strong>
+                <span class="text-[10px] text-fuchsia-200">Google Slides / Canva / PDF</span>
+              </div>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/10 flex items-center gap-2.5">
+              <span class="text-base">🚀</span>
+              <div>
+                <strong class="block text-white text-[11px]">2. Final Project Link</strong>
+                <span class="text-[10px] text-fuchsia-200">Live Demo / Repo / Model (Optional)</span>
+              </div>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/10 flex items-center gap-2.5">
+              <span class="text-base">💡</span>
+              <div>
+                <strong class="block text-white text-[11px]">3. Key Reflection</strong>
+                <span class="text-[10px] text-fuchsia-200">Project Overview &amp; Learnings</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN SUBMISSION FORM -->
+    <form id="final_submission-form" onsubmit="submitExercise(event)" novalidate>
+
+      <!-- Section 1: Project Identity -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-6 border-b border-gray-100 pb-4">
+          <div class="w-9 h-9 rounded-xl text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-fuchsia-600 shadow-sm">1</div>
+          <div>
+            <h2 class="text-base font-black text-gray-900">Project Information</h2>
+            <p class="text-xs text-gray-500">Provide your project title and team details.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label for="project-title" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              Project Title <span class="text-red-500">*</span>
+            </label>
+            <input id="project-title" type="text" placeholder="e.g. AI Homework Helper &amp; Tutor Bot"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="project-title-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your project title.</p>
+          </div>
+          <div>
+            <label for="team-members" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              Team Members / Collaborators
+              <span class="text-gray-400 font-normal lowercase">(optional)</span>
+            </label>
+            <input id="team-members" type="text" placeholder="e.g. Solo project or Alex M., Sam K."
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Links (Presentation & Final Project) -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-6 border-b border-gray-100 pb-4">
+          <div class="w-9 h-9 rounded-xl text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-fuchsia-600 shadow-sm">2</div>
+          <div>
+            <h2 class="text-base font-black text-gray-900">Project Links</h2>
+            <p class="text-xs text-gray-500">Store your presentation slides and final project demo URLs.</p>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <!-- Presentation Link (Required) -->
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label for="presentation-link" class="block text-xs font-black uppercase tracking-widest text-gray-700 flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-fuchsia-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12H4z" />
+                </svg>
+                Presentation Link <span class="text-red-500">*</span>
+              </label>
+              <span class="text-[11px] font-medium text-fuchsia-600 bg-fuchsia-50 px-2.5 py-0.5 rounded-full border border-fuchsia-100">
+                Google Slides / Canva / Pitch Deck / PDF
+              </span>
+            </div>
+            <div class="relative">
+              <input id="presentation-link" type="url" placeholder="https://docs.google.com/presentation/d/..."
+                oninput="updatePreviewBtn('presentation-link', 'pres-preview-btn')"
+                class="form-input w-full px-4 py-3 pr-28 rounded-xl border border-gray-200 bg-gray-50 text-sm font-mono text-gray-900 placeholder-gray-400 transition-all" required />
+              <a id="pres-preview-btn" href="#" target="_blank"
+                class="hidden absolute right-2 top-2 px-3 py-1.5 bg-fuchsia-600 text-white rounded-lg text-xs font-bold hover:bg-fuchsia-700 transition-all shadow-sm flex items-center gap-1">
+                Test Link ↗
+              </a>
+            </div>
+            <p id="presentation-link-error" class="hidden text-xs text-red-500 font-medium mt-1">Please provide a valid URL starting with http:// or https://</p>
+            <p class="text-[11px] text-gray-400 mt-1.5">Make sure link sharing permissions are set to "Anyone with the link can view".</p>
+          </div>
+
+          <!-- Final Project Link (Optional / If Applicable) -->
+          <div class="pt-4 border-t border-gray-100">
+            <div class="flex items-center justify-between mb-1.5">
+              <label for="project-link" class="block text-xs font-black uppercase tracking-widest text-gray-700 flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                Final Project Link
+                <span class="text-gray-400 font-normal lowercase">(if applicable)</span>
+              </label>
+              <span class="text-[11px] font-medium text-purple-700 bg-purple-50 px-2.5 py-0.5 rounded-full border border-purple-100">
+                Live App / Model / Repo / Figma / Video
+              </span>
+            </div>
+            <div class="relative">
+              <input id="project-link" type="url" placeholder="https://my-ai-app.vercel.app or https://teachablemachine.withgoogle.com/models/..."
+                oninput="updatePreviewBtn('project-link', 'proj-preview-btn')"
+                class="form-input w-full px-4 py-3 pr-28 rounded-xl border border-gray-200 bg-gray-50 text-sm font-mono text-gray-900 placeholder-gray-400 transition-all" />
+              <a id="proj-preview-btn" href="#" target="_blank"
+                class="hidden absolute right-2 top-2 px-3 py-1.5 bg-purple-600 text-white rounded-lg text-xs font-bold hover:bg-purple-700 transition-all shadow-sm flex items-center gap-1">
+                Test Link ↗
+              </a>
+            </div>
+            <p id="project-link-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid URL starting with http:// or https://</p>
+            <p class="text-[11px] text-gray-400 mt-1.5">Optional: If your project has a working web app, Teachable Machine model link, GitHub repository, Figma prototype, or video demo, paste it here.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Reflection & Summary -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-6 border-b border-gray-100 pb-4">
+          <div class="w-9 h-9 rounded-xl text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-fuchsia-600 shadow-sm">3</div>
+          <div>
+            <h2 class="text-base font-black text-gray-900">Project Reflection &amp; Overview</h2>
+            <p class="text-xs text-gray-500">Reflect on your project journey and key takeaways.</p>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <!-- Project Summary -->
+          <div>
+            <label for="project-summary" class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-1.5">
+              Project Overview &amp; AI Tools Used <span class="text-red-500">*</span>
+            </label>
+            <textarea id="project-summary" rows="3"
+              placeholder="Briefly describe what your final AI project is, what problem it addresses, and which AI models/tools (e.g. ChatGPT, Teachable Machine, Midjourney, Claude API, HuggingFace) you utilized…"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="project-summary-error" class="hidden text-xs text-red-500 font-medium mt-1">Please provide a brief project summary.</p>
+          </div>
+
+          <!-- Key Learnings -->
+          <div>
+            <label for="key-learnings" class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-1.5">
+              Biggest Key Learning or AI Insight <span class="text-red-500">*</span>
+            </label>
+            <textarea id="key-learnings" rows="3"
+              placeholder="What is the single biggest concept, technical skill, or ethical principle you learned during this course and project?"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="key-learnings-error" class="hidden text-xs text-red-500 font-medium mt-1">Please share your biggest key learning.</p>
+          </div>
+
+          <!-- Proudest Accomplishment / Challenge Overcome -->
+          <div>
+            <label for="proudest-accomplishment" class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-1.5">
+              Proudest Accomplishment or Challenge Overcome <span class="text-red-500">*</span>
+            </label>
+            <textarea id="proudest-accomplishment" rows="3"
+              placeholder="What aspect of your project are you most proud of, or what tough obstacle did you troubleshoot and overcome?"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="proudest-accomplishment-error" class="hidden text-xs text-red-500 font-medium mt-1">Please answer what you are proud of or what challenge you solved.</p>
+          </div>
+
+          <!-- Enjoyment Rating -->
+          <div class="pt-4 border-t border-gray-100">
+            <label class="block text-xs font-black uppercase tracking-widest text-gray-700 mb-2">
+              Overall Course &amp; Project Experience Rating <span class="text-red-500">*</span>
+            </label>
+            <div class="flex items-center gap-2" id="enjoyment-stars" role="group" aria-label="Enjoyment rating">
+              <button type="button" class="star-btn" data-val="1" onclick="setRating(1)" aria-label="1 star">⭐</button>
+              <button type="button" class="star-btn" data-val="2" onclick="setRating(2)" aria-label="2 stars">⭐</button>
+              <button type="button" class="star-btn" data-val="3" onclick="setRating(3)" aria-label="3 stars">⭐</button>
+              <button type="button" class="star-btn" data-val="4" onclick="setRating(4)" aria-label="4 stars">⭐</button>
+              <button type="button" class="star-btn" data-val="5" onclick="setRating(5)" aria-label="5 stars">⭐</button>
+              <span id="rating-label" class="ml-3 text-xs font-bold text-gray-400">Click to rate</span>
+            </div>
+            <p id="rating-error" class="hidden text-xs text-red-500 font-medium mt-1">Please select a rating.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Box -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-12">
+        <p id="form-error" class="hidden text-sm font-medium text-red-500 mb-4 flex items-center gap-2 bg-red-50 p-3 rounded-xl border border-red-200">
+          <svg class="w-5 h-5 flex-shrink-0 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+          <span id="form-error-text">Please complete all required fields correctly.</span>
+        </p>
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-700 hover:to-purple-700">
+          <span id="submit-label">Submit Final Presentation &amp; Project Links 🎓&#8594;</span>
+        </button>
+        <p class="text-center text-xs text-gray-400 font-medium mt-3">Submissions will be displayed in the teacher dashboard.</p>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- SUCCESS SCREEN OVERLAY -->
+  <div id="success-screen"
+    class="hidden fixed inset-0 z-[90] bg-[#FAF5FF]/95 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="text-center max-w-lg w-full bg-white rounded-3xl shadow-2xl p-8 border border-fuchsia-100">
+      <div class="w-20 h-20 mx-auto rounded-2xl mb-6 flex items-center justify-center bg-fuchsia-100 text-fuchsia-600 shadow-inner">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <div class="inline-block px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 bg-fuchsia-100 text-fuchsia-800 border border-fuchsia-200">
+        Submission Confirmed! 🎉
+      </div>
+      <h2 class="text-3xl font-black text-gray-900 mb-2 tracking-tight">
+        Congratulations, <span id="success-name" class="text-fuchsia-600"></span>!
+      </h2>
+      <p class="text-gray-600 mb-6 leading-relaxed text-xs">
+        Your final presentation and project links have been successfully registered!
+      </p>
+
+      <!-- Submitted Summary Card -->
+      <div class="bg-gray-50 border border-gray-200 rounded-2xl p-4 mb-6 text-left text-xs space-y-2">
+        <div>
+          <span class="text-[10px] font-black uppercase text-gray-400 block">Project Title</span>
+          <strong id="summary-title" class="text-gray-900 font-bold text-sm">—</strong>
+        </div>
+        <div class="pt-2 border-t border-gray-200/60">
+          <span class="text-[10px] font-black uppercase text-gray-400 block">Presentation Link</span>
+          <a id="summary-pres-link" href="#" target="_blank" class="text-fuchsia-600 font-mono font-bold truncate block hover:underline">—</a>
+        </div>
+        <div id="summary-proj-box" class="pt-2 border-t border-gray-200/60">
+          <span class="text-[10px] font-black uppercase text-gray-400 block">Final Project Link</span>
+          <a id="summary-proj-link" href="#" target="_blank" class="text-purple-600 font-mono font-bold truncate block hover:underline">—</a>
+        </div>
+      </div>
+
+      <a href="index.html"
+        class="inline-flex items-center justify-center gap-2 text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-700 hover:to-purple-700 w-full">
+        Return to Course Hub
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+    const TABLE = 'introai_week16_final_submission';
+    const SESSION_KEY = 'introai_w16_final_submission';
+
+    let studentName = '', studentEmail = '';
+    let enjoymentRating = 0;
+
+    const ratingDescriptions = [
+      "Click to rate",
+      "1/5 — Needs work",
+      "2/5 — Fair",
+      "3/5 — Good",
+      "4/5 — Great experience!",
+      "5/5 — Outstanding & Inspiring! 🚀"
+    ];
+
+    function validateEmail(e) { return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(e.trim()); }
+    function validateUrl(u) { return /^https?:\/\/.+/i.test(u.trim()); }
+
+    function updatePreviewBtn(inputId, btnId) {
+      const input = document.getElementById(inputId);
+      const btn = document.getElementById(btnId);
+      const val = input.value.trim();
+      if (val && validateUrl(val)) {
+        btn.href = val;
+        btn.classList.remove('hidden');
+      } else {
+        btn.classList.add('hidden');
+      }
+    }
+
+    async function handleRegistration(ev) {
+      ev.preventDefault();
+      const nameEl = document.getElementById('reg-name');
+      const emailEl = document.getElementById('reg-email');
+      const nameErr = document.getElementById('reg-name-error');
+      const emailErr = document.getElementById('reg-email-error');
+      let ok = true;
+
+      nameEl.classList.remove('error'); nameErr.classList.add('hidden');
+      emailEl.classList.remove('error'); emailErr.classList.add('hidden');
+
+      if (!nameEl.value.trim()) { nameEl.classList.add('error'); nameErr.classList.remove('hidden'); ok = false; }
+      if (!emailEl.value.trim() || !validateEmail(emailEl.value)) { emailEl.classList.add('error'); emailErr.classList.remove('hidden'); ok = false; }
+      if (!ok) return;
+
+      const btn = document.getElementById('reg-submit-btn');
+      btn.disabled = true;
+      document.getElementById('reg-btn-label').innerHTML = '<span class="spinner"></span> Restoring session…';
+
+      studentName = nameEl.value.trim();
+      studentEmail = emailEl.value.trim();
+      sessionStorage.setItem(`${SESSION_KEY}_name`, studentName);
+      sessionStorage.setItem(`${SESSION_KEY}_email`, studentEmail);
+
+      const overlay = document.getElementById('registration-overlay');
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.remove(), 450);
+    }
+
+    (function restoreSession() {
+      const n = sessionStorage.getItem(`${SESSION_KEY}_name`);
+      const e = sessionStorage.getItem(`${SESSION_KEY}_email`);
+      if (n && e) {
+        studentName = n; studentEmail = e;
+        const overlay = document.getElementById('registration-overlay');
+        if (overlay) overlay.remove();
+      }
+    })();
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#enjoyment-stars .star-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx < val);
+      });
+      document.getElementById('rating-label').textContent = ratingDescriptions[val];
+      document.getElementById('rating-label').classList.remove('text-gray-400');
+      document.getElementById('rating-label').classList.add('text-fuchsia-700');
+      document.getElementById('rating-error').classList.add('hidden');
+    }
+
+    async function supabaseInsert(payload) {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!resp.ok) {
+        const text = await resp.text();
+        throw new Error(`HTTP ${resp.status}: ${text}`);
+      }
+    }
+
+    async function submitExercise(ev) {
+      ev.preventDefault();
+      let ok = true;
+
+      // 1. Project Title
+      const titleEl = document.getElementById('project-title');
+      const titleErr = document.getElementById('project-title-error');
+      const titleVal = titleEl.value.trim();
+      titleEl.classList.toggle('error', !titleVal);
+      titleErr.classList.toggle('hidden', !!titleVal);
+      if (!titleVal) ok = false;
+
+      // 2. Presentation Link (Required URL)
+      const presLinkEl = document.getElementById('presentation-link');
+      const presLinkErr = document.getElementById('presentation-link-error');
+      const presLinkVal = presLinkEl.value.trim();
+      const validPresUrl = presLinkVal && validateUrl(presLinkVal);
+      presLinkEl.classList.toggle('error', !validPresUrl);
+      presLinkErr.classList.toggle('hidden', validPresUrl);
+      if (!validPresUrl) ok = false;
+
+      // 3. Project Link (Optional, but if filled must be URL)
+      const projLinkEl = document.getElementById('project-link');
+      const projLinkErr = document.getElementById('project-link-error');
+      const projLinkVal = projLinkEl.value.trim();
+      let validProjUrl = true;
+      if (projLinkVal) {
+        validProjUrl = validateUrl(projLinkVal);
+        projLinkEl.classList.toggle('error', !validProjUrl);
+        projLinkErr.classList.toggle('hidden', validProjUrl);
+        if (!validProjUrl) ok = false;
+      } else {
+        projLinkEl.classList.remove('error');
+        projLinkErr.classList.add('hidden');
+      }
+
+      // 4. Project Summary
+      const summaryEl = document.getElementById('project-summary');
+      const summaryErr = document.getElementById('project-summary-error');
+      const summaryVal = summaryEl.value.trim();
+      summaryEl.classList.toggle('error', !summaryVal);
+      summaryErr.classList.toggle('hidden', !!summaryVal);
+      if (!summaryVal) ok = false;
+
+      // 5. Key Learnings
+      const learningsEl = document.getElementById('key-learnings');
+      const learningsErr = document.getElementById('key-learnings-error');
+      const learningsVal = learningsEl.value.trim();
+      learningsEl.classList.toggle('error', !learningsVal);
+      learningsErr.classList.toggle('hidden', !!learningsVal);
+      if (!learningsVal) ok = false;
+
+      // 6. Proudest Accomplishment
+      const proudEl = document.getElementById('proudest-accomplishment');
+      const proudErr = document.getElementById('proudest-accomplishment-error');
+      const proudVal = proudEl.value.trim();
+      proudEl.classList.toggle('error', !proudVal);
+      proudErr.classList.toggle('hidden', !!proudVal);
+      if (!proudVal) ok = false;
+
+      // 7. Enjoyment Rating
+      if (enjoymentRating === 0) {
+        document.getElementById('rating-error').classList.remove('hidden');
+        ok = false;
+      }
+
+      if (!ok) {
+        document.getElementById('form-error-text').textContent = 'Please fix the highlighted fields before submitting.';
+        document.getElementById('form-error').classList.remove('hidden');
+        const firstError = document.querySelector('.error, [id$="-error"]:not(.hidden)');
+        if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      document.getElementById('form-error').classList.add('hidden');
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting Final Project Links…';
+
+      const payload = {
+        student_name:            studentName,
+        student_email:           studentEmail,
+        project_title:           titleVal,
+        team_members:            document.getElementById('team-members').value.trim() || 'Solo',
+        presentation_link:       presLinkVal,
+        project_link:            projLinkVal || null,
+        project_summary:         summaryVal,
+        key_learnings:           learningsVal,
+        proudest_accomplishment: proudVal,
+        enjoyment_rating:        enjoymentRating,
+        submitted_at:            new Date().toISOString(),
+      };
+
+      try {
+        await supabaseInsert(payload);
+
+        // Populate summary modal
+        document.getElementById('success-name').textContent = studentName.split(' ')[0];
+        document.getElementById('summary-title').textContent = titleVal;
+
+        const presLinkAnchor = document.getElementById('summary-pres-link');
+        presLinkAnchor.href = presLinkVal;
+        presLinkAnchor.textContent = presLinkVal;
+
+        const projBox = document.getElementById('summary-proj-box');
+        const projLinkAnchor = document.getElementById('summary-proj-link');
+        if (projLinkVal) {
+          projLinkAnchor.href = projLinkVal;
+          projLinkAnchor.textContent = projLinkVal;
+          projBox.classList.remove('hidden');
+        } else {
+          projBox.classList.add('hidden');
+        }
+
+        document.getElementById('success-screen').classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        console.error('[Week 16 Submission Error]:', err.message);
+        btn.disabled = false;
+        document.getElementById('submit-label').textContent = 'Submit Final Presentation & Project Links 🎓 →';
+
+        if (err.message.includes('409') || err.message.includes('duplicate key') || err.message.includes('uq_w16_final_submission_email')) {
+          document.getElementById('form-error-text').textContent = '⚠️ You have already submitted your Week 16 final links! Reach out to your instructor if you need to update them.';
+        } else {
+          document.getElementById('form-error-text').textContent = `⚠️ Submission failed: ${err.message}. Please check your connection and try again.`;
+        }
+        document.getElementById('form-error').classList.remove('hidden');
+      }
+    }
+  </script>
+
+</body>
+</html>

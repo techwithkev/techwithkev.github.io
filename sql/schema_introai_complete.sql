@@ -2133,9 +2133,8 @@ DROP POLICY IF EXISTS "auth_all_cohort_exercises" ON introai_cohort_exercises;
 CREATE POLICY "anon_select_cohort_exercises"
   ON introai_cohort_exercises FOR SELECT TO anon USING (true);
 
-CREATE POLICY "anon_all_cohort_exercises"
-  ON introai_cohort_exercises FOR ALL TO anon USING (true) WITH CHECK (true);
-
+-- Only authenticated teachers (via the teacher dashboard's login wall) manage toggles —
+-- anon never writes to this table, so no anon FOR ALL grant here (see TODOS.md history).
 CREATE POLICY "auth_all_cohort_exercises"
   ON introai_cohort_exercises FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
