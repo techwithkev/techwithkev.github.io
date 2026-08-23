@@ -5024,7 +5024,7 @@
     async function loadAll() {
       document.getElementById('last-refresh').textContent = 'Refreshing…';
       try {
-        const [hw, exam, codes, sa, sh, cb, cp, pd, ws, ap, pc, mg, isSwap, tm, bta, ayf, dsr, kc, stb, da, bd, dd, testSub, testCodes, bct, bds, ftd, pvp, met, caioOld, nl, fp, pb, poc, pt, pl, ads, mc, sm, wwyd, mcbot, bvl, acm, wai] = await Promise.all([
+        const [hw, exam, codes, sa, sh, cb, cp, pd, ws, ap, pc, mg, isSwap, tm, bta, ayf, dsr, kc, stb, da, bd, dd, testSub, testCodes, bct, bds, ftd, pvp, met, caioOld, nl, fp, pb, poc, pt, pl, ads, mc, sm, wwyd, mcbot, bvl, acm, wai, finalSub] = await Promise.all([
           sb.from('homework_submissions').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('caio_final_exam_results').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('access_codes').select('*').order('created_at', { ascending: false }).limit(10000),
