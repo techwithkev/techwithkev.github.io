@@ -7166,6 +7166,17 @@
               <div style="font-size:10px; color:#334155; margin-top:2px;"><strong>Human:</strong> ${esc(r.job3_human_required_tasks || '—')}</div>
             </div>
           </div>
+
+          <div class="field-label" style="margin-top:12px;">🏆 10-Year Change Ranking</div>
+          <div class="field-value" style="display:flex; gap:12px; flex-wrap:wrap;">
+            <span>🥇 <strong>Most Change:</strong> <span class="badge badge-indigo">${esc(r.rank_1_job || '—')}</span></span>
+            <span>🥈 <strong>Moderate:</strong> <span class="badge badge-indigo">${esc(r.rank_2_job || '—')}</span></span>
+            <span>🥉 <strong>Least Change:</strong> <span class="badge badge-indigo">${esc(r.rank_3_job || '—')}</span></span>
+          </div>
+
+          <div class="field-label" style="margin-top:12px; color:#3730a3;">💬 Ranking Defense Sentence</div>
+          <div class="field-value" style="background:#eef2ff; border-color:#c7d2fe; font-weight:600;">${esc(r.ranking_defense_sentence || '—')}</div>
+        `;
       } else if (type === 'finalSub') {
         bodyHtml = `
           <div style="padding:14px; background:#faf5ff; border-radius:12px; border:1px solid #f0abfc; margin-bottom:16px;">
@@ -7204,18 +7215,6 @@
             <span style="font-size:11px; font-weight:800; color:#475569; text-transform:uppercase; display:block;">Proudest Accomplishment or Challenge Overcome</span>
             <div style="font-size:12px; color:#1e293b; margin-top:3px; background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #e2e8f0; white-space:pre-wrap;">${esc(r.proudest_accomplishment || '—')}</div>
           </div>
-        `;
-      }
-
-          <div class="field-label" style="margin-top:12px;">🏆 10-Year Change Ranking</div>
-          <div class="field-value" style="display:flex; gap:12px; flex-wrap:wrap;">
-            <span>🥇 <strong>Most Change:</strong> <span class="badge badge-indigo">${esc(r.rank_1_job || '—')}</span></span>
-            <span>🥈 <strong>Moderate:</strong> <span class="badge badge-indigo">${esc(r.rank_2_job || '—')}</span></span>
-            <span>🥉 <strong>Least Change:</strong> <span class="badge badge-indigo">${esc(r.rank_3_job || '—')}</span></span>
-          </div>
-
-          <div class="field-label" style="margin-top:12px; color:#3730a3;">💬 Ranking Defense Sentence</div>
-          <div class="field-value" style="background:#eef2ff; border-color:#c7d2fe; font-weight:600;">${esc(r.ranking_defense_sentence || '—')}</div>
         `;
       }
 
