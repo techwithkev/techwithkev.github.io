@@ -150,7 +150,7 @@ Deno.serve(async (req) => {
 
     // ── Supabase service-role client (bypasses RLS for trusted writes) ───────
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const serviceKey = Deno.env.get('SUPABASE_SERVICE_KEY')!;
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? Deno.env.get('SUPABASE_SERVICE_KEY') ?? Deno.env.get('SUPABASE_ANON_KEY')!;
     const db = createClient(supabaseUrl, serviceKey, {
       auth: { persistSession: false },
     });
@@ -163,7 +163,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (codeErr || !codeRow) {
-      return new Response(JSON.stringify({ error: 'Invalid access code.' }), {
+      return new Response(JSON.stringify({ error: `Invalid access code: ${codeErr?.message || 'Code not found'}` }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -180,8 +180,8 @@ Deno.serve(async (req) => {
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-    if (codeRow.uses_count >= codeRow.max_uses) {
-      return new Response(JSON.stringify({ error: 'Access code has reached its use limit.' }), {
+    if (codeRow.uses_count > codeRow.max_uses) {
+      return new Response(JSON.stringify({ error: 'Access code has exceeded its use limit.' }), {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -248,7 +248,7 @@ Deno.serve(async (req) => {
       : await db.from(RESULTS_TABLE).insert(savePayload);
     if (insertErr) {
       console.error('Insert error:', insertErr);
-      return new Response(JSON.stringify({ error: 'Failed to save results. Please try again.' }), {
+      return new Response(JSON.stringify({ error: `Failed to save results: ${insertErr.message || JSON.stringify(insertErr)}` }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
