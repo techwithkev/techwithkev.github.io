@@ -158,7 +158,7 @@ Deno.serve(async (req) => {
     // ── Validate access code server-side ────────────────────────────────────
     const { data: codeRow, error: codeErr } = await db
       .from(ACCESS_TABLE)
-      .select('id, class_number, max_uses, uses_count, is_active')
+      .select('id, class_number, max_uses, uses_count, is_active, cohort')
       .eq('code', accessCode.toUpperCase())
       .single();
 
@@ -219,6 +219,8 @@ Deno.serve(async (req) => {
       q17_text: answers.q17_text,
       q18_text: answers.q18_text,
       q21_text: answers.q21_text,
+      // Cohort — taken from the DB row, not from the client, to prevent spoofing
+      cohort: codeRow.cohort ?? null,
     };
 
     // ── Save results ─────────────────────────────────────────────────────────

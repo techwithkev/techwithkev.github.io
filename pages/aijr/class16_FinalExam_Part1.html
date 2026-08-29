@@ -1737,6 +1737,7 @@
     /* ══ STATE ══ */
     let studentName = '';
     let validatedCode = '';
+    let validatedCohort = '';
     const answered = new Set();
 
     /* ══════════════════════════════════════════════════
@@ -1798,7 +1799,7 @@
       try {
         const { data, error } = await db
           .from(ACCESS_TABLE)
-          .select('id, class_number, max_uses, uses_count, is_active')
+          .select('id, class_number, max_uses, uses_count, is_active, cohort')
           .eq('code', code)
           .single();
 
@@ -1845,6 +1846,7 @@
         }
 
         validatedCode = code;
+        validatedCohort = data.cohort || '';
         inp.value = '';
         document.getElementById('access-gate').style.display = 'none';
         document.getElementById('cover').style.display = 'block';
@@ -1997,6 +1999,7 @@
           body: JSON.stringify({
             studentName,
             accessCode: validatedCode,
+            cohort: validatedCohort,
             examClass: EXAM_CLASS,
             answers,
           }),

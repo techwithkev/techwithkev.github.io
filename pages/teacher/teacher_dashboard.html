@@ -5153,11 +5153,13 @@
           created_at: c.created_at
         }));
 
-        // Normalize caio_final_exam_results (access code in access_codes table)
+        // Normalize caio_final_exam_results
+        // Prefer the stored cohort column (set by the Edge Function since 2026-08-29).
+        // Fall back to the codeToCohorMap lookup for rows submitted before the migration.
         const normalizedCaioFinal = (exam.data || []).map(r => ({
           id: r.id,
           student_name: r.student_name,
-          cohort: r.access_code ? (codeToCohorMap[(r.access_code || '').toUpperCase()] || '') : '',
+          cohort: r.cohort || (r.access_code ? (codeToCohorMap[(r.access_code || '').toUpperCase()] || '') : ''),
           test_id: 'Classes 1–7 Final Exam (Legacy)',
           access_code: r.access_code,
           mcq_score: r.mcq_score ?? 0,
