@@ -126,7 +126,7 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { studentName, accessCode, answers } = body;
+    const { studentName, accessCode, sessionId, answers } = body;
 
     // ── Basic input validation ───────────────────────────────────────────────
     if (!studentName || typeof studentName !== 'string' || studentName.trim().length < 2) {
@@ -221,10 +221,17 @@ Deno.serve(async (req) => {
       q21_text: answers.q21_text,
       // Cohort — taken from the DB row, not from the client, to prevent spoofing
       cohort: codeRow.cohort ?? null,
+      // Session tracking — session_id upsert key; started_at is intentionally
+      // omitted here so the value written at exam-start is preserved by Postgres.
+      session_id:   sessionId && /^[0-9a-f-]{36}$/i.test(sessionId) ? sessionId : null,
+      submitted_at: new Date().toISOString(),
     };
 
-    // ── Save results ─────────────────────────────────────────────────────────
-    const { error: insertErr } = await db.from(RESULTS_TABLE).insert(dbPayload);
+    // ── Save results (upsert on session_id so the start-time row is updated, not duplicated) ──
+    const { error: insertErr } = await db.from(RESULTS_TABLE).upsert(dbPayload, {
+      onConflict: 'session_id',
+      ignoreDuplicates: false,
+    });
     if (insertErr) {
       console.error('Insert error:', insertErr);
       return new Response(JSON.stringify({ error: 'Failed to save results. Please try again.' }), {

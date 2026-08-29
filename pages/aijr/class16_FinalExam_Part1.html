@@ -1738,6 +1738,7 @@
     let studentName = '';
     let validatedCode = '';
     let validatedCohort = '';
+    let sessionId = '';       // UUID generated at test start; upsert key for the Edge Function
     const answered = new Set();
 
     /* ══════════════════════════════════════════════════
@@ -1866,7 +1867,7 @@
     /* ══════════════════════════════════════════════════
        NAME GATE → START TEST
        ══════════════════════════════════════════════════ */
-    function startTest() {
+    async function startTest() {
       const inp = document.getElementById('sname');
       const err = document.getElementById('nerr');
       const nm = inp.value.trim();
@@ -1874,6 +1875,23 @@
         inp.classList.add('field-err'); err.style.display = 'block'; inp.focus(); return;
       }
       studentName = nm;
+
+      // Generate a session UUID and write a partial row so teachers can see
+      // who is actively taking the exam before they submit.
+      sessionId = crypto.randomUUID();
+      if (!SUPABASE_URL.includes('YOUR_PROJECT')) {
+        db.from('caio_final_exam_results').insert({
+          session_id:   sessionId,
+          student_name: studentName,
+          access_code:  validatedCode,
+          cohort:       validatedCohort || null,
+          class_number: EXAM_CLASS,
+          started_at:   new Date().toISOString(),
+        }).then(({ error }) => {
+          if (error) console.warn('Session row insert failed:', error.message);
+        });
+      }
+
       document.getElementById('cover').style.display = 'none';
       document.getElementById('test-area').style.display = 'block';
       document.getElementById('bname').textContent = studentName;
@@ -1999,8 +2017,9 @@
           body: JSON.stringify({
             studentName,
             accessCode: validatedCode,
-            cohort: validatedCohort,
-            examClass: EXAM_CLASS,
+            cohort:     validatedCohort,
+            sessionId,
+            examClass:  EXAM_CLASS,
             answers,
           }),
         });
