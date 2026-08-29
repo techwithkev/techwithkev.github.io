@@ -5982,8 +5982,27 @@
         });
 
       } catch (err) {
-        console.error('loadActiveNow error:', err);
-        list.innerHTML = '<span style="font-size:0.82rem;color:#ef4444;">Could not load active sessions.</span>';
+        // A 400 almost always means the migration hasn't been run yet —
+        // session_id / started_at columns don't exist. Show a friendly notice
+        // and stop polling so we don't spam Supabase with failing requests.
+        const isSchemaMissing = err?.code === 'PGRST200'
+          || (err?.message || '').toLowerCase().includes('column')
+          || (err?.details || '').toLowerCase().includes('column')
+          || String(err?.status || err?.code || '') === '400';
+
+        if (isSchemaMissing) {
+          stopActiveNowPolling();
+          list.innerHTML = `<span style="font-size:0.82rem;color:#6b7280;">
+            ⏳ <strong>Migration pending.</strong> Run
+            <code style="font-size:0.78rem;background:#f1f5f9;padding:1px 5px;border-radius:4px;">20260829_add_cohort_to_access_codes_and_results.sql</code>
+            in Supabase SQL editor to enable live monitoring.
+          </span>`;
+          count.textContent = '— migration needed';
+          badge.style.display = 'none';
+        } else {
+          console.error('loadActiveNow error:', err);
+          list.innerHTML = '<span style="font-size:0.82rem;color:#ef4444;">Could not load active sessions.</span>';
+        }
       }
     }
 
