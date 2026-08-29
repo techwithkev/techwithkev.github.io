@@ -1887,6 +1887,7 @@
           cohort:       validatedCohort || null,
           class_number: EXAM_CLASS,
           started_at:   new Date().toISOString(),
+          submitted_at: null,
         }).then(({ error }) => {
           if (error) console.warn('Session row insert failed:', error.message);
         });

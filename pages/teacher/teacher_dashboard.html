@@ -5186,7 +5186,7 @@
         // Filter to submitted rows only — in-progress sessions (started_at set, submitted_at null)
         // are intentionally excluded here; they appear only in the Active Now panel.
         const normalizedCaioFinal = (exam.data || [])
-          .filter(r => r.submitted_at)
+          .filter(r => r.auto_score !== null && r.auto_score !== undefined)
           .map(r => ({
           id: r.id,
           student_name: r.student_name,
@@ -5926,7 +5926,7 @@
           .from('caio_final_exam_results')
           .select('id, session_id, student_name, cohort, class_number, started_at')
           .eq('class_number', 16)
-          .is('submitted_at', null)
+          .is('auto_score', null)
           .gte('started_at', cutoff)
           .order('started_at', { ascending: true });
 
