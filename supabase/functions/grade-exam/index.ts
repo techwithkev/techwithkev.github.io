@@ -227,11 +227,25 @@ Deno.serve(async (req) => {
       submitted_at: new Date().toISOString(),
     };
 
-    // ── Save results (upsert on session_id so the start-time row is updated, not duplicated) ──
-    const { error: insertErr } = await db.from(RESULTS_TABLE).upsert(dbPayload, {
-      onConflict: 'session_id',
-      ignoreDuplicates: false,
-    });
+    // ── Save results ─────────────────────────────────────────────────────────
+    // Use upsert only when session_id is present (requires the migration to have
+    // run). Fall back to plain insert pre-migration so submissions always work.
+    const validSessionId = sessionId && /^[0-9a-f-]{36}$/i.test(sessionId)
+      ? sessionId
+      : null;
+
+    // Strip session_id / started_at from the payload if migration hasn't run yet
+    // (those columns won't exist and will cause a 500).
+    const savePayload = validSessionId
+      ? dbPayload  // includes session_id already set above
+      : (() => { const p = { ...dbPayload }; delete p.session_id; return p; })();
+
+    const { error: insertErr } = validSessionId
+      ? await db.from(RESULTS_TABLE).upsert(savePayload, {
+          onConflict: 'session_id',
+          ignoreDuplicates: false,
+        })
+      : await db.from(RESULTS_TABLE).insert(savePayload);
     if (insertErr) {
       console.error('Insert error:', insertErr);
       return new Response(JSON.stringify({ error: 'Failed to save results. Please try again.' }), {
