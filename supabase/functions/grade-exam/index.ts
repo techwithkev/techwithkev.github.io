@@ -13,28 +13,28 @@ const MCQ: Record<string, string> = {
 
 const BLANKS: Record<string, string[]> = {
   // Q16 — A* Search
-  q16_b1: ['0'],
-  q16_b2: ['heappop'],
-  q16_b3: ['h[neighbor]'],
-  q16_b4: ['heappush'],
-  q16_b5: ['node'],
+  q16_b1: ['0', '0.0', 'int(0)'],
+  q16_b2: ['heappop', 'heapq.heappop'],
+  q16_b3: ['h[neighbor]', 'h.get(neighbor)', 'h[neighbor_node]'],
+  q16_b4: ['heappush', 'heapq.heappush'],
+  q16_b5: ['node', 'current'],
   q16_b6: ['append'],
   // Q19 — k-Means
   q19_b1: ['cluster'],
-  q19_b2: ['3'],
-  q19_b3: ['fit'],
-  q19_b4: ['labels'],
-  q19_b5: ['inertia'],
-  q19_b6: ['labels'],
+  q19_b2: ['3', '3.0'],
+  q19_b3: ['fit', 'fit_predict'],
+  q19_b4: ['labels', 'labels_'],
+  q19_b5: ['inertia', 'inertia_'],
+  q19_b6: ['labels', 'km.labels_', 'labels_'],
   // Q20 — Q-learning
-  q20_b1: ['state'],
-  q20_b2: ['action'],
-  q20_b3: ['max'],
-  q20_b4: ['best_next'],
-  q20_b5: ['alpha'],
+  q20_b1: ['state', 's'],
+  q20_b2: ['action', 'a'],
+  q20_b3: ['max', 'amax', 'np.max', 'np.amax'],
+  q20_b4: ['best_next', 'max_next', 'np.max(q[next_state])', 'max(q[next_state])'],
+  q20_b5: ['alpha', 'lr', 'learning_rate'],
 };
 
-// Rubrics shown to students AFTER submission only
+// Rubrics shown to instructors in dashboard / audit
 const RUBRICS: Record<number, string> = {
   16: 'b1:0  b2:heappop  b3:h[neighbor]  b4:heappush  b5:node  b6:append',
   17: 'Centroid A=(3,2.67) · Centroid B=(9,7) · Inertia(A): dist²((1,2),(3,2.67))=4+0.449=4.449 · dist²((3,4),(3,2.67))=0+1.778=1.778 · dist²((5,2),(3,2.67))=4+0.449=4.449 · Total=10.67',
@@ -60,10 +60,11 @@ const EXAM_CLASS = 16;
 
 function matchBlank(id: string, val: string | undefined): boolean {
   if (!val) return false;
-  const n = val.toLowerCase().replace(/\s/g, '');
+  const n = val.toLowerCase().trim().replace(/['"]/g, '').replace(/\s/g, '');
+  if (!n) return false;
   return (BLANKS[id] || []).some((ans) => {
-    const an = ans.toLowerCase().replace(/\s/g, '');
-    return n === an || n.includes(an) || an.includes(n);
+    const an = ans.toLowerCase().trim().replace(/['"]/g, '').replace(/\s/g, '');
+    return n === an;
   });
 }
 
