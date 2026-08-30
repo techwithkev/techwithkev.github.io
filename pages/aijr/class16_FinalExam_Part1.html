@@ -2112,12 +2112,9 @@
           inner = `<div class="pill-row"><span class="pill mn">Submitted · pending instructor review</span></div>
         <div class="oe-ans">${esc(r.text || '(no answer)')}</div>`;
         }
-        // rubrics come from server — only available after submission
-        const rubricText = rubrics?.[q] || '';
         d.innerHTML = `<div class="rev-qn">Q${q} · ${r.type === 'blanks' ? 'Fill-in-blanks' : 'Open-ended / Calculation'} · 5 pts</div>
       <div class="rev-qt">${qLabels[q]}</div>
-      ${inner}
-      ${rubricText ? `<div class="rubric">📋 Marking guide: ${esc(rubricText)}</div>` : ''}`;
+      ${inner}`;
         od.appendChild(d);
       });
     }
