@@ -1,0 +1,2462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Graph Theory & Representations — Interactive Visualizer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- KaTeX for math typesetting -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg-base: #0a0d14;
+      --bg-surface: #111726;
+      --bg-card: #161e31;
+      --bg-card-hover: #1c263e;
+      --border-subtle: rgba(255, 255, 255, 0.07);
+      --border-medium: rgba(255, 255, 255, 0.14);
+      --border-accent: rgba(99, 102, 241, 0.35);
+
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+
+      --accent-primary: #6366f1;
+      --accent-primary-glow: rgba(99, 102, 241, 0.25);
+      --accent-cyan: #06b6d4;
+      --accent-cyan-glow: rgba(6, 182, 212, 0.25);
+      --accent-emerald: #10b981;
+      --accent-emerald-glow: rgba(16, 185, 129, 0.25);
+      --accent-amber: #f59e0b;
+      --accent-amber-glow: rgba(245, 158, 11, 0.25);
+      --accent-rose: #f43f5e;
+      --accent-rose-glow: rgba(244, 63, 94, 0.25);
+      --accent-purple: #a855f7;
+      --accent-purple-glow: rgba(168, 85, 247, 0.25);
+
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 18px;
+      --radius-xl: 24px;
+      --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      --transition-base: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Self-contained math styling */
+    .math {
+      font-family: 'Outfit', 'Georgia', serif;
+      font-style: italic;
+      color: #f1f5f9;
+      font-weight: 500;
+    }
+
+    .math-expr {
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.28);
+      color: #c7d2fe;
+      padding: 1px 7px;
+      border-radius: 5px;
+      font-size: 0.88em;
+      font-weight: 600;
+      white-space: nowrap;
+      display: inline-block;
+    }
+
+    .math-expr.emerald {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.28);
+      color: #a7f3d0;
+    }
+
+    .math-expr.amber {
+      background: rgba(245, 158, 11, 0.12);
+      border-color: rgba(245, 158, 11, 0.28);
+      color: #fde68a;
+    }
+
+    .math-expr.cyan {
+      background: rgba(6, 182, 212, 0.12);
+      border-color: rgba(6, 182, 212, 0.28);
+      color: #a5f3fc;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 24px;
+      width: 100%;
+    }
+
+    /* Header & Navigation */
+    header.site-header {
+      background: rgba(17, 23, 38, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 14px 0;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .site-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #fff 40%, var(--accent-primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .nav-tab {
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.83rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: transparent;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: var(--transition-base);
+    }
+
+    .nav-tab:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--border-subtle);
+    }
+
+    .nav-tab.active {
+      color: #fff;
+      background: rgba(99, 102, 241, 0.18);
+      border-color: var(--border-accent);
+    }
+
+    .hero-banner {
+      padding: 44px 0 28px;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 14px;
+      border-radius: 9999px;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid var(--border-accent);
+      color: #a5b4fc;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+
+    .hero-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+
+    .hero-subtitle {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    /* Concept Sections */
+    .concept-section {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 36px;
+      margin-bottom: 48px;
+      box-shadow: var(--shadow-card);
+      position: relative;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .section-tagline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .complexity-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .complexity-pill.primary {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: rgba(99, 102, 241, 0.35);
+      color: #a5b4fc;
+    }
+
+    .complexity-pill.emerald {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.35);
+      color: #6ee7b7;
+    }
+
+    .complexity-pill.amber {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: rgba(245, 158, 11, 0.35);
+      color: #fcd34d;
+    }
+
+    .section-title {
+      font-size: 1.65rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .section-description {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      max-width: 900px;
+      line-height: 1.6;
+    }
+
+    /* Controls Panel */
+    .controls-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .playback-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .inputs-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition-base);
+      border: 1px solid var(--border-medium);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-primary);
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .btn-primary {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: #fff;
+      box-shadow: 0 0 16px var(--accent-primary-glow);
+    }
+
+    .btn-emerald {
+      background: var(--accent-emerald);
+      border-color: var(--accent-emerald);
+      color: #fff;
+      box-shadow: 0 0 16px var(--accent-emerald-glow);
+    }
+
+    .btn-amber {
+      background: var(--accent-amber);
+      border-color: var(--accent-amber);
+      color: #1a1a1a;
+      font-weight: 700;
+      box-shadow: 0 0 16px var(--accent-amber-glow);
+    }
+
+    .slider {
+      -webkit-appearance: none;
+      width: 75px;
+      height: 5px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.15);
+      outline: none;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--accent-primary);
+      cursor: pointer;
+    }
+
+    /* Stage Canvas & Visualization Layout */
+    .stage-container {
+      background: rgba(10, 13, 20, 0.7);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .step-status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.93rem;
+      flex-wrap: wrap;
+    }
+
+    .step-counter {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .step-counter strong {
+      color: var(--accent-primary);
+    }
+
+    /* Split Stage: Graph Canvas + Matrix Panel */
+    .graph-matrix-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    @media (max-width: 900px) {
+      .graph-matrix-split {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .stage-card {
+      background: rgba(17, 23, 38, 0.6);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 320px;
+      position: relative;
+    }
+
+    .stage-card-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* SVG Graph Elements */
+    svg.graph-svg {
+      width: 100%;
+      height: 300px;
+      overflow: visible;
+    }
+
+    .graph-node {
+      cursor: pointer;
+      transition: transform 0.2s ease, fill 0.2s ease;
+    }
+
+    .graph-node circle {
+      stroke-width: 2.5px;
+      transition: stroke 0.2s ease, fill 0.2s ease;
+    }
+
+    .graph-node:hover circle {
+      transform: scale(1.08);
+      transform-origin: center;
+    }
+
+    .graph-node text {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      fill: #ffffff;
+      text-anchor: middle;
+      dominant-baseline: central;
+      pointer-events: none;
+    }
+
+    .graph-edge {
+      stroke: rgba(148, 163, 184, 0.35);
+      stroke-width: 2px;
+      transition: stroke 0.25s, stroke-width 0.25s;
+    }
+
+    .graph-edge.active {
+      stroke: var(--accent-cyan);
+      stroke-width: 3.5px;
+      filter: drop-shadow(0 0 6px var(--accent-cyan-glow));
+    }
+
+    .graph-edge.highlight-amber {
+      stroke: var(--accent-amber);
+      stroke-width: 3.5px;
+      filter: drop-shadow(0 0 6px var(--accent-amber-glow));
+    }
+
+    /* Interactive Adjacency Matrix Grid */
+    .matrix-table-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: auto;
+    }
+
+    table.matrix-table {
+      border-collapse: separate;
+      border-spacing: 6px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    table.matrix-table th {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      padding: 4px 6px;
+      text-align: center;
+    }
+
+    table.matrix-table td {
+      width: 38px;
+      height: 38px;
+      text-align: center;
+      vertical-align: middle;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      transition: var(--transition-base);
+      cursor: pointer;
+    }
+
+    table.matrix-table td.has-edge {
+      color: #fff;
+      background: rgba(99, 102, 241, 0.25);
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 10px var(--accent-primary-glow);
+    }
+
+    table.matrix-table td.diagonal {
+      background: rgba(255, 255, 255, 0.03);
+      color: #475569;
+    }
+
+    table.matrix-table td.row-active {
+      border-color: var(--accent-cyan);
+      background: rgba(6, 182, 212, 0.18);
+      color: #a5f3fc;
+    }
+
+    table.matrix-table td.cell-symmetric {
+      border-color: var(--accent-purple);
+      background: rgba(168, 85, 247, 0.22);
+      color: #f3e8ff;
+    }
+
+    .matrix-row-sum {
+      font-size: 0.78rem;
+      color: var(--accent-emerald);
+      font-weight: 700;
+      padding: 0 6px;
+    }
+
+    /* Formula Readout Banner */
+    .formula-banner {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 20px;
+      background: rgba(0, 0, 0, 0.45);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.92rem;
+    }
+
+    .formula-math {
+      font-family: 'JetBrains Mono', monospace;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Multi-Language Code Tabs */
+    .explanation-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 24px;
+    }
+
+    @media (max-width: 860px) {
+      .explanation-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .info-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 20px;
+    }
+
+    .info-card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-card p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+
+    .info-card ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .info-card li {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      margin-bottom: 8px;
+      position: relative;
+      padding-left: 18px;
+    }
+
+    .info-card li::before {
+      content: '▹';
+      position: absolute;
+      left: 0;
+      color: var(--accent-primary);
+      font-weight: 700;
+    }
+
+    .code-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .lang-tabs {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 3px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .lang-tab {
+      padding: 4px 10px;
+      border-radius: 5px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition-base);
+    }
+
+    .lang-tab:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .lang-tab.active {
+      color: #ffffff;
+      background: var(--accent-primary);
+      box-shadow: 0 0 10px var(--accent-primary-glow);
+    }
+
+    #sec-concepts .lang-tab.active {
+      background: var(--accent-emerald);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.35);
+    }
+
+    #sec-special-classes .lang-tab.active {
+      background: var(--accent-amber);
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
+    }
+
+    .code-panel {
+      display: none;
+    }
+
+    .code-panel.active {
+      display: block;
+      animation: codeFadeIn 0.2s ease-in-out;
+    }
+
+    @keyframes codeFadeIn {
+      from { opacity: 0; transform: translateY(3px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .code-block {
+      background: #090c13;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      font-size: 0.82rem;
+      color: #cbd5e1;
+      overflow-x: auto;
+      line-height: 1.45;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .code-hl {
+      color: #38bdf8;
+    }
+
+    .code-comment {
+      color: #64748b;
+      font-style: italic;
+    }
+
+    /* Decision Card & Scenarios Component */
+    .decision-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      margin-top: 20px;
+    }
+
+    .decision-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 10px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 14px;
+    }
+
+    .badge-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .decision-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    @media (max-width: 900px) {
+      .decision-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .decision-col {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+    }
+
+    .decision-heading {
+      font-size: 0.86rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .decision-heading.success { color: #34d399; }
+    .decision-heading.scenarios { color: #38bdf8; }
+    .decision-heading.warning { color: #f87171; }
+
+    .decision-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 0.84rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    .decision-list li {
+      position: relative;
+      padding-left: 18px;
+      margin-bottom: 10px;
+    }
+
+    .decision-list li:last-child { margin-bottom: 0; }
+    .decision-list li::before { position: absolute; left: 0; font-weight: bold; }
+    .decision-heading.success + .decision-list li::before { content: '✓'; color: #34d399; }
+    .decision-heading.scenarios + .decision-list li::before { content: '•'; color: #38bdf8; font-size: 1.1em; }
+    .decision-heading.warning + .decision-list li::before { content: '✕'; color: #f87171; }
+    .decision-list strong { color: #f1f5f9; }
+
+    /* Legend Component */
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      margin-top: 14px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Toast */
+    #toast-msg {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 12px 20px;
+      background: #1e293b;
+      color: #fff;
+      border-left: 4px solid var(--accent-primary);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: none;
+      z-index: 1000;
+      animation: slide-up 0.25s ease-out;
+    }
+
+    @keyframes slide-up {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    footer.site-footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 40px 0;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Site Navigation -->
+  <header class="site-header">
+    <div class="container header-content">
+      <a href="#" class="site-title">
+        <span>⚡</span> Graph Theory & Representations
+      </a>
+      <nav class="nav-tabs">
+        <button class="nav-tab active" onclick="scrollToSection('sec-adj-matrix', this)">1. Adjacency Matrix</button>
+        <button class="nav-tab" onclick="scrollToSection('sec-concepts', this)">2. Concepts & K_n</button>
+        <button class="nav-tab" onclick="scrollToSection('sec-special-classes', this)">3. Bipartite & Classes</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container" style="flex: 1;">
+    
+    <!-- Hero Banner -->
+    <div class="hero-banner">
+      <div class="hero-badge">🏆 Competitive Programming & Graph Theory Part 1</div>
+      <h1 class="hero-title">Graph Representations & Foundations</h1>
+      <p class="hero-subtitle">
+        Interactive exploration of Adjacency Matrices, Node Degrees, Complete Graphs <span class="math">K<sub>n</sub></span> with combinatorial proofs, Trees, Bipartite Recommendation Networks, and Digraphs.
+      </p>
+    </div>
+
+
+    <!-- ================================================================= -->
+    <!-- SECTION 1: GRAPH REPRESENTATIONS & ADJACENCY MATRIX               -->
+    <!-- ================================================================= -->
+    <section id="sec-adj-matrix" class="concept-section" style="--section-color: var(--accent-primary);">
+      <div class="section-header">
+        <div class="section-meta">
+          <div class="section-tagline">
+            <span class="complexity-pill primary">Space: O(V²)</span>
+            <span class="complexity-pill">Edge Lookup: O(1)</span>
+            <span class="complexity-pill">Degree Query: O(V)</span>
+          </div>
+          <h2 class="section-title">1. Graph Representations: The Adjacency Matrix</h2>
+          <p class="section-description">
+            A graph with <span class="math">n</span> vertices is represented in memory by a <span class="math">n &times; n</span> 2D matrix <span class="math">A</span>, where entry <span class="math-expr">A[i][j]</span> stores the number of edges joining node <span class="math">i</span> and node <span class="math">j</span>. For an undirected graph, <span class="math">A</span> is <strong>symmetric</strong> (<span class="math">A[i][j] = A[j][i]</span>). In simple graphs, <span class="math">A[i][j] &le; 1</span> and diagonal entries <span class="math">A[i][i] = 0</span> (no self-loops).
+          </p>
+        </div>
+      </div>
+
+      <!-- Controls Panel -->
+      <div class="controls-panel">
+        <div class="playback-group">
+          <button id="m-btn-play" class="btn btn-primary" onclick="matrixCtrl.togglePlay()">▶ Play Row Inspector</button>
+          <button class="btn" onclick="matrixCtrl.stepBack()">◀ Back</button>
+          <button class="btn" onclick="matrixCtrl.stepForward()">Next ▶</button>
+          <button class="btn" onclick="matrixCtrl.reset()">↺ Reset</button>
+        </div>
+
+        <div class="inputs-group">
+          <div class="input-wrapper">
+            <span>Toggle Edge:</span>
+            <button class="btn" onclick="matrixCtrl.toggleEdgePrompt()">Add/Remove (u, v)</button>
+            <button class="btn" onclick="matrixCtrl.loadPreset('star')">Star</button>
+            <button class="btn" onclick="matrixCtrl.loadPreset('cycle')">Cycle</button>
+            <button class="btn" onclick="matrixCtrl.loadPreset('random')">Random</button>
+          </div>
+          <div class="input-wrapper">
+            <span>Speed:</span>
+            <input type="range" min="0.5" max="3" step="0.5" value="1" class="slider" id="m-speed" onchange="matrixCtrl.updateSpeed(this.value)">
+            <span id="m-speed-val">1x</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Animation Stage: Split Graph & Matrix -->
+      <div class="stage-container">
+        <div class="step-status-bar">
+          <div class="step-counter">
+            Inspecting: <strong id="m-inspect-label">Node 0 (Row 0)</strong>
+          </div>
+          <div id="m-explanation">
+            <span class="icon">🔍</span> Click <strong>Play</strong> or any cell/node to inspect row sum and symmetry.
+          </div>
+          <div id="m-badge-simple" class="complexity-pill primary">Simple Graph: True</div>
+        </div>
+
+        <div class="graph-matrix-split">
+          <!-- Left: SVG Graph Canvas -->
+          <div class="stage-card">
+            <div class="stage-card-title">
+              <span>Interactive Graph G(V, E)</span>
+              <span style="font-size: 0.75rem; color: var(--text-muted);">Click any node to inspect</span>
+            </div>
+            <svg id="m-graph-svg" class="graph-svg" viewBox="0 0 380 300">
+              <!-- Rendered by Controller -->
+            </svg>
+          </div>
+
+          <!-- Right: Interactive Matrix Table -->
+          <div class="stage-card">
+            <div class="stage-card-title">
+              <span>Adjacency Matrix A [5 &times; 5]</span>
+              <span style="font-size: 0.75rem; color: var(--accent-emerald);">Row Sum = Degree d(v)</span>
+            </div>
+            <div class="matrix-table-wrapper" id="m-matrix-container">
+              <!-- Rendered by Controller -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend-row">
+          <div class="legend-item">
+            <div class="legend-color" style="background: var(--accent-primary);"></div> Current Node (Row i)
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: var(--accent-cyan);"></div> Incident Edges / Connected Neighbors
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: var(--accent-purple);"></div> Symmetric Matrix Counterpart A[j][i]
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: rgba(255,255,255,0.03);"></div> Diagonal A[i][i] = 0 (No self-loops)
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Formula Readout -->
+      <div class="formula-banner">
+        <div class="formula-math" id="m-formula-readout">
+          <span>Row Sum Property: <strong id="m-sum-eval">d(v) = &sum;<sub>j</sub> A[i][j]</strong></span>
+          <span>·</span>
+          <span>Symmetry: <code id="m-sym-eval">A[i][j] == A[j][i]</code></span>
+        </div>
+        <div style="font-size: 0.85rem; color: var(--text-muted);">
+          Space comparison: Matrix <span class="math-expr">O(V&sup2;)</span> vs Adjacency List <span class="math-expr">O(V + E)</span>
+        </div>
+      </div>
+
+      <!-- Theoretical Notes & Code -->
+      <div class="explanation-grid">
+        <div class="info-card">
+          <div class="info-card-title">💡 CCC Contest Insights & Adjacency Lists</div>
+          <ul>
+            <li><strong>Adjacency Matrix vs. Adjacency List:</strong> For dense graphs where <span class="math">E &approx; V&sup2;</span> (e.g. Floyd-Warshall <span class="math-expr">O(V&sup3;)</span>), an adjacency matrix is optimal because <span class="math-expr">O(1)</span> edge queries <span class="math">A[u][v]</span> have zero pointer overhead.</li>
+            <li><strong>Memory Overflow Trap:</strong> If <span class="math">V = 100,000</span> (standard in CCC Senior), a matrix requires <span class="math">100,000 &times; 100,000 &times; 4 \text{ bytes} \approx 40 \text{ GB}</span> of RAM, triggering an immediate Memory Limit Exceeded (MLE). You must use an <strong>Adjacency List</strong> (<span class="math-expr">vector&lt;int&gt; adj[N]</span>).</li>
+            <li><strong>Matrix Multiplications & Paths:</strong> In graph theory, <span class="math">A<sup>k</sup>[i][j]</span> counts the exact number of walks of length <span class="math">k</span> between node <span class="math">i</span> and node <span class="math">j</span>!</li>
+          </ul>
+        </div>
+
+        <div class="info-card">
+          <div class="code-card-header">
+            <div class="info-card-title" style="margin-bottom: 0;">💻 Implementation Pattern</div>
+            <div class="lang-tabs" data-group="m-code">
+              <button class="lang-tab active" onclick="switchLanguage('python')">Python</button>
+              <button class="lang-tab" onclick="switchLanguage('cpp')">C++</button>
+              <button class="lang-tab" onclick="switchLanguage('java')">Java</button>
+            </div>
+          </div>
+
+          <!-- Python -->
+          <div class="code-panel active" data-lang="python">
+            <pre class="code-block"><code><span class="code-comment"># Graph representations in Python</span>
+V = <span class="code-hl">5</span>
+<span class="code-comment"># 1. Adjacency Matrix: O(V^2) space, O(1) edge check</span>
+adj_matrix = [[<span class="code-hl">0</span>] * V <span class="code-hl">for</span> _ <span class="code-hl">in</span> range(V)]
+
+<span class="code-hl">def</span> add_edge_matrix(u, v):
+    adj_matrix[u][v] = <span class="code-hl">1</span>
+    adj_matrix[v][u] = <span class="code-hl">1</span>  <span class="code-comment"># Symmetric for undirected</span>
+
+<span class="code-comment"># Degree is the row sum:</span>
+<span class="code-hl">def</span> get_degree(u):
+    <span class="code-hl">return</span> sum(adj_matrix[u])
+
+<span class="code-comment"># 2. Adjacency List: O(V + E) space (Essential for V > 5000)</span>
+adj_list = [[] <span class="code-hl">for</span> _ <span class="code-hl">in</span> range(V)]
+<span class="code-hl">def</span> add_edge_list(u, v):
+    adj_list[u].append(v)
+    adj_list[v].append(u)</code></pre>
+          </div>
+
+          <!-- C++ -->
+          <div class="code-panel" data-lang="cpp">
+            <pre class="code-block"><code><span class="code-comment">// Graph representations in C++</span>
+<span class="code-hl">#include</span> <span class="code-hl">&lt;vector&gt;</span>
+<span class="code-hl">#include</span> <span class="code-hl">&lt;numeric&gt;</span>
+
+<span class="code-comment">// 1. Adjacency Matrix (V &lt;= 2000)</span>
+<span class="code-hl">const int</span> MAXV = <span class="code-hl">500</span>;
+<span class="code-hl">int</span> adjMatrix[MAXV][MAXV];
+
+<span class="code-hl">void</span> addEdgeMatrix(<span class="code-hl">int</span> u, <span class="code-hl">int</span> v) {
+    adjMatrix[u][v] = <span class="code-hl">1</span>;
+    adjMatrix[v][u] = <span class="code-hl">1</span>; <span class="code-comment">// Symmetric</span>
+}
+
+<span class="code-hl">int</span> getDegree(<span class="code-hl">int</span> u, <span class="code-hl">int</span> V) {
+    <span class="code-hl">int</span> deg = <span class="code-hl">0</span>;
+    <span class="code-hl">for</span> (<span class="code-hl">int</span> j = <span class="code-hl">0</span>; j &lt; V; j++) deg += adjMatrix[u][j];
+    <span class="code-hl">return</span> deg;
+}
+
+<span class="code-comment">// 2. Adjacency List (Standard for V &gt;= 100,000)</span>
+std::vector&lt;<span class="code-hl">int</span>&gt; adjList[<span class="code-hl">100005</span>];
+<span class="code-hl">void</span> addEdgeList(<span class="code-hl">int</span> u, <span class="code-hl">int</span> v) {
+    adjList[u].push_back(v);
+    adjList[v].push_back(u);
+}</code></pre>
+          </div>
+
+          <!-- Java -->
+          <div class="code-panel" data-lang="java">
+            <pre class="code-block"><code><span class="code-comment">// Graph representations in Java</span>
+<span class="code-hl">import</span> java.util.*;
+
+<span class="code-hl">public class</span> GraphRep {
+    <span class="code-comment">// 1. Adjacency Matrix</span>
+    <span class="code-hl">int</span>[][] adjMatrix;
+    <span class="code-hl">public</span> GraphRep(<span class="code-hl">int</span> V) {
+        adjMatrix = <span class="code-hl">new int</span>[V][V];
+    }
+    <span class="code-hl">public void</span> addEdge(<span class="code-hl">int</span> u, <span class="code-hl">int</span> v) {
+        adjMatrix[u][v] = <span class="code-hl">1</span>;
+        adjMatrix[v][u] = <span class="code-hl">1</span>; <span class="code-comment">// Symmetric</span>
+    }
+    <span class="code-hl">public int</span> getDegree(<span class="code-hl">int</span> u) {
+        <span class="code-hl">int</span> deg = <span class="code-hl">0</span>;
+        <span class="code-hl">for</span> (<span class="code-hl">int</span> val : adjMatrix[u]) deg += val;
+        <span class="code-hl">return</span> deg;
+    }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Decision Criteria -->
+      <div class="decision-card">
+        <div class="decision-header">
+          <div class="info-card-title" style="margin-bottom: 0;">
+            <span>🎯</span> When to Use & Decision Criteria
+          </div>
+          <span class="badge-tag">Matrix vs List Selection</span>
+        </div>
+
+        <div class="decision-grid">
+          <div class="decision-col">
+            <h4 class="decision-heading success">✔ When to Use Matrix</h4>
+            <ul class="decision-list">
+              <li><strong>Dense Graphs:</strong> When <span class="math">E &approx; V&sup2;</span>, the <span class="math-expr">O(V&sup2;)</span> memory is fully utilized without pointer waste.</li>
+              <li><strong>Small Vertex Count (<span class="math">V &le; 2,000</span>):</strong> Fits comfortably within the 256 MB or 512 MB contest memory limits.</li>
+              <li><strong>Frequent Edge Existence Checks:</strong> Asking <em>"Are <span class="math">u</span> and <span class="math">v</span> connected?"</em> in exact <span class="math-expr">O(1)</span> time.</li>
+              <li><strong>All-Pairs Shortest Path:</strong> Floyd-Warshall algorithm naturally operates over 2D cost matrices.</li>
+            </ul>
+          </div>
+
+          <div class="decision-col">
+            <h4 class="decision-heading scenarios">📋 Contest Scenarios</h4>
+            <ul class="decision-list">
+              <li><strong>Matrix Powers for Path Counting:</strong> Finding the number of paths of exact length <span class="math">k</span> via binary matrix exponentiation in <span class="math-expr">O(V&sup3; log k)</span>.</li>
+              <li><strong>Grid / Maze Networks:</strong> 2D spatial mazes where neighbor connections are naturally row-and-column adjacent.</li>
+              <li><strong>Transitive Closure (Warshall's):</strong> Finding if any reachable path exists between any two nodes.</li>
+            </ul>
+          </div>
+
+          <div class="decision-col">
+            <h4 class="decision-heading warning">❌ When NOT to Use</h4>
+            <ul class="decision-list">
+              <li><strong>Sparse Graphs (<span class="math">V &ge; 10,000</span>):</strong> Iterating through all neighbors of node <span class="math">u</span> requires scanning all <span class="math">V</span> entries in row <span class="math">u</span>, degrading BFS/DFS from <span class="math-expr">O(V + E)</span> to <span class="math-expr">O(V&sup2;)</span> (TLE).</li>
+              <li><strong>Massive Inputs (<span class="math">V = 100,000</span>):</strong> Allocating a <span class="math">100,000 &times; 100,000</span> array throws an instant Memory Limit Exceeded error. Always switch to an <strong>Adjacency List</strong>.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ================================================================= -->
+    <!-- SECTION 2: FUNDAMENTAL GRAPH THEORY CONCEPTS & FORMULAS           -->
+    <!-- ================================================================= -->
+    <section id="sec-concepts" class="concept-section" style="--section-color: var(--accent-emerald);">
+      <div class="section-header">
+        <div class="section-meta">
+          <div class="section-tagline">
+            <span class="complexity-pill emerald">Handshaking Lemma: &sum; d_v = 2m</span>
+            <span class="complexity-pill">K_n Edges: n(n-1)/2</span>
+            <span class="complexity-pill">Tree Edges: m = n - 1</span>
+          </div>
+          <h2 class="section-title">2. Fundamental Concepts: Degrees, K_n Proof & Trees</h2>
+          <p class="section-description">
+            A graph <span class="math">G(V, E)</span> has vertex set <span class="math">V</span> of size <span class="math">n</span> and edge set <span class="math">E</span> of size <span class="math">m</span>. Vertices <span class="math">u</span> and <span class="math">v</span> are <strong>adjacent</strong> if an edge connects them; the edge is <strong>incident</strong> to both endpoints. The <strong>neighbor set</strong> <span class="math">N(v)</span> contains all nodes adjacent to <span class="math">v</span>. Complete graphs <span class="math">K<sub>n</sub></span> connect every pair of distinct vertices, containing exactly <span class="math-expr emerald">n(n &minus; 1) / 2</span> edges.
+          </p>
+        </div>
+      </div>
+
+      <!-- Controls Panel -->
+      <div class="controls-panel">
+        <div class="playback-group">
+          <button id="c-btn-play" class="btn btn-emerald" onclick="conceptsCtrl.togglePlay()">▶ Play Kn Edge Addition</button>
+          <button class="btn" onclick="conceptsCtrl.stepBack()">◀ Back</button>
+          <button class="btn" onclick="conceptsCtrl.stepForward()">Next ▶</button>
+          <button class="btn" onclick="conceptsCtrl.reset()">↺ Reset</button>
+        </div>
+
+        <div class="inputs-group">
+          <div class="input-wrapper">
+            <label for="c-n-slider">Vertices (n):</label>
+            <input type="range" min="3" max="8" value="5" class="slider" id="c-n-slider" onchange="conceptsCtrl.setN(this.value)">
+            <span id="c-n-val" style="font-weight: 700; color: var(--accent-emerald);">n = 5</span>
+          </div>
+          <button class="btn" onclick="conceptsCtrl.toggleMode('kn')">Complete Graph (Kn)</button>
+          <button class="btn" onclick="conceptsCtrl.toggleMode('tree')">Tree Mode (Acyclic)</button>
+        </div>
+      </div>
+
+      <!-- Animation Stage -->
+      <div class="stage-container">
+        <div class="step-status-bar">
+          <div class="step-counter">
+            Mode: <strong id="c-mode-label" style="color: var(--accent-emerald);">Complete Graph K5</strong>
+          </div>
+          <div id="c-explanation">
+            <span class="icon">📊</span> Step through the combinatorial proof: each new vertex adds edges to all preceding vertices.
+          </div>
+          <div id="c-edge-count-badge" class="complexity-pill emerald">Edges m = 10</div>
+        </div>
+
+        <!-- Canvas and Proof Breakdown Split -->
+        <div class="graph-matrix-split">
+          <!-- Graph Stage -->
+          <div class="stage-card">
+            <div class="stage-card-title">
+              <span id="c-canvas-title">Complete Graph K5 Visualization</span>
+              <span style="font-size: 0.75rem; color: var(--text-muted);">Click node to inspect N(v)</span>
+            </div>
+            <svg id="c-graph-svg" class="graph-svg" viewBox="0 0 380 300">
+              <!-- Rendered by Controller -->
+            </svg>
+          </div>
+
+          <!-- Proof Breakdown Card -->
+          <div class="stage-card" style="align-items: flex-start; justify-content: flex-start;">
+            <div class="stage-card-title">
+              <span>📐 Combinatorial Proof & Degrees</span>
+              <span style="font-size: 0.75rem; color: var(--accent-emerald);">Sum of First (n-1) Integers</span>
+            </div>
+            <div style="width: 100%; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6;">
+              <p style="margin-bottom: 8px;">
+                <strong>Combinatorial Derivation:</strong> In <span class="math">K<sub>n</sub></span>, each of the <span class="math">n</span> vertices connects to all other <span class="math">n &minus; 1</span> vertices.
+              </p>
+              <div style="background: rgba(0,0,0,0.3); padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); margin-bottom: 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">
+                <div id="c-proof-sum">Edges = 0 + 1 + 2 + 3 + 4 = 10</div>
+                <div style="color: var(--accent-emerald); margin-top: 4px;" id="c-proof-formula">Formula: 5 &times; 4 / 2 = 10 edges</div>
+              </div>
+              <p style="margin-bottom: 6px;">
+                <strong>Handshaking Lemma Verification:</strong>
+              </p>
+              <div id="c-degree-list" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;">
+                <!-- Degree chips -->
+              </div>
+              <div style="font-size: 0.82rem; color: var(--text-muted);" id="c-handshake-sum">
+                &sum; d(v) = 4 + 4 + 4 + 4 + 4 = 20 = 2 &times; 10 edges (Verified!)
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend-row">
+          <div class="legend-item">
+            <div class="legend-color" style="background: var(--accent-emerald);"></div> Selected Vertex v
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: var(--accent-cyan);"></div> Neighbor Set N(v)
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: var(--accent-amber);"></div> Incident Edges
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: rgba(255,255,255,0.15);"></div> Other Graph Edges
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Formula Readout -->
+      <div class="formula-banner">
+        <div class="formula-math">
+          <span>Complete Graph: <strong id="c-kn-formula">m = n(n - 1) / 2</strong></span>
+          <span>·</span>
+          <span>Tree Property: <strong>m = n &minus; 1 (No cycles)</strong></span>
+          <span>·</span>
+          <span>Handshaking: <strong>&sum; d(v) = 2m</strong></span>
+        </div>
+      </div>
+
+      <!-- Notes & Code -->
+      <div class="explanation-grid">
+        <div class="info-card">
+          <div class="info-card-title">💡 CCC Contest Graph Properties</div>
+          <ul>
+            <li><strong>The Handshaking Lemma:</strong> Since every undirected edge connects exactly two vertices, the sum of all degrees is always even (<span class="math">2m</span>). Therefore, the number of vertices with an <em>odd degree</em> must be even!</li>
+            <li><strong>Trees as Minimal Connected Graphs:</strong> A tree with <span class="math">n</span> nodes always has exactly <span class="math">n &minus; 1</span> edges and exactly <strong>one unique simple path</strong> between any pair of vertices. Adding any edge introduces a cycle.</li>
+            <li><strong>Counting Subgraphs:</strong> The number of spanning trees in a complete graph <span class="math">K<sub>n</sub></span> is given by Cayley's formula: <span class="math">n<sup>n-2</sup></span>.</li>
+          </ul>
+        </div>
+
+        <div class="info-card">
+          <div class="code-card-header">
+            <div class="info-card-title" style="margin-bottom: 0;">💻 Implementation Pattern</div>
+            <div class="lang-tabs" data-group="c-code">
+              <button class="lang-tab active" onclick="switchLanguage('python')">Python</button>
+              <button class="lang-tab" onclick="switchLanguage('cpp')">C++</button>
+              <button class="lang-tab" onclick="switchLanguage('java')">Java</button>
+            </div>
+          </div>
+
+          <!-- Python -->
+          <div class="code-panel active" data-lang="python">
+            <pre class="code-block"><code><span class="code-comment"># Graph properties in Python</span>
+<span class="code-hl">def</span> complete_graph_edges(n):
+    <span class="code-comment"># Kn has n*(n-1)//2 edges</span>
+    <span class="code-hl">return</span> n * (n - <span class="code-hl">1</span>) // <span class="code-hl">2</span>
+
+<span class="code-hl">def</span> verify_handshaking(degrees, m):
+    <span class="code-comment"># Sum of degrees must equal 2 * m</span>
+    <span class="code-hl">return</span> sum(degrees) == <span class="code-hl">2</span> * m
+
+<span class="code-hl">def</span> is_valid_tree_edge_count(n, m):
+    <span class="code-comment"># A connected tree with n vertices always has n-1 edges</span>
+    <span class="code-hl">return</span> m == n - <span class="code-hl">1</span></code></pre>
+          </div>
+
+          <!-- C++ -->
+          <div class="code-panel" data-lang="cpp">
+            <pre class="code-block"><code><span class="code-comment">// Graph properties in C++</span>
+<span class="code-hl">#include</span> <span class="code-hl">&lt;vector&gt;</span>
+<span class="code-hl">#include</span> <span class="code-hl">&lt;numeric&gt;</span>
+
+<span class="code-hl">long long</span> completeGraphEdges(<span class="code-hl">int</span> n) {
+    <span class="code-comment">// Use 64-bit to prevent overflow when n > 65536</span>
+    <span class="code-hl">return</span> <span class="code-hl">1LL</span> * n * (n - <span class="code-hl">1</span>) / <span class="code-hl">2</span>;
+}
+
+<span class="code-hl">bool</span> verifyHandshaking(<span class="code-hl">const</span> std::vector&lt;<span class="code-hl">int</span>&gt;&amp; degs, <span class="code-hl">long long</span> m) {
+    <span class="code-hl">long long</span> sumDegs = <span class="code-hl">0</span>;
+    <span class="code-hl">for</span> (<span class="code-hl">int</span> d : degs) sumDegs += d;
+    <span class="code-hl">return</span> sumDegs == <span class="code-hl">2LL</span> * m;
+}</code></pre>
+          </div>
+
+          <!-- Java -->
+          <div class="code-panel" data-lang="java">
+            <pre class="code-block"><code><span class="code-comment">// Graph properties in Java</span>
+<span class="code-hl">public class</span> GraphTheoryUtils {
+    <span class="code-hl">public static long</span> completeGraphEdges(<span class="code-hl">int</span> n) {
+        <span class="code-hl">return</span> (<span class="code-hl">long</span>)n * (n - <span class="code-hl">1</span>) / <span class="code-hl">2</span>;
+    }
+    <span class="code-hl">public static boolean</span> verifyHandshaking(<span class="code-hl">int</span>[] degs, <span class="code-hl">long</span> m) {
+        <span class="code-hl">long</span> sum = <span class="code-hl">0</span>;
+        <span class="code-hl">for</span> (<span class="code-hl">int</span> d : degs) sum += d;
+        <span class="code-hl">return</span> sum == <span class="code-hl">2</span> * m;
+    }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Decision Criteria -->
+      <div class="decision-card">
+        <div class="decision-header">
+          <div class="info-card-title" style="margin-bottom: 0;">
+            <span>🎯</span> When to Use & Decision Criteria
+          </div>
+          <span class="badge-tag">Graph Invariants & Invariants</span>
+        </div>
+
+        <div class="decision-grid">
+          <div class="decision-col">
+            <h4 class="decision-heading success">✔ When to Use Degrees & Formulas</h4>
+            <ul class="decision-list">
+              <li><strong>Eulerian Path / Circuit Checks:</strong> Check if every vertex has an even degree (Eulerian circuit), or exactly 2 odd-degree vertices (Eulerian path).</li>
+              <li><strong>Tree Quick Validation:</strong> Check if a graph is a tree by testing <span class="math">m = n - 1</span> and verifying it is connected via a single BFS/DFS.</li>
+              <li><strong>Degree Sequences:</strong> Determining if a given sequence of numbers can form a valid simple graph (Havel-Hakimi Theorem).</li>
+            </ul>
+          </div>
+
+          <div class="decision-col">
+            <h4 class="decision-heading scenarios">📋 Contest Scenarios</h4>
+            <ul class="decision-list">
+              <li><strong>Substation / Network Redundancy:</strong> Finding articulation points (cut vertices) and bridges where node degrees reveal critical bottleneck connections.</li>
+              <li><strong>Complete Tournament Pairings:</strong> Round-robin tournament schedules where all <span class="math">n(n-1)/2</span> matches must be played.</li>
+              <li><strong>Handshaking Parity Questions:</strong> Proving impossible conditions (e.g. Can 7 friends each have exactly 3 handshakes? No, <span class="math">7 \times 3 = 21</span> is odd!).</li>
+            </ul>
+          </div>
+
+          <div class="decision-col">
+            <h4 class="decision-heading warning">❌ When NOT to Use</h4>
+            <ul class="decision-list">
+              <li><strong>Assuming Edge Count Guarantees Acyclicity:</strong> An arbitrary graph with <span class="math">m = n - 1</span> is NOT necessarily a tree if it is disconnected (e.g. a triangle plus an isolated node). Always verify connectivity!</li>
+              <li><strong>Multigraphs:</strong> Do not use simple <span class="math">K<sub>n</sub></span> formulas for multigraphs where multiple edges exist between the same vertex pair.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ================================================================= -->
+    <!-- SECTION 3: SPECIAL CLASSES OF GRAPHS & BIPARTITE NETWORKS         -->
+    <!-- ================================================================= -->
+    <section id="sec-special-classes" class="concept-section" style="--section-color: var(--accent-amber);">
+      <div class="section-header">
+        <div class="section-meta">
+          <div class="section-tagline">
+            <span class="complexity-pill amber">Bipartite: No Odd Cycles</span>
+            <span class="complexity-pill">Complete Bipartite: Kr,s = r &times; s</span>
+            <span class="complexity-pill">2-Colorable: O(V + E)</span>
+          </div>
+          <h2 class="section-title">3. Special Classes: Bipartite, Recommendation Graphs & Digraphs</h2>
+          <p class="section-description">
+            A <strong>Bipartite Graph</strong> partitions vertices into two disjoint sets <span class="math">V<sub>1</sub></span> and <span class="math">V<sub>2</sub></span> such that every edge connects a node in <span class="math">V<sub>1</sub></span> to a node in <span class="math">V<sub>2</sub></span>—no internal edges exist within the same set! A classic application is a <strong>User-Item recommendation system</strong>. In a <strong>Complete Bipartite Graph</strong> <span class="math">K<sub>r, s</sub></span>, every vertex of <span class="math">V<sub>1</sub></span> connects to all vertices of <span class="math">V<sub>2</sub></span>, having exactly <span class="math-expr amber">r &times; s</span> edges.
+          </p>
+        </div>
+      </div>
+
+      <!-- Controls Panel -->
+      <div class="controls-panel">
+        <div class="playback-group">
+          <button id="b-btn-test" class="btn btn-amber" onclick="bipartiteCtrl.runTwoColorTest()">▶ 2-Color BFS Check</button>
+          <button class="btn" onclick="bipartiteCtrl.toggleCompleteBipartite()">Toggle K3,3 Complete</button>
+          <button class="btn" onclick="bipartiteCtrl.toggleAddInternalEdge()">Add Invalid Internal Edge</button>
+          <button class="btn" onclick="bipartiteCtrl.reset()">↺ Reset</button>
+        </div>
+
+        <div class="inputs-group">
+          <div class="input-wrapper">
+            <span>Graph Variation:</span>
+            <select id="b-graph-type" class="btn" onchange="bipartiteCtrl.setGraphType(this.value)" style="background: rgba(0,0,0,0.4); color: var(--text-primary); border-color: var(--border-subtle); outline: none;">
+              <option value="bipartite">Bipartite (User-Item Recommendation)</option>
+              <option value="digraph">Directed Graph (Digraph with In/Out Degrees)</option>
+              <option value="multigraph">Multigraph (Parallel Edges & Self-Loops)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Animation Stage -->
+      <div class="stage-container">
+        <div class="step-status-bar">
+          <div class="step-counter">
+            Class: <strong id="b-class-label" style="color: var(--accent-amber);">Bipartite Recommendation System</strong>
+          </div>
+          <div id="b-explanation">
+            <span class="icon">🔄</span> Left column represents <strong>Users (V1)</strong>, right column represents <strong>Items (V2)</strong>. All edges cross sets.
+          </div>
+          <div id="b-status-badge" class="complexity-pill amber">Valid Bipartite: True</div>
+        </div>
+
+        <div class="stage-card" style="min-height: 340px;">
+          <svg id="b-graph-svg" class="graph-svg" viewBox="0 0 760 300" style="height: 300px;">
+            <!-- Rendered by Controller -->
+          </svg>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend-row">
+          <div class="legend-item">
+            <div class="legend-color" style="background: var(--accent-cyan);"></div> Partition Set V1 (Users / Red Set)
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: var(--accent-amber);"></div> Partition Set V2 (Movies / Blue Set)
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: var(--accent-emerald);"></div> Valid Crossing Edges (No intra-set edges)
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: var(--accent-rose);"></div> Invalid Intra-set Conflict (Violates Bipartite)
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Formula Readout -->
+      <div class="formula-banner">
+        <div class="formula-math">
+          <span>Complete Bipartite Size: <strong id="b-edge-formula">|E| = |V1| &times; |V2| = 3 &times; 3 = 9</strong></span>
+          <span>·</span>
+          <span>Fundamental Theorem: <strong>A graph is bipartite &hArr; it contains NO odd-length cycles</strong></span>
+        </div>
+      </div>
+
+      <!-- Notes & Code -->
+      <div class="explanation-grid">
+        <div class="info-card">
+          <div class="info-card-title">💡 CCC Contest Applications of Special Graphs</div>
+          <ul>
+            <li><strong>2-Colorability / Bipartite Matching:</strong> In CCC problems, checking if a conflict graph is bipartite determines if participants can be separated into two teams without rivalries.</li>
+            <li><strong>Maximum Bipartite Matching:</strong> Used for job-applicant assignment, dating apps, and bipartite matching using the <strong>Hopcroft-Karp algorithm</strong> or <strong>Max Flow (Dinic's)</strong>.</li>
+            <li><strong>Directed Graphs (Digraphs):</strong> In digraphs, degree splits into <strong>in-degree</strong> (incoming edges) and <strong>out-degree</strong> (outgoing edges). Vertices with <span class="math">in-degree = 0</span> are source nodes for <strong>Topological Sort</strong>!</li>
+          </ul>
+        </div>
+
+        <div class="info-card">
+          <div class="code-card-header">
+            <div class="info-card-title" style="margin-bottom: 0;">💻 Implementation Pattern</div>
+            <div class="lang-tabs" data-group="b-code">
+              <button class="lang-tab active" onclick="switchLanguage('python')">Python</button>
+              <button class="lang-tab" onclick="switchLanguage('cpp')">C++</button>
+              <button class="lang-tab" onclick="switchLanguage('java')">Java</button>
+            </div>
+          </div>
+
+          <!-- Python -->
+          <div class="code-panel active" data-lang="python">
+            <pre class="code-block"><code><span class="code-comment"># O(V + E) Bipartite Check using BFS in Python</span>
+<span class="code-hl">from</span> collections <span class="code-hl">import</span> deque
+
+<span class="code-hl">def</span> is_bipartite(graph):
+    n = len(graph)
+    color = [-<span class="code-hl">1</span>] * n  <span class="code-comment"># -1: uncolored, 0: Set A, 1: Set B</span>
+
+    <span class="code-hl">for</span> start <span class="code-hl">in</span> range(n):
+        <span class="code-hl">if</span> color[start] != -<span class="code-hl">1</span>:
+            <span class="code-hl">continue</span>
+        queue = deque([start])
+        color[start] = <span class="code-hl">0</span>
+        <span class="code-hl">while</span> queue:
+            u = queue.popleft()
+            <span class="code-hl">for</span> v <span class="code-hl">in</span> graph[u]:
+                <span class="code-hl">if</span> color[v] == -<span class="code-hl">1</span>:
+                    color[v] = <span class="code-hl">1</span> - color[u]  <span class="code-comment"># Alternate color</span>
+                    queue.append(v)
+                <span class="code-hl">elif</span> color[v] == color[u]:
+                    <span class="code-hl">return</span> <span class="code-hl">False</span>  <span class="code-comment"># Odd cycle detected!</span>
+    <span class="code-hl">return</span> <span class="code-hl">True</span></code></pre>
+          </div>
+
+          <!-- C++ -->
+          <div class="code-panel" data-lang="cpp">
+            <pre class="code-block"><code><span class="code-comment">// O(V + E) Bipartite Check in C++</span>
+<span class="code-hl">#include</span> <span class="code-hl">&lt;vector&gt;</span>
+<span class="code-hl">#include</span> <span class="code-hl">&lt;queue&gt;</span>
+
+<span class="code-hl">bool</span> isBipartite(<span class="code-hl">int</span> n, <span class="code-hl">const</span> std::vector&lt;std::vector&lt;<span class="code-hl">int</span>&gt;&gt;&amp; adj) {
+    std::vector&lt;<span class="code-hl">int</span>&gt; color(n, -<span class="code-hl">1</span>);
+    <span class="code-hl">for</span> (<span class="code-hl">int</span> i = <span class="code-hl">0</span>; i &lt; n; i++) {
+        <span class="code-hl">if</span> (color[i] != -<span class="code-hl">1</span>) <span class="code-hl">continue</span>;
+        std::queue&lt;<span class="code-hl">int</span>&gt; q;
+        q.push(i);
+        color[i] = <span class="code-hl">0</span>;
+        <span class="code-hl">while</span> (!q.empty()) {
+            <span class="code-hl">int</span> u = q.front(); q.pop();
+            <span class="code-hl">for</span> (<span class="code-hl">int</span> v : adj[u]) {
+                <span class="code-hl">if</span> (color[v] == -<span class="code-hl">1</span>) {
+                    color[v] = <span class="code-hl">1</span> - color[u];
+                    q.push(v);
+                } <span class="code-hl">else if</span> (color[v] == color[u]) {
+                    <span class="code-hl">return false</span>; <span class="code-comment">// Odd cycle!</span>
+                }
+            }
+        }
+    }
+    <span class="code-hl">return true</span>;
+}</code></pre>
+          </div>
+
+          <!-- Java -->
+          <div class="code-panel" data-lang="java">
+            <pre class="code-block"><code><span class="code-comment">// O(V + E) Bipartite Check in Java</span>
+<span class="code-hl">import</span> java.util.*;
+
+<span class="code-hl">public class</span> BipartiteChecker {
+    <span class="code-hl">public static boolean</span> isBipartite(<span class="code-hl">int</span> n, List&lt;Integer&gt;[] adj) {
+        <span class="code-hl">int</span>[] color = <span class="code-hl">new int</span>[n];
+        Arrays.fill(color, -<span class="code-hl">1</span>);
+        <span class="code-hl">for</span> (<span class="code-hl">int</span> i = <span class="code-hl">0</span>; i &lt; n; i++) {
+            <span class="code-hl">if</span> (color[i] != -<span class="code-hl">1</span>) <span class="code-hl">continue</span>;
+            Queue&lt;Integer&gt; q = <span class="code-hl">new</span> LinkedList&lt;&gt;();
+            q.add(i);
+            color[i] = <span class="code-hl">0</span>;
+            <span class="code-hl">while</span> (!q.isEmpty()) {
+                <span class="code-hl">int</span> u = q.poll();
+                <span class="code-hl">for</span> (<span class="code-hl">int</span> v : adj[u]) {
+                    <span class="code-hl">if</span> (color[v] == -<span class="code-hl">1</span>) {
+                        color[v] = <span class="code-hl">1</span> - color[u];
+                        q.add(v);
+                    } <span class="code-hl">else if</span> (color[v] == color[u]) {
+                        <span class="code-hl">return false</span>;
+                    }
+                }
+            }
+        }
+        <span class="code-hl">return true</span>;
+    }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Decision Criteria -->
+      <div class="decision-card">
+        <div class="decision-header">
+          <div class="info-card-title" style="margin-bottom: 0;">
+            <span>🎯</span> When to Use & Decision Criteria
+          </div>
+          <span class="badge-tag">Graph Taxonomy Selection</span>
+        </div>
+
+        <div class="decision-grid">
+          <div class="decision-col">
+            <h4 class="decision-heading success">✔ When to Model as Bipartite</h4>
+            <ul class="decision-list">
+              <li><strong>Two Heterogeneous Entity Sets:</strong> Connections only exist between two distinct types of objects (e.g. Users &harr; Items, Students &harr; Courses, Doctors &harr; Hospitals).</li>
+              <li><strong>2-Coloring Feasibility:</strong> Problems requiring partitioning elements into two non-conflicting groups.</li>
+              <li><strong>Grid Parity:</strong> Grids with coordinate parity <span class="math">(r + c) \pmod 2</span> form a natural bipartite graph between black and white chess squares!</li>
+            </ul>
+          </div>
+
+          <div class="decision-col">
+            <h4 class="decision-heading scenarios">📋 Contest Scenarios</h4>
+            <ul class="decision-list">
+              <li><strong>Maximum Cardinality Matching:</strong> Pairing maximum number of applicants with jobs using augmenting paths (K&ouml;nig's Theorem: Max Matching = Min Vertex Cover in bipartite graphs).</li>
+              <li><strong>Knight's Tour / Domino Tilings:</strong> Every domino covers exactly 1 black and 1 white cell, translating grid tiling into bipartite matching.</li>
+              <li><strong>Dependency Tracking (Digraphs):</strong> Course prerequisites and compiler task builds (DAGs, Topological Sorting).</li>
+            </ul>
+          </div>
+
+          <div class="decision-col">
+            <h4 class="decision-heading warning">❌ When NOT to Use</h4>
+            <ul class="decision-list">
+              <li><strong>Graphs with Odd Cycles (Triangles, Pentagons):</strong> If a cycle of length 3, 5, 7 exists, the graph cannot be partitioned into two independent sets. 2-coloring will fail.</li>
+              <li><strong>Peer-to-Peer Relationships:</strong> Social networks where friends can be friends with each other are general graphs, NOT bipartite.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="toast-msg">Notification</div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>Olympiads School &amp; TechWithKev · Competitive Programming Graph Theory Visualizer</p>
+      <p style="margin-top: 6px; font-size: 0.78rem;">Designed for Canadian Computing Competition (CCC) Junior &amp; Senior Preparation</p>
+    </div>
+  </footer>
+
+  <!-- ================================================================= -->
+  <!-- JAVASCRIPT CONTROLLERS                                            -->
+  <!-- ================================================================= -->
+  <script>
+    function showToast(msg) {
+      const toast = document.getElementById('toast-msg');
+      toast.textContent = msg;
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 2600);
+    }
+
+    function scrollToSection(id, btn) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+    }
+
+    let currentLang = 'python';
+    function switchLanguage(lang) {
+      currentLang = lang;
+      document.querySelectorAll('.lang-tab').forEach(btn => {
+        const text = btn.textContent.trim().toLowerCase();
+        if (text === lang.toLowerCase() || (lang === 'cpp' && text === 'c++')) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+      document.querySelectorAll('.code-panel').forEach(panel => {
+        if (panel.getAttribute('data-lang') === lang) panel.classList.add('active');
+        else panel.classList.remove('active');
+      });
+      const langNames = { python: 'Python', cpp: 'C++', java: 'Java' };
+      showToast(`Switched code examples to ${langNames[lang] || lang}`);
+    }
+
+    /* ═════════════════════════════════════════════════════════════════ */
+    /* 1. ADJACENCY MATRIX CONTROLLER                                    */
+    /* ═════════════════════════════════════════════════════════════════ */
+    class AdjacencyMatrixController {
+      constructor() {
+        this.n = 5;
+        this.nodes = [
+          { id: 0, label: '0', x: 190, y: 50 },
+          { id: 1, label: '1', x: 310, y: 130 },
+          { id: 2, label: '2', x: 265, y: 250 },
+          { id: 3, label: '3', x: 115, y: 250 },
+          { id: 4, label: '4', x: 70, y: 130 }
+        ];
+        // Standard initial undirected graph edges: 0-1, 1-2, 2-3, 3-4, 4-0, 0-2
+        this.matrix = [
+          [0, 1, 1, 0, 1],
+          [1, 0, 1, 0, 0],
+          [1, 1, 0, 1, 0],
+          [0, 0, 1, 0, 1],
+          [1, 0, 0, 1, 0]
+        ];
+        this.activeRow = 0;
+        this.isPlaying = false;
+        this.timer = null;
+        this.speed = 1.0;
+        this.render();
+      }
+
+      render() {
+        this.renderGraph();
+        this.renderMatrixTable();
+        this.updateStats();
+      }
+
+      renderGraph() {
+        const svg = document.getElementById('m-graph-svg');
+        svg.innerHTML = '';
+
+        // Edges
+        for (let i = 0; i < this.n; i++) {
+          for (let j = i + 1; j < this.n; j++) {
+            if (this.matrix[i][j] > 0) {
+              const u = this.nodes[i];
+              const v = this.nodes[j];
+              const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+              line.setAttribute('x1', u.x);
+              line.setAttribute('y1', u.y);
+              line.setAttribute('x2', v.x);
+              line.setAttribute('y2', v.y);
+              line.setAttribute('class', 'graph-edge');
+
+              if (i === this.activeRow || j === this.activeRow) {
+                line.classList.add('active');
+              }
+              svg.appendChild(line);
+            }
+          }
+        }
+
+        // Nodes
+        this.nodes.forEach(node => {
+          const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          g.setAttribute('class', 'graph-node');
+          g.onclick = () => this.setActiveRow(node.id);
+
+          const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          circle.setAttribute('cx', node.x);
+          circle.setAttribute('cy', node.y);
+          circle.setAttribute('r', 18);
+
+          if (node.id === this.activeRow) {
+            circle.setAttribute('fill', '#6366f1');
+            circle.setAttribute('stroke', '#a5b4fc');
+          } else if (this.matrix[this.activeRow][node.id] > 0) {
+            circle.setAttribute('fill', '#06b6d4');
+            circle.setAttribute('stroke', '#a5f3fc');
+          } else {
+            circle.setAttribute('fill', '#1e293b');
+            circle.setAttribute('stroke', 'rgba(255,255,255,0.2)');
+          }
+
+          const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          text.setAttribute('x', node.x);
+          text.setAttribute('y', node.y);
+          text.textContent = node.label;
+
+          g.appendChild(circle);
+          g.appendChild(text);
+          svg.appendChild(g);
+        });
+      }
+
+      renderMatrixTable() {
+        const container = document.getElementById('m-matrix-container');
+        let html = '<table class="matrix-table">';
+        
+        // Header
+        html += '<tr><th></th>';
+        for (let j = 0; j < this.n; j++) {
+          html += `<th>${j}</th>`;
+        }
+        html += '<th style="color: var(--accent-emerald);">deg(i)</th></tr>';
+
+        // Rows
+        for (let i = 0; i < this.n; i++) {
+          const isRowActive = (i === this.activeRow);
+          html += `<tr><th style="${isRowActive ? 'color: var(--accent-primary); font-weight: bold;' : ''}">${i}</th>`;
+          let rowSum = 0;
+
+          for (let j = 0; j < this.n; j++) {
+            const val = this.matrix[i][j];
+            rowSum += val;
+            let classes = [];
+            if (val > 0) classes.push('has-edge');
+            if (i === j) classes.push('diagonal');
+            if (isRowActive) classes.push('row-active');
+            if (j === this.activeRow && !isRowActive && val > 0) classes.push('cell-symmetric');
+
+            html += `<td class="${classes.join(' ')}" onclick="matrixCtrl.toggleCell(${i}, ${j})" title="Toggle Edge (${i}, ${j})">${val}</td>`;
+          }
+
+          html += `<td class="matrix-row-sum">${rowSum}</td></tr>`;
+        }
+
+        html += '</table>';
+        container.innerHTML = html;
+      }
+
+      updateStats() {
+        const i = this.activeRow;
+        const deg = this.matrix[i].reduce((a, b) => a + b, 0);
+        const neighbors = [];
+        for (let j = 0; j < this.n; j++) {
+          if (this.matrix[i][j] > 0) neighbors.push(j);
+        }
+
+        document.getElementById('m-inspect-label').textContent = `Node ${i} (Row ${i})`;
+        document.getElementById('m-explanation').innerHTML = 
+          `<span class="icon">🔍</span> Node <strong>${i}</strong> has degree <strong>d(${i}) = ${deg}</strong> with neighbor set N(${i}) = {${neighbors.join(', ')}}. Row sum in matrix equals ${deg}.`;
+        
+        document.getElementById('m-sum-eval').textContent = `d(${i}) = ${this.matrix[i].join(' + ')} = ${deg}`;
+
+        // Verify Symmetry and Simple Graph
+        let isSymmetric = true;
+        let isSimple = true;
+        for (let r = 0; r < this.n; r++) {
+          if (this.matrix[r][r] !== 0) isSimple = false;
+          for (let c = 0; c < this.n; c++) {
+            if (this.matrix[r][c] !== this.matrix[c][r]) isSymmetric = false;
+            if (this.matrix[r][c] > 1) isSimple = false;
+          }
+        }
+
+        document.getElementById('m-sym-eval').textContent = isSymmetric ? "A[i][j] == A[j][i] (Symmetric: Yes)" : "Asymmetric (Directed)";
+        const badge = document.getElementById('m-badge-simple');
+        badge.textContent = isSimple ? "Simple Graph: True (A[i][i]=0, A[i][j]<=1)" : "Multigraph / Has Loops";
+        badge.className = isSimple ? "complexity-pill primary" : "complexity-pill amber";
+      }
+
+      setActiveRow(row) {
+        this.activeRow = row;
+        this.render();
+      }
+
+      toggleCell(i, j) {
+        if (i === j) {
+          showToast(`A[${i}][${i}] is on diagonal (self-loop). Toggling...`);
+          this.matrix[i][i] = this.matrix[i][i] ? 0 : 1;
+        } else {
+          const newVal = this.matrix[i][j] ? 0 : 1;
+          this.matrix[i][j] = newVal;
+          this.matrix[j][i] = newVal; // Undirected symmetry
+          showToast(`Toggled edge (${i}, ${j}): ${newVal ? 'Connected' : 'Disconnected'}`);
+        }
+        this.activeRow = i;
+        this.render();
+      }
+
+      toggleEdgePrompt() {
+        const u = prompt("Enter first vertex (0 to 4):", "0");
+        if (u === null) return;
+        const v = prompt("Enter second vertex (0 to 4):", "3");
+        if (v === null) return;
+        const nu = parseInt(u), nv = parseInt(v);
+        if (nu >= 0 && nu < 5 && nv >= 0 && nv < 5) {
+          this.toggleCell(nu, nv);
+        } else {
+          showToast("Invalid node indices!");
+        }
+      }
+
+      loadPreset(type) {
+        if (type === 'star') {
+          this.matrix = [
+            [0, 1, 1, 1, 1],
+            [1, 0, 0, 0, 0],
+            [1, 0, 0, 0, 0],
+            [1, 0, 0, 0, 0],
+            [1, 0, 0, 0, 0]
+          ];
+          showToast("Loaded Star Graph: Node 0 connected to all");
+        } else if (type === 'cycle') {
+          this.matrix = [
+            [0, 1, 0, 0, 1],
+            [1, 0, 1, 0, 0],
+            [0, 1, 0, 1, 0],
+            [0, 0, 1, 0, 1],
+            [1, 0, 0, 1, 0]
+          ];
+          showToast("Loaded 5-Cycle Graph C5");
+        } else if (type === 'random') {
+          this.matrix = Array.from({ length: 5 }, () => Array(5).fill(0));
+          for (let i = 0; i < 5; i++) {
+            for (let j = i + 1; j < 5; j++) {
+              if (Math.random() > 0.45) {
+                this.matrix[i][j] = 1;
+                this.matrix[j][i] = 1;
+              }
+            }
+          }
+          showToast("Generated Random Simple Graph");
+        }
+        this.render();
+      }
+
+      stepForward() {
+        this.activeRow = (this.activeRow + 1) % this.n;
+        this.render();
+      }
+
+      stepBack() {
+        this.activeRow = (this.activeRow - 1 + this.n) % this.n;
+        this.render();
+      }
+
+      reset() {
+        this.pause();
+        this.activeRow = 0;
+        this.render();
+      }
+
+      togglePlay() {
+        if (this.isPlaying) this.pause();
+        else this.play();
+      }
+
+      play() {
+        this.isPlaying = true;
+        document.getElementById('m-btn-play').textContent = '⏸ Pause';
+        this.timer = setInterval(() => {
+          this.stepForward();
+        }, 1300 / this.speed);
+      }
+
+      pause() {
+        this.isPlaying = false;
+        document.getElementById('m-btn-play').textContent = '▶ Play Row Inspector';
+        clearInterval(this.timer);
+      }
+
+      updateSpeed(val) {
+        this.speed = parseFloat(val);
+        document.getElementById('m-speed-val').textContent = `${this.speed}x`;
+        if (this.isPlaying) {
+          this.pause();
+          this.play();
+        }
+      }
+    }
+
+
+    /* ═════════════════════════════════════════════════════════════════ */
+    /* 2. CONCEPTS & COMPLETE GRAPH (K_n) CONTROLLER                     */
+    /* ═════════════════════════════════════════════════════════════════ */
+    class ConceptsController {
+      constructor() {
+        this.n = 5;
+        this.mode = 'kn'; // 'kn' or 'tree'
+        this.stepIdx = 4; // number of vertices connected so far
+        this.selectedNode = 0;
+        this.isPlaying = false;
+        this.timer = null;
+        this.speed = 1.0;
+        this.render();
+      }
+
+      getCoords(n) {
+        const cx = 190, cy = 150, r = 105;
+        const coords = [];
+        for (let i = 0; i < n; i++) {
+          const angle = (2 * Math.PI * i / n) - (Math.PI / 2);
+          coords.push({
+            id: i,
+            label: `${i}`,
+            x: cx + r * Math.cos(angle),
+            y: cy + r * Math.sin(angle)
+          });
+        }
+        return coords;
+      }
+
+      render() {
+        const svg = document.getElementById('c-graph-svg');
+        svg.innerHTML = '';
+        const coords = this.getCoords(this.n);
+        const edges = [];
+
+        if (this.mode === 'kn') {
+          // Add edges up to current stepIdx
+          for (let i = 0; i <= this.stepIdx && i < this.n; i++) {
+            for (let j = 0; j < i; j++) {
+              edges.push([j, i]);
+            }
+          }
+        } else {
+          // Tree mode: 0 is center/root, connecting 1..n-1
+          for (let i = 1; i < this.n; i++) {
+            edges.push([0, i]);
+          }
+        }
+
+        // Draw edges
+        edges.forEach(([uId, vId]) => {
+          const u = coords[uId];
+          const v = coords[vId];
+          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line.setAttribute('x1', u.x);
+          line.setAttribute('y1', u.y);
+          line.setAttribute('x2', v.x);
+          line.setAttribute('y2', v.y);
+          line.setAttribute('class', 'graph-edge');
+
+          if (uId === this.selectedNode || vId === this.selectedNode) {
+            line.classList.add('highlight-amber');
+          }
+          svg.appendChild(line);
+        });
+
+        // Draw nodes
+        coords.forEach(node => {
+          const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          g.setAttribute('class', 'graph-node');
+          g.onclick = () => this.selectNode(node.id);
+
+          const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          circle.setAttribute('cx', node.x);
+          circle.setAttribute('cy', node.y);
+          circle.setAttribute('r', 16);
+
+          const isNeighbor = edges.some(([u, v]) => (u === this.selectedNode && v === node.id) || (v === this.selectedNode && u === node.id));
+
+          if (node.id === this.selectedNode) {
+            circle.setAttribute('fill', '#10b981');
+            circle.setAttribute('stroke', '#6ee7b7');
+          } else if (isNeighbor) {
+            circle.setAttribute('fill', '#06b6d4');
+            circle.setAttribute('stroke', '#a5f3fc');
+          } else {
+            circle.setAttribute('fill', '#1e293b');
+            circle.setAttribute('stroke', 'rgba(255,255,255,0.2)');
+          }
+
+          const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          text.setAttribute('x', node.x);
+          text.setAttribute('y', node.y);
+          text.textContent = node.label;
+
+          g.appendChild(circle);
+          g.appendChild(text);
+          svg.appendChild(g);
+        });
+
+        // Update Text and Proof calculations
+        this.updateCalculations(edges);
+      }
+
+      updateCalculations(edges) {
+        const m = edges.length;
+        const totalPossible = (this.n * (this.n - 1)) / 2;
+
+        document.getElementById('c-edge-count-badge').textContent = `Edges m = ${m}`;
+        document.getElementById('c-mode-label').textContent = this.mode === 'kn' ? `Complete Graph K${this.n}` : `Tree on ${this.n} Vertices (m = ${this.n-1})`;
+
+        // Degrees
+        const degrees = Array(this.n).fill(0);
+        edges.forEach(([u, v]) => {
+          degrees[u]++;
+          degrees[v]++;
+        });
+
+        // Handshaking breakdown
+        const degSum = degrees.reduce((a, b) => a + b, 0);
+        const degChipsContainer = document.getElementById('c-degree-list');
+        degChipsContainer.innerHTML = degrees.map((d, idx) => 
+          `<span class="complexity-pill ${idx === this.selectedNode ? 'emerald' : ''}">d(${idx}) = ${d}</span>`
+        ).join('');
+
+        document.getElementById('c-handshake-sum').textContent = 
+          `∑ d(v) = ${degrees.join(' + ')} = ${degSum} = 2 × ${m} edges. Handshaking Lemma verified!`;
+
+        // Proof breakdown
+        if (this.mode === 'kn') {
+          const sumTerms = [];
+          for (let i = 0; i < this.n; i++) sumTerms.push(i);
+          document.getElementById('c-proof-sum').textContent = `Edges = ${sumTerms.join(' + ')} = ${totalPossible}`;
+          document.getElementById('c-proof-formula').textContent = 
+            `Formula: ${this.n}(${this.n} - 1) / 2 = ${this.n * (this.n - 1)} / 2 = ${totalPossible} edges`;
+          document.getElementById('c-explanation').innerHTML = 
+            `<span class="icon">📊</span> Adding vertices sequentially: vertex 1 adds 1 edge, vertex 2 adds 2 edges, ..., vertex ${this.n - 1} adds ${this.n - 1} edges.`;
+        } else {
+          document.getElementById('c-proof-sum').textContent = `Tree Edge Invariant: m = n - 1 = ${this.n} - 1 = ${this.n - 1}`;
+          document.getElementById('c-proof-formula').textContent = `Minimally connected & cycle-free. Exactly 1 simple path between all node pairs.`;
+          document.getElementById('c-explanation').innerHTML = 
+            `<span class="icon">🌲</span> Trees are connected graphs with no cycles. Removing any edge disconnects the graph; adding any edge creates a cycle!`;
+        }
+      }
+
+      setN(val) {
+        this.n = parseInt(val);
+        document.getElementById('c-n-val').textContent = `n = ${this.n}`;
+        this.stepIdx = this.n - 1;
+        this.selectedNode = 0;
+        this.render();
+      }
+
+      toggleMode(mode) {
+        this.mode = mode;
+        this.stepIdx = this.n - 1;
+        this.render();
+        showToast(mode === 'kn' ? `Switched to Complete Graph K${this.n}` : `Switched to Tree Mode (m = n - 1)`);
+      }
+
+      selectNode(id) {
+        this.selectedNode = id;
+        this.render();
+      }
+
+      stepForward() {
+        if (this.stepIdx < this.n - 1) {
+          this.stepIdx++;
+          this.render();
+        } else {
+          this.pause();
+        }
+      }
+
+      stepBack() {
+        if (this.stepIdx > 0) {
+          this.stepIdx--;
+          this.render();
+        }
+      }
+
+      reset() {
+        this.pause();
+        this.stepIdx = 1;
+        this.render();
+      }
+
+      togglePlay() {
+        if (this.isPlaying) this.pause();
+        else this.play();
+      }
+
+      play() {
+        this.isPlaying = true;
+        document.getElementById('c-btn-play').textContent = '⏸ Pause';
+        this.timer = setInterval(() => {
+          if (this.stepIdx >= this.n - 1) {
+            this.stepIdx = 0;
+          }
+          this.stepForward();
+        }, 1400 / this.speed);
+      }
+
+      pause() {
+        this.isPlaying = false;
+        document.getElementById('c-btn-play').textContent = '▶ Play Kn Edge Addition';
+        clearInterval(this.timer);
+      }
+    }
+
+
+    /* ═════════════════════════════════════════════════════════════════ */
+    /* 3. BIPARTITE & SPECIAL CLASSES CONTROLLER                         */
+    /* ═════════════════════════════════════════════════════════════════ */
+    class BipartiteController {
+      constructor() {
+        this.graphType = 'bipartite'; // 'bipartite', 'digraph', 'multigraph'
+        this.hasInvalidEdge = false;
+        this.isCompleteBipartite = false;
+        this.colored = false;
+        this.render();
+      }
+
+      setGraphType(type) {
+        this.graphType = type;
+        this.hasInvalidEdge = false;
+        this.isCompleteBipartite = false;
+        this.colored = false;
+        this.render();
+        showToast(`Selected Graph Variation: ${type.toUpperCase()}`);
+      }
+
+      toggleCompleteBipartite() {
+        this.isCompleteBipartite = !this.isCompleteBipartite;
+        this.hasInvalidEdge = false;
+        this.render();
+        showToast(this.isCompleteBipartite ? "Complete Bipartite K3,3 (All 9 crossing edges connected)" : "Sparse Bipartite Recommendation Graph");
+      }
+
+      toggleAddInternalEdge() {
+        this.hasInvalidEdge = !this.hasInvalidEdge;
+        this.render();
+        showToast(this.hasInvalidEdge ? "Added intra-set edge (U0 - U1)! Odd cycle created!" : "Removed intra-set edge. Graph is valid bipartite again.");
+      }
+
+      runTwoColorTest() {
+        this.colored = true;
+        this.render();
+        if (this.hasInvalidEdge) {
+          showToast("2-Coloring FAILED! Intra-set conflict detected between User 0 and User 1.");
+        } else {
+          showToast("2-Coloring PASSED! Valid Bipartite Graph confirmed.");
+        }
+      }
+
+      reset() {
+        this.hasInvalidEdge = false;
+        this.isCompleteBipartite = false;
+        this.colored = false;
+        this.render();
+      }
+
+      render() {
+        const svg = document.getElementById('b-graph-svg');
+        svg.innerHTML = '';
+
+        if (this.graphType === 'bipartite') {
+          this.renderBipartite(svg);
+        } else if (this.graphType === 'digraph') {
+          this.renderDigraph(svg);
+        } else {
+          this.renderMultigraph(svg);
+        }
+      }
+
+      renderBipartite(svg) {
+        document.getElementById('b-class-label').textContent = "Bipartite User-Item Recommendation Graph";
+
+        // Partition 1: Users (Left)
+        const users = [
+          { id: 'u0', label: 'User 0', x: 180, y: 70, set: 1 },
+          { id: 'u1', label: 'User 1', x: 180, y: 150, set: 1 },
+          { id: 'u2', label: 'User 2', x: 180, y: 230, set: 1 }
+        ];
+
+        // Partition 2: Movies / Items (Right)
+        const items = [
+          { id: 'm0', label: 'Movie A', x: 580, y: 70, set: 2 },
+          { id: 'm1', label: 'Movie B', x: 580, y: 150, set: 2 },
+          { id: 'm2', label: 'Movie C', x: 580, y: 230, set: 2 }
+        ];
+
+        let edges = [];
+        if (this.isCompleteBipartite) {
+          // All 3x3 = 9 edges
+          users.forEach(u => {
+            items.forEach(m => edges.push([u, m, 'normal']));
+          });
+        } else {
+          // Standard recommendation connections
+          edges.push([users[0], items[0], 'normal']);
+          edges.push([users[0], items[1], 'normal']);
+          edges.push([users[1], items[1], 'normal']);
+          edges.push([users[1], items[2], 'normal']);
+          edges.push([users[2], items[0], 'normal']);
+          edges.push([users[2], items[2], 'normal']);
+        }
+
+        if (this.hasInvalidEdge) {
+          // Invalid intra-set edge between User 0 and User 1
+          edges.push([users[0], users[1], 'invalid']);
+        }
+
+        // Draw edges
+        edges.forEach(([u, v, type]) => {
+          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line.setAttribute('x1', u.x);
+          line.setAttribute('y1', u.y);
+          line.setAttribute('x2', v.x);
+          line.setAttribute('y2', v.y);
+          line.setAttribute('class', 'graph-edge');
+
+          if (type === 'invalid') {
+            line.setAttribute('stroke', '#f43f5e');
+            line.setAttribute('stroke-width', '4');
+            line.setAttribute('stroke-dasharray', '6,6');
+          } else {
+            line.setAttribute('stroke', '#10b981');
+          }
+          svg.appendChild(line);
+        });
+
+        // Draw nodes
+        [...users, ...items].forEach(node => {
+          const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          g.setAttribute('class', 'graph-node');
+
+          const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          circle.setAttribute('cx', node.x);
+          circle.setAttribute('cy', node.y);
+          circle.setAttribute('r', 24);
+
+          if (node.set === 1) {
+            circle.setAttribute('fill', '#0284c7');
+            circle.setAttribute('stroke', '#38bdf8');
+          } else {
+            circle.setAttribute('fill', '#d97706');
+            circle.setAttribute('stroke', '#fcd34d');
+          }
+
+          const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          text.setAttribute('x', node.x);
+          text.setAttribute('y', node.y);
+          text.setAttribute('font-size', '11px');
+          text.textContent = node.label;
+
+          g.appendChild(circle);
+          g.appendChild(text);
+          svg.appendChild(g);
+        });
+
+        // Status update
+        const statusBadge = document.getElementById('b-status-badge');
+        if (this.hasInvalidEdge) {
+          statusBadge.className = 'complexity-pill';
+          statusBadge.style.color = '#f87171';
+          statusBadge.textContent = 'Not Bipartite (Intra-set edge detected!)';
+          document.getElementById('b-explanation').innerHTML = 
+            `<span class="icon">⚠️</span> <strong>Invalid Intra-set Edge Detected!</strong> Edge between User 0 and User 1 connects two nodes within the same set V1, violating the bipartite definition!`;
+        } else {
+          statusBadge.className = 'complexity-pill amber';
+          statusBadge.textContent = 'Valid Bipartite: True';
+          document.getElementById('b-explanation').innerHTML = 
+            `<span class="icon">🔄</span> Bipartite graph with <strong>|V1| = 3 users</strong> and <strong>|V2| = 3 items</strong>. All ${edges.length} edges cross between partitions.`;
+        }
+
+        document.getElementById('b-edge-formula').textContent = 
+          this.isCompleteBipartite ? "|E| = 3 × 3 = 9 (Complete K3,3)" : `|E| = ${edges.length} crossing edges`;
+      }
+
+      renderDigraph(svg) {
+        document.getElementById('b-class-label').textContent = "Directed Graph (Digraph) with In/Out Degrees";
+        document.getElementById('b-status-badge').textContent = "Directed Graph";
+        document.getElementById('b-explanation').innerHTML = 
+          `<span class="icon">➡️</span> In a digraph, edges have orientation. Node degrees split into <strong>in-degree</strong> (arrows entering) and <strong>out-degree</strong> (arrows leaving).`;
+
+        // Arrow marker def
+        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        defs.innerHTML = `
+          <marker id="arrow" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="#f59e0b" />
+          </marker>
+        `;
+        svg.appendChild(defs);
+
+        const nodes = [
+          { id: 0, label: '0 (In:0, Out:2)', x: 180, y: 150 },
+          { id: 1, label: '1 (In:1, Out:1)', x: 380, y: 80 },
+          { id: 2, label: '2 (In:1, Out:1)', x: 380, y: 220 },
+          { id: 3, label: '3 (In:2, Out:0)', x: 580, y: 150 }
+        ];
+
+        const edges = [
+          [nodes[0], nodes[1]],
+          [nodes[0], nodes[2]],
+          [nodes[1], nodes[3]],
+          [nodes[2], nodes[3]]
+        ];
+
+        edges.forEach(([u, v]) => {
+          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line.setAttribute('x1', u.x);
+          line.setAttribute('y1', u.y);
+          line.setAttribute('x2', v.x);
+          line.setAttribute('y2', v.y);
+          line.setAttribute('stroke', '#f59e0b');
+          line.setAttribute('stroke-width', '2.5');
+          line.setAttribute('marker-end', 'url(#arrow)');
+          svg.appendChild(line);
+        });
+
+        nodes.forEach(node => {
+          const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+          g.setAttribute('class', 'graph-node');
+
+          const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          circle.setAttribute('cx', node.x);
+          circle.setAttribute('cy', node.y);
+          circle.setAttribute('r', 24);
+          circle.setAttribute('fill', '#1e293b');
+          circle.setAttribute('stroke', '#f59e0b');
+
+          const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          text.setAttribute('x', node.x);
+          text.setAttribute('y', node.y);
+          text.setAttribute('font-size', '10px');
+          text.textContent = node.label.split(' ')[0];
+
+          g.appendChild(circle);
+          g.appendChild(text);
+          svg.appendChild(g);
+        });
+
+        document.getElementById('b-edge-formula').textContent = "∑ in-degree = ∑ out-degree = |E| = 4";
+      }
+
+      renderMultigraph(svg) {
+        document.getElementById('b-class-label').textContent = "Multigraph with Parallel Edges & Self-Loops";
+        document.getElementById('b-status-badge').textContent = "Multigraph (A[i][j] > 1 or A[i][i] > 0)";
+        document.getElementById('b-explanation').innerHTML = 
+          `<span class="icon">➰</span> In a multigraph, two vertices can be joined by multiple parallel edges (<span class="math">A[i][j] > 1</span>), and vertices can have self-loops (<span class="math">A[i][i] > 0</span>, counting twice in degree).`;
+
+        const u = { x: 260, y: 150, label: 'Node A' };
+        const v = { x: 500, y: 150, label: 'Node B' };
+
+        // 3 parallel edges between u and v
+        const p1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        p1.setAttribute('d', `M ${u.x} ${u.y} Q 380 70 ${v.x} ${v.y}`);
+        p1.setAttribute('fill', 'none');
+        p1.setAttribute('stroke', '#06b6d4');
+        p1.setAttribute('stroke-width', '2.5');
+
+        const p2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        p2.setAttribute('x1', u.x); p2.setAttribute('y1', u.y);
+        p2.setAttribute('x2', v.x); p2.setAttribute('y2', v.y);
+        p2.setAttribute('stroke', '#06b6d4');
+        p2.setAttribute('stroke-width', '2.5');
+
+        const p3 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        p3.setAttribute('d', `M ${u.x} ${u.y} Q 380 230 ${v.x} ${v.y}`);
+        p3.setAttribute('fill', 'none');
+        p3.setAttribute('stroke', '#06b6d4');
+        p3.setAttribute('stroke-width', '2.5');
+
+        // Self loop on Node A
+        const loop = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        loop.setAttribute('cx', u.x - 30);
+        loop.setAttribute('cy', u.y - 30);
+        loop.setAttribute('r', 20);
+        loop.setAttribute('fill', 'none');
+        loop.setAttribute('stroke', '#a855f7');
+        loop.setAttribute('stroke-width', '2.5');
+
+        svg.appendChild(p1);
+        svg.appendChild(p2);
+        svg.appendChild(p3);
+        svg.appendChild(loop);
+
+        [u, v].forEach(node => {
+          const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          circle.setAttribute('cx', node.x);
+          circle.setAttribute('cy', node.y);
+          circle.setAttribute('r', 26);
+          circle.setAttribute('fill', '#1e293b');
+          circle.setAttribute('stroke', '#06b6d4');
+
+          const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          text.setAttribute('x', node.x);
+          text.setAttribute('y', node.y);
+          text.setAttribute('font-size', '11px');
+          text.setAttribute('fill', '#fff');
+          text.setAttribute('text-anchor', 'middle');
+          text.setAttribute('dominant-baseline', 'central');
+          text.textContent = node.label;
+
+          svg.appendChild(circle);
+          svg.appendChild(text);
+        });
+
+        document.getElementById('b-edge-formula').textContent = "d(A) = 3 parallel + (2 × 1 self-loop) = 5";
+      }
+    }
+
+    // Initialize all controllers on DOM load
+    let matrixCtrl, conceptsCtrl, bipartiteCtrl;
+
+    function renderAllMath() {
+      if (typeof renderMathInElement === 'function') {
+        renderMathInElement(document.body, {
+          delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '$', right: '$', display: false }
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      matrixCtrl = new AdjacencyMatrixController();
+      conceptsCtrl = new ConceptsController();
+      bipartiteCtrl = new BipartiteController();
+      renderAllMath();
+    });
+  </script>
+</body>
+</html>
