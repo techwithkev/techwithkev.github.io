@@ -766,6 +766,74 @@
       font-style: italic;
     }
 
+    /* Language switcher tabs */
+    .code-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .lang-tabs {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 3px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .lang-tab {
+      padding: 4px 10px;
+      border-radius: 5px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition-base);
+    }
+
+    .lang-tab:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .lang-tab.active {
+      color: #ffffff;
+      background: var(--accent-primary);
+      box-shadow: 0 0 10px var(--accent-primary-glow);
+    }
+
+    #sec-prefix-sum .lang-tab.active {
+      background: var(--accent-emerald);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.35);
+    }
+
+    #sec-diff-array .lang-tab.active {
+      background: var(--accent-amber);
+      box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
+    }
+
+    .code-panel {
+      display: none;
+    }
+
+    .code-panel.active {
+      display: block;
+      animation: codeFadeIn 0.2s ease-in-out;
+    }
+
+    @keyframes codeFadeIn {
+      from { opacity: 0; transform: translateY(3px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     /* Legend Component */
     .legend-row {
       display: flex;
@@ -1005,19 +1073,74 @@
           </ul>
         </div>
         <div class="info-card">
-          <div class="info-card-title">💻 Implementation Pattern (Python)</div>
-          <pre class="code-block"><code><span class="code-comment"># O(log N) Binary Search</span>
+          <div class="code-card-header">
+            <div class="info-card-title" style="margin-bottom: 0;">💻 Implementation Pattern</div>
+            <div class="lang-tabs" data-group="bs-code">
+              <button class="lang-tab active" onclick="switchLanguage('python')">Python</button>
+              <button class="lang-tab" onclick="switchLanguage('cpp')">C++</button>
+              <button class="lang-tab" onclick="switchLanguage('java')">Java</button>
+            </div>
+          </div>
+
+          <!-- Python -->
+          <div class="code-panel active" data-lang="python">
+            <pre class="code-block"><code><span class="code-comment"># O(log N) Binary Search in Python</span>
 <span class="code-hl">def</span> binary_search(arr, target):
     L, R = <span class="code-hl">0</span>, len(arr) - <span class="code-hl">1</span>
     <span class="code-hl">while</span> L &lt;= R:
         mid = L + (R - L) // <span class="code-hl">2</span>
         <span class="code-hl">if</span> arr[mid] == target:
-            <span class="code-hl">return</span> mid  <span class="code-comment"># Found target!</span>
+            <span class="code-hl">return</span> mid  <span class="code-comment"># Found target index</span>
         <span class="code-hl">elif</span> arr[mid] &lt; target:
             L = mid + <span class="code-hl">1</span> <span class="code-comment"># Search right half</span>
         <span class="code-hl">else</span>:
             R = mid - <span class="code-hl">1</span> <span class="code-comment"># Search left half</span>
-    <span class="code-hl">return</span> -<span class="code-hl">1</span>       <span class="code-comment"># Not found</span></code></pre>
+    <span class="code-hl">return</span> -<span class="code-hl">1</span>       <span class="code-comment"># Target not present</span></code></pre>
+          </div>
+
+          <!-- C++ -->
+          <div class="code-panel" data-lang="cpp">
+            <pre class="code-block"><code><span class="code-comment">// O(log N) Binary Search in C++</span>
+<span class="code-hl">#include</span> <span class="code-hl">&lt;vector&gt;</span>
+
+<span class="code-hl">int</span> binarySearch(<span class="code-hl">const</span> std::vector&lt;<span class="code-hl">int</span>&gt;&amp; arr, <span class="code-hl">int</span> target) {
+    <span class="code-hl">int</span> L = <span class="code-hl">0</span>, R = (<span class="code-hl">int</span>)arr.size() - <span class="code-hl">1</span>;
+    <span class="code-hl">while</span> (L &lt;= R) {
+        <span class="code-comment">// Avoids 32-bit signed integer overflow:</span>
+        <span class="code-hl">int</span> mid = L + (R - L) / <span class="code-hl">2</span>;
+        <span class="code-hl">if</span> (arr[mid] == target) {
+            <span class="code-hl">return</span> mid; <span class="code-comment">// Found!</span>
+        } <span class="code-hl">else if</span> (arr[mid] &lt; target) {
+            L = mid + <span class="code-hl">1</span>; <span class="code-comment">// Search right</span>
+        } <span class="code-hl">else</span> {
+            R = mid - <span class="code-hl">1</span>; <span class="code-comment">// Search left</span>
+        }
+    }
+    <span class="code-hl">return</span> -<span class="code-hl">1</span>; <span class="code-comment">// Not found</span>
+}</code></pre>
+          </div>
+
+          <!-- Java -->
+          <div class="code-panel" data-lang="java">
+            <pre class="code-block"><code><span class="code-comment">// O(log N) Binary Search in Java</span>
+<span class="code-hl">public class</span> BinarySearch {
+    <span class="code-hl">public static int</span> search(<span class="code-hl">int</span>[] arr, <span class="code-hl">int</span> target) {
+        <span class="code-hl">int</span> L = <span class="code-hl">0</span>, R = arr.length - <span class="code-hl">1</span>;
+        <span class="code-hl">while</span> (L &lt;= R) {
+            <span class="code-comment">// Avoids integer overflow:</span>
+            <span class="code-hl">int</span> mid = L + (R - L) / <span class="code-hl">2</span>;
+            <span class="code-hl">if</span> (arr[mid] == target) {
+                <span class="code-hl">return</span> mid; <span class="code-comment">// Found!</span>
+            } <span class="code-hl">else if</span> (arr[mid] &lt; target) {
+                L = mid + <span class="code-hl">1</span>; <span class="code-comment">// Search right</span>
+            } <span class="code-hl">else</span> {
+                R = mid - <span class="code-hl">1</span>; <span class="code-comment">// Search left</span>
+            }
+        }
+        <span class="code-hl">return</span> -<span class="code-hl">1</span>; <span class="code-comment">// Not found</span>
+    }
+}</code></pre>
+          </div>
         </div>
       </div>
 
@@ -1147,8 +1270,18 @@
           </ul>
         </div>
         <div class="info-card">
-          <div class="info-card-title">💻 Implementation Pattern (Python)</div>
-          <pre class="code-block"><code><span class="code-comment"># Build 1-indexed Prefix Sum Array in O(N)</span>
+          <div class="code-card-header">
+            <div class="info-card-title" style="margin-bottom: 0;">💻 Implementation Pattern</div>
+            <div class="lang-tabs" data-group="ps-code">
+              <button class="lang-tab active" onclick="switchLanguage('python')">Python</button>
+              <button class="lang-tab" onclick="switchLanguage('cpp')">C++</button>
+              <button class="lang-tab" onclick="switchLanguage('java')">Java</button>
+            </div>
+          </div>
+
+          <!-- Python -->
+          <div class="code-panel active" data-lang="python">
+            <pre class="code-block"><code><span class="code-comment"># Build 1-indexed Prefix Sum Array in O(N)</span>
 P = [<span class="code-hl">0</span>] * (len(A) + <span class="code-hl">1</span>)
 <span class="code-hl">for</span> i <span class="code-hl">in</span> range(len(A)):
     P[i + <span class="code-hl">1</span>] = P[i] + A[i]
@@ -1156,6 +1289,49 @@ P = [<span class="code-hl">0</span>] * (len(A) + <span class="code-hl">1</span>)
 <span class="code-comment"># Answer each range sum query in O(1)</span>
 <span class="code-hl">def</span> query_sum(L, R):
     <span class="code-hl">return</span> P[R + <span class="code-hl">1</span>] - P[L]</code></pre>
+          </div>
+
+          <!-- C++ -->
+          <div class="code-panel" data-lang="cpp">
+            <pre class="code-block"><code><span class="code-comment">// 1-indexed Prefix Sum Array in C++</span>
+<span class="code-hl">#include</span> <span class="code-hl">&lt;vector&gt;</span>
+
+<span class="code-comment">// Build in O(N) using long long to avoid sum overflow:</span>
+std::vector&lt;<span class="code-hl">long long</span>&gt; buildPrefixSum(<span class="code-hl">const</span> std::vector&lt;<span class="code-hl">int</span>&gt;&amp; A) {
+    <span class="code-hl">int</span> n = (<span class="code-hl">int</span>)A.size();
+    std::vector&lt;<span class="code-hl">long long</span>&gt; P(n + <span class="code-hl">1</span>, <span class="code-hl">0</span>);
+    <span class="code-hl">for</span> (<span class="code-hl">int</span> i = <span class="code-hl">0</span>; i &lt; n; i++) {
+        P[i + <span class="code-hl">1</span>] = P[i] + A[i];
+    }
+    <span class="code-hl">return</span> P;
+}
+
+<span class="code-comment">// O(1) Range sum query for subarray [L...R]:</span>
+<span class="code-hl">long long</span> querySum(<span class="code-hl">const</span> std::vector&lt;<span class="code-hl">long long</span>&gt;&amp; P, <span class="code-hl">int</span> L, <span class="code-hl">int</span> R) {
+    <span class="code-hl">return</span> P[R + <span class="code-hl">1</span>] - P[L];
+}</code></pre>
+          </div>
+
+          <!-- Java -->
+          <div class="code-panel" data-lang="java">
+            <pre class="code-block"><code><span class="code-comment">// 1-indexed Prefix Sum Array in Java</span>
+<span class="code-hl">public class</span> PrefixSum {
+    <span class="code-hl">private long</span>[] P;
+
+    <span class="code-comment">// Build in O(N):</span>
+    <span class="code-hl">public</span> PrefixSum(<span class="code-hl">int</span>[] A) {
+        P = <span class="code-hl">new long</span>[A.length + <span class="code-hl">1</span>];
+        <span class="code-hl">for</span> (<span class="code-hl">int</span> i = <span class="code-hl">0</span>; i &lt; A.length; i++) {
+            P[i + <span class="code-hl">1</span>] = P[i] + A[i];
+        }
+    }
+
+    <span class="code-comment">// Query [L, R] in O(1):</span>
+    <span class="code-hl">public long</span> query(<span class="code-hl">int</span> L, <span class="code-hl">int</span> R) {
+        <span class="code-hl">return</span> P[R + <span class="code-hl">1</span>] - P[L];
+    }
+}</code></pre>
+          </div>
         </div>
       </div>
 
@@ -1300,8 +1476,18 @@ P = [<span class="code-hl">0</span>] * (len(A) + <span class="code-hl">1</span>)
           </table>
         </div>
         <div class="info-card">
-          <div class="info-card-title">💻 Implementation Pattern (Python)</div>
-          <pre class="code-block"><code><span class="code-comment"># Initialize Difference Array D</span>
+          <div class="code-card-header">
+            <div class="info-card-title" style="margin-bottom: 0;">💻 Implementation Pattern</div>
+            <div class="lang-tabs" data-group="da-code">
+              <button class="lang-tab active" onclick="switchLanguage('python')">Python</button>
+              <button class="lang-tab" onclick="switchLanguage('cpp')">C++</button>
+              <button class="lang-tab" onclick="switchLanguage('java')">Java</button>
+            </div>
+          </div>
+
+          <!-- Python -->
+          <div class="code-panel active" data-lang="python">
+            <pre class="code-block"><code><span class="code-comment"># Difference Array for O(1) Range Updates</span>
 D = [<span class="code-hl">0</span>] * (N + <span class="code-hl">1</span>)
 
 <span class="code-comment"># Apply range update [L, R] += V in O(1)</span>
@@ -1314,6 +1500,66 @@ A = [<span class="code-hl">0</span>] * N
 A[<span class="code-hl">0</span>] = D[<span class="code-hl">0</span>]
 <span class="code-hl">for</span> i <span class="code-hl">in</span> range(<span class="code-hl">1</span>, N):
     A[i] = A[i - <span class="code-hl">1</span>] + D[i]</code></pre>
+          </div>
+
+          <!-- C++ -->
+          <div class="code-panel" data-lang="cpp">
+            <pre class="code-block"><code><span class="code-comment">// Difference Array for O(1) Range Updates in C++</span>
+<span class="code-hl">#include</span> <span class="code-hl">&lt;vector&gt;</span>
+
+<span class="code-hl">struct</span> DifferenceArray {
+    <span class="code-hl">int</span> n;
+    std::vector&lt;<span class="code-hl">long long</span>&gt; D;
+
+    DifferenceArray(<span class="code-hl">int</span> n) : n(n), D(n + <span class="code-hl">1</span>, <span class="code-hl">0</span>) {}
+
+    <span class="code-comment">// Apply [L, R] += V in O(1):</span>
+    <span class="code-hl">void</span> rangeAdd(<span class="code-hl">int</span> L, <span class="code-hl">int</span> R, <span class="code-hl">long long</span> V) {
+        D[L] += V;
+        <span class="code-hl">if</span> (R + <span class="code-hl">1</span> &lt; n) D[R + <span class="code-hl">1</span>] -= V;
+    }
+
+    <span class="code-comment">// Reconstruct final array in O(N):</span>
+    std::vector&lt;<span class="code-hl">long long</span>&gt; reconstruct() {
+        std::vector&lt;<span class="code-hl">long long</span>&gt; A(n);
+        A[<span class="code-hl">0</span>] = D[<span class="code-hl">0</span>];
+        <span class="code-hl">for</span> (<span class="code-hl">int</span> i = <span class="code-hl">1</span>; i &lt; n; i++) {
+            A[i] = A[i - <span class="code-hl">1</span>] + D[i];
+        }
+        <span class="code-hl">return</span> A;
+    }
+};</code></pre>
+          </div>
+
+          <!-- Java -->
+          <div class="code-panel" data-lang="java">
+            <pre class="code-block"><code><span class="code-comment">// Difference Array for O(1) Range Updates in Java</span>
+<span class="code-hl">public class</span> DifferenceArray {
+    <span class="code-hl">private int</span> n;
+    <span class="code-hl">private long</span>[] D;
+
+    <span class="code-hl">public</span> DifferenceArray(<span class="code-hl">int</span> n) {
+        <span class="code-hl">this</span>.n = n;
+        <span class="code-hl">this</span>.D = <span class="code-hl">new long</span>[n + <span class="code-hl">1</span>];
+    }
+
+    <span class="code-comment">// Apply [L, R] += V in O(1):</span>
+    <span class="code-hl">public void</span> rangeAdd(<span class="code-hl">int</span> L, <span class="code-hl">int</span> R, <span class="code-hl">long</span> V) {
+        D[L] += V;
+        <span class="code-hl">if</span> (R + <span class="code-hl">1</span> &lt; n) D[R + <span class="code-hl">1</span>] -= V;
+    }
+
+    <span class="code-comment">// Reconstruct final array in O(N):</span>
+    <span class="code-hl">public long</span>[] reconstruct() {
+        <span class="code-hl">long</span>[] A = <span class="code-hl">new long</span>[n];
+        A[<span class="code-hl">0</span>] = D[<span class="code-hl">0</span>];
+        <span class="code-hl">for</span> (<span class="code-hl">int</span> i = <span class="code-hl">1</span>; i &lt; n; i++) {
+            A[i] = A[i - <span class="code-hl">1</span>] + D[i];
+        }
+        <span class="code-hl">return</span> A;
+    }
+}</code></pre>
+          </div>
         </div>
       </div>
 
@@ -1351,6 +1597,34 @@ A[<span class="code-hl">0</span>] = D[<span class="code-hl">0</span>]
       }
       document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
       if (btn) btn.classList.add('active');
+    }
+
+    // Language Tab Switcher (Python, C++, Java)
+    let currentLang = 'python';
+
+    function switchLanguage(lang) {
+      currentLang = lang;
+      // Update all language tab buttons across all cards
+      document.querySelectorAll('.lang-tab').forEach(btn => {
+        const text = btn.textContent.trim().toLowerCase();
+        if (text === lang.toLowerCase() || (lang === 'cpp' && text === 'c++')) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      // Toggle visible code panel in all code cards
+      document.querySelectorAll('.code-panel').forEach(panel => {
+        if (panel.getAttribute('data-lang') === lang) {
+          panel.classList.add('active');
+        } else {
+          panel.classList.remove('active');
+        }
+      });
+
+      const langNames = { python: 'Python', cpp: 'C++', java: 'Java' };
+      showToast(`Switched code examples to ${langNames[lang] || lang}`);
     }
 
     /* ═════════════════════════════════════════════════════════════════ */
