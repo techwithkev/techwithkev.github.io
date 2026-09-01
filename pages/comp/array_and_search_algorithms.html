@@ -858,6 +858,124 @@
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
+    /* Decision Card & Scenarios Component */
+    .decision-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      margin-top: 20px;
+    }
+
+    .decision-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 10px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 14px;
+    }
+
+    .badge-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .decision-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    @media (max-width: 900px) {
+      .decision-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .decision-col {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+    }
+
+    .decision-heading {
+      font-size: 0.86rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .decision-heading.success {
+      color: #34d399;
+    }
+
+    .decision-heading.scenarios {
+      color: #38bdf8;
+    }
+
+    .decision-heading.warning {
+      color: #f87171;
+    }
+
+    .decision-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 0.84rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    .decision-list li {
+      position: relative;
+      padding-left: 18px;
+      margin-bottom: 10px;
+    }
+
+    .decision-list li:last-child {
+      margin-bottom: 0;
+    }
+
+    .decision-list li::before {
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+    }
+
+    .decision-heading.success + .decision-list li::before {
+      content: '✓';
+      color: #34d399;
+    }
+
+    .decision-heading.scenarios + .decision-list li::before {
+      content: '•';
+      color: #38bdf8;
+      font-size: 1.1em;
+    }
+
+    .decision-heading.warning + .decision-list li::before {
+      content: '✕';
+      color: #f87171;
+    }
+
+    .decision-list strong {
+      color: #f1f5f9;
+    }
+
     /* Tooltip / Toast Notification */
     #toast-msg {
       position: fixed;
@@ -1144,6 +1262,49 @@
         </div>
       </div>
 
+      <!-- Decision Criteria & Scenarios -->
+      <div class="decision-card">
+        <div class="decision-header">
+          <div class="info-card-title" style="margin-bottom: 0;">
+            <span>🎯</span> When to Use & Decision Criteria
+          </div>
+          <span class="badge-tag">O(log N) Decision Rules</span>
+        </div>
+
+        <div class="decision-grid">
+          <!-- Col 1: When to Use -->
+          <div class="decision-col">
+            <h4 class="decision-heading success">✔ When to Use</h4>
+            <ul class="decision-list">
+              <li><strong>Monotonic Condition:</strong> The search space is sorted, or a condition <span class="math">f(x)</span> transitions predictably (e.g. <code>FFFF...TTTT</code> or <code>TTTT...FFFF</code>).</li>
+              <li><strong>Massive Range (<span class="math">N &le; 10<sup>9</sup></span> to <span class="math">10<sup>18</sup></span>):</strong> A linear scan <span class="math-expr">O(N)</span> triggers Time Limit Exceeded (TLE), but <span class="math-expr">O(log N)</span> executes in only &le; 30–60 iterations.</li>
+              <li><strong>Verifiable Solution:</strong> You cannot easily construct the optimal answer directly, but you can <em>check</em> if a candidate answer <span class="math">x</span> is feasible in <span class="math-expr">O(N)</span>.</li>
+              <li><strong>Direct Index Access:</strong> The underlying data structure supports <span class="math-expr">O(1)</span> random indexing (array or vector).</li>
+            </ul>
+          </div>
+
+          <!-- Col 2: Scenarios -->
+          <div class="decision-col">
+            <h4 class="decision-heading scenarios">📋 Contest Scenarios</h4>
+            <ul class="decision-list">
+              <li><strong>Binary Search on the Answer:</strong> Optimization tasks asking to <em>"maximize the minimum"</em> or <em>"minimize the maximum"</em> (e.g. conveyor belt packing, painter partitions, aggressive cows).</li>
+              <li><strong>Boundary &amp; Frequency Queries:</strong> Finding the first index &ge; <span class="math">x</span> (<code>lower_bound</code>) or first index &gt; <span class="math">x</span> (<code>upper_bound</code>) to count elements in range <span class="math">[A, B]</span>.</li>
+              <li><strong>Monotonic Mathematical Functions:</strong> Inverting monotone formulas (e.g. finding integer square root or <span class="math">x<sup>k</sup> &le; M</span>).</li>
+            </ul>
+          </div>
+
+          <!-- Col 3: When NOT to Use -->
+          <div class="decision-col">
+            <h4 class="decision-heading warning">❌ When NOT to Use</h4>
+            <ul class="decision-list">
+              <li><strong>Unsorted Arrays with a Single Query:</strong> Sorting costs <span class="math-expr">O(N log N)</span>. If you only search once, a simple <span class="math-expr">O(N)</span> linear scan is faster.</li>
+              <li><strong>Non-Monotonic Search Spaces:</strong> If validity oscillates erratically without a single split point, binary search will prune the wrong half.</li>
+              <li><strong>Linked Lists:</strong> Finding <code>mid</code> takes <span class="math-expr">O(N)</span> time, degrading binary search to <span class="math-expr">O(N)</span> overall.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
     </section>
 
 
@@ -1326,11 +1487,53 @@ std::vector&lt;<span class="code-hl">long long</span>&gt; buildPrefixSum(<span c
         }
     }
 
-    <span class="code-comment">// Query [L, R] in O(1):</span>
-    <span class="code-hl">public long</span> query(<span class="code-hl">int</span> L, <span class="code-hl">int</span> R) {
-        <span class="code-hl">return</span> P[R + <span class="code-hl">1</span>] - P[L];
+    // Query [L, R] in O(1):
+    public long query(int L, int R) {
+        return P[R + 1] - P[L];
     }
 }</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Decision Criteria & Scenarios -->
+      <div class="decision-card">
+        <div class="decision-header">
+          <div class="info-card-title" style="margin-bottom: 0;">
+            <span>🎯</span> When to Use & Decision Criteria
+          </div>
+          <span class="badge-tag">O(1) Range Sum Rules</span>
+        </div>
+
+        <div class="decision-grid">
+          <!-- Col 1: When to Use -->
+          <div class="decision-col">
+            <h4 class="decision-heading success">✔ When to Use</h4>
+            <ul class="decision-list">
+              <li><strong>Static Array (Zero / Few Updates):</strong> Array values remain unmodified after initialization.</li>
+              <li><strong>Frequent Range Queries (<span class="math">Q &ge; 10<sup>4</sup></span>):</strong> You must answer thousands of range sum queries across arbitrary intervals <span class="math">[L &hellip; R]</span> without re-looping.</li>
+              <li><strong>Invertible Operations:</strong> The aggregation can be reversed with subtraction (e.g. arithmetic sums, XOR sums since <span class="math">X &oplus; X = 0</span>).</li>
+              <li><strong>Multidimensional Grid Sums:</strong> Rapidly computing subgrid integrals in 2D grids in <span class="math-expr emerald">O(1)</span> time using 2D prefix sums.</li>
+            </ul>
+          </div>
+
+          <!-- Col 2: Scenarios -->
+          <div class="decision-col">
+            <h4 class="decision-heading scenarios">📋 Contest Scenarios</h4>
+            <ul class="decision-list">
+              <li><strong>Subarray Sum Equals <span class="math">K</span>:</strong> Storing prefix sums in a Hash Map to count all subarrays with sum <span class="math">K</span> in linear <span class="math-expr">O(N)</span> time.</li>
+              <li><strong>Divisibility &amp; Modulo Properties:</strong> Finding subarrays whose sum is divisible by <span class="math">K</span> by tracking <span class="math">P[i] \pmod K</span> (Pigeonhole Principle).</li>
+              <li><strong>2D Region Queries:</strong> Rapidly checking sum or density of points in subgrids of maps or images.</li>
+            </ul>
+          </div>
+
+          <!-- Col 3: When NOT to Use -->
+          <div class="decision-col">
+            <h4 class="decision-heading warning">❌ When NOT to Use</h4>
+            <ul class="decision-list">
+              <li><strong>Dynamic Element Updates:</strong> If elements change between queries, updating <span class="math">P</span> costs <span class="math-expr">O(N)</span> per modification. Use a <strong>Fenwick Tree (Binary Indexed Tree)</strong> or <strong>Segment Tree</strong> (<span class="math-expr">O(log N)</span> update &amp; query).</li>
+              <li><strong>Non-Invertible Queries (Range Min/Max):</strong> You cannot find the minimum in <span class="math">[L &hellip; R]</span> by subtracting prefix minimums. Use a <strong>Sparse Table</strong> (<span class="math-expr">O(1)</span> static RMQ) or <strong>Segment Tree</strong>.</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -1549,16 +1752,57 @@ A[<span class="code-hl">0</span>] = D[<span class="code-hl">0</span>]
         <span class="code-hl">if</span> (R + <span class="code-hl">1</span> &lt; n) D[R + <span class="code-hl">1</span>] -= V;
     }
 
-    <span class="code-comment">// Reconstruct final array in O(N):</span>
-    <span class="code-hl">public long</span>[] reconstruct() {
-        <span class="code-hl">long</span>[] A = <span class="code-hl">new long</span>[n];
-        A[<span class="code-hl">0</span>] = D[<span class="code-hl">0</span>];
-        <span class="code-hl">for</span> (<span class="code-hl">int</span> i = <span class="code-hl">1</span>; i &lt; n; i++) {
-            A[i] = A[i - <span class="code-hl">1</span>] + D[i];
+    // Reconstruct final array in O(N):
+    public long[] reconstruct() {
+        long[] A = new long[n];
+        A[0] = D[0];
+        for (int i = 1; i < n; i++) {
+            A[i] = A[i - 1] + D[i];
         }
-        <span class="code-hl">return</span> A;
+        return A;
     }
 }</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Decision Criteria & Scenarios -->
+      <div class="decision-card">
+        <div class="decision-header">
+          <div class="info-card-title" style="margin-bottom: 0;">
+            <span>🎯</span> When to Use & Decision Criteria
+          </div>
+          <span class="badge-tag">O(1) Batch Range Update Rules</span>
+        </div>
+
+        <div class="decision-grid">
+          <!-- Col 1: When to Use -->
+          <div class="decision-col">
+            <h4 class="decision-heading success">✔ When to Use</h4>
+            <ul class="decision-list">
+              <li><strong>Offline Range Updates:</strong> You receive <span class="math">M</span> interval update operations <span class="math">[L, R] += V</span> that can all be accumulated <em>before</em> any queries are evaluated.</li>
+              <li><strong>Massive Volume (<span class="math">M, N &ge; 10<sup>5</sup></span>):</strong> A naive loop per update costs <span class="math-expr">O(M &times; N) &approx; 10<sup>10</sup></span> operations (TLE), whereas Difference Array runs in <span class="math-expr amber">O(M + N) &approx; 2 &times; 10<sup>5</sup></span> total.</li>
+              <li><strong>Final Array Reconstruction:</strong> You only need the final state of the entire array, or multiple point queries at the end of all updates.</li>
+            </ul>
+          </div>
+
+          <!-- Col 2: Scenarios -->
+          <div class="decision-col">
+            <h4 class="decision-heading scenarios">📋 Contest Scenarios</h4>
+            <ul class="decision-list">
+              <li><strong>Interval Overlapping &amp; Peak Capacity:</strong> Tracking passenger loads on buses/trains between stops (e.g. finding peak load in carpooling / flight reservations).</li>
+              <li><strong>Batch Range Additions:</strong> Applying successive layer additions or terrain terraforming height deltas across contiguous intervals.</li>
+              <li><strong>Coordinate Compression Sweep-line:</strong> Combining difference arrays with sorted event coordinates for 1D/2D sweep-line algorithms.</li>
+            </ul>
+          </div>
+
+          <!-- Col 3: When NOT to Use -->
+          <div class="decision-col">
+            <h4 class="decision-heading warning">❌ When NOT to Use</h4>
+            <ul class="decision-list">
+              <li><strong>Online / Interleaved Queries:</strong> If you must query <span class="math">A[i]</span> or <span class="math">Sum(L…R)</span> while range updates are actively happening, a difference array cannot answer without a full <span class="math-expr">O(N)</span> rebuild. Use a <strong>Segment Tree with Lazy Propagation</strong> (<span class="math-expr">O(log N)</span>).</li>
+              <li><strong>Range Overwrites / Assignments:</strong> Difference arrays only support additive deltas (<span class="math">+= V</span>), not setting ranges to constant values (<span class="math">A[L…R] = V</span>).</li>
+            </ul>
           </div>
         </div>
       </div>
