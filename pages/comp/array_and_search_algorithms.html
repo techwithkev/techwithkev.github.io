@@ -7,6 +7,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- KaTeX for math typesetting -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
   <style>
     :root {
       --bg-base: #0a0d14;
@@ -39,6 +43,39 @@
       --radius-xl: 24px;
       --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
       --transition-base: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Clean self-contained math styling */
+    .math {
+      font-family: 'Outfit', 'Georgia', serif;
+      font-style: italic;
+      color: #f1f5f9;
+      font-weight: 500;
+    }
+
+    .math-expr {
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.28);
+      color: #c7d2fe;
+      padding: 1px 7px;
+      border-radius: 5px;
+      font-size: 0.88em;
+      font-weight: 600;
+      white-space: nowrap;
+      display: inline-block;
+    }
+
+    .math-expr.emerald {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.28);
+      color: #a7f3d0;
+    }
+
+    .math-expr.amber {
+      background: rgba(245, 158, 11, 0.12);
+      border-color: rgba(245, 158, 11, 0.28);
+      color: #fde68a;
     }
 
     * {
@@ -874,7 +911,7 @@
           </div>
           <h2 class="section-title">1. Binary Search in Sorted Array</h2>
           <p class="section-description">
-            Instead of examining all $N$ elements sequentially ($O(N)$), binary search cuts the search space in half at each step by comparing the middle element against the target value. Halving $N=1,000,000$ items requires only $\approx 20$ comparisons!
+            Instead of examining all <span class="math">N</span> elements sequentially (<span class="math-expr">O(N)</span>), binary search cuts the search space in half at each step by comparing the middle element against the target value. Halving <span class="math">N</span> = 1,000,000 items requires only &approx; 20 comparisons!
           </p>
         </div>
       </div>
@@ -953,7 +990,7 @@
           <span>Comparisons Made: <span id="bs-comp-count" class="num-tag">0</span></span>
         </div>
         <div style="font-size: 0.85rem; color: var(--text-muted);">
-          Max steps for $N=16$: <strong>⌈log₂(16)⌉ = 4</strong>
+          Max steps for <span class="math">N</span> = 16: <strong>&lceil;log<sub>2</sub>(16)&rceil; = 4</strong>
         </div>
       </div>
 
@@ -962,9 +999,9 @@
         <div class="info-card">
           <div class="info-card-title">💡 CCC Contest Insights</div>
           <ul>
-            <li><strong>Preventing Integer Overflow:</strong> In C++ and Java, writing <code>mid = (L + R) / 2</code> can overflow 32-bit signed integers if $L + R > 2^{31}-1$. Always prefer <code>mid = L + (R - L) / 2</code>.</li>
+            <li><strong>Preventing Integer Overflow:</strong> In C++ and Java, writing <code>mid = (L + R) / 2</code> can overflow 32-bit signed integers if <span class="math-expr">L + R &gt; 2<sup>31</sup> &minus; 1</span>. Always prefer <code>mid = L + (R - L) / 2</code>.</li>
             <li><strong>Binary Search on Answer:</strong> In many CCC Junior/Senior problems (e.g. minimizing maximum distances, capacity checks), you binary search over the <em>answer space</em> instead of an explicit array.</li>
-            <li><strong>Standard Library Shortcuts:</strong> In C++, use <code>std::lower_bound</code> (first element $\ge x$) and <code>std::upper_bound</code> (first element $> x$). In Python, use <code>bisect.bisect_left</code>.</li>
+            <li><strong>Standard Library Shortcuts:</strong> In C++, use <code>std::lower_bound</code> (first element &ge; <span class="math">x</span>) and <code>std::upper_bound</code> (first element &gt; <span class="math">x</span>). In Python, use <code>bisect.bisect_left</code>.</li>
           </ul>
         </div>
         <div class="info-card">
@@ -1001,7 +1038,7 @@
           </div>
           <h2 class="section-title">2. Prefix Sum Array (Range Sum Queries)</h2>
           <p class="section-description">
-            A Prefix Sum array precalculates cumulative sums so that the sum of any subarray from index $L$ to $R$ can be answered in exact <strong>$O(1)$ constant time</strong> using the formula $\text{Sum}(L \dots R) = P[R+1] - P[L]$. This eliminates repetitive $O(N)$ loop overhead for $Q$ queries.
+            A Prefix Sum array precalculates cumulative sums so that the sum of any subarray from index <span class="math">L</span> to <span class="math">R</span> can be answered in exact <strong><span class="math-expr emerald">O(1)</span> constant time</strong> using the formula <span class="math-expr emerald">Sum(L…R) = P[R+1] &minus; P[L]</span>. This eliminates repetitive <span class="math-expr">O(N)</span> loop overhead for <span class="math">Q</span> queries.
           </p>
         </div>
       </div>
@@ -1041,7 +1078,7 @@
             State: <strong id="ps-status-label">Ready</strong>
           </div>
           <div class="step-explanation" id="ps-explanation">
-            <span class="icon">📊</span> Step through the construction of prefix sums $P[i] = P[i-1] + A[i-1]$, or enter range $[L, R]$ to test an instant $O(1)$ query.
+            <span class="icon">📊</span> Step through the construction of prefix sums <span class="math-expr emerald">P[i] = P[i-1] + A[i-1]</span>, or enter range [<span class="math">L</span>, <span class="math">R</span>] to test an instant <span class="math-expr emerald">O(1)</span> query.
           </div>
         </div>
 
@@ -1055,8 +1092,8 @@
             <!-- Rendered by JS -->
           </div>
 
-          <div style="margin: 10px 0; color: var(--accent-emerald); font-size: 1.2rem; font-weight: 700;">
-            ⬇ Cumulative Accumulation $P[i] = P[i-1] + A[i-1]$
+          <div style="margin: 10px 0; color: var(--accent-emerald); font-size: 1.15rem; font-weight: 700;">
+            ⬇ Cumulative Accumulation <span class="math-expr emerald">P[i] = P[i-1] + A[i-1]</span>
           </div>
 
           <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); width: 100%; display: flex; justify-content: space-between;">
@@ -1099,14 +1136,14 @@
         <div class="info-card">
           <div class="info-card-title">💡 Why 1-Indexed Prefix Sums?</div>
           <p>
-            When using $0$-indexed prefix sums ($P[i] = \sum_{k=0}^{i} A[k]$), querying $L=0$ requires special-casing because $P[L-1]$ is out-of-bounds ($P[-1]$).
+            When using 0-indexed prefix sums (<span class="math-expr">P[i] = &sum;<sub>k=0</sub><sup>i</sup> A[k]</span>), querying <span class="math">L</span> = 0 requires special-casing because <span class="math">P</span>[<span class="math">L</span> &minus; 1] is out-of-bounds (<span class="math">P</span>[&minus;1]).
           </p>
           <p>
-            By defining $P$ with length $N+1$ and $P[0] = 0$:
+            By defining <span class="math">P</span> with length <span class="math">N</span> + 1 and <span class="math">P</span>[0] = 0:
           </p>
           <ul>
-            <li>$P[k]$ stores the sum of the first $k$ elements ($A[0 \dots k-1]$).</li>
-            <li>$\text{Sum}(L \dots R) = P[R+1] - P[L]$ works unconditionally without any <code>if (L == 0)</code> branch checks!</li>
+            <li><span class="math">P</span>[<span class="math">k</span>] stores the sum of the first <span class="math">k</span> elements (<span class="math">A</span>[0 &hellip; <span class="math">k</span> &minus; 1]).</li>
+            <li><span class="math-expr emerald">Sum(L…R) = P[R+1] &minus; P[L]</span> works unconditionally without any <code>if (L == 0)</code> branch checks!</li>
           </ul>
         </div>
         <div class="info-card">
@@ -1139,7 +1176,7 @@ P = [<span class="code-hl">0</span>] * (len(A) + <span class="code-hl">1</span>)
           </div>
           <h2 class="section-title">3. Difference Array (Range Update Operations)</h2>
           <p class="section-description">
-            The mathematical dual of prefix sums. If you have $M$ operations that require adding $+V$ across a range $[L, R]$, updating the array naively takes $O(M \times N)$. A Difference Array reduces each range update to just <strong>two boundary operations in $O(1)$</strong>: $D[L] \mathrel{+}= V$ and $D[R+1] \mathrel{-}= V$. Then one final prefix sum restores all values in $O(N)$!
+            The mathematical dual of prefix sums. If you have <span class="math">M</span> operations that require adding +<span class="math">V</span> across a range [<span class="math">L</span>, <span class="math">R</span>], updating the array naively takes <span class="math-expr">O(M &times; N)</span>. A Difference Array reduces each range update to just <strong>two boundary operations in <span class="math-expr amber">O(1)</span></strong>: <span class="math-expr amber">D[L] += V</span> and <span class="math-expr amber">D[R+1] &minus;= V</span>. Then one final prefix sum restores all values in <span class="math-expr">O(N)</span>!
           </p>
         </div>
       </div>
@@ -1183,7 +1220,7 @@ P = [<span class="code-hl">0</span>] * (len(A) + <span class="code-hl">1</span>)
             Phase: <strong id="da-phase-label">Initial State</strong>
           </div>
           <div class="step-explanation" id="da-explanation">
-            <span class="icon">🔄</span> Click <strong>Next ▶</strong> to apply range update $D[L] += V$ and $D[R+1] -= V$, then observe how prefix summing $D$ propagates and cancels the change!
+            <span class="icon">🔄</span> Click <strong>Next ▶</strong> to apply range update <span class="math-expr amber">D[L] += V</span> and <span class="math-expr amber">D[R+1] &minus;= V</span>, then observe how prefix summing <span class="math">D</span> propagates and cancels the change!
           </div>
         </div>
 
@@ -1198,7 +1235,7 @@ P = [<span class="code-hl">0</span>] * (len(A) + <span class="code-hl">1</span>)
           </div>
 
           <div style="margin: 10px 0; color: var(--accent-cyan); font-size: 1.15rem; font-weight: 700;">
-            ⬇ Cumulative Prefix Sum: $A[i] = A[i-1] + D[i]$
+            ⬇ Cumulative Prefix Sum: <span class="math-expr amber">A[i] = A[i-1] + D[i]</span>
           </div>
 
           <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); width: 100%; display: flex; justify-content: space-between;">
@@ -2074,13 +2111,46 @@ A[<span class="code-hl">0</span>] = D[<span class="code-hl">0</span>]
       }
     }
 
-    // Initialize all 3 controllers on DOM load
+    // Initialize all 3 controllers and math typesetting
     let bsController, psController, daController;
+
+    function renderAllMath() {
+      if (typeof renderMathInElement === 'function') {
+        renderMathInElement(document.body, {
+          delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '$', right: '$', display: false }
+          ],
+          ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+          throwOnError: false
+        });
+      } else {
+        // Fallback for offline / blocked CDN: format $...$ into styled badges
+        document.querySelectorAll('.section-description, .info-card p, .info-card li, .step-explanation, .formula-banner, .array-strip-wrapper').forEach(el => {
+          el.innerHTML = el.innerHTML.replace(/\$([^\$]+)\$/g, (match, p1) => {
+            const clean = p1.replace(/\\approx/g, '≈')
+                            .replace(/\\times/g, '×')
+                            .replace(/\\dots/g, '…')
+                            .replace(/\\ge/g, '≥')
+                            .replace(/\\mathrel\{\+\}=/g, '+=')
+                            .replace(/\\mathrel\{-\}=/g, '-=')
+                            .replace(/\\text\{Sum\}/g, 'Sum')
+                            .replace(/\\sum_\{k=0\}\^\{i\}/g, '∑(k=0..i)');
+            return `<span style="font-family: 'JetBrains Mono', monospace; color: #38bdf8; font-weight: 600; font-size: 0.9em; padding: 1px 5px; background: rgba(56, 189, 248, 0.08); border-radius: 4px;">${clean}</span>`;
+          });
+        });
+      }
+    }
 
     window.addEventListener('DOMContentLoaded', () => {
       bsController = new BinarySearchController();
       psController = new PrefixSumController();
       daController = new DifferenceArrayController();
+      renderAllMath();
+    });
+
+    window.addEventListener('load', () => {
+      renderAllMath();
     });
   </script>
 </body>
