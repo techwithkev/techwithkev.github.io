@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exercise Submissions — Instructor Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../assets/js/teacher-shared.js"></script>
+  <style>
+    :root {
+      --navy:#0d1117;--surface:#161b22;--surface2:#1c2230;--surface3:#21262d;
+      --border:#30363d;--gold:#f0b429;--text:#e6edf3;--muted:#7d8590;
+      --green:#3fb950;--red:#f85149;--blue:#58a6ff;--purple:#bc8cff;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);min-height:100vh;}
+    .site-header{border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;}
+    .back-link{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--gold);text-decoration:none;}
+    .back-link:hover{text-decoration:underline;}
+    .auth-badge{display:flex;align-items:center;gap:8px;font-size:.75rem;font-family:'DM Mono',monospace;color:var(--muted);}
+    .dot{width:7px;height:7px;border-radius:50%;background:var(--green);}
+    .logout-btn{background:none;border:1px solid var(--border);color:var(--red);font-size:.72rem;font-family:'DM Mono',monospace;padding:3px 9px;border-radius:5px;cursor:pointer;}
+    #login-gate{min-height:100vh;display:flex;align-items:center;justify-content:center;}
+    .login-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px 36px;width:400px;}
+    .login-card h2{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:20px;}
+    .field input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:.875rem;font-family:'DM Mono',monospace;outline:none;margin-bottom:10px;}
+    .field input:focus{border-color:var(--gold);}
+    .btn-gold{width:100%;background:var(--gold);color:#1a1200;font-weight:700;font-size:.9rem;padding:11px;border:none;border-radius:10px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+    #login-error{color:var(--red);font-size:.78rem;margin-top:8px;}
+    #app{display:none;}
+
+    /* ── Layout ── */
+    .app-layout{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 53px);}
+    @media(max-width:900px){.app-layout{grid-template-columns:1fr;}}
+
+    /* ── Sidebar ── */
+    .sidebar{border-right:1px solid var(--border);padding:24px 0;overflow-y:auto;max-height:calc(100vh - 53px);position:sticky;top:0;}
+    .sidebar-section{margin-bottom:8px;}
+    .sidebar-label{font-family:'DM Mono',monospace;font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);padding:8px 20px 4px;}
+    .sidebar-select{width:calc(100% - 32px);margin:0 16px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text);font-size:.8rem;font-family:'DM Mono',monospace;outline:none;}
+    .sidebar-select:focus{border-color:var(--gold);}
+    .week-group{margin-bottom:2px;}
+    .week-heading{
+      padding:6px 20px;font-family:'DM Mono',monospace;font-size:.68rem;
+      color:var(--muted);text-transform:uppercase;letter-spacing:.08em;
+    }
+    .exercise-item{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:8px 20px;cursor:pointer;font-size:.82rem;
+      transition:background .12s;border-left:3px solid transparent;
+    }
+    .exercise-item:hover{background:var(--surface2);}
+    .exercise-item.active{background:var(--surface2);border-left-color:var(--gold);color:var(--gold);}
+    .exercise-item .count{
+      font-family:'DM Mono',monospace;font-size:.68rem;
+      background:var(--surface3);border:1px solid var(--border);
+      border-radius:20px;padding:1px 7px;color:var(--muted);
+    }
+    .exercise-item.active .count{background:rgba(240,180,41,.12);border-color:rgba(240,180,41,.3);color:var(--gold);}
+
+    /* ── Main panel ── */
+    .main-panel{padding:32px;overflow-x:auto;}
+    .panel-header-row{
+      display:flex;align-items:flex-start;justify-content:space-between;
+      margin-bottom:24px;gap:16px;flex-wrap:wrap;
+    }
+    .panel-title{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;}
+    .panel-title span{color:var(--gold);}
+    .panel-meta{font-size:.78rem;color:var(--muted);margin-top:4px;}
+    .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+    .search-input{
+      background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+      padding:7px 12px;color:var(--text);font-size:.8rem;font-family:'DM Mono',monospace;
+      outline:none;width:220px;
+    }
+    .search-input:focus{border-color:var(--gold);}
+    .btn-sm{padding:7px 13px;border-radius:7px;font-size:.78rem;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;}
+    .btn-outline{background:none;border:1px solid var(--border);color:var(--text);}
+    .btn-outline:hover{border-color:var(--gold);}
+
+    /* ── Stats bar ── */
+    .stats-bar{
+      display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap;
+    }
+    .stat-chip{
+      background:var(--surface);border:1px solid var(--border);border-radius:10px;
+      padding:10px 16px;display:flex;flex-direction:column;gap:2px;
+    }
+    .stat-chip .val{font-family:'DM Mono',monospace;font-size:1.1rem;font-weight:700;}
+    .stat-chip .lbl{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+
+    /* ── Table ── */
+    .data-table{width:100%;border-collapse:collapse;font-size:.82rem;}
+    .data-table th{text-align:left;padding:10px 14px;font-family:'DM Mono',monospace;font-size:.67rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap;}
+    .data-table td{padding:11px 14px;border-bottom:1px solid rgba(48,54,61,.5);vertical-align:top;max-width:320px;}
+    .data-table tr:last-child td{border-bottom:none;}
+    .data-table tr:hover td{background:rgba(255,255,255,.02);cursor:pointer;}
+    .trunc{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px;}
+    .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.7rem;font-family:'DM Mono',monospace;}
+    .badge-green{background:rgba(63,185,80,.1);color:var(--green);border:1px solid rgba(63,185,80,.2);}
+    .badge-gold{background:rgba(240,180,41,.1);color:var(--gold);border:1px solid rgba(240,180,41,.2);}
+    .empty-state{padding:48px;text-align:center;color:var(--muted);font-size:.875rem;}
+    .no-exercise{
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      min-height:60vh;gap:12px;color:var(--muted);
+    }
+    .no-exercise .icon{font-size:3rem;opacity:.4;}
+
+    /* ── Detail drawer ── */
+    .drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;display:none;}
+    .drawer-overlay.open{display:block;}
+    .drawer{
+      position:fixed;right:0;top:0;bottom:0;width:560px;max-width:100%;
+      background:var(--surface);border-left:1px solid var(--border);z-index:101;
+      overflow-y:auto;display:none;flex-direction:column;
+    }
+    .drawer.open{display:flex;}
+    .drawer-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:1;}
+    .drawer-header h3{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;}
+    .close-btn{background:none;border:1px solid var(--border);color:var(--muted);padding:5px 10px;border-radius:6px;cursor:pointer;font-size:.8rem;}
+    .close-btn:hover{color:var(--text);}
+    .drawer-body{padding:20px 24px;flex:1;}
+    .meta-row{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+    .meta-pill{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);}
+    .meta-pill strong{color:var(--text);font-weight:500;}
+    .payload-section{margin-top:8px;}
+    .payload-section h4{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+    .payload-field{margin-bottom:14px;}
+    .payload-field .pf-key{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--blue);margin-bottom:4px;}
+    .payload-field .pf-val{
+      background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+      padding:10px 12px;font-size:.82rem;line-height:1.6;white-space:pre-wrap;word-break:break-word;
+    }
+    .star-rating{color:var(--gold);font-size:1rem;}
+
+    /* ── Enjoyment distribution ── */
+    .enjoy-dist{display:flex;gap:4px;align-items:flex-end;height:50px;margin-bottom:4px;}
+    .enjoy-bar{flex:1;background:rgba(240,180,41,.15);border-radius:3px 3px 0 0;position:relative;min-height:4px;}
+    .enjoy-bar-fill{position:absolute;bottom:0;left:0;right:0;background:var(--gold);border-radius:3px 3px 0 0;transition:height .3s;}
+    .enjoy-labels{display:flex;gap:4px;}
+    .enjoy-label{flex:1;text-align:center;font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);}
+  </style>
+</head>
+<body>
+
+<!-- ── LOGIN ──────────────────────────────────────────────── -->
+<div id="login-gate">
+  <div class="login-card">
+    <h2>🔑 Teacher Sign-In</h2>
+    <div class="field"><input type="email"    id="l-email"    placeholder="teacher@school.ca" /></div>
+    <div class="field"><input type="password" id="l-password" placeholder="Password" /></div>
+    <button class="btn-gold" onclick="doLogin()">Sign In</button>
+    <div id="login-error"></div>
+  </div>
+</div>
+
+<!-- ── APP ───────────────────────────────────────────────── -->
+<div id="app">
+  <header class="site-header">
+    <a href="index.html" class="back-link">← Instructor Hub</a>
+    <div class="auth-badge">
+      <div class="dot"></div>
+      <span id="auth-label">signed in</span>
+      <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+    </div>
+  </header>
+
+  <div class="app-layout">
+    <!-- ── Sidebar ── -->
+    <nav class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Course</div>
+        <select class="sidebar-select" id="course-select" onchange="onCourseChange()">
+          <option value="">Loading…</option>
+        </select>
+        <div class="sidebar-label">Cohort</div>
+        <select class="sidebar-select" id="cohort-select" onchange="onCohortChange()">
+          <option value="">Select cohort</option>
+        </select>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Exercises</div>
+        <div id="exercise-list">
+          <div style="padding:12px 20px;font-size:.78rem;color:var(--muted);">Select a cohort to see exercises.</div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ── Main Panel ── -->
+    <main class="main-panel">
+      <!-- No exercise selected -->
+      <div id="no-exercise-state" class="no-exercise">
+        <div class="icon">📋</div>
+        <div>Select a cohort and exercise from the sidebar.</div>
+        <div style="font-size:.78rem;">Submissions appear here after students complete an activity.</div>
+      </div>
+
+      <!-- Submission view -->
+      <div id="submission-view" style="display:none;">
+        <div class="panel-header-row">
+          <div>
+            <div class="panel-title" id="exercise-title">Exercise Name</div>
+            <div class="panel-meta" id="exercise-meta">—</div>
+          </div>
+          <div class="toolbar">
+            <input type="text" class="search-input" id="search-input" placeholder="Search by name or email…" oninput="filterRows()" />
+            <button class="btn-sm btn-outline" onclick="exportCSV()">↓ CSV</button>
+            <button class="btn-sm btn-outline" onclick="loadSubmissions()">↻</button>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-bar" id="stats-bar"></div>
+
+        <!-- Enjoyment distribution -->
+        <div id="enjoy-section" style="display:none;margin-bottom:20px;">
+          <div style="font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;">Enjoyment Distribution</div>
+          <div class="enjoy-dist" id="enjoy-dist"></div>
+          <div class="enjoy-labels">
+            <div class="enjoy-label">1⭐</div>
+            <div class="enjoy-label">2⭐</div>
+            <div class="enjoy-label">3⭐</div>
+            <div class="enjoy-label">4⭐</div>
+            <div class="enjoy-label">5⭐</div>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Student</th>
+                <th>Email</th>
+                <th>Enjoyment</th>
+                <th>Submitted</th>
+                <th>Preview</th>
+              </tr>
+            </thead>
+            <tbody id="submissions-tbody">
+              <tr><td colspan="6" class="empty-state">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ── Detail Drawer ── -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="detail-drawer">
+  <div class="drawer-header">
+    <h3 id="drawer-student-name">—</h3>
+    <button class="close-btn" onclick="closeDrawer()">✕ Close</button>
+  </div>
+  <div class="drawer-body" id="drawer-body"></div>
+</div>
+
+<script>
+  var sb = createTeacherClient();
+  var currentUser = null;
+  var allCourses   = [];
+  var allExercises = [];
+  var rawData      = [];
+  var filteredData = [];
+  var activeExercise = null;
+  var activeCohortId = null;
+
+  // ── Auth ─────────────────────────────────────────────────────
+  async function init() {
+    var session = await getTeacherSession();
+    if (session) { currentUser = session.user; setAuthed(); }
+  }
+  function setAuthed() {
+    document.getElementById('login-gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('auth-label').textContent = currentUser.email;
+    loadCourses();
+  }
+  async function doLogin() {
+    var { user, error } = await TeacherAuth.login(
+      document.getElementById('l-email').value.trim(),
+      document.getElementById('l-password').value
+    );
+    if (error) { document.getElementById('login-error').textContent = error; return; }
+    currentUser = user; setAuthed();
+  }
+  async function doLogout() { await TeacherAuth.logout(); location.reload(); }
+  ['l-email','l-password'].forEach(id =>
+    document.getElementById(id).addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); })
+  );
+
+  // ── Courses ──────────────────────────────────────────────────
+  async function loadCourses() {
+    var { data } = await sb.from('courses').select('id,slug,name').eq('is_active',true).order('name');
+    allCourses = data || [];
+    var sel = document.getElementById('course-select');
+    sel.innerHTML = allCourses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    if (allCourses.length) await onCourseChange();
+  }
+
+  async function onCourseChange() {
+    var courseId = document.getElementById('course-select').value;
+    if (!courseId) return;
+
+    // Load cohorts
+    var { data } = await sb
+      .from('cohorts')
+      .select('id,name,term')
+      .eq('course_id', courseId)
+      .eq('is_active', true)
+      .order('term', { ascending: false });
+
+    var cohortSel = document.getElementById('cohort-select');
+    cohortSel.innerHTML = (data && data.length)
+      ? data.map(c => `<option value="${c.id}">${c.name}${c.term ? ' — ' + c.term : ''}</option>`).join('')
+      : '<option value="">No cohorts found</option>';
+
+    // Load exercises for this course
+    var { data: exDefs } = await sb
+      .from('exercise_definitions')
+      .select('id,exercise_slug,label,week_number,sequence_order')
+      .eq('course_id', courseId)
+      .eq('is_active', true)
+      .order('week_number')
+      .order('sequence_order');
+
+    allExercises = exDefs || [];
+
+    if (data && data.length) {
+      activeCohortId = data[0].id;
+      await onCohortChange();
+    }
+  }
+
+  async function onCohortChange() {
+    activeCohortId = document.getElementById('cohort-select').value;
+    if (!activeCohortId) return;
+
+    // Load submission counts per exercise for this cohort
+    var { data: counts } = await sb
+      .from('exercise_submissions')
+      .select('exercise_id')
+      .eq('cohort_id', activeCohortId);
+
+    var countMap = {};
+    (counts || []).forEach(r => {
+      countMap[r.exercise_id] = (countMap[r.exercise_id] || 0) + 1;
+    });
+
+    renderExerciseList(countMap);
+
+    // Deselect current exercise
+    document.getElementById('no-exercise-state').style.display = 'flex';
+    document.getElementById('submission-view').style.display = 'none';
+    activeExercise = null;
+  }
+
+  function renderExerciseList(countMap) {
+    var list = document.getElementById('exercise-list');
+    if (!allExercises.length) {
+      list.innerHTML = '<div style="padding:12px 20px;font-size:.78rem;color:var(--muted);">No exercises registered for this course.</div>';
+      return;
+    }
+
+    // Group by week
+    var byWeek = {};
+    allExercises.forEach(ex => {
+      var wk = ex.week_number || 0;
+      if (!byWeek[wk]) byWeek[wk] = [];
+      byWeek[wk].push(ex);
+    });
+
+    list.innerHTML = Object.entries(byWeek)
+      .sort(([a],[b]) => Number(a) - Number(b))
+      .map(([wk, exs]) => `
+        <div class="week-group">
+          <div class="week-heading">Week ${wk}</div>
+          ${exs.map(ex => `
+            <div class="exercise-item" id="ex-item-${ex.id}" onclick="selectExercise(${ex.id}, '${ex.exercise_slug}', '${ex.label.replace(/'/g,"\\'")}')">
+              <span>${ex.label.replace(/^Week \d+ — /, '')}</span>
+              <span class="count">${countMap[ex.id] || 0}</span>
+            </div>
+          `).join('')}
+        </div>
+      `).join('');
+  }
+
+  async function selectExercise(exerciseId, slug, label) {
+    activeExercise = { id: exerciseId, slug, label };
+
+    document.querySelectorAll('.exercise-item').forEach(el => el.classList.remove('active'));
+    document.getElementById('ex-item-' + exerciseId)?.classList.add('active');
+
+    document.getElementById('no-exercise-state').style.display = 'none';
+    document.getElementById('submission-view').style.display = 'block';
+    document.getElementById('exercise-title').innerHTML = `<span>${label}</span>`;
+
+    await loadSubmissions();
+  }
+
+  async function loadSubmissions() {
+    if (!activeExercise || !activeCohortId) return;
+
+    var cohortName = document.getElementById('cohort-select').options[document.getElementById('cohort-select').selectedIndex]?.text || '';
+    document.getElementById('exercise-meta').textContent = cohortName + ' · Loading…';
+
+    var { data, error } = await sb
+      .from('exercise_submissions')
+      .select('*')
+      .eq('exercise_id', activeExercise.id)
+      .eq('cohort_id', activeCohortId)
+      .order('submitted_at', { ascending: false });
+
+    rawData = data || [];
+    filteredData = rawData.slice();
+
+    document.getElementById('exercise-meta').textContent =
+      cohortName + ' · ' + rawData.length + ' submission' + (rawData.length !== 1 ? 's' : '');
+
+    renderStats();
+    renderTable();
+  }
+
+  function renderStats() {
+    var total = rawData.length;
+    var withEnjoy = rawData.filter(r => r.enjoyment_rating);
+    var avgEnjoy = withEnjoy.length
+      ? (withEnjoy.reduce((s, r) => s + r.enjoyment_rating, 0) / withEnjoy.length).toFixed(1)
+      : '—';
+
+    document.getElementById('stats-bar').innerHTML = `
+      <div class="stat-chip"><div class="val">${total}</div><div class="lbl">Submissions</div></div>
+      <div class="stat-chip"><div class="val">${avgEnjoy}</div><div class="lbl">Avg Enjoyment</div></div>
+      <div class="stat-chip"><div class="val">${rawData.length ? fmtDate(rawData[0].submitted_at) : '—'}</div><div class="lbl">Latest</div></div>
+    `;
+
+    // Enjoyment distribution
+    if (withEnjoy.length) {
+      var dist = [0,0,0,0,0];
+      withEnjoy.forEach(r => { if (r.enjoyment_rating >= 1 && r.enjoyment_rating <= 5) dist[r.enjoyment_rating-1]++; });
+      var maxVal = Math.max(...dist, 1);
+      document.getElementById('enjoy-section').style.display = 'block';
+      document.getElementById('enjoy-dist').innerHTML = dist.map((v, i) => `
+        <div class="enjoy-bar" title="${i+1}★: ${v} student${v!==1?'s':''}">
+          <div class="enjoy-bar-fill" style="height:${Math.round((v/maxVal)*100)}%;"></div>
+        </div>
+      `).join('');
+    } else {
+      document.getElementById('enjoy-section').style.display = 'none';
+    }
+  }
+
+  function renderTable() {
+    var tbody = document.getElementById('submissions-tbody');
+    if (!filteredData.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No submissions yet for this cohort.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = filteredData.map((r, i) => {
+      var preview = getPayloadPreview(r.payload);
+      var stars = r.enjoyment_rating ? '⭐'.repeat(r.enjoyment_rating) : '—';
+      return `
+        <tr onclick="openDrawer(${i})">
+          <td style="color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;">${i+1}</td>
+          <td style="font-weight:600;">${esc(r.student_name)}</td>
+          <td style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted);">${esc(r.student_email)}</td>
+          <td style="font-size:.85rem;">${stars}</td>
+          <td style="font-size:.75rem;color:var(--muted);white-space:nowrap;">${fmtDate(r.submitted_at)}</td>
+          <td class="trunc" style="color:var(--muted);font-size:.78rem;">${esc(preview)}</td>
+        </tr>`;
+    }).join('');
+  }
+
+  function filterRows() {
+    var q = document.getElementById('search-input').value.toLowerCase();
+    filteredData = q
+      ? rawData.filter(r =>
+          (r.student_name || '').toLowerCase().includes(q) ||
+          (r.student_email || '').toLowerCase().includes(q)
+        )
+      : rawData.slice();
+    renderTable();
+  }
+
+  // ── Drawer ────────────────────────────────────────────────────
+  function openDrawer(idx) {
+    var r = filteredData[idx];
+    if (!r) return;
+    document.getElementById('drawer-student-name').textContent = r.student_name;
+
+    var body = document.getElementById('drawer-body');
+    var stars = r.enjoyment_rating ? '⭐'.repeat(r.enjoyment_rating) + ' ' + r.enjoyment_rating + '/5' : 'Not rated';
+
+    body.innerHTML = `
+      <div class="meta-row">
+        <div class="meta-pill">📧 <strong>${esc(r.student_email)}</strong></div>
+        <div class="meta-pill">🕐 <strong>${fmtDateFull(r.submitted_at)}</strong></div>
+        <div class="meta-pill">⭐ <strong>${stars}</strong></div>
+      </div>
+      <div class="payload-section">
+        <h4>Submission Payload</h4>
+        ${renderPayloadFields(r.payload)}
+      </div>
+    `;
+
+    document.getElementById('detail-drawer').classList.add('open');
+    document.getElementById('drawer-overlay').classList.add('open');
+  }
+
+  function closeDrawer() {
+    document.getElementById('detail-drawer').classList.remove('open');
+    document.getElementById('drawer-overlay').classList.remove('open');
+  }
+
+  function renderPayloadFields(payload) {
+    if (!payload || typeof payload !== 'object') return '<div style="color:var(--muted);">No payload data.</div>';
+    return Object.entries(payload).map(([k, v]) => {
+      var display = typeof v === 'object' ? JSON.stringify(v, null, 2) : String(v);
+      return `
+        <div class="payload-field">
+          <div class="pf-key">${esc(k)}</div>
+          <div class="pf-val">${esc(display)}</div>
+        </div>`;
+    }).join('');
+  }
+
+  // ── CSV Export ────────────────────────────────────────────────
+  function exportCSV() {
+    if (!rawData.length) { alert('No data to export.'); return; }
+
+    // Collect all payload keys
+    var payloadKeys = new Set();
+    rawData.forEach(r => { if (r.payload) Object.keys(r.payload).forEach(k => payloadKeys.add(k)); });
+    var pkArr = Array.from(payloadKeys);
+
+    var headers = ['student_name','student_email','enjoyment_rating','submitted_at', ...pkArr];
+    var rows = rawData.map(r =>
+      headers.map(h => {
+        if (['student_name','student_email','enjoyment_rating','submitted_at'].includes(h)) return csvCell(r[h]);
+        return csvCell(r.payload ? r.payload[h] : '');
+      }).join(',')
+    );
+
+    var csv = [headers.join(','), ...rows].join('\n');
+    var blob = new Blob([csv], { type: 'text/csv' });
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href = url; a.download = (activeExercise?.slug || 'submissions') + '_' + activeCohortId + '.csv';
+    a.click(); URL.revokeObjectURL(url);
+  }
+
+  // ── Utilities ─────────────────────────────────────────────────
+  function esc(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function fmtDate(ts) {
+    if (!ts) return '—';
+    return new Date(ts).toLocaleDateString('en-CA', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+  }
+  function fmtDateFull(ts) {
+    if (!ts) return '—';
+    return new Date(ts).toLocaleString('en-CA', { dateStyle:'medium', timeStyle:'short' });
+  }
+  function csvCell(v) {
+    var s = v == null ? '' : String(v);
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  function getPayloadPreview(payload) {
+    if (!payload || typeof payload !== 'object') return '';
+    var vals = Object.values(payload).filter(v => typeof v === 'string' && v.length > 2);
+    return vals[0] ? vals[0].slice(0, 80) : JSON.stringify(payload).slice(0, 80);
+  }
+
+  init();
+</script>
+</body>
+</html>

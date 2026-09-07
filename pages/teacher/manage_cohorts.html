@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/activity.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../assets/js/teacher-shared.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -113,12 +114,8 @@
   </footer>
 
   <script>
-    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
-    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
-
-    const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
-      auth: { persistSession: true }
-    });
+    // Credentials and Supabase client from teacher-shared.js
+    const db = createTeacherClient();
 
     let currentUser = null;
 

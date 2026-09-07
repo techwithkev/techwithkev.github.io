@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cohorts & Classes — Instructor Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../assets/js/teacher-shared.js"></script>
+  <style>
+    :root {
+      --navy: #0d1117; --surface: #161b22; --surface2: #1c2230; --surface3: #21262d;
+      --border: #30363d; --gold: #f0b429; --text: #e6edf3; --muted: #7d8590;
+      --green: #3fb950; --red: #f85149; --blue: #58a6ff; --purple: #bc8cff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--navy); color: var(--text); min-height: 100vh; }
+
+    /* ── Layout ── */
+    .site-header {
+      border-bottom: 1px solid var(--border); padding: 16px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .back-link { font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--gold); text-decoration: none; }
+    .back-link:hover { text-decoration: underline; }
+    .auth-badge { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; font-family: 'DM Mono', monospace; color: var(--muted); }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+    .logout-btn { background: none; border: 1px solid var(--border); color: var(--red); font-size: 0.72rem; font-family: 'DM Mono', monospace; padding: 3px 9px; border-radius: 5px; cursor: pointer; }
+    .logout-btn:hover { background: rgba(248,81,73,0.08); }
+
+    .page-wrap { max-width: 1200px; margin: 0 auto; padding: 40px 32px; }
+    .page-header { margin-bottom: 40px; }
+    .page-label { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--gold); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+    .page-title { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; }
+    .page-title span { color: var(--gold); }
+    .page-subtitle { color: var(--muted); font-size: 0.875rem; margin-top: 6px; }
+
+    /* ── Login gate ── */
+    #login-gate {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    }
+    .login-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      padding: 40px 36px; width: 400px;
+    }
+    .login-card h2 { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 800; margin-bottom: 20px; }
+    .field input {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 12px; color: var(--text); font-size: 0.875rem;
+      font-family: 'DM Mono', monospace; outline: none; margin-bottom: 10px; transition: border-color 0.15s;
+    }
+    .field input:focus { border-color: var(--gold); }
+    .btn-gold {
+      width: 100%; background: var(--gold); color: #1a1200; font-weight: 700;
+      font-size: 0.9rem; padding: 11px; border: none; border-radius: 10px; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; transition: opacity 0.15s;
+    }
+    .btn-gold:hover { opacity: 0.88; }
+    #login-error { color: var(--red); font-size: 0.78rem; margin-top: 8px; }
+
+    /* ── App ── */
+    #app { display: none; }
+
+    /* ── Two-column layout ── */
+    .columns { display: grid; grid-template-columns: 320px 1fr; gap: 24px; align-items: start; }
+    @media (max-width: 900px) { .columns { grid-template-columns: 1fr; } }
+
+    /* ── Panels ── */
+    .panel {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+    }
+    .panel-header {
+      padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .panel-header h3 { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; }
+    .panel-body { padding: 20px 24px; }
+
+    /* ── Course tabs ── */
+    .course-tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+    .course-tab {
+      padding: 6px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 600;
+      cursor: pointer; border: 1px solid var(--border); background: var(--surface2);
+      color: var(--muted); transition: all 0.15s;
+    }
+    .course-tab.active { background: var(--gold); color: #1a1200; border-color: var(--gold); }
+
+    /* ── Forms ── */
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 9px 12px; color: var(--text); font-size: 0.85rem;
+      font-family: 'DM Mono', monospace; outline: none; transition: border-color 0.15s;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--gold); }
+    .form-group textarea { resize: vertical; min-height: 70px; }
+
+    .btn-sm {
+      padding: 7px 14px; border-radius: 7px; font-size: 0.8rem; font-weight: 600;
+      cursor: pointer; border: none; font-family: 'DM Sans', sans-serif; transition: opacity 0.15s;
+    }
+    .btn-sm:hover { opacity: 0.82; }
+    .btn-primary { background: var(--gold); color: #1a1200; }
+    .btn-danger  { background: rgba(248,81,73,0.12); color: var(--red); border: 1px solid rgba(248,81,73,0.25); }
+
+    /* ── Table ── */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+    .data-table th {
+      text-align: left; padding: 10px 14px; font-family: 'DM Mono', monospace;
+      font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--muted); border-bottom: 1px solid var(--border);
+    }
+    .data-table td { padding: 12px 14px; border-bottom: 1px solid rgba(48,54,61,0.5); vertical-align: top; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .badge {
+      display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 0.72rem;
+      font-family: 'DM Mono', monospace; font-weight: 500;
+    }
+    .badge-green { background: rgba(63,185,80,0.1); color: var(--green); border: 1px solid rgba(63,185,80,0.2); }
+    .badge-red   { background: rgba(248,81,73,0.1);  color: var(--red);   border: 1px solid rgba(248,81,73,0.2); }
+    .badge-gold  { background: rgba(240,180,41,0.1); color: var(--gold);  border: 1px solid rgba(240,180,41,0.2); }
+
+    .empty-state { padding: 32px; text-align: center; color: var(--muted); font-size: 0.83rem; }
+
+    /* ── Classes sub-panel ── */
+    .cohort-row-expand { background: var(--surface2); border-top: 1px solid var(--border); display: none; }
+    .cohort-row-expand.open { display: table-row; }
+    .cohort-expand-cell { padding: 16px 20px; }
+    .classes-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .class-chip {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--surface3); border: 1px solid var(--border);
+      border-radius: 8px; padding: 5px 10px; font-size: 0.78rem; font-family: 'DM Mono', monospace;
+    }
+    .class-chip .seq { color: var(--muted); font-size: 0.7rem; }
+    .class-chip .del-class { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.85rem; padding: 0 0 0 4px; }
+    .class-chip .del-class:hover { color: var(--red); }
+    .add-class-row { display: flex; gap: 8px; margin-top: 8px; }
+    .add-class-row input {
+      flex: 1; background: var(--surface3); border: 1px solid var(--border);
+      border-radius: 7px; padding: 7px 10px; color: var(--text);
+      font-size: 0.8rem; font-family: 'DM Mono', monospace; outline: none;
+    }
+    .add-class-row input:focus { border-color: var(--gold); }
+
+    .section-divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+  </style>
+</head>
+<body>
+
+<!-- ── LOGIN GATE ─────────────────────────────────────────── -->
+<div id="login-gate">
+  <div class="login-card">
+    <h2>🔑 Teacher Sign-In</h2>
+    <div class="field"><input type="email"    id="l-email"    placeholder="teacher@school.ca" /></div>
+    <div class="field"><input type="password" id="l-password" placeholder="Password" /></div>
+    <button class="btn-gold" onclick="doLogin()">Sign In</button>
+    <div id="login-error"></div>
+  </div>
+</div>
+
+<!-- ── APP ───────────────────────────────────────────────── -->
+<div id="app">
+  <header class="site-header">
+    <a href="index.html" class="back-link">← Instructor Hub</a>
+    <div class="auth-badge">
+      <div class="dot"></div>
+      <span id="auth-label">signed in</span>
+      <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+    </div>
+  </header>
+
+  <div class="page-wrap">
+    <div class="page-header">
+      <p class="page-label">Administration</p>
+      <h1 class="page-title">Cohorts & <span>Classes</span></h1>
+      <p class="page-subtitle">Create semester cohorts and class sessions for each course. Cohorts group students; classes scope access codes and homework.</p>
+    </div>
+
+    <!-- Course selector tabs -->
+    <div class="course-tabs" id="course-tabs">
+      <!-- populated by JS -->
+    </div>
+
+    <div class="columns">
+      <!-- ── Create Cohort Form ── -->
+      <div>
+        <div class="panel">
+          <div class="panel-header"><h3>Create Cohort</h3></div>
+          <div class="panel-body">
+            <div class="form-group">
+              <label>Course</label>
+              <select id="new-cohort-course"><!-- populated --></select>
+            </div>
+            <div class="form-group">
+              <label>Cohort Name</label>
+              <input type="text" id="new-cohort-name" placeholder="e.g. Fall 2026 — Saturday 10am" />
+            </div>
+            <div class="form-group">
+              <label>Slug <span style="color:var(--muted)">(auto-generated)</span></label>
+              <input type="text" id="new-cohort-slug" placeholder="fall-2026-sat-10am" style="font-size:0.78rem;" />
+            </div>
+            <div class="form-group">
+              <label>Term</label>
+              <input type="text" id="new-cohort-term" placeholder="Fall 2026" />
+            </div>
+            <button class="btn-sm btn-primary" style="width:100%;padding:10px;" onclick="createCohort()">Create Cohort</button>
+            <div id="cohort-msg" style="margin-top:10px;font-size:0.78rem;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Cohort List ── -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Active Cohorts</h3>
+          <span id="cohort-count" style="font-family:var(--dm-mono,monospace);font-size:0.75rem;color:var(--muted);"></span>
+        </div>
+        <table class="data-table" id="cohorts-table">
+          <thead>
+            <tr>
+              <th>Cohort</th>
+              <th>Course</th>
+              <th>Term</th>
+              <th>Status</th>
+              <th>Classes</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="cohorts-tbody">
+            <tr><td colspan="6" class="empty-state">Loading cohorts…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var sb = createTeacherClient();
+  var currentUser = null;
+  var courses = [];
+  var allCohorts = [];
+  var activeCourseId = null;
+
+  // ── Auth ─────────────────────────────────────────────────────
+  async function init() {
+    var session = await getTeacherSession();
+    if (session) { currentUser = session.user; setAuthed(); }
+  }
+
+  function setAuthed() {
+    document.getElementById('login-gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('auth-label').textContent = currentUser.email;
+    loadCourses();
+  }
+
+  async function doLogin() {
+    var email    = document.getElementById('l-email').value.trim();
+    var password = document.getElementById('l-password').value;
+    var errEl    = document.getElementById('login-error');
+    errEl.textContent = '';
+
+    var { user, error } = await TeacherAuth.login(email, password);
+    if (error) { errEl.textContent = error; return; }
+    currentUser = user; setAuthed();
+  }
+
+  async function doLogout() { await TeacherAuth.logout(); location.reload(); }
+
+  ['l-email','l-password'].forEach(id =>
+    document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); })
+  );
+
+  // ── Courses ──────────────────────────────────────────────────
+  async function loadCourses() {
+    var { data } = await sb.from('courses').select('id,slug,name,color_theme').eq('is_active', true).order('name');
+    courses = data || [];
+
+    // Course tab switcher
+    var tabsEl = document.getElementById('course-tabs');
+    var courseSelect = document.getElementById('new-cohort-course');
+    tabsEl.innerHTML = '';
+    courseSelect.innerHTML = '';
+
+    courses.forEach((c, i) => {
+      var tab = document.createElement('button');
+      tab.className = 'course-tab' + (i === 0 ? ' active' : '');
+      tab.textContent = c.name;
+      tab.dataset.courseId = c.id;
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.course-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        activeCourseId = c.id;
+        renderCohorts();
+      });
+      tabsEl.appendChild(tab);
+
+      var opt = document.createElement('option');
+      opt.value = c.id; opt.textContent = c.name;
+      courseSelect.appendChild(opt);
+    });
+
+    if (courses.length) {
+      activeCourseId = courses[0].id;
+      await loadCohorts();
+    }
+  }
+
+  // ── Cohorts ──────────────────────────────────────────────────
+  async function loadCohorts() {
+    var { data } = await sb
+      .from('cohorts')
+      .select('id,slug,name,term,is_active,course_id,courses(name,slug)')
+      .order('term', { ascending: false });
+
+    allCohorts = data || [];
+    renderCohorts();
+  }
+
+  function renderCohorts() {
+    var filtered = activeCourseId
+      ? allCohorts.filter(c => c.course_id === activeCourseId)
+      : allCohorts;
+
+    var countEl = document.getElementById('cohort-count');
+    countEl.textContent = filtered.length + ' cohort' + (filtered.length !== 1 ? 's' : '');
+
+    var tbody = document.getElementById('cohorts-tbody');
+    if (!filtered.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No cohorts for this course yet. Create one using the form.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = filtered.map(c => `
+      <tr id="row-${c.id}">
+        <td>
+          <div style="font-weight:600;font-size:0.875rem;">${c.name}</div>
+          <div style="font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--muted);margin-top:2px;">${c.slug}</div>
+        </td>
+        <td><span class="badge badge-gold">${c.courses ? c.courses.name : '—'}</span></td>
+        <td style="color:var(--muted);font-size:0.83rem;">${c.term || '—'}</td>
+        <td><span class="badge ${c.is_active ? 'badge-green' : 'badge-red'}">${c.is_active ? 'Active' : 'Inactive'}</span></td>
+        <td>
+          <button class="btn-sm" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);"
+            onclick="toggleClasses(${c.id})">Manage ▾</button>
+        </td>
+        <td>
+          <button class="btn-sm btn-danger" onclick="toggleActive(${c.id}, ${!c.is_active})">
+            ${c.is_active ? 'Deactivate' : 'Activate'}
+          </button>
+        </td>
+      </tr>
+      <tr class="cohort-row-expand" id="expand-${c.id}">
+        <td colspan="6" class="cohort-expand-cell" id="expand-content-${c.id}">
+          <div style="color:var(--muted);font-size:0.8rem;">Loading classes…</div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // ── Classes ───────────────────────────────────────────────────
+  var openCohortId = null;
+
+  async function toggleClasses(cohortId) {
+    var row = document.getElementById('expand-' + cohortId);
+
+    if (openCohortId === cohortId) {
+      row.classList.remove('open');
+      openCohortId = null;
+      return;
+    }
+    if (openCohortId) document.getElementById('expand-' + openCohortId)?.classList.remove('open');
+    row.classList.add('open');
+    openCohortId = cohortId;
+    await renderClasses(cohortId);
+  }
+
+  async function renderClasses(cohortId) {
+    var container = document.getElementById('expand-content-' + cohortId);
+    container.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;">Loading…</div>';
+
+    var { data: classes } = await sb
+      .from('classes')
+      .select('id,label,sequence_order,is_active')
+      .eq('cohort_id', cohortId)
+      .order('sequence_order');
+
+    var chips = (classes || []).map(cl => `
+      <div class="class-chip" id="chip-${cl.id}">
+        <span class="seq">#${cl.sequence_order}</span>
+        <span>${cl.label}</span>
+        <button class="del-class" onclick="deleteClass(${cl.id}, ${cohortId})" title="Remove">✕</button>
+      </div>
+    `).join('') || '<span style="color:var(--muted);font-size:0.78rem;">No classes yet.</span>';
+
+    container.innerHTML = `
+      <p style="font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;">
+        Classes in this cohort
+      </p>
+      <div class="classes-list" id="classes-list-${cohortId}">${chips}</div>
+      <div class="add-class-row">
+        <input type="text" id="new-class-label-${cohortId}" placeholder="e.g. Week 1 or Class 7" maxlength="60" />
+        <button class="btn-sm btn-primary" onclick="addClass(${cohortId})">+ Add Class</button>
+      </div>
+      <div id="class-msg-${cohortId}" style="margin-top:8px;font-size:0.75rem;"></div>
+    `;
+
+    document.getElementById('new-class-label-' + cohortId)
+      .addEventListener('keydown', e => { if (e.key === 'Enter') addClass(cohortId); });
+  }
+
+  async function addClass(cohortId) {
+    var input = document.getElementById('new-class-label-' + cohortId);
+    var msg   = document.getElementById('class-msg-' + cohortId);
+    var label = input.value.trim();
+    msg.textContent = '';
+
+    if (!label) { msg.style.color = 'var(--red)'; msg.textContent = 'Enter a class label.'; return; }
+
+    // Determine next sequence_order
+    var { data: existing } = await sb
+      .from('classes')
+      .select('sequence_order')
+      .eq('cohort_id', cohortId)
+      .order('sequence_order', { ascending: false })
+      .limit(1);
+
+    var nextSeq = existing && existing.length ? existing[0].sequence_order + 1 : 1;
+
+    var { error } = await sb.from('classes').insert([{
+      cohort_id: cohortId, label, sequence_order: nextSeq, is_active: true
+    }]);
+
+    if (error) { msg.style.color = 'var(--red)'; msg.textContent = 'Error: ' + error.message; return; }
+
+    msg.style.color = 'var(--green)'; msg.textContent = '✓ Class added.';
+    input.value = '';
+    setTimeout(() => { msg.textContent = ''; }, 2000);
+    await renderClasses(cohortId);
+  }
+
+  async function deleteClass(classId, cohortId) {
+    if (!confirm('Remove this class? Access codes linked to it will have their class_id set to NULL.')) return;
+    await sb.from('classes').delete().eq('id', classId);
+    await renderClasses(cohortId);
+  }
+
+  // ── Create Cohort ─────────────────────────────────────────────
+  async function createCohort() {
+    var courseId = document.getElementById('new-cohort-course').value;
+    var name     = document.getElementById('new-cohort-name').value.trim();
+    var slug     = document.getElementById('new-cohort-slug').value.trim() || slugify(name);
+    var term     = document.getElementById('new-cohort-term').value.trim();
+    var msg      = document.getElementById('cohort-msg');
+    msg.textContent = '';
+
+    if (!courseId || !name) { msg.style.color = 'var(--red)'; msg.textContent = 'Course and name are required.'; return; }
+
+    var { error } = await sb.from('cohorts').insert([{
+      course_id: Number(courseId), name, slug, term: term || null,
+      is_active: true, created_by: currentUser.id
+    }]);
+
+    if (error) { msg.style.color = 'var(--red)'; msg.textContent = 'Error: ' + error.message; return; }
+
+    msg.style.color = 'var(--green)'; msg.textContent = '✓ Cohort created!';
+    document.getElementById('new-cohort-name').value = '';
+    document.getElementById('new-cohort-slug').value = '';
+    document.getElementById('new-cohort-term').value = '';
+    await loadCohorts();
+  }
+
+  async function toggleActive(cohortId, newValue) {
+    await sb.from('cohorts').update({ is_active: newValue }).eq('id', cohortId);
+    await loadCohorts();
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────
+  function slugify(str) {
+    return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  }
+
+  // Auto-slug from name
+  document.getElementById('new-cohort-name').addEventListener('input', function() {
+    var slugInput = document.getElementById('new-cohort-slug');
+    if (!slugInput.dataset.userEdited) slugInput.value = slugify(this.value);
+  });
+  document.getElementById('new-cohort-slug').addEventListener('input', function() {
+    this.dataset.userEdited = '1';
+  });
+
+  init();
+</script>
+</body>
+</html>
