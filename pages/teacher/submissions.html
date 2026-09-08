@@ -144,6 +144,22 @@
     .enjoy-bar-fill{position:absolute;bottom:0;left:0;right:0;background:var(--gold);border-radius:3px 3px 0 0;transition:height .3s;}
     .enjoy-labels{display:flex;gap:4px;}
     .enjoy-label{flex:1;text-align:center;font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);}
+
+    /* ── Exam Question Review Styles ── */
+    .qn-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:14px;}
+    .qn-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;}
+    .qn-title{font-size:.85rem;font-weight:700;color:var(--text);}
+    .qn-meta{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--muted);}
+    .mcq-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(85px, 1fr));gap:6px;margin-top:8px;}
+    .mcq-pill{background:var(--surface3);border:1px solid var(--border);border-radius:6px;padding:6px 8px;text-align:center;font-family:'DM Mono',monospace;font-size:.75rem;}
+    .mcq-pill.ok{border-color:rgba(63,185,80,.4);color:var(--green);background:rgba(63,185,80,.08);}
+    .mcq-pill.bad{border-color:rgba(248,81,73,.4);color:var(--red);background:rgba(248,81,73,.08);}
+    .blank-list{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+    .blank-row{display:flex;align-items:center;gap:8px;font-size:.8rem;}
+    .blank-id{font-family:'DM Mono',monospace;color:var(--blue);font-size:.75rem;min-width:75px;}
+    .blank-val{font-family:'DM Mono',monospace;background:var(--surface3);padding:4px 8px;border-radius:4px;border:1px solid var(--border);flex:1;color:var(--text);}
+    .rubric-box{margin-top:10px;background:rgba(240,180,41,.06);border-left:3px solid var(--gold);padding:8px 12px;font-size:.75rem;color:var(--muted);border-radius:0 6px 6px 0;line-height:1.5;}
+    .rubric-box strong{color:var(--gold);}
   </style>
 </head>
 <body>
@@ -800,22 +816,194 @@
 
   function renderMidtermDetails(qd) {
     if (!qd) return '<div style="color:var(--muted);">No question details recorded.</div>';
-    var data = typeof qd === 'string' ? JSON.parse(qd) : qd;
-    return `<pre class="pf-val" style="font-family:'DM Mono',monospace;font-size:.78rem;">${esc(JSON.stringify(data, null, 2))}</pre>`;
+    var data = typeof qd === 'string' ? (()=>{ try { return JSON.parse(qd); } catch(e){ return null; } })() : qd;
+    if (!data || typeof data !== 'object') return `<pre class="pf-val">${esc(String(qd))}</pre>`;
+
+    var html = '';
+    // MCQ Grid
+    if (data.mcq) {
+      var pills = Object.entries(data.mcq).map(([k, v]) => {
+        var isOk = v.correct === true;
+        var ans = v.answer || '—';
+        return `<div class="mcq-pill ${isOk ? 'ok' : 'bad'}">${k.toUpperCase()}: ${ans} ${isOk ? '✓' : '✗'}</div>`;
+      }).join('');
+      html += `
+        <div class="qn-card">
+          <div class="qn-head">
+            <div class="qn-title">Q1–Q15: Multiple Choice Questions</div>
+            <div class="qn-meta">30 pts</div>
+          </div>
+          <div class="mcq-grid">${pills}</div>
+        </div>
+      `;
+    }
+
+    // Q16–Q20 blanks
+    var midTitles = {
+      16: 'Q16 · Data Preprocessing blanks (Class 3)',
+      17: 'Q17 · MSE Cost Function blanks (Class 5)',
+      18: 'Q18 · Confusion Matrix Metrics blanks (Class 6)',
+      19: 'Q19 · Sigmoid & Predict blanks (Class 6)',
+      20: 'Q20 · Kernel Trick blanks (Class 9)'
+    };
+    [16, 17, 18, 19, 20].forEach(q => {
+      var r = data[`q${q}`];
+      if (r && r.items) {
+        html += `
+          <div class="qn-card">
+            <div class="qn-head">
+              <div class="qn-title">${midTitles[q]}</div>
+              <div class="qn-meta">${r.pts || 0}/5 pts (${r.cor || 0}/${r.of || 0} correct)</div>
+            </div>
+            <div class="blank-list">
+              ${r.items.map(b => `<div class="blank-row"><span class="blank-id">${b.id}:</span><code class="blank-val">${b.ok ? '✅' : '❌'} ${esc(b.val || '—')}</code></div>`).join('')}
+            </div>
+          </div>
+        `;
+      }
+    });
+
+    // Q21 Open-Ended
+    if (data.q21) {
+      html += `
+        <div class="qn-card">
+          <div class="qn-head">
+            <div class="qn-title">Q21 · Bias/Variance Open-Ended (Classes 2 & 4)</div>
+            <div class="qn-meta">5 pts · Open-Ended</div>
+          </div>
+          <div class="pf-val">${esc(data.q21.text || '(No response provided)')}</div>
+        </div>
+      `;
+    }
+
+    return html || `<pre class="pf-val">${esc(JSON.stringify(data, null, 2))}</pre>`;
   }
 
   function renderFinalExamDetails(r) {
     var html = '';
+
+    // 1. MCQ Breakdown (Q1–Q15)
     if (r.mcq_details) {
       var mcq = typeof r.mcq_details === 'string' ? JSON.parse(r.mcq_details) : r.mcq_details;
-      html += `<div class="payload-field"><div class="pf-key">MCQ Details</div><div class="pf-val"><pre>${esc(JSON.stringify(mcq, null, 2))}</pre></div></div>`;
+      var pills = Object.entries(mcq).map(([k, v]) => {
+        var isOk = v.correct === true;
+        var ans = v.answer || '—';
+        return `<div class="mcq-pill ${isOk ? 'ok' : 'bad'}">${k.toUpperCase()}: ${ans} ${isOk ? '✓' : '✗'}</div>`;
+      }).join('');
+
+      html += `
+        <div class="qn-card">
+          <div class="qn-head">
+            <div class="qn-title">Q1–Q15: Multiple Choice Questions</div>
+            <div class="qn-meta">Score: ${r.mcq_score != null ? r.mcq_score : '—'}/30 pts</div>
+          </div>
+          <div class="mcq-grid">${pills}</div>
+        </div>
+      `;
     }
-    ['q17_text', 'q18_text', 'q21_text'].forEach(q => {
-      if (r[q]) {
-        html += `<div class="payload-field"><div class="pf-key">${q.toUpperCase()} Open-Ended</div><div class="pf-val">${esc(r[q])}</div></div>`;
-      }
-    });
-    return html || '<div style="color:var(--muted);">No detailed response data recorded.</div>';
+
+    // 2. Q16 Blanks (A* Search)
+    var q16Blanks = [
+      { id: 'b1 (cost)', val: r.q16_b1 },
+      { id: 'b2 (pop)',  val: r.q16_b2 },
+      { id: 'b3 (h[n])', val: r.q16_b3 },
+      { id: 'b4 (push)', val: r.q16_b4 },
+      { id: 'b5 (node)', val: r.q16_b5 },
+      { id: 'b6 (app)',  val: r.q16_b6 }
+    ];
+    html += `
+      <div class="qn-card">
+        <div class="qn-head">
+          <div class="qn-title">Q16 · A* Search Algorithm (Fill-in-the-Blanks)</div>
+          <div class="qn-meta">5 pts</div>
+        </div>
+        <div class="blank-list">
+          ${q16Blanks.map(b => `<div class="blank-row"><span class="blank-id">${b.id}:</span><code class="blank-val">${esc(b.val || '—')}</code></div>`).join('')}
+        </div>
+        <div class="rubric-box"><strong>📋 Model Answer:</strong> b1: <code>0</code> · b2: <code>heappop</code> · b3: <code>h[neighbor]</code> · b4: <code>heappush</code> · b5: <code>node</code> · b6: <code>append</code></div>
+      </div>
+    `;
+
+    // 3. Q17 Open-Ended (Outliers & Inertia)
+    html += `
+      <div class="qn-card">
+        <div class="qn-head">
+          <div class="qn-title">Q17 · Outlier Detection & Inertia Calculation</div>
+          <div class="qn-meta">5 pts · Open-Ended</div>
+        </div>
+        <div class="pf-val">${esc(r.q17_text || '(No response provided)')}</div>
+        <div class="rubric-box"><strong>📋 Model Answer:</strong> Centroid A=(3, 2.67), Centroid B=(9, 7). Inertia(A) = 10.67. Moving the outlier (9,7) to new cluster B reduces cluster A inertia by 75%+.</div>
+      </div>
+    `;
+
+    // 4. Q18 Open-Ended (Naive Bayes Spam)
+    html += `
+      <div class="qn-card">
+        <div class="qn-head">
+          <div class="qn-title">Q18 · Naive Bayes Spam Classification</div>
+          <div class="qn-meta">5 pts · Open-Ended</div>
+        </div>
+        <div class="pf-val">${esc(r.q18_text || '(No response provided)')}</div>
+        <div class="rubric-box"><strong>📋 Model Answer:</strong> Score(Spam) = 0.40 × 0.80 × 0.70 = 0.224. Score(Not Spam) = 0.60 × 0.10 × 0.05 = 0.003. P(Spam|email) ≈ 98.7% → Classified as Spam.</div>
+      </div>
+    `;
+
+    // 5. Q19 Blanks (k-Means Scikit-Learn)
+    var q19Blanks = [
+      { id: 'b1 (cluster)', val: r.q19_b1 },
+      { id: 'b2 (n_clust)', val: r.q19_b2 },
+      { id: 'b3 (fit)',     val: r.q19_b3 },
+      { id: 'b4 (labels_)', val: r.q19_b4 },
+      { id: 'b5 (inertia)', val: r.q19_b5 },
+      { id: 'b6 (pred)',    val: r.q19_b6 }
+    ];
+    html += `
+      <div class="qn-card">
+        <div class="qn-head">
+          <div class="qn-title">Q19 · k-Means in Scikit-Learn (Fill-in-the-Blanks)</div>
+          <div class="qn-meta">5 pts</div>
+        </div>
+        <div class="blank-list">
+          ${q19Blanks.map(b => `<div class="blank-row"><span class="blank-id">${b.id}:</span><code class="blank-val">${esc(b.val || '—')}</code></div>`).join('')}
+        </div>
+        <div class="rubric-box"><strong>📋 Model Answer:</strong> b1: <code>cluster</code> · b2: <code>3</code> · b3: <code>fit</code> · b4: <code>labels_</code> · b5: <code>inertia_</code> · b6: <code>labels_</code> (or <code>km.labels_</code>)</div>
+      </div>
+    `;
+
+    // 6. Q20 Blanks (Q-Learning Update)
+    var q20Blanks = [
+      { id: 'b1 (state)',     val: r.q20_b1 },
+      { id: 'b2 (action)',    val: r.q20_b2 },
+      { id: 'b3 (max)',       val: r.q20_b3 },
+      { id: 'b4 (best_next)', val: r.q20_b4 },
+      { id: 'b5 (alpha)',     val: r.q20_b5 }
+    ];
+    html += `
+      <div class="qn-card">
+        <div class="qn-head">
+          <div class="qn-title">Q20 · Q-Learning Algorithm Update (Fill-in-the-Blanks)</div>
+          <div class="qn-meta">5 pts</div>
+        </div>
+        <div class="blank-list">
+          ${q20Blanks.map(b => `<div class="blank-row"><span class="blank-id">${b.id}:</span><code class="blank-val">${esc(b.val || '—')}</code></div>`).join('')}
+        </div>
+        <div class="rubric-box"><strong>📋 Model Answer:</strong> b1: <code>state</code> · b2: <code>action</code> · b3: <code>max</code> (or <code>np.max</code>) · b4: <code>best_next</code> · b5: <code>alpha</code> (or <code>learning_rate</code>)</div>
+      </div>
+    `;
+
+    // 7. Q21 Open-Ended (A* vs Q-learning)
+    html += `
+      <div class="qn-card">
+        <div class="qn-head">
+          <div class="qn-title">Q21 · A* vs Q-Learning Robotics (Open-Ended)</div>
+          <div class="qn-meta">5 pts · Open-Ended</div>
+        </div>
+        <div class="pf-val">${esc(r.q21_text || '(No response provided)')}</div>
+        <div class="rubric-box"><strong>📋 Model Answer:</strong> (1) A* for known map with static obstacles + admissible heuristic guarantees shortest path. (2) Q-learning for dynamic/unknown map learning from rewards (State=pos, Action=step, Reward=penalty/goal). (3) γ=0.9 heavily weights future rewards, motivating robot to reach destination quickly.</div>
+      </div>
+    `;
+
+    return html;
   }
 
   function getPayloadPreview(payload) {
@@ -858,7 +1046,14 @@
       headers = ['student_name','test_id','auto_score','mcq_score','blank_score','total_possible','pct','submitted_at','access_code'];
       rows = rawData.map(r => headers.map(h => csvCell(r[h])).join(','));
     } else if (activeItem.type === 'aijr_final_exam') {
-      headers = ['student_name','class_number','auto_score','mcq_score','blank_score','submitted_at','access_code','q17_text','q18_text','q21_text'];
+      headers = [
+        'student_name','class_number','auto_score','mcq_score','blank_score','submitted_at','access_code',
+        'q16_b1','q16_b2','q16_b3','q16_b4','q16_b5','q16_b6',
+        'q17_text','q18_text',
+        'q19_b1','q19_b2','q19_b3','q19_b4','q19_b5','q19_b6',
+        'q20_b1','q20_b2','q20_b3','q20_b4','q20_b5',
+        'q21_text'
+      ];
       rows = rawData.map(r => headers.map(h => csvCell(r[h])).join(','));
     }
 
