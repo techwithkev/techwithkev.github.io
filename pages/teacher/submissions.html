@@ -635,7 +635,7 @@
     } else if (activeItem.type === 'aijr_midterm') {
       thead.innerHTML = `
         <tr>
-          <th>#</th><th>Student</th><th>Auto Score</th><th>MCQ</th><th>Blanks</th><th>Pct</th><th>Submitted</th>
+          <th>#</th><th>Student</th><th>Total Score</th><th>MCQ</th><th>Blanks</th><th>Open-Ended (AI)</th><th>Pct</th><th>Submitted</th>
         </tr>`;
     } else if (activeItem.type === 'aijr_final_exam') {
       thead.innerHTML = `
@@ -677,15 +677,21 @@
             <td class="trunc" style="color:var(--muted);font-size:.78rem;">${esc(qPreview || r.homework_title || 'View details')}</td>
           </tr>`;
       } else if (activeItem.type === 'aijr_midterm') {
-        var pct = r.pct != null ? Math.round(r.pct) : (r.auto_score != null ? Math.round((r.auto_score/60)*100) : null);
-        var badgeCls = pct >= 80 ? 'badge-green' : pct >= 60 ? 'badge-gold' : 'badge-red';
+        var qd = typeof r.question_detail === 'string' ? (()=>{ try { return JSON.parse(r.question_detail); } catch(e){ return {}; } })() : (r.question_detail || {});
+        var oeScore = qd?.summary?.open_ended_score != null
+          ? qd.summary.open_ended_score
+          : (qd?.q21?.score != null ? qd.q21.score : null);
+        var totalScore = r.auto_score != null ? r.auto_score : (r.score != null ? r.score : '—');
+        var pct = r.pct != null ? Math.round(r.pct) : (r.auto_score != null ? Math.round((r.auto_score / 60) * 100) : null);
+        var badgeCls = pct != null ? (pct >= 80 ? 'badge-green' : pct >= 60 ? 'badge-gold' : 'badge-red') : '';
         return `
           <tr onclick="openDrawer(${i})">
             <td style="color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;">${i+1}</td>
             <td style="font-weight:600;">${esc(r.student_name)}</td>
-            <td style="font-family:'DM Mono',monospace;font-weight:700;color:var(--gold);">${r.auto_score != null ? r.auto_score : '—'}</td>
-            <td style="font-family:'DM Mono',monospace;color:var(--muted);">${r.mcq_score != null ? r.mcq_score : '—'}</td>
-            <td style="font-family:'DM Mono',monospace;color:var(--muted);">${r.blank_score != null ? r.blank_score : '—'}</td>
+            <td style="font-family:'DM Mono',monospace;font-weight:700;color:var(--gold);">${totalScore}/60</td>
+            <td style="font-family:'DM Mono',monospace;color:var(--muted);">${r.mcq_score != null ? r.mcq_score + '/30' : '—'}</td>
+            <td style="font-family:'DM Mono',monospace;color:var(--muted);">${r.blank_score != null ? r.blank_score + '/25' : '—'}</td>
+            <td style="font-family:'DM Mono',monospace;color:var(--teal);font-weight:600;">${oeScore != null ? oeScore + '/5' : '—'}</td>
             <td>${pct != null ? `<span class="badge ${badgeCls}">${pct}%</span>` : '—'}</td>
             <td style="font-size:.75rem;color:var(--muted);white-space:nowrap;">${fmtDate(r.submitted_at)}</td>
           </tr>`;
@@ -759,16 +765,22 @@
         </div>
       `;
     } else if (activeItem.type === 'aijr_midterm') {
+      var qd = typeof r.question_detail === 'string' ? (()=>{ try { return JSON.parse(r.question_detail); } catch(e){ return {}; } })() : (r.question_detail || {});
+      var oeScore = qd?.summary?.open_ended_score != null
+        ? qd.summary.open_ended_score
+        : (qd?.q21?.score != null ? qd.q21.score : null);
+      var pct = r.pct != null ? Math.round(r.pct) : (r.auto_score != null ? Math.round((r.auto_score / 60) * 100) : 0);
       body.innerHTML = `
         <div class="meta-row">
-          <div class="meta-pill">Auto Score <strong>${r.auto_score}/60 (${r.pct || Math.round((r.auto_score/60)*100)}%)</strong></div>
-          <div class="meta-pill">MCQ <strong>${r.mcq_score}/30</strong></div>
-          <div class="meta-pill">Blanks <strong>${r.blank_score}/25</strong></div>
+          <div class="meta-pill">Auto Score <strong>${r.auto_score != null ? r.auto_score : '—'}/60 (${pct}%)</strong></div>
+          <div class="meta-pill">MCQ <strong>${r.mcq_score != null ? r.mcq_score : '—'}/30</strong></div>
+          <div class="meta-pill">Blanks <strong>${r.blank_score != null ? r.blank_score : '—'}/25</strong></div>
+          <div class="meta-pill">Open-Ended (AI) <strong>${oeScore != null ? oeScore + '/5' : '—'}</strong></div>
           <div class="meta-pill">Code <strong>${esc(r.access_code || '—')}</strong></div>
           <div class="meta-pill">🕐 <strong>${fmtDateFull(r.submitted_at)}</strong></div>
         </div>
         <div class="payload-section">
-          <h4>Test Question Details</h4>
+          <h4>Midterm Assessment Review</h4>
           ${renderMidtermDetails(r.question_detail)}
         </div>
       `;
@@ -836,25 +848,26 @@
     if (!data || typeof data !== 'object') return `<pre class="pf-val">${esc(String(qd))}</pre>`;
 
     var html = '';
-    // MCQ Grid
+    // 1. MCQ Grid (Q1–Q15)
     if (data.mcq) {
       var pills = Object.entries(data.mcq).map(([k, v]) => {
         var isOk = v.correct === true;
         var ans = v.answer || '—';
         return `<div class="mcq-pill ${isOk ? 'ok' : 'bad'}">${k.toUpperCase()}: ${ans} ${isOk ? '✓' : '✗'}</div>`;
       }).join('');
+      var mcqScore = data?.summary?.mcq_score != null ? data.summary.mcq_score : Object.values(data.mcq).filter(v => v.correct).length * 2;
       html += `
         <div class="qn-card">
           <div class="qn-head">
             <div class="qn-title">Q1–Q15: Multiple Choice Questions</div>
-            <div class="qn-meta">30 pts</div>
+            <div class="qn-meta"><span class="ai-score-pill">${mcqScore}/30 pts</span></div>
           </div>
           <div class="mcq-grid">${pills}</div>
         </div>
       `;
     }
 
-    // Q16–Q20 blanks
+    // 2. Q16–Q20 blanks
     var midTitles = {
       16: 'Q16 · Data Preprocessing blanks (Class 3)',
       17: 'Q17 · MSE Cost Function blanks (Class 5)',
@@ -862,6 +875,14 @@
       19: 'Q19 · Sigmoid & Predict blanks (Class 6)',
       20: 'Q20 · Kernel Trick blanks (Class 9)'
     };
+    var midModelAnswers = {
+      16: "b1: <code>fillna(0)</code> · b2: <code>fillna(mean)</code> · b3: <code>units_sold*price*(1-discount)</code> · b4: <code>'store_id'</code> · b5: <code>sum</code> · b6: <code>sort_values(ascending=False)</code>",
+      17: "b1: <code>w*x[i]+b</code> · b2: <code>(f_wb-y[i])**2</code>",
+      18: "b1: <code>(TP+TN)/total</code> · b2: <code>TP/(TP+FP)</code> · b3: <code>TP/(TP+FN)</code> · b4: <code>2*P*R/(P+R)</code>",
+      19: "b1: <code>1/(1+np.exp(-z))</code> · b2: <code>w@X.T+b</code> · b3: <code>sigmoid(z)</code> · b4: <code>astype(int)</code>",
+      20: "b1: <code>(x*xp+1)**2</code> · b2: <code>[x, x**2]</code> · b3: <code>math.exp(-gamma*distance**2)</code>"
+    };
+
     [16, 17, 18, 19, 20].forEach(q => {
       var r = data[`q${q}`];
       if (r && r.items) {
@@ -869,25 +890,31 @@
           <div class="qn-card">
             <div class="qn-head">
               <div class="qn-title">${midTitles[q]}</div>
-              <div class="qn-meta">${r.pts || 0}/5 pts (${r.cor || 0}/${r.of || 0} correct)</div>
+              <div class="qn-meta"><span class="ai-score-pill">${r.pts || 0}/5 pts</span></div>
             </div>
             <div class="blank-list">
               ${r.items.map(b => `<div class="blank-row"><span class="blank-id">${b.id}:</span><code class="blank-val">${b.ok ? '✅' : '❌'} ${esc(b.val || '—')}</code></div>`).join('')}
             </div>
+            <div class="rubric-box"><strong>📋 Model Answer:</strong> ${midModelAnswers[q]}</div>
           </div>
         `;
       }
     });
 
-    // Q21 Open-Ended
+    // 3. Q21 Open-Ended (Bias/Variance & Overfitting)
     if (data.q21) {
+      var q21Score = data.q21.score != null ? data.q21.score : (data?.summary?.open_ended_score != null ? data.summary.open_ended_score : '—');
+      var q21Feedback = data.q21.feedback || '';
+      var studentTxt = data.q21.student_text || data.q21.text || '';
       html += `
         <div class="qn-card">
           <div class="qn-head">
-            <div class="qn-title">Q21 · Bias/Variance Open-Ended (Classes 2 & 4)</div>
-            <div class="qn-meta">5 pts · Open-Ended</div>
+            <div class="qn-title">Q21 · Bias/Variance & Overfitting Remediation (Open-Ended)</div>
+            <div class="qn-meta"><span class="ai-score-pill">🤖 Groq AI Score: ${q21Score}/5 pts</span></div>
           </div>
-          <div class="pf-val">${esc(data.q21.text || '(No response provided)')}</div>
+          <div class="pf-val">${esc(studentTxt || '(No response provided)')}</div>
+          ${q21Feedback ? `<div class="ai-feedback-box"><strong>🤖 Groq LLM Evaluation:</strong> ${esc(q21Feedback)}</div>` : ''}
+          <div class="rubric-box"><strong>📋 Model Answer & Rubric:</strong> Train R² ≫ Test R² indicates overfitting / high variance (Class 2). Remediation: regularization (L1/L2), simpler model/less polynomial features, more data, or k-fold CV (Class 4). Explicitly link high variance to model complexity and need for generalization.</div>
         </div>
       `;
     }

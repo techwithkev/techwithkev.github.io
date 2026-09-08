@@ -1506,54 +1506,36 @@ model_poly.X_fit_.shape  # (320, 5)  — identical</pre>
     </div>
   </div>
 
-  <!-- ══ RESULTS ══ -->
+  <!-- ══ SUBMISSION CONFIRMATION (STUDENT VIEW) ══ -->
   <div id="results-area">
     <div class="res-inner">
-
-      <div class="res-hero">
-        <div class="rh-l">
-          <h2>Student</h2>
-          <div class="rname" id="r-name"></div>
-          <p class="rsub">Classes 1–7 Test · Submitted just now</p>
+      <div class="res-hero" style="text-align: center; display: block; padding: 48px 32px;">
+        <div style="font-size: 3.5rem; margin-bottom: 16px;">🎉</div>
+        <h2 style="font-size: 1.8rem; margin-bottom: 8px;">Midterm Assessment Submitted Successfully!</h2>
+        <p style="color: var(--mid); font-size: 1rem; max-width: 540px; margin: 0 auto 24px;">
+          Thank you, <strong id="r-name" style="color: var(--text);">Student</strong>. Your Class 10 Midterm responses have been securely received and recorded in the system.
+        </p>
+        <div class="stat-row" style="max-width: 500px; margin: 0 auto 28px; justify-content: center;">
+          <div class="stat-c" style="flex: 1;">
+            <div class="sl">Status</div>
+            <div class="sv" style="color: var(--correct); font-size: 1rem;">✅ Recorded</div>
+          </div>
+          <div class="stat-c" style="flex: 1;">
+            <div class="sl">Assessment</div>
+            <div class="sv" style="font-size: 0.95rem;">Midterm (1–9)</div>
+          </div>
+          <div class="stat-c" style="flex: 1;">
+            <div class="sl">Code</div>
+            <div class="sv" id="r-code" style="font-size: 0.95rem;">—</div>
+          </div>
         </div>
-        <div class="rh-r">
-          <div class="big-sc"><span id="r-score"></span><span>/60</span></div>
-          <div class="sc-lbl">Auto-graded score</div>
-          <div class="pct-pill" id="r-pct"></div>
+        <div style="background: rgba(13, 46, 58, 0.05); border: 1px solid var(--border); border-radius: 12px; padding: 18px 24px; max-width: 540px; margin: 0 auto 32px; text-align: left; font-size: 0.88rem; color: var(--mid); line-height: 1.6;">
+          ℹ️ <strong>Instructor Review Notice:</strong> Your instructor will review your performance and release results through the teacher portal.
         </div>
-      </div>
-
-      <div class="stat-row">
-        <div class="stat-c">
-          <div class="sl">MCQ Score</div>
-          <div class="sv" id="r-mcq">—</div>
-        </div>
-        <div class="stat-c">
-          <div class="sl">MCQ Correct</div>
-          <div class="sv" id="r-mcqc">—</div>
-        </div>
-        <div class="stat-c">
-          <div class="sl">Blanks Score</div>
-          <div class="sv" id="r-blank">—</div>
-        </div>
-        <div class="stat-c">
-          <div class="sl">Pending Review</div>
-          <div class="sv">Q21</div>
+        <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+          <a href="index.html" class="gate-btn" style="text-decoration: none; padding: 12px 28px; display: inline-block; width: auto; font-weight: 700;">Return to AI Junior Hub</a>
         </div>
       </div>
-
-      <div id="upload-box"></div>
-
-      <div class="rev-sec">
-        <h3>Part 1 Review — Multiple Choice</h3>
-        <div id="mcq-rev"></div>
-      </div>
-
-      <div class="rev-sec">
-        <h3>Part 2 Review — Fill-in-the-Blank &amp; Open-Ended</h3>
-        <div id="oe-rev"></div>
-      </div>
-
     </div>
   </div>
 
@@ -1561,13 +1543,12 @@ model_poly.X_fit_.shape  # (320, 5)  — identical</pre>
     /* ══ SUPABASE CONFIG ══ */
     const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
-    const TEST_ID = 'classes1to7_test';
+    const MIDTERM_CLASS = 10;
 
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, { auth: { persistSession: false } });
 
     let studentName = '';
     let validatedAccessCode = null;
-    const startedAt = new Date().toISOString();
     const answered = new Set();
 
     function show(id, flex = false) { document.getElementById(id).style.display = flex ? 'flex' : 'block'; }
@@ -1631,21 +1612,8 @@ model_poly.X_fit_.shape  # (320, 5)  — identical</pre>
           codeBtn.disabled = false; codeBtn.textContent = 'Continue →';
           return;
         }
-        const MIDTERM_CLASS = 10;
         if (data.class_id && data.classes && data.classes.sequence_order !== MIDTERM_CLASS) {
           codeErr.textContent = `This code is for ${data.classes.label || 'another class'}, not Class ${MIDTERM_CLASS} (Midterm Exam).`;
-          codeErr.style.display = 'block';
-          codeBtn.disabled = false; codeBtn.textContent = 'Continue →';
-          return;
-        }
-
-        const { error: updateErr } = await db
-          .from('access_codes')
-          .update({ uses_count: data.uses_count + 1 })
-          .eq('id', data.id);
-
-        if (updateErr) {
-          codeErr.textContent = 'Error validating code. Please try again.';
           codeErr.style.display = 'block';
           codeBtn.disabled = false; codeBtn.textContent = 'Continue →';
           return;
@@ -1709,212 +1677,77 @@ model_poly.X_fit_.shape  # (320, 5)  — identical</pre>
       document.getElementById('ptxt').textContent = `${answered.size} / 21 answered`;
     }
 
-    /* ══ ANSWER KEYS ══ */
-    const MCQ = { q1: 'B', q2: 'A', q3: 'A', q4: 'B', q5: 'B', q6: 'A', q7: 'A', q8: 'A', q9: 'A', q10: 'A', q11: 'A', q12: 'A', q13: 'A', q14: 'A', q15: 'B' };
-
-    const BLANKS = {
-      q16_b1: ['fillna'],
-      q16_b2: ['fillna'],
-      q16_b3: ["df['units_sold'] * df['price'] * (1 - df['discount'])", "units_sold * price * (1 - discount)"],
-      q16_b4: ["'store_id'", "store_id"],
-      q16_b5: ['sum'],
-      q16_b6: ['sort_values(ascending=False)', 'sort_values(ascending = False)'],
-      q17_b1: ['w * x[i] + b', 'w*x[i]+b', 'w * x[i]+b', 'w*x[i] + b'],
-      q17_b2: ['(f_wb - y[i]) ** 2', '(f_wb-y[i])**2', '(f_wb - y[i])**2'],
-      q18_b1: ['(TP + TN) / (TP + FP + FN + TN)', '(tp+tn)/(tp+fp+fn+tn)'],
-      q18_b2: ['TP / (TP + FP)', 'tp/(tp+fp)'],
-      q18_b3: ['TP / (TP + FN)', 'tp/(tp+fn)'],
-      q18_b4: ['2 * precision * recall / (precision + recall)', '2*precision*recall/(precision+recall)'],
-      q19_b1: ['1 / (1 + np.exp(-z))', '1/(1+np.exp(-z))'],
-      q19_b2: ['w @ X.T + b', 'w@X.T+b'],
-      q19_b3: ['sigmoid(z)'],
-      q19_b4: ['astype(int)'],
-      q20_b1: ['(x * xp + 1) ** 2', '(x*xp+1)**2', '(x * xp + 1)**2'],
-      q20_b2: ['[x, x**2]', '[x, x ** 2]'],
-      q20_b3: ['math.exp(-gamma * distance**2)', 'math.exp(-gamma*distance**2)', 'math.exp(-gamma * distance ** 2)']
-    };
-
-    const QLBLS = {
-      1: 'ANI / AGI / ASI — which exists today',
-      2: 'NumPy dot product of two vectors',
-      3: 'Population variance of [2,4,4,6,10]',
-      4: 'Low train error, high CV error — diagnosis',
-      5: 'Min-Max scaling — value of 40 in [10..50]',
-      6: 'pd.get_dummies — shape after one-hot encoding',
-      7: 'Train/val/test split proportions',
-      8: '5-fold cross-validation — number of fits',
-      9: 'MSE cost J(w=0.8, b=0.9)',
-      10: 'StandardScaler — correct fit/transform pattern',
-      11: 'Sigmoid function — σ(5)',
-      12: 'Confusion matrix — recall',
-      13: 'Confusion matrix — precision',
-      14: 'Quadratic kernel K(3,3)',
-      15: 'What the kernel trick actually does'
-    };
-
-    const OPTS = {
-      q1: { A: 'AGI', B: 'ANI', C: 'ASI', D: 'Artificial Hybrid Intelligence', E: 'General Deep Learning' },
-      q2: { A: '32', B: '21', C: '30', D: '15', E: '24' },
-      q3: { A: '7.36', B: '5.20', C: '2.713', D: '6.40', E: '8.00' },
-      q4: { A: 'High bias (underfitting)', B: 'High variance (overfitting)', C: 'Perfectly calibrated', D: 'Data leakage', E: 'Learning rate too small' },
-      q5: { A: '0.60', B: '0.75', C: '0.80', D: '0.40', E: '1.00' },
-      q6: { A: '(400,8)', B: '(400,9)', C: '(400,5)', D: '(400,4)', E: '(400,12)' },
-      q7: { A: '60/20/20', B: '70/20/10', C: '80/10/10', D: '50/30/20', E: '64/16/20' },
-      q8: { A: '5', B: '1', C: '10', D: '4', E: '25' },
-      q9: { A: '0.525', B: '1.050', C: '0.2625', D: '5.250', E: '0.420' },
-      q10: { A: 'fit_transform train, transform test', B: 'fit_transform both separately', C: 'fit test, transform train', D: 'fit_transform full dataset then split', E: 'scaling unnecessary' },
-      q11: { A: '0.9933', B: '0.5000', C: '1.0000', D: '0.0067', E: '0.8590' },
-      q12: { A: '0.6667', B: '0.8000', C: '0.7000', D: '0.7273', E: '0.5000' },
-      q13: { A: '0.7576', B: '0.8333', C: '0.7400', D: '0.7937', E: '0.6250' },
-      q14: { A: '100', B: '49', C: '91', D: '82', E: '64' },
-      q15: { A: 'Adds new polynomial columns', B: 'Computes similarity in higher dimensions, no new columns', C: 'Removes features', D: 'Only works if linear', E: 'Converts categorical to numeric' }
-    };
-
-    const RUBRICS = {
-      16: "fillna · fillna · units_sold*price*(1-discount) · 'store_id' · sum · sort_values(ascending=False)",
-      17: 'f_wb = w*x[i]+b  |  cost_sum += (f_wb-y[i])**2  →  J(0.8,0.9)=0.525',
-      18: 'accuracy=(TP+TN)/total · precision=TP/(TP+FP) · recall=TP/(TP+FN) · f1=2·P·R/(P+R)',
-      19: 'sigmoid: 1/(1+np.exp(-z)) · z=w@X.T+b · probabilities=sigmoid(z) · .astype(int)',
-      20: 'kernel: (x*xp+1)**2 · phi: [x,x**2] · rbf: math.exp(-gamma*distance**2)',
-      21: 'Train R² ≫ Test R² = high variance/overfitting (Class 2). Fixes: more data, regularization, simpler model, more k-fold CV (Class 4). Full credit needs diagnosis + a named fix + the bias/variance link.'
-    };
-
+    /* ══ COLLECT ANSWERS ══ */
     function collect() {
       const a = {};
-      for (let q = 1; q <= 15; q++) { const s = document.querySelector(`input[name="q${q}"]:checked`); a[`q${q}`] = s ? s.value : null; }
+      for (let q = 1; q <= 15; q++) {
+        const s = document.querySelector(`input[name="q${q}"]:checked`);
+        a[`q${q}`] = s ? s.value : null;
+      }
       ['q16_b1', 'q16_b2', 'q16_b3', 'q16_b4', 'q16_b5', 'q16_b6',
         'q17_b1', 'q17_b2',
         'q18_b1', 'q18_b2', 'q18_b3', 'q18_b4',
         'q19_b1', 'q19_b2', 'q19_b3', 'q19_b4',
-        'q20_b1', 'q20_b2', 'q20_b3'].forEach(id => { const el = document.getElementById(id); a[id] = el ? el.value.trim() : ''; });
+        'q20_b1', 'q20_b2', 'q20_b3'].forEach(id => {
+          const el = document.getElementById(id);
+          a[id] = el ? el.value.trim() : '';
+        });
       a['q21_text'] = (document.getElementById('q21') || {}).value?.trim() || '';
       return a;
     }
 
-    function matchBlank(id, val) {
-      if (!val) return false;
-      const n = val.toLowerCase().replace(/\s/g, '');
-      return (BLANKS[id] || []).some(ans => {
-        const an = ans.toLowerCase().replace(/\s/g, '');
-        return n === an || n.includes(an) || an.includes(n);
-      });
-    }
-
-    function gradeAll(a) {
-      const res = {}; let mcqS = 0, blankS = 0;
-      for (let q = 1; q <= 15; q++) { const ok = a[`q${q}`] === MCQ[`q${q}`]; if (ok) mcqS += 2; res[`q${q}`] = { ok, s: a[`q${q}`], c: MCQ[`q${q}`] }; }
-
-      function blanksGroup(k, ids) {
-        const cor = ids.filter(id => matchBlank(id, a[id])).length;
-        const pts = Math.round((cor / ids.length) * 5);
-        blankS += pts;
-        res[k] = { type: 'blanks', pts, cor, of: ids.length, items: ids.map(id => ({ id, val: a[id], ok: matchBlank(id, a[id]) })) };
-      }
-      blanksGroup('q16', ['q16_b1', 'q16_b2', 'q16_b3', 'q16_b4', 'q16_b5', 'q16_b6']);
-      blanksGroup('q17', ['q17_b1', 'q17_b2']);
-      blanksGroup('q18', ['q18_b1', 'q18_b2', 'q18_b3', 'q18_b4']);
-      blanksGroup('q19', ['q19_b1', 'q19_b2', 'q19_b3', 'q19_b4']);
-      blanksGroup('q20', ['q20_b1', 'q20_b2', 'q20_b3']);
-      res['q21'] = { type: 'oe', text: a['q21_text'] || '' };
-
-      return { res, mcqS, blankS, auto: mcqS + blankS };
-    }
-
-    function submitTest() {
+    /* ══ SUBMIT ASSESSMENT (BACKEND AUTO-GRADING) ══ */
+    async function submitTest() {
       const btn = document.getElementById('sub-btn');
-      btn.disabled = true; btn.textContent = 'Grading…';
-      const a = collect();
-      const { res, mcqS, blankS, auto } = gradeAll(a);
-      showResults(res, mcqS, blankS, auto);
-      upload(a, res, mcqS, blankS, auto);
+      btn.disabled = true;
+      btn.textContent = '⏳ Grading & Submitting…';
+
+      const answers = collect();
+      const EDGE_URL = `${SUPABASE_URL}/functions/v1/grade-exam`;
+
+      try {
+        const resp = await fetch(EDGE_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${SUPABASE_ANON}`,
+          },
+          body: JSON.stringify({
+            studentName,
+            accessCode: validatedAccessCode,
+            examClass: MIDTERM_CLASS,
+            answers,
+          }),
+        });
+
+        const result = await resp.json();
+
+        if (!resp.ok) {
+          btn.disabled = false;
+          btn.textContent = 'Submit Test →';
+          alert(`Submission error: ${result.error || 'Please try again.'}`);
+          return;
+        }
+
+        showResults();
+
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = 'Submit Test →';
+        alert('Network error — check your connection and try again.');
+        console.error('submitTest error:', err);
+      }
     }
 
-    function showResults(res, mcqS, blankS, auto) {
+    /* ══ SHOW SUBMISSION CONFIRMATION ══ */
+    function showResults() {
       document.getElementById('test-area').style.display = 'none';
       document.getElementById('results-area').style.display = 'block';
       window.scrollTo(0, 0);
 
-      document.getElementById('r-name').textContent = studentName;
-      document.getElementById('r-score').textContent = auto;
-      document.getElementById('r-pct').textContent = Math.round((auto / 60) * 100) + '%';
-
-      const mcqC = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].filter(q => res[`q${q}`].ok).length;
-      const ms = document.getElementById('r-mcq'); ms.textContent = mcqS + ' / 30'; if (mcqS >= 20) ms.classList.add('g');
-      document.getElementById('r-mcqc').textContent = mcqC + ' / 15';
-      document.getElementById('r-blank').textContent = blankS + ' / 25';
-
-      const md = document.getElementById('mcq-rev'); md.innerHTML = '';
-      for (let q = 1; q <= 15; q++) {
-        const r = res[`q${q}`]; const o = OPTS[`q${q}`] || {};
-        const sl = r.s ? `${r.s}) ${o[r.s] || r.s}` : 'No answer';
-        const cl = `${r.c}) ${o[r.c] || r.c}`;
-        const d = document.createElement('div');
-        d.className = `rev-c ${r.ok ? 'ok' : 'bad'}`;
-        d.innerHTML = `<div class="rev-qn">Q${q} · MCQ · ${r.ok ? '+2 pts' : '0 pts'}</div>
-      <div class="rev-qt">${QLBLS[q]}</div>
-      <div class="pill-row">
-        <span class="pill ${r.ok ? 'sc' : 'sw'}">${r.ok ? '✓' : '✗'} ${sl}</span>
-        ${!r.ok ? `<span class="pill ca">✓ ${cl}</span>` : ''}
-      </div>`;
-        md.appendChild(d);
-      }
-
-      const od = document.getElementById('oe-rev'); od.innerHTML = '';
-      const titles = { 16: 'Data Preprocessing blanks (Class 3)', 17: 'MSE Cost Function blanks (Class 5)', 18: 'Confusion Matrix Metrics blanks (Class 6)', 19: 'Sigmoid & Predict blanks (Class 6)', 20: 'Kernel Trick blanks (Class 9)', 21: 'Bias/Variance Open-Ended (Classes 2 & 4)' };
-      [16, 17, 18, 19, 20, 21].forEach(q => {
-        const r = res[`q${q}`];
-        const d = document.createElement('div');
-        d.className = 'rev-c man';
-        let inner = '';
-        if (r.type === 'blanks') {
-          inner = `<div class="pill-row"><span class="pill mn">Blanks: ${r.pts}/5 pts (${r.cor}/${r.of} correct)</span></div>
-        <div class="b-detail">${r.items.map(b => `${b.ok ? '✅' : '❌'} <code>${b.id}</code>: "${b.val || '—'}"`).join('<br>')}</div>`;
-        } else {
-          inner = `<div class="pill-row"><span class="pill mn">Submitted · pending instructor review</span></div>
-        <div class="oe-ans">${esc(r.text || '(no answer)')}</div>`;
-        }
-        d.innerHTML = `<div class="rev-qn">Q${q} · ${r.type === 'blanks' ? 'Fill-in-blanks' : 'Open-ended'} · 5 pts</div>
-      <div class="rev-qt">${titles[q]}</div>
-      ${inner}
-      <div class="rubric">📋 Marking guide: ${RUBRICS[q]}</div>`;
-        od.appendChild(d);
-      });
-    }
-
-    function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>'); }
-
-    async function upload(a, res, mcqS, blankS, auto) {
-      const box = document.getElementById('upload-box');
-      box.innerHTML = '<div class="upload-status uploading">⏳ Saving results…</div>';
-
-      const mcqD = {};
-      for (let q = 1; q <= 15; q++) mcqD[`q${q}`] = { answer: a[`q${q}`], correct: res[`q${q}`].ok };
-
-      const questionDetail = { mcq: mcqD };
-      [16, 17, 18, 19, 20].forEach(q => { questionDetail[`q${q}`] = res[`q${q}`]; });
-      questionDetail['q21'] = { text: a.q21_text };
-
-      const payload = {
-        student_name: studentName,
-        test_id: TEST_ID,
-        access_code: validatedAccessCode,
-        mcq_score: mcqS,
-        blank_score: blankS,
-        auto_score: auto,
-        total_possible: 60,
-        pct: Math.round((auto / 60) * 100),
-        question_detail: questionDetail,
-        started_at: startedAt,
-        submitted_at: new Date().toISOString()
-      };
-
-      try {
-        const { error } = await db.from('test_submissions').insert([payload]);
-        if (error) throw error;
-        box.innerHTML = '<div class="upload-status success">✅ Results saved. Your instructor will review the open-ended answer (Q21).</div>';
-      } catch (err) {
-        box.innerHTML = `<div class="upload-status failed">⚠️ Upload failed — screenshot this page and send it to your instructor.<br><small>${err.message || ''}</small></div>`;
-      }
+      document.getElementById('r-name').textContent = studentName || 'Student';
+      const codeEl = document.getElementById('r-code');
+      if (codeEl) codeEl.textContent = validatedAccessCode || '—';
     }
 
     /* ══ BOOT ══ */
