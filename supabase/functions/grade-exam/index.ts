@@ -231,24 +231,50 @@ Deno.serve(async (req) => {
     };
 
     // ── Save results ─────────────────────────────────────────────────────────
-    // Use upsert only when session_id is present (requires the migration to have
-    // run). Fall back to plain insert pre-migration so submissions always work.
     const validSessionId = sessionId && /^[0-9a-f-]{36}$/i.test(sessionId)
       ? sessionId
       : null;
 
-    // Strip session_id / started_at from the payload if migration hasn't run yet
-    // (those columns won't exist and will cause a 500).
-    const savePayload = validSessionId
-      ? dbPayload  // includes session_id already set above
-      : (() => { const p = { ...dbPayload }; delete p.session_id; return p; })();
+    let insertErr: any = null;
 
-    const { error: insertErr } = validSessionId
-      ? await db.from(RESULTS_TABLE).upsert(savePayload, {
-          onConflict: 'session_id',
-          ignoreDuplicates: false,
-        })
-      : await db.from(RESULTS_TABLE).insert(savePayload);
+    if (validSessionId) {
+      // Check if row with this session_id already exists
+      const { data: existing, error: selectErr } = await db
+        .from(RESULTS_TABLE)
+        .select('id')
+        .eq('session_id', validSessionId)
+        .maybeSingle();
+
+      if (!selectErr && existing && existing.id) {
+        const { error: updateErr } = await db
+          .from(RESULTS_TABLE)
+          .update(dbPayload)
+          .eq('id', existing.id);
+        insertErr = updateErr;
+      } else {
+        const { error: insErr } = await db
+          .from(RESULTS_TABLE)
+          .insert(dbPayload);
+        
+        // If session_id column doesn't exist, retry without session_id
+        if (insErr && insErr.message && insErr.message.includes('session_id')) {
+          const { session_id, ...payloadWithoutSession } = dbPayload;
+          const { error: retryErr } = await db
+            .from(RESULTS_TABLE)
+            .insert(payloadWithoutSession);
+          insertErr = retryErr;
+        } else {
+          insertErr = insErr;
+        }
+      }
+    } else {
+      const { session_id, ...payloadWithoutSession } = dbPayload;
+      const { error: insErr } = await db
+        .from(RESULTS_TABLE)
+        .insert(payloadWithoutSession);
+      insertErr = insErr;
+    }
+
     if (insertErr) {
       console.error('Insert error:', insertErr);
       return new Response(JSON.stringify({ error: `Failed to save results: ${insertErr.message || JSON.stringify(insertErr)}` }), {
