@@ -869,22 +869,13 @@
       try {
         const { data, error } = await db
           .from('access_codes')
-          .select('id, class_number, cohort, max_uses, uses_count, is_active')
+          .select('id, purpose, max_uses, uses_count, is_active, cohort_id, class_id, cohorts(id, name, slug), classes(id, label, sequence_order)')
           .eq('code', code)
           .single();
 
         if (error || !data) {
           codeInput.classList.add('err');
           codeErr.textContent = 'Invalid code. Try again.';
-          codeErr.style.display = 'block';
-          codeBtn.disabled = false;
-          codeBtn.textContent = 'Continue →';
-          return;
-        }
-
-        // Validate code belongs to THIS class
-        if (data.class_number !== expectedClass) {
-          codeErr.textContent = `This code is for Class ${data.class_number}, not Class ${expectedClass}. Use your Class ${expectedClass} code.`;
           codeErr.style.display = 'block';
           codeBtn.disabled = false;
           codeBtn.textContent = 'Continue →';
@@ -907,6 +898,15 @@
           return;
         }
 
+        // Validate code belongs to THIS class (if class-scoped)
+        if (data.class_id && data.classes && data.classes.sequence_order !== expectedClass) {
+          codeErr.textContent = `This code is for ${data.classes.label || 'another class'}, not Class ${expectedClass}. Use your Class ${expectedClass} code.`;
+          codeErr.style.display = 'block';
+          codeBtn.disabled = false;
+          codeBtn.textContent = 'Continue →';
+          return;
+        }
+
         // Increment use count
         const { error: updateErr } = await db
           .from('access_codes')
@@ -921,8 +921,8 @@
           return;
         }
 
-        validatedClassNumber = data.class_number;
-        validatedCohort = data.cohort || 'aijr';
+        validatedClassNumber = (data.classes && data.classes.sequence_order) ? data.classes.sequence_order : expectedClass;
+        validatedCohort = data.cohorts?.name || data.cohorts?.slug || 'aijr';
         validatedAccessCode = code;
 
         hide('access-code-gate');
