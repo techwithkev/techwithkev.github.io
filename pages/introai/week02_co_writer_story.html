@@ -274,7 +274,7 @@
     }
 
     async function validateAccessCode(code) {
-      const resp = await fetch(`${SUPABASE_URL}/rest/v1/access_codes?code=eq.${encodeURIComponent(code)}&select=id,cohort,class_number,max_uses,uses_count,is_active`, {
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/access_codes?code=eq.${encodeURIComponent(code)}&select=id,purpose,max_uses,uses_count,is_active,cohort_id,class_id,cohorts(id,name,slug),classes(id,label,sequence_order)`, {
         method: 'GET',
         headers: {
           'apikey': SUPABASE_KEY,
@@ -339,10 +339,10 @@
           return;
         }
 
-        // Validate code belongs to Co-Writer Story class (Class 102)
-        if (codeRecord.class_number !== 102) {
+        // Validate code belongs to Co-Writer Story class if class-scoped
+        if (codeRecord.class_id && codeRecord.classes && codeRecord.classes.sequence_order !== 2 && codeRecord.classes.sequence_order !== 102) {
           codeEl.classList.add('error');
-          codeErrEl.textContent = `This code is for Class ${codeRecord.class_number}, not for the Co-Writer Story activity.`;
+          codeErrEl.textContent = `This code is for ${codeRecord.classes.label || 'another class'}, not for the Co-Writer Story activity.`;
           codeErrEl.classList.remove('hidden');
           btn.disabled = false;
           document.getElementById('reg-btn-label').textContent = 'Join Storybook →';
@@ -371,7 +371,7 @@
         await incrementCodeUses(codeRecord.id, codeRecord.uses_count + 1);
 
         // We use the cohort of the access code as the classNumber!
-        const classNum = codeRecord.cohort;
+        const classNum = codeRecord.cohorts?.slug || codeRecord.cohorts?.name || 'introai';
 
         studentName = name;
         studentEmail = email;

@@ -632,7 +632,7 @@
 
       const { data, error } = await db
         .from('access_codes')
-        .select('id, code, class_number, cohort, uses_count, max_uses, is_active, created_at')
+        .select('id, code, uses_count, max_uses, is_active, created_at, cohorts(name, slug), classes(label, sequence_order)')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -641,11 +641,15 @@
         return;
       }
 
-      allCodes = data || [];
+      allCodes = (data || []).map(c => ({
+        ...c,
+        cohort: c.cohorts?.name || c.cohorts?.slug || c.cohort || '—',
+        class_number: c.classes?.sequence_order || c.class_number || 'All'
+      }));
 
       // Populate filter dropdowns
-      const classes = [...new Set(allCodes.map(c => c.class_number))].sort((a,b)=>a-b);
-      const cohorts = [...new Set(allCodes.map(c => c.cohort))].sort();
+      const classes = [...new Set(allCodes.map(c => c.class_number))].filter(c => c !== 'All').sort((a,b)=>a-b);
+      const cohorts = [...new Set(allCodes.map(c => c.cohort))].filter(Boolean).sort();
       const classFilter = document.getElementById('filter-class');
       const cohortFilter = document.getElementById('filter-cohort');
       const currentClass = classFilter.value;

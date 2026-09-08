@@ -5054,7 +5054,7 @@
         const [hw, exam, codes, sa, sh, cb, cp, pd, ws, ap, pc, mg, isSwap, tm, bta, ayf, dsr, kc, stb, da, bd, dd, testSub, testCodes, bct, bds, ftd, pvp, met, caioOld, nl, fp, pb, poc, pt, pl, ads, mc, sm, wwyd, mcbot, bvl, acm, wai, finalSub] = await Promise.all([
           sb.from('homework_submissions').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('caio_final_exam_results').select('*').order('submitted_at', { ascending: false }).limit(10000),
-          sb.from('access_codes').select('*').order('created_at', { ascending: false }).limit(10000),
+          sb.from('access_codes').select('*, cohorts(name, slug), classes(label, sequence_order)').order('created_at', { ascending: false }).limit(10000),
           sb.from('introai_week01_self_assessment').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('introai_week01_scavenger_hunt').select('*').order('submitted_at', { ascending: false }).limit(10000),
           sb.from('introai_week01_chatbots').select('*').order('submitted_at', { ascending: false }).limit(10000),
@@ -5118,7 +5118,7 @@
         // Build access_code → cohort lookup from BOTH access_codes and test_access_codes
         codeToCohorMap = {};
         (codes && codes.data ? codes.data : []).forEach(c => {
-          if (c.code) codeToCohorMap[c.code.toUpperCase()] = c.cohort || '';
+          if (c.code) codeToCohorMap[c.code.toUpperCase()] = c.cohorts?.name || c.cohorts?.slug || c.cohort || '';
         });
         (testCodes && testCodes.data ? testCodes.data : []).forEach(c => {
           if (c.code) codeToCohorMap[c.code.toUpperCase()] = c.cohort || 'aijr';
