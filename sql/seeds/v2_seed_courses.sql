@@ -111,53 +111,11 @@ ON CONFLICT (course_id, exercise_slug) DO UPDATE SET
   week_number    = EXCLUDED.week_number,
   sequence_order = EXCLUDED.sequence_order;
 
--- ── 3. EXERCISE DEFINITIONS — AIJR ───────────────────────────────────────────
-WITH aijr AS (SELECT id FROM courses WHERE slug = 'aijr')
-INSERT INTO exercise_definitions (course_id, exercise_slug, label, week_number, sequence_order, is_active)
-SELECT
-  aijr.id, slug, label, class_num, seq, true
-FROM aijr, (VALUES
-  ('class01_array_shape_transformer',          'Class 1 — Array Shape Transformer',                          1,  1),
-  ('class01_pixel_matrix_explorer',            'Class 1 — Pixel Matrix Explorer',                             1,  2),
-  ('class02_subgroup_bias_dragger',            'Class 2 — Subgroup Bias Dragger',                             2,  1),
-  ('class02_learning_curve_gap',               'Class 2 — Learning Curve Gap',                                2,  2),
-  ('class03_min_max_vs_z_score_normalizer',    'Class 3 — Min-Max vs Z-Score Normalizer',                     3,  1),
-  ('class03_z_score_gradient_descent',         'Class 3 — Z-Score Gradient Descent',                          3,  2),
-  ('class04_k_fold_carousel',                  'Class 4 — K-Fold Carousel',                                   4,  1),
-  ('class04_overfitting_polynomial',           'Class 4 — Overfitting Polynomial',                            4,  2),
-  ('class05_the_geometric_mse_square',         'Class 5 — Geometric MSE Square',                              5,  1),
-  ('class06_gradient_descent',                 'Class 6 — Gradient Descent',                                  6,  1),
-  ('class07_entropy_splitter',                 'Class 7 — Decision Trees: Entropy Splitter',                  7,  1),
-  ('class08_naive_bayes_knn',                  'Class 8 — Naive Bayes & K-NN Classifier',                     8,  1),
-  ('class09_kernel_trick',                     'Class 9 — The Kernel Trick',                                  9,  1),
-  ('class09_svm_soft_margin',                  'Class 9 — SVM Soft Margin (C Parameter)',                     9,  2),
-  ('class10_midterm_exam',                     'Class 10 — Midterm Exam (Classes 1–9)',                      10,  1),
-  ('class10_cheatsheet',                       'Class 10 — Midterm Cheatsheet',                              10,  2),
-  ('class11_search_visualizer',                'Class 11 — Search Algorithms (Uninformed & Informed)',        11,  1),
-  ('class12_constraint_propagation',           'Class 12 — Constraint Propagation & Minimax',                12,  1),
-  ('class13_k_means_clustering',               'Class 13 — k-Means Clustering',                              13,  1),
-  ('class13_principal_component_analysis',     'Class 13 — Principal Component Analysis (PCA)',              13,  2),
-  ('class13_t_sne_process_visualizer',         'Class 13 — t-SNE Process Visualizer',                         13,  3),
-  ('class14_extended_clustering',              'Class 14 — Extended Clustering (DBSCAN / GMM)',              14,  1),
-  ('class15_mae_rmse',                         'Class 15 — Outlier Penalty (MAE vs RMSE)',                   15,  1),
-  ('class15_r2_coefficient_of_determination',  'Class 15 — R² Coefficient of Determination',                 15,  2),
-  ('class15_roc_auc',                          'Class 15 — ROC Curve & AUC',                                 15,  3),
-  ('class15_visualization',                    'Class 15 — Bias-Variance & L2 Regularization',               15,  4),
-  ('class15_learning_curves',                  'Class 15 — Learning Curves Diagnostic',                      15,  5),
-  ('class16_agent_environment_loop',           'Class 16 — Agent-Environment Loop',                          16,  1),
-  ('class16_mdp',                              'Class 16 — Markov Decision Process',                         16,  2),
-  ('class16_bellman_gridworld',                'Class 16 — Bellman Gridworld',                               16,  3),
-  ('class16_epsilon_visualizer',               'Class 16 — The Bandit Lab (Exploration vs Exploitation)',    16,  4),
-  ('class16_qlearning',                        'Class 16 — Q-Learning Algorithm Update',                     16,  5),
-  ('class17_cosine_similarity',                'Class 17 — Recommender Systems (Cosine Similarity)',         17,  1),
-  ('class18_self_attention',                   'Class 18 — Self-Attention Web',                              18,  1),
-  ('class18_latent_space',                     'Class 18 — Latent Space Interpolation',                      18,  2),
-  ('class19_final_exam',                       'Class 19 — Final Exam (Classes 1–18)',                       19,  1)
-) AS t(slug, label, class_num, seq)
-ON CONFLICT (course_id, exercise_slug) DO UPDATE SET
-  label          = EXCLUDED.label,
-  week_number    = EXCLUDED.week_number,
-  sequence_order = EXCLUDED.sequence_order;
+-- ── 3. CLEANUP: Ensure no visualizer pages are in exercise_definitions for AIJR ──
+--   AIJR uses homework_submissions and exam submissions (Midterm & Final Exam),
+--   not exercise_definitions (which are exclusively for Intro to AI student exercises).
+DELETE FROM exercise_definitions
+WHERE course_id = (SELECT id FROM courses WHERE slug = 'aijr');
 
 -- ── NOTE: Cohort creation ─────────────────────────────────────────────────────
 -- Create your real cohorts via the teacher dashboard (pages/teacher/cohorts.html).
