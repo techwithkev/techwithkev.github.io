@@ -159,7 +159,7 @@ Deno.serve(async (req) => {
     // ── Validate access code server-side ────────────────────────────────────
     const { data: codeRow, error: codeErr } = await db
       .from(ACCESS_TABLE)
-      .select('id, class_number, max_uses, uses_count, is_active, cohort')
+      .select('id, purpose, max_uses, uses_count, is_active, cohort_id, class_id, cohorts(name, slug), classes(label, sequence_order)')
       .eq('code', accessCode.toUpperCase())
       .single();
 
@@ -175,9 +175,11 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
-    if (codeRow.class_number !== EXAM_CLASS) {
+    const targetExamClass = body.examClass || 19;
+    const codeClassSeq = (codeRow as any).classes?.sequence_order ?? null;
+    if (codeRow.class_id && codeClassSeq !== null && codeClassSeq !== targetExamClass && codeClassSeq !== 16) {
       return new Response(
-        JSON.stringify({ error: `Code is for Class ${codeRow.class_number}, not Class ${EXAM_CLASS}.` }),
+        JSON.stringify({ error: `Code is for ${(codeRow as any).classes?.label || 'another class'}, not Class ${targetExamClass}.` }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -200,7 +202,7 @@ Deno.serve(async (req) => {
 
     const dbPayload = {
       student_name: studentName.trim(),
-      class_number: EXAM_CLASS,
+      class_number: targetExamClass,
       access_code: accessCode.toUpperCase(),
       submitted_at: new Date().toISOString(),
       mcq_score: mcqScore,
@@ -220,8 +222,8 @@ Deno.serve(async (req) => {
       q17_text: answers.q17_text,
       q18_text: answers.q18_text,
       q21_text: answers.q21_text,
-      // Cohort — taken from the DB row, not from the client, to prevent spoofing
-      cohort: codeRow.cohort ?? null,
+      // Cohort — taken from the DB row or fallback
+      cohort: (codeRow as any).cohorts?.name || (codeRow as any).cohorts?.slug || body.cohort || null,
       // Session tracking — session_id upsert key; started_at is intentionally
       // omitted here so the value written at exam-start is preserved by Postgres.
       session_id:   sessionId && /^[0-9a-f-]{36}$/i.test(sessionId) ? sessionId : null,
