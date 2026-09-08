@@ -12,8 +12,8 @@ This repository is being refactored from a fragmented, per-exercise Supabase tab
 
 ### The 4 Major Subsystems
 1. **Marketing / Landing:** Root `index.md`, `courses.md`, `pricing.md`, `assessments.md` (Jekyll / GitHub Pages).
-2. **Intro to AI (`pages/introai/`):** 35+ interactive student exercise pages across 16 weeks.
-3. **AI Olympiad Junior (`pages/aijr/`):** Class pages, homework submissions, and final exams.
+2. **Intro to AI (`pages/introai/`):** 38+ interactive student exercise pages across 19 classes (Classes 1–13 foundational, Classes 14–16 new science/business/robotics topics, Classes 17–19 build sessions & grand showcase).
+3. **AI Olympiad Junior (`pages/aijr/`):** 30+ interactive visualizers, homework assignments, Class 10 Midterm (Classes 1–9), and Class 19 Final Exam across the expanded 19-class competition syllabus.
 4. **Teacher Portal (`pages/teacher/`):** Dashboard for managing cohorts, classes, student access codes, exercise submissions, homework, exams, and analytics.
 
 ---

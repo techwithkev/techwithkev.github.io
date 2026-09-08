@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Classes 1–7 Test — AI Junior Competition</title>
+  <title>Class 10 Midterm Assessment (Classes 1–9) — AI Junior Competition</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link
@@ -999,7 +999,7 @@
   <!-- ══ ACCESS CODE GATE ══ -->
   <div id="access-code-gate">
     <div class="gate-card">
-      <div class="gate-logo">AI Junior Competition · Classes 1–7 Test</div>
+      <div class="gate-logo">AI Junior Competition · Class 10 Midterm Assessment (Classes 1–9)</div>
       <h2>Test Access</h2>
       <p class="gate-sub">Enter the access code your instructor gave you to begin.</p>
       <label class="gate-label" for="access-code">Access Code</label>
@@ -1013,8 +1013,8 @@
   <div id="cover">
     <div class="cover-wrap">
       <span class="hero-tag">STRUCTURED FOR SUCCESS</span>
-      <h1>Classes 1–7<br><em>Practice Test.</em></h1>
-      <p class="cover-sub">Assess your understanding across Classes 1–7. Complete all 21 questions and receive instant
+      <h1>Class 10 Midterm<br><em>Practice Assessment.</em></h1>
+      <p class="cover-sub">Assess your understanding across Classes 1–9. Complete all 21 questions and receive instant
         auto-graded feedback on the multiple choice and fill-in-the-blank sections.</p>
 
       <div class="score-grid">
@@ -1061,7 +1061,7 @@
       <!-- PART 1 -->
       <div class="part-hdr">
         <h2>Part 1: Multiple Choice</h2>
-        <p>Q1–15 · 2 pts each · Classes 1–7</p>
+        <p>Q1–15 · 2 pts each · Classes 1–9</p>
       </div>
 
       <!-- Q1 — Class 1 -->
@@ -1352,10 +1352,10 @@ cv_scores = cross_val_score(model, X, y, cv=kf, scoring='r2')</pre>
         </ul>
       </div>
 
-      <!-- Q14 — Class 7 -->
+      <!-- Q14 — Class 9 -->
       <div class="qc" id="qcard-14">
         <div class="q-meta"><span class="q-num">Q14</span><span class="q-pts">2 pts</span><span class="q-tag">Class
-            7</span></div>
+            9</span></div>
         <div class="q-body">
           <p>Using the quadratic kernel <code>K(x, x′) = (x·x′ + 1)²</code>, what is <code>K(3, 3)</code>?</p>
         </div>
@@ -1373,10 +1373,10 @@ cv_scores = cross_val_score(model, X, y, cv=kf, scoring='r2')</pre>
         </ul>
       </div>
 
-      <!-- Q15 — Class 7 -->
+      <!-- Q15 — Class 9 -->
       <div class="qc" id="qcard-15">
         <div class="q-meta"><span class="q-num">Q15</span><span class="q-pts">2 pts</span><span class="q-tag">Class
-            7</span></div>
+            9</span></div>
         <div class="q-body">
           <p>After fitting <code>KernelRidge(kernel='polynomial', degree=2, coef0=1)</code>, a check shows:</p>
           <pre>X_train_s.shape          # (320, 5)
@@ -1401,7 +1401,7 @@ model_poly.X_fit_.shape  # (320, 5)  — identical</pre>
       <!-- PART 2 -->
       <div class="part-hdr">
         <h2>Part 2: Fill-in-the-Blank &amp; Open-Ended</h2>
-        <p>Q16–21 · 5 pts each · Classes 2–7</p>
+        <p>Q16–21 · 5 pts each · Classes 1–9</p>
       </div>
 
       <!-- Q16 — Class 3 blanks -->
@@ -1468,12 +1468,12 @@ model_poly.X_fit_.shape  # (320, 5)  — identical</pre>
         </div>
       </div>
 
-      <!-- Q20 — Class 7 blanks -->
+      <!-- Q20 — Class 9 blanks -->
       <div class="qc" id="qcard-20">
         <div class="q-meta"><span class="q-num">Q20</span><span class="q-pts">5 pts · fill in blanks</span><span
-            class="q-tag">Class 7</span></div>
+            class="q-tag">Class 9</span></div>
         <div class="q-body">
-          <p>Fill in the three blanks to complete the kernel functions from Class 7:</p>
+          <p>Fill in the three blanks to complete the kernel functions from Class 9:</p>
         </div>
         <div class="bcode">def kernel(x, xp):
           return <input class="bi" id="q20_b1" placeholder="b1" style="width:160px;"> # quadratic kernel
@@ -1620,7 +1620,7 @@ model_poly.X_fit_.shape  # (320, 5)  — identical</pre>
           return;
         }
         if (data.test_id !== TEST_ID) {
-          codeErr.textContent = 'This code is not valid for the Classes 1–7 test.';
+          codeErr.textContent = 'This code is not valid for the Class 10 Midterm (Classes 1–9) test.';
           codeErr.style.display = 'block';
           codeBtn.disabled = false; codeBtn.textContent = 'Continue →';
           return;
@@ -1859,7 +1859,7 @@ model_poly.X_fit_.shape  # (320, 5)  — identical</pre>
       }
 
       const od = document.getElementById('oe-rev'); od.innerHTML = '';
-      const titles = { 16: 'Data Preprocessing blanks (Class 3)', 17: 'MSE Cost Function blanks (Class 5)', 18: 'Confusion Matrix Metrics blanks (Class 6)', 19: 'Sigmoid & Predict blanks (Class 6)', 20: 'Kernel Trick blanks (Class 7)', 21: 'Bias/Variance Open-Ended (Classes 2 & 4)' };
+      const titles = { 16: 'Data Preprocessing blanks (Class 3)', 17: 'MSE Cost Function blanks (Class 5)', 18: 'Confusion Matrix Metrics blanks (Class 6)', 19: 'Sigmoid & Predict blanks (Class 6)', 20: 'Kernel Trick blanks (Class 9)', 21: 'Bias/Variance Open-Ended (Classes 2 & 4)' };
       [16, 17, 18, 19, 20, 21].forEach(q => {
         const r = res[`q${q}`];
         const d = document.createElement('div');

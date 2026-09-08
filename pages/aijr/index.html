@@ -31,19 +31,25 @@
                 <div class="relative">
                     <select id="class-filter" onchange="filterCards()" class="appearance-none pl-4 pr-9 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 shadow-sm cursor-pointer hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-all">
                         <option value="all">All Classes</option>
-                        <option value="01">Class 01</option>
-                        <option value="02">Class 02</option>
-                        <option value="03">Class 03</option>
-                        <option value="04">Class 04</option>
-                        <option value="05">Class 05</option>
-                        <option value="07">Class 07</option>
-                        <option value="08">Class 08</option>
-                        <option value="09">Class 09</option>
-                        <option value="11">Class 11</option>
-                        <option value="12">Class 12</option>
-                        <option value="13">Class 13</option>
-                        <option value="14">Class 14</option>
-                        <option value="15">Class 15</option>
+                        <option value="01">Class 01 — Data & Tensors</option>
+                        <option value="02">Class 02 — Bias & Variance</option>
+                        <option value="03">Class 03 — Feature Scaling</option>
+                        <option value="04">Class 04 — Validation & Folds</option>
+                        <option value="05">Class 05 — Loss Functions & MSE</option>
+                        <option value="06">Class 06 — Gradient Descent</option>
+                        <option value="07">Class 07 — Decision Trees & Ensembles</option>
+                        <option value="08">Class 08 — Naive Bayes & K-NN</option>
+                        <option value="09">Class 09 — Kernel Methods & SVM</option>
+                        <option value="10">Class 10 — Midterm Exam</option>
+                        <option value="11">Class 11 — Search Algorithms</option>
+                        <option value="12">Class 12 — Adversarial Search & CSPs</option>
+                        <option value="13">Class 13 — k-Means & PCA</option>
+                        <option value="14">Class 14 — Extended Clustering</option>
+                        <option value="15">Class 15 — Evaluation & Regularization</option>
+                        <option value="16">Class 16 — Reinforcement Learning</option>
+                        <option value="17">Class 17 — Recommender Systems</option>
+                        <option value="18">Class 18 — Generative AI & LLMs</option>
+                        <option value="19">Class 19 — Final Exam</option>
                     </select>
                     <!-- Chevron icon -->
                     <svg class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
@@ -120,7 +126,6 @@
                 <p class="text-sm text-gray-500 flex-grow">Visualizing how feature scaling transforms the loss landscape from an elongated bowl (causing slow, zigzagging gradient descent) to a circular bowl (enabling fast, direct convergence).</p>
             </a>
 
-
             <!-- Class 04 K-Fold Carousel Tile -->
             <a href="class04_k_fold_carousel.html" data-class="04" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-violet-400 transition-all flex flex-col">
                 <div class="flex justify-between items-start mb-4">
@@ -152,7 +157,7 @@
             </a>
 
             <!-- Class 06 Gradient Descent Tile -->
-            <a href="class06_gradient_descent.html" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-emerald-400 transition-all flex flex-col">
+            <a href="class06_gradient_descent.html" data-class="06" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-emerald-400 transition-all flex flex-col">
                 <div class="flex justify-between items-start mb-4">
                     <span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-md group-hover:bg-emerald-100 group-hover:text-emerald-800 transition-colors">Class 06</span>
                     <svg class="w-5 h-5 text-gray-300 group-hover:text-emerald-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
@@ -161,238 +166,259 @@
                 <p class="text-sm text-gray-500 flex-grow">Watch a ball roll down the loss curve to find the best-fitting line. Control the learning rate to see how step sizes affect optimization.</p>
             </a>
 
-
-
-
-
-
-
-
-
-            <!-- Class 07 Tile -->
-            <a href="class07_kernel_trick.html" data-class="07" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-400 transition-all flex flex-col">
+            <!-- Class 07 Decision Trees & Ensembles: Entropy Splitter Tile -->
+            <a href="class07_entropy_splitter.html" data-class="07" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-emerald-400 transition-all flex flex-col">
                 <div class="flex justify-between items-start mb-4">
-                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-md group-hover:bg-blue-100 group-hover:text-blue-800 transition-colors">Class 07</span>
-                    <svg class="w-5 h-5 text-gray-300 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">The Kernel Trick</h3>
-                <p class="text-sm text-gray-500 flex-grow">Interactive concept for visualizing non-linear separable data.</p>
-            </a>
-
-            <!-- Class 08 Part 1 Tile -->
-            <a href="class08_part1.html" data-class="08" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-400 transition-all flex flex-col">
-                <div class="flex justify-between items-start mb-4">
-                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-md group-hover:bg-blue-100 group-hover:text-blue-800 transition-colors">Class 08</span>
-                    <svg class="w-5 h-5 text-gray-300 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">Course Materials Part 1</h3>
-                <p class="text-sm text-gray-500 flex-grow">Slides, notes, and interactive components for Class 8.</p>
-            </a>
-
-            <!-- Class 09 Entropy Splitter Tile -->
-            <a href="class09_entropy_splitter.html" data-class="09" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-emerald-400 transition-all flex flex-col">
-                <div class="flex justify-between items-start mb-4">
-                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-md group-hover:bg-emerald-100 group-hover:text-emerald-800 transition-colors">Class 09</span>
+                    <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-widest rounded-md">Class 07</span>
                     <svg class="w-5 h-5 text-gray-300 group-hover:text-emerald-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-emerald-600 transition-colors">Entropy Splitter</h3>
-                <p class="text-sm text-gray-500 flex-grow">Drag a horizontal or vertical split across a mixed red/blue dataset and watch Entropy and Information Gain update live — see which cut creates purer leaves.</p>
+                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-emerald-600 transition-colors">Decision Trees: Entropy Splitter</h3>
+                <p class="text-sm text-gray-500 flex-grow">Drag a horizontal or vertical split across a mixed dataset to watch Entropy and Information Gain update live. Explore how random forests and gradient boosted ensembles aggregate weak trees.</p>
+            </a>
+
+            <!-- Class 08 Naive Bayes & K-NN Tile -->
+            <a href="homework.html?class=8" data-class="08" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-teal-400 transition-all flex flex-col">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="px-3 py-1 bg-teal-100 text-teal-800 text-[10px] font-black uppercase tracking-widest rounded-md">Class 08</span>
+                    <svg class="w-5 h-5 text-gray-300 group-hover:text-teal-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-teal-600 transition-colors">Naive Bayes &amp; K-Nearest Neighbors</h3>
+                <p class="text-sm text-gray-500 flex-grow">Explore Bayes' theorem with word priors, conditional independence assumptions, Euclidean distance metrics for K-NN, and the bias-variance tradeoff as k varies.</p>
+            </a>
+
+            <!-- Class 09 The Kernel Trick Tile -->
+            <a href="class09_kernel_trick.html" data-class="09" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-400 transition-all flex flex-col">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="px-3 py-1 bg-blue-100 text-blue-800 text-[10px] font-black uppercase tracking-widest rounded-md">Class 09</span>
+                    <svg class="w-5 h-5 text-gray-300 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">The Kernel Trick (SVM)</h3>
+                <p class="text-sm text-gray-500 flex-grow">Interactive concept for projecting non-linearly separable 2D data into higher-dimensional space where a linear hyperplane can achieve clean separation.</p>
             </a>
 
             <!-- Class 09 SVM Soft Margin Tile -->
             <a href="class09_svm_soft_margin.html" data-class="09" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-400 transition-all flex flex-col">
                 <div class="flex justify-between items-start mb-4">
-                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-md group-hover:bg-indigo-100 group-hover:text-indigo-800 transition-colors">Class 09</span>
+                    <span class="px-3 py-1 bg-indigo-100 text-indigo-800 text-[10px] font-black uppercase tracking-widest rounded-md">Class 09</span>
                     <svg class="w-5 h-5 text-gray-300 group-hover:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </div>
                 <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors">SVM Soft Margin (C Parameter)</h3>
                 <p class="text-sm text-gray-500 flex-grow">Drag the C slider and watch the SVM margin widen (soft / low C) or narrow (hard / high C) as the penalty for margin violations changes.</p>
             </a>
 
-            <!-- Class 11 k-Means Clustering Tile -->
-            <a href="class11_k_means_clustering.html" data-class="11" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-violet-400 transition-all flex flex-col">
+            <!-- Class 10 Midterm Exam Part 1 Tile -->
+            <a href="class10_midterm_exam.html" data-class="10" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-amber-400 transition-all flex flex-col">
                 <div class="flex justify-between items-start mb-4">
-                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-md group-hover:bg-violet-100 group-hover:text-violet-800 transition-colors">Class 11</span>
+                    <span class="px-3 py-1 bg-amber-100 text-amber-800 text-[10px] font-black uppercase tracking-widest rounded-md">Class 10 · Midterm</span>
+                    <svg class="w-5 h-5 text-gray-300 group-hover:text-amber-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-amber-600 transition-colors">Midterm Assessment (Classes 1–9)</h3>
+                <p class="text-sm text-gray-500 flex-grow">Comprehensive midterm exam covering data representations, regression, decision trees, Naive Bayes, KNN, and SVM kernel methods.</p>
+            </a>
+
+            <!-- Class 12 Constraint Propagation Tile -->
+            <a href="class12_constraint_propagation.html" data-class="12" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-cyan-400 transition-all flex flex-col">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="px-3 py-1 bg-cyan-100 text-cyan-800 text-[10px] font-black uppercase tracking-widest rounded-md">Class 12</span>
+                    <svg class="w-5 h-5 text-gray-300 group-hover:text-cyan-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-cyan-600 transition-colors">Adversarial Search &amp; CSPs</h3>
+                <p class="text-sm text-gray-500 flex-grow">Interactive map coloring visualizer exploring the AC-3 constraint propagation algorithm, forward checking, backtracking search, and minimax with alpha-beta pruning.</p>
+            </a>
+
+            <!-- Class 13 k-Means Clustering Tile -->
+            <a href="class13_k_means_clustering.html" data-class="13" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-violet-400 transition-all flex flex-col">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="px-3 py-1 bg-violet-100 text-violet-800 text-[10px] font-black uppercase tracking-widest rounded-md">Class 13</span>
                     <svg class="w-5 h-5 text-gray-300 group-hover:text-violet-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </div>
                 <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-violet-600 transition-colors">k-Means Centroid Dragger</h3>
-                <p class="text-sm text-gray-500 flex-grow">Click to place 3 centroids, then step through the assign → move cycle and watch clusters converge. Drag any centroid to reset and explore.</p>
+                <p class="text-sm text-gray-500 flex-grow">Click to place centroids, then step through the assign → move cycle and watch clusters converge. Drag any centroid to reset and explore.</p>
             </a>
 
-            <!-- Class 11 Principal Component Analysis Tile -->
-            <a href="class11_principal_component_analysis.html" data-class="11" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-400 transition-all flex flex-col">
+            <!-- Class 13 Principal Component Analysis Tile -->
+            <a href="class13_principal_component_analysis.html" data-class="13" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-400 transition-all flex flex-col">
                 <div class="flex justify-between items-start mb-4">
-                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-md group-hover:bg-indigo-100 group-hover:text-indigo-800 transition-colors">Class 11</span>
+                    <span class="px-3 py-1 bg-indigo-100 text-indigo-800 text-[10px] font-black uppercase tracking-widest rounded-md">Class 13</span>
                     <svg class="w-5 h-5 text-gray-300 group-hover:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors">Principal Component Analysis</h3>
+                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors">Principal Component Analysis (PCA)</h3>
                 <p class="text-sm text-gray-500 flex-grow">Rotate a projection line through a 2D dataset to maximize captured variance, calculate eigenvalues/eigenvectors, and see PCA reconstruction error live.</p>
             </a>
 
-            <!-- Class 11 t-SNE Process Visualizer Tile -->
-            <a href="class11_t_sne_process_visualizer.html" data-class="11" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-rose-400 transition-all flex flex-col">
+            <!-- Class 13 t-SNE Process Visualizer Tile -->
+            <a href="class13_t_sne_process_visualizer.html" data-class="13" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-rose-400 transition-all flex flex-col">
                 <div class="flex justify-between items-start mb-4">
-                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-md group-hover:bg-rose-100 group-hover:text-rose-800 transition-colors">Class 11</span>
+                    <span class="px-3 py-1 bg-rose-100 text-rose-800 text-[10px] font-black uppercase tracking-widest rounded-md">Class 13</span>
                     <svg class="w-5 h-5 text-gray-300 group-hover:text-rose-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </div>
                 <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-rose-600 transition-colors">t-SNE Process Visualizer</h3>
                 <p class="text-sm text-gray-500 flex-grow">Watch high-dimensional points unroll and group in 2D space. Adjust perplexity, step through KL-divergence gradient descent, and hover to see attractive/repulsive forces live.</p>
             </a>
 
-
-
-            <!-- Class 12 MAE RMSE Tile -->
-            <a href="class12_mae_rmse.html" data-class="12" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-400 transition-all flex flex-col">
+            <!-- Class 14 Extended Clustering Tile -->
+            <a href="homework.html?class=14" data-class="14" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-purple-400 transition-all flex flex-col">
                 <div class="flex justify-between items-start mb-4">
-                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-md group-hover:bg-blue-100 group-hover:text-blue-800 transition-colors">Class 12</span>
-                    <svg class="w-5 h-5 text-gray-300 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    <span class="px-3 py-1 bg-purple-100 text-purple-800 text-[10px] font-black uppercase tracking-widest rounded-md">Class 14</span>
+                    <svg class="w-5 h-5 text-gray-300 group-hover:text-purple-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">The Outlier Penalty</h3>
-                <p class="text-sm text-gray-500 flex-grow">Interactive visualizer comparing Mean Absolute Error vs Root Mean Squared Error.</p>
+                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">Extended Clustering (DBSCAN &amp; GMM)</h3>
+                <p class="text-sm text-gray-500 flex-grow">Discover non-spherical clustering with DBSCAN core/border/noise points, hierarchical agglomerative clustering with dendrogram cuts, and Gaussian Mixture Models (GMM).</p>
             </a>
 
-            <!-- Class 12 R2 Coefficient Tile -->
-            <a href="class12_r2_coefficient_of_determination.html" data-class="12" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-400 transition-all flex flex-col">
+            <!-- Class 15 MAE RMSE Tile -->
+            <a href="class15_mae_rmse.html" data-class="15" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-400 transition-all flex flex-col">
                 <div class="flex justify-between items-start mb-4">
-                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-md group-hover:bg-blue-100 group-hover:text-blue-800 transition-colors">Class 12</span>
+                    <span class="px-3 py-1 bg-blue-100 text-blue-800 text-[10px] font-black uppercase tracking-widest rounded-md">Class 15</span>
                     <svg class="w-5 h-5 text-gray-300 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">R² Coefficient</h3>
-                <p class="text-sm text-gray-500 flex-grow">Interactive visualizer exploring Variance Explained and model fit.</p>
+                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">The Outlier Penalty (MAE vs RMSE)</h3>
+                <p class="text-sm text-gray-500 flex-grow">Interactive visualizer comparing Mean Absolute Error vs Root Mean Squared Error response to extreme data points.</p>
             </a>
 
-            <!-- Class 12 ROC AUC Tile -->
-            <a href="class12_roc_auc.html" data-class="12" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-400 transition-all flex flex-col">
+            <!-- Class 15 R2 Coefficient Tile -->
+            <a href="class15_r2_coefficient_of_determination.html" data-class="15" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-400 transition-all flex flex-col">
                 <div class="flex justify-between items-start mb-4">
-                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-md group-hover:bg-blue-100 group-hover:text-blue-800 transition-colors">Class 12</span>
+                    <span class="px-3 py-1 bg-blue-100 text-blue-800 text-[10px] font-black uppercase tracking-widest rounded-md">Class 15</span>
                     <svg class="w-5 h-5 text-gray-300 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">ROC Curve & AUC</h3>
-                <p class="text-sm text-gray-500 flex-grow">Interactive explorer for class overlap and decision thresholds.</p>
+                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">R² Coefficient of Determination</h3>
+                <p class="text-sm text-gray-500 flex-grow">Interactive visualizer exploring Variance Explained, baseline total sum of squares, and model fit.</p>
             </a>
 
-            <!-- Class 12 Vis Tile -->
-            <a href="class12_visualization.html" data-class="12" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-400 transition-all flex flex-col">
+            <!-- Class 15 ROC AUC Tile -->
+            <a href="class15_roc_auc.html" data-class="15" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-400 transition-all flex flex-col">
                 <div class="flex justify-between items-start mb-4">
-                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-md group-hover:bg-blue-100 group-hover:text-blue-800 transition-colors">Class 12</span>
+                    <span class="px-3 py-1 bg-blue-100 text-blue-800 text-[10px] font-black uppercase tracking-widest rounded-md">Class 15</span>
                     <svg class="w-5 h-5 text-gray-300 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">Bias-Variance Tradeoff</h3>
-                <p class="text-sm text-gray-500 flex-grow">Visualizing L2 Regularization on a polynomial regression model.</p>
+                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">ROC Curve &amp; AUC</h3>
+                <p class="text-sm text-gray-500 flex-grow">Interactive explorer for class probability distributions, classification thresholds, TPR, and FPR.</p>
             </a>
 
-            <!-- Class 12 Learning Curves Tile -->
-            <a href="class12_learning_curves.html" data-class="12" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-400 transition-all flex flex-col">
+            <!-- Class 15 Vis Tile -->
+            <a href="class15_visualization.html" data-class="15" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-400 transition-all flex flex-col">
                 <div class="flex justify-between items-start mb-4">
-                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-md group-hover:bg-blue-100 group-hover:text-blue-800 transition-colors">Class 12</span>
+                    <span class="px-3 py-1 bg-blue-100 text-blue-800 text-[10px] font-black uppercase tracking-widest rounded-md">Class 15</span>
                     <svg class="w-5 h-5 text-gray-300 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">Learning Curves</h3>
-                <p class="text-sm text-gray-500 flex-grow">Diagnostic tool for spotting underfitting and overfitting using training data size.</p>
-            </a>
-            <!-- Class 13 Agent Env Loop Tile -->
-            <a href="class13_agent_environment_loop.html" data-class="13" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-400 transition-all flex flex-col">
-                <div class="flex justify-between items-start mb-4">
-                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-md group-hover:bg-blue-100 group-hover:text-blue-800 transition-colors">Class 13</span>
-                    <svg class="w-5 h-5 text-gray-300 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">Agent-Environment Loop</h3>
-                <p class="text-sm text-gray-500 flex-grow">Interactive diagram exploring the fundamental cycle of Reinforcement Learning.</p>
+                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">Bias-Variance &amp; L2 Regularization</h3>
+                <p class="text-sm text-gray-500 flex-grow">Visualizing weight penalties (Ridge/L2) on a polynomial model to control complexity and prevent overfitting.</p>
             </a>
 
-            <!-- Class 13 MDP Tile -->
-            <a href="class13_mdp.html" data-class="13" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-400 transition-all flex flex-col">
+            <!-- Class 15 Learning Curves Tile -->
+            <a href="class15_learning_curves.html" data-class="15" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-400 transition-all flex flex-col">
                 <div class="flex justify-between items-start mb-4">
-                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-md group-hover:bg-blue-100 group-hover:text-blue-800 transition-colors">Class 13</span>
+                    <span class="px-3 py-1 bg-blue-100 text-blue-800 text-[10px] font-black uppercase tracking-widest rounded-md">Class 15</span>
                     <svg class="w-5 h-5 text-gray-300 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">Markov Decision Process</h3>
-                <p class="text-sm text-gray-500 flex-grow">Interactive visualizer exploring probabilistic state transitions and the Markov Property.</p>
+                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">Learning Curves Diagnostic</h3>
+                <p class="text-sm text-gray-500 flex-grow">Spotting high bias (underfitting) vs high variance (overfitting) by tracking training vs validation error as sample size grows.</p>
             </a>
 
-            <!-- Class 13 Bellman Gridworld Tile -->
-            <a href="class13_bellman_gridworld.html" data-class="13" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-400 transition-all flex flex-col">
+            <!-- Class 16 Agent Env Loop Tile -->
+            <a href="class16_agent_environment_loop.html" data-class="16" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-emerald-400 transition-all flex flex-col">
                 <div class="flex justify-between items-start mb-4">
-                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-md group-hover:bg-blue-100 group-hover:text-blue-800 transition-colors">Class 13</span>
+                    <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-widest rounded-md">Class 16</span>
+                    <svg class="w-5 h-5 text-gray-300 group-hover:text-emerald-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-emerald-600 transition-colors">Agent-Environment Loop</h3>
+                <p class="text-sm text-gray-500 flex-grow">Interactive diagram exploring the fundamental cycle of Reinforcement Learning: state, action, reward, next state.</p>
+            </a>
+
+            <!-- Class 16 MDP Tile -->
+            <a href="class16_mdp.html" data-class="16" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-emerald-400 transition-all flex flex-col">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-widest rounded-md">Class 16</span>
+                    <svg class="w-5 h-5 text-gray-300 group-hover:text-emerald-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-emerald-600 transition-colors">Markov Decision Process</h3>
+                <p class="text-sm text-gray-500 flex-grow">Interactive visualizer exploring probabilistic state transitions, transition functions, and the Markov Property.</p>
+            </a>
+
+            <!-- Class 16 Bellman Gridworld Tile -->
+            <a href="class16_bellman_gridworld.html" data-class="16" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-emerald-400 transition-all flex flex-col">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-widest rounded-md">Class 16</span>
+                    <svg class="w-5 h-5 text-gray-300 group-hover:text-emerald-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-emerald-600 transition-colors">Bellman Gridworld</h3>
+                <p class="text-sm text-gray-500 flex-grow">Interactive visualizer for value iteration, Bellman optimality equation, and the discount factor γ.</p>
+            </a>
+
+            <!-- Class 16 Epsilon Tile -->
+            <a href="class16_epsilon_visualizer.html" data-class="16" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-emerald-400 transition-all flex flex-col">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-widest rounded-md">Class 16</span>
+                    <svg class="w-5 h-5 text-gray-300 group-hover:text-emerald-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-emerald-600 transition-colors">The Bandit Lab (Epsilon-Greedy)</h3>
+                <p class="text-sm text-gray-500 flex-grow">Multi-Armed Bandit game exploring the exploration vs exploitation dilemma and epsilon decay schedules.</p>
+            </a>
+
+            <!-- Class 16 Q-Learning Tile -->
+            <a href="class16_qlearning.html" data-class="16" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-emerald-400 transition-all flex flex-col">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-widest rounded-md">Class 16</span>
+                    <svg class="w-5 h-5 text-gray-300 group-hover:text-emerald-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-emerald-600 transition-colors">Q-Learning Update</h3>
+                <p class="text-sm text-gray-500 flex-grow">Step-by-step breakdown of Temporal Difference (TD) error and Q-Table state-action value updates.</p>
+            </a>
+
+            <!-- Class 17 Cosine Similarity Tile -->
+            <a href="class17_cosine_similarity.html" data-class="17" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-400 transition-all flex flex-col">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="px-3 py-1 bg-blue-100 text-blue-800 text-[10px] font-black uppercase tracking-widest rounded-md">Class 17</span>
                     <svg class="w-5 h-5 text-gray-300 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">Bellman Gridworld</h3>
-                <p class="text-sm text-gray-500 flex-grow">Interactive visualizer for value iteration and the discount factor.</p>
+                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">Recommender Systems (Cosine Similarity)</h3>
+                <p class="text-sm text-gray-500 flex-grow">Interactive 3D vector space demonstrating collaborative filtering, user/item embeddings, and angle-based similarity.</p>
             </a>
 
-            <!-- Class 13 Epsilon Tile -->
-            <a href="class13_epsilon_visualizer.html" data-class="13" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-400 transition-all flex flex-col">
+            <!-- Class 18 Self-Attention Web Tile -->
+            <a href="class18_self_attention.html" data-class="18" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-400 transition-all flex flex-col">
                 <div class="flex justify-between items-start mb-4">
-                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-md group-hover:bg-blue-100 group-hover:text-blue-800 transition-colors">Class 13</span>
-                    <svg class="w-5 h-5 text-gray-300 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    <span class="px-3 py-1 bg-indigo-100 text-indigo-800 text-[10px] font-black uppercase tracking-widest rounded-md">Class 18</span>
+                    <svg class="w-5 h-5 text-gray-300 group-hover:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">The Bandit Lab</h3>
-                <p class="text-sm text-gray-500 flex-grow">Multi-Armed Bandit game exploring the exploration vs exploitation dilemma.</p>
+                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors">Self-Attention Web</h3>
+                <p class="text-sm text-gray-500 flex-grow">Hover over ambiguous words to see how query-key-value attention weights connect tokens and resolve contextual meaning.</p>
             </a>
 
-            <!-- Class 13 Q-Learning Tile -->
-            <a href="class13_qlearning.html" data-class="13" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-400 transition-all flex flex-col">
+            <!-- Class 18 Latent Space Interpolation Tile -->
+            <a href="class18_latent_space.html" data-class="18" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-violet-400 transition-all flex flex-col">
                 <div class="flex justify-between items-start mb-4">
-                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-md group-hover:bg-blue-100 group-hover:text-blue-800 transition-colors">Class 13</span>
-                    <svg class="w-5 h-5 text-gray-300 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">Q-Learning Update</h3>
-                <p class="text-sm text-gray-500 flex-grow">Step-by-step breakdown of the TD Error and Q-Table update algorithm.</p>
-            </a>
-
-            <!-- Class 14 Cosine Similarity Tile -->
-            <a href="class14_cosine_similarity.html" data-class="14" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-400 transition-all flex flex-col">
-                <div class="flex justify-between items-start mb-4">
-                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-md group-hover:bg-blue-100 group-hover:text-blue-800 transition-colors">Class 14</span>
-                    <svg class="w-5 h-5 text-gray-300 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">Cosine Similarity</h3>
-                <p class="text-sm text-gray-500 flex-grow">Interactive 3D vector space demonstrating how recommender systems compare user tastes.</p>
-            </a>
-
-            <!-- Class 14 Constraint Propagation Tile -->
-            <a href="class14_constraint_propagation.html" data-class="14" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-400 transition-all flex flex-col">
-                <div class="flex justify-between items-start mb-4">
-                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-md group-hover:bg-blue-100 group-hover:text-blue-800 transition-colors">Class 14</span>
-                    <svg class="w-5 h-5 text-gray-300 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">Constraint Propagation</h3>
-                <p class="text-sm text-gray-500 flex-grow">Interactive map coloring visualizer exploring the AC-3 algorithm and node constraints.</p>
-            </a>
-
-            <!-- Class 15 Self-Attention Web Tile -->
-            <a href="class15_self_attention.html" data-class="15" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-400 transition-all flex flex-col">
-                <div class="flex justify-between items-start mb-4">
-                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-md group-hover:bg-blue-100 group-hover:text-blue-800 transition-colors">Class 15</span>
-                    <svg class="w-5 h-5 text-gray-300 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">Self-Attention Web</h3>
-                <p class="text-sm text-gray-500 flex-grow">Hover over ambiguous words to see how attention weights connect tokens and resolve meaning in context.</p>
-            </a>
-
-            <!-- Class 15 Latent Space Interpolation Tile -->
-            <a href="class15_latent_space.html" data-class="15" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-violet-400 transition-all flex flex-col">
-                <div class="flex justify-between items-start mb-4">
-                    <span class="px-3 py-1 bg-gray-100 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-md group-hover:bg-violet-100 group-hover:text-violet-800 transition-colors">Class 15</span>
+                    <span class="px-3 py-1 bg-violet-100 text-violet-800 text-[10px] font-black uppercase tracking-widest rounded-md">Class 18</span>
                     <svg class="w-5 h-5 text-gray-300 group-hover:text-violet-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </div>
                 <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-violet-600 transition-colors">Latent Space Interpolation</h3>
-                <p class="text-sm text-gray-500 flex-grow">Drag a point through the 2D latent map to smoothly morph between two generated face expressions in real time.</p>
+                <p class="text-sm text-gray-500 flex-grow">Drag a point through the 2D latent representation manifold to smoothly morph between generated visual representations.</p>
+            </a>
+
+            <!-- Class 19 Final Exam Tile -->
+            <a href="class19_final_exam.html" data-class="19" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-red-400 transition-all flex flex-col">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="px-3 py-1 bg-red-100 text-red-800 text-[10px] font-black uppercase tracking-widest rounded-md">Class 19 · Final Exam</span>
+                    <svg class="w-5 h-5 text-gray-300 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-red-600 transition-colors">Final Exam (Classes 1–18)</h3>
+                <p class="text-sm text-gray-500 flex-grow">Cumulative final exam testing complete machine learning theory, supervised/unsupervised algorithms, search, RL, and modern generative AI.</p>
             </a>
 
         </div>
 
-        <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6">General Resources & Cheatsheets</h2>
+        <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6">General Resources &amp; Cheatsheets</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             
-            <a href="class08_cheatsheet.html" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-green-400 transition-all flex items-center gap-4">
+            <a href="class10_cheatsheet.html" class="group bg-white border border-gray-200 p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-green-400 transition-all flex items-center gap-4">
                 <div class="w-12 h-12 rounded-xl bg-green-50 text-green-600 flex items-center justify-center font-bold text-xl group-hover:scale-110 transition-transform">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                 </div>
                 <div>
-                    <h3 class="text-md font-bold text-gray-900 group-hover:text-green-600 transition-colors">Class 08 Cheatsheet</h3>
-                    <p class="text-xs text-gray-500">Quick reference for class concepts.</p>
+                    <h3 class="text-md font-bold text-gray-900 group-hover:text-green-600 transition-colors">Midterm Cheatsheet</h3>
+                    <p class="text-xs text-gray-500">Quick reference for Midterm Concepts (Classes 1–9).</p>
                 </div>
             </a>
 

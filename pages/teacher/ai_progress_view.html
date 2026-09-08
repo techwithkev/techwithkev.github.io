@@ -1477,7 +1477,7 @@
     function renderProgressTab() {
       const container = document.getElementById('tab-content');
       if (!progressRecs[activeStudent]) {
-        container.innerHTML = `<div class="no-data-box"><p>No progress notes yet</p><small>Student hasn't submitted the Week 12 form</small></div>`;
+        container.innerHTML = `<div class="no-data-box"><p>No progress notes yet</p><small>Student hasn't submitted progress notes</small></div>`;
         return;
       }
       const sessions = progressRecs[activeStudent];
@@ -1498,7 +1498,7 @@
         <div class="section-card-body">
           <div class="field-row"><span class="field-key">Current phase</span><span class="field-val">${r.phase ? `<span class="phase-pill">● ${r.phase}</span>` : '<span class="empty">Not answered</span>'}</span></div>
           <div class="field-row"><span class="field-key">Accomplishments</span><span class="field-val ${r.accomplishments ? '' : 'empty'}">${r.accomplishments || 'Not answered'}</span></div>
-          <div class="field-row"><span class="field-key">Confidence (Week 15)</span><span class="field-val">
+          <div class="field-row"><span class="field-key">Confidence (Showcase Readiness)</span><span class="field-val">
             ${r.confidence_rating
           ? `<div class="conf-bar-wrap"><div class="conf-bar"><div class="conf-fill" style="width:${confFill}%;background:${confColor(r.confidence_rating)}"></div></div><span class="conf-val" style="color:${confColor(r.confidence_rating)}">${r.confidence_rating} / 5</span></div>`
           : '<span class="empty">Not rated</span>'}

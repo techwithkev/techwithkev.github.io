@@ -1980,12 +1980,12 @@
               W13 Ex2: Will AI Take This Job?
             </button>
 
-            <div class="nav-section-label" style="margin-top:20px">Week 16 &mdash; Showcase</div>
+            <div class="nav-section-label" style="margin-top:20px">Week 19 &mdash; Showcase</div>
             <button class="nav-item" onclick="showPage('introai-final-submission')">
               <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
                 <path d="M8 1.75l2.25 4.56 5.03.73-3.64 3.55.86 5.01L8 13.25l-4.5 2.35.86-5.01L.72 7.04l5.03-.73L8 1.75z" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
-              W16: Final Project &amp; Slides 🎓
+              W19: Final Project &amp; Slides 🎓
             </button>
           </div>
 
@@ -2169,7 +2169,7 @@
           <div class="page-header">
             <div>
               <div class="page-title">Full Class Gradebook 📊</div>
-              <div class="page-subtitle">Comp AI Jr. grade matrix &mdash; Students as rows, Classes 1–16 as columns</div>
+              <div class="page-subtitle">Comp AI Jr. grade matrix &mdash; Students as rows, Classes 1–19 as columns</div>
             </div>
             <div class="header-actions">
               <button class="btn btn-secondary" onclick="loadAll()">
@@ -4636,11 +4636,11 @@
           </div>
         </div>
 
-        <!-- ══ INTRO TO AI: FINAL PROJECT & PRESENTATION SUBMISSION (Week 16) ══ -->
+        <!-- ══ INTRO TO AI: FINAL PROJECT & PRESENTATION SUBMISSION (Week 19) ══ -->
         <div class="page" id="page-introai-final-submission">
           <div class="page-header">
             <div>
-              <div class="page-title">Final Project &amp; Presentation Submission — Week 16 🎓🚀</div>
+              <div class="page-title">Final Project &amp; Presentation Submission — Week 19 🎓🚀</div>
               <div class="page-subtitle">Student presentation slide links, final project links, project overviews, and course reflections</div>
             </div>
             <div class="header-actions">
@@ -5697,7 +5697,7 @@
       });
 
       const students = Object.values(studentMap).sort((a, b) => a.name.localeCompare(b.name));
-      const maxClass = 16;
+      const maxClass = 19;
       const classList = [];
       for (let i = 1; i <= maxClass; i++) classList.push(i);
 
@@ -5819,7 +5819,7 @@
       });
 
       const students = Object.values(studentMap).sort((a, b) => a.name.localeCompare(b.name));
-      const classList = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16];
+      const classList = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19];
 
       const headerRow = ['student_name', 'cohort', ...classList.map(c => `class_${c}_score`), 'completed_count', 'average_score_pct'];
       const rows = [headerRow];
@@ -11075,7 +11075,12 @@
       { id: 'week12_bot_vs_llm', title: 'Rule-Based Bot vs. LLM Chatbot', week: 12, category: 'Chatbot Programming', page: 'week12_bot_vs_llm.html' },
       { id: 'week13_ai_career_mapping', title: 'AI Career Mapping', week: 13, category: 'AI Career Mapping', page: 'week13_ai_career_mapping.html' },
       { id: 'week13_will_ai_take_this_job', title: '“Will AI Take This Job?” Analysis', week: 13, category: 'AI Career Mapping', page: 'week13_will_ai_take_this_job.html' },
-      { id: 'week16_final_submission', title: 'Final Project & Presentation Submission', week: 16, category: 'Final Showcase', page: 'week16_final_submission.html' }
+      { id: 'week14_science_research', title: 'AI in Science & Research', week: 14, category: 'Science & Research', page: 'week14_science_research.html' },
+      { id: 'week15_business_entrepreneurship', title: 'AI for Business & Entrepreneurship', week: 15, category: 'Business & Startups', page: 'week15_business_entrepreneurship.html' },
+      { id: 'week16_robotics_physical_ai', title: 'Robotics & Physical AI', week: 16, category: 'Robotics & Physical AI', page: 'week16_robotics_physical_ai.html' },
+      { id: 'week17_checkin', title: 'Project Build Session Check-In', week: 17, category: 'Final Project', page: 'week17_checkin.html' },
+      { id: 'week18_checkin', title: 'Project Build Session & Rehearsal Check-In', week: 18, category: 'Final Project', page: 'week18_checkin.html' },
+      { id: 'week19_final_submission', title: 'Final Project & Presentation Submission', week: 19, category: 'Final Showcase', page: 'week19_final_submission.html' }
     ];
 
     let currentControlCohort = 'aijr';
@@ -11293,7 +11298,7 @@
       { key: 'bvl', title: 'Bot vs LLM Chatbot', week: 12, dataRef: () => bvlData },
       { key: 'acm', title: 'AI Career Mapping', week: 13, dataRef: () => acmData },
       { key: 'wai', title: 'Will AI Take This Job?', week: 13, dataRef: () => waiData },
-      { key: 'finalSub', title: 'Final Project & Presentation Submission', week: 16, dataRef: () => finalSubData },
+      { key: 'finalSub', title: 'Final Project & Presentation Submission', week: 19, dataRef: () => finalSubData },
       { key: 'hw', title: 'Weekly Homework Quiz', week: 0, dataRef: () => hwData },
       { key: 'exam', title: 'Midterm / Final Exam', week: 0, dataRef: () => examData }
     ];

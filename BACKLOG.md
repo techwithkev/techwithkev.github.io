@@ -90,13 +90,23 @@ Gradually update student exercise pages in `pages/introai/` and `pages/aijr/` to
   - Weeks 02 to 06 exercises (Vision, Sound, Teachable Machine, Chatbots).
 - [ ] **[TASK-4.3] Batch 3 — Weeks 07–12 Intro AI Pages:**
   - Weeks 07 to 12 exercises (Ethics, Generation, Embeddings, Prompt Engineering).
-- [ ] **[TASK-4.4] Batch 4 — Weeks 13–16 Intro AI Pages:**
-  - `week13_will_ai_take_this_job.html`, `week13_ai_career_mapping.html`, `week16_final_submission.html`, etc.
-  - Remove redundant raw `SUPABASE_URL` / `SUPABASE_ANON` constants.
-- [ ] **[TASK-4.5] AIJR Student Pages:**
-  - `pages/aijr/homework.html`
-  - `pages/aijr/class16_FinalExam_Part1.html`
-  - `pages/aijr/class08_part1.html`
+- [ ] **[TASK-4.4] Batch 4 — Weeks 13–16 Intro AI Pages (New & Emerging Topics):**
+  - Week 13: `week13_will_ai_take_this_job.html`, `week13_ai_career_mapping.html`, `week13_checkin.html`
+  - Week 14: AI in Science & Research (`week14_science_research.html` - to author)
+  - Week 15: AI for Business & Entrepreneurship (`week15_business_entrepreneurship.html` - to author)
+  - Week 16: Robotics & Physical AI (`week16_robotics_physical_ai.html` - to author)
+- [ ] **[TASK-4.5] Batch 5 — Weeks 17–19 Intro AI Pages (Build Sprint & Showcase):**
+  - Week 17: `week17_checkin.html`, `week17_progress_notes.html` (Project Build Session)
+  - Week 18: `week18_checkin.html` (Project Build Session & Rehearsal)
+  - Week 19: `week19_final_submission.html` (Showcase, Debate & What's Next)
+- [x] **[TASK-4.6] AIJR Student Pages & File Renames (19-Class Expansion):**
+  - `pages/aijr/index.html` (Visualizers Hub with 19-class filter dropdown and remapped tiles)
+  - `pages/aijr/homework.html` (Homework Hub for Classes 1–19)
+  - `pages/aijr/class10_midterm_exam.html` (Class 10 Midterm Assessment — Classes 1–9)
+  - `pages/aijr/class10_cheatsheet.html` (Class 10 Midterm Cheatsheet — Classes 1–9)
+  - `pages/aijr/class19_final_exam.html` (Class 19 Final Exam — Classes 1–18)
+  - Renamed visualizer files to match 19-class sequence (`class07_entropy_splitter.html`, `class09_kernel_trick.html`, `class12_constraint_propagation.html`, `class13_k_means_clustering.html`, `class13_principal_component_analysis.html`, `class13_t_sne_process_visualizer.html`, `class15_mae_rmse.html`, `class15_r2_coefficient_of_determination.html`, `class15_roc_auc.html`, `class15_visualization.html`, `class15_learning_curves.html`, `class16_agent_environment_loop.html`, `class16_mdp.html`, `class16_bellman_gridworld.html`, `class16_epsilon_visualizer.html`, `class16_qlearning.html`, `class17_cosine_similarity.html`, `class18_self_attention.html`, `class18_latent_space.html`)
+  - Optional concept visualizers / modules for Class 7 (Ensembles), Class 8 (Naive Bayes), Class 12 (Minimax & Adversarial Search), Class 14 (Extended Clustering DBSCAN/GMM).
 
 ---
 

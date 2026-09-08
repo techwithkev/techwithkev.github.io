@@ -89,12 +89,22 @@ FROM introai, (VALUES
   ('week13_ai_career_mapping',  'Week 13 — AI Career Mapping',          13, 1),
   ('week13_will_ai_take_this_job','Week 13 — Will AI Take This Job?',   13, 2),
   ('week13_checkin',            'Week 13 — Build Check-In',             13, 3),
-  -- Week 14
-  ('week14_checkin',            'Week 14 — Build Check-In',             14, 1),
-  -- Week 15
-  ('week15_checkin',            'Week 15 — Final Build Check-In',       15, 1),
-  -- Week 16
-  ('week16_final_submission',   'Week 16 — Final Project Submission',   16, 1)
+  -- Week 14 (Inserted: AI in Science & Research)
+  ('week14_science_research',   'Week 14 — AI in Science & Research',   14, 1),
+  -- Week 15 (Inserted: AI for Business & Entrepreneurship)
+  ('week15_business_entrepreneurship', 'Week 15 — AI for Business & Entrepreneurship', 15, 1),
+  -- Week 16 (Inserted: Robotics & Physical AI)
+  ('week16_robotics_physical_ai', 'Week 16 — Robotics & Physical AI',   16, 1),
+  -- Week 17 (Renumbered from 14: Project Build Session)
+  ('week17_checkin',            'Week 17 — Project Build Session',      17, 1),
+  ('week17_progress_notes',     'Week 17 — Progress Notes',             17, 2),
+  ('week14_checkin',            'Week 17 — Project Build Session (Legacy slug)', 17, 3),
+  -- Week 18 (Renumbered from 15: Project Build Session & Rehearsal)
+  ('week18_checkin',            'Week 18 — Project Build Session & Rehearsal', 18, 1),
+  ('week15_checkin',            'Week 18 — Project Build Session & Rehearsal (Legacy slug)', 18, 2),
+  -- Week 19 (Renumbered from 16: Showcase, Debate & What's Next)
+  ('week19_final_submission',   'Week 19 — Showcase, Debate & What''s Next', 19, 1),
+  ('week16_final_submission',   'Week 19 — Final Project Submission (Legacy slug)', 19, 2)
 ) AS t(slug, label, week_num, seq)
 ON CONFLICT (course_id, exercise_slug) DO UPDATE SET
   label          = EXCLUDED.label,
@@ -107,30 +117,42 @@ INSERT INTO exercise_definitions (course_id, exercise_slug, label, week_number, 
 SELECT
   aijr.id, slug, label, class_num, seq, true
 FROM aijr, (VALUES
-  ('class01_array_shape_transformer',  'Class 1 — Array Shape Transformer',  1,  1),
-  ('class01_pixel_matrix_explorer',    'Class 1 — Pixel Matrix Explorer',     1,  2),
-  ('class02_learning_curve_gap',       'Class 2 — Learning Curve Gap',        2,  1),
-  ('class02_subgroup_bias_dragger',    'Class 2 — Subgroup Bias Dragger',     2,  2),
-  ('class03_min_max_vs_z_score',       'Class 3 — Min-Max vs Z-Score',        3,  1),
-  ('class03_z_score_gradient_descent', 'Class 3 — Z-Score Gradient Descent',  3,  2),
-  ('class04_k_fold_carousel',          'Class 4 — K-Fold Carousel',           4,  1),
-  ('class04_overfitting_polynomial',   'Class 4 — Overfitting Polynomial',    4,  2),
-  ('class05_geometric_mse_square',     'Class 5 — Geometric MSE Square',      5,  1),
-  ('class06_gradient_descent',         'Class 6 — Gradient Descent',          6,  1),
-  ('class07_kernel_trick',             'Class 7 — Kernel Trick',              7,  1),
-  ('class08_part1',                    'Class 8 — Test Part 1',               8,  1),
-  ('class08_cheatsheet',               'Class 8 — Cheatsheet',                8,  2),
-  ('class09_entropy_splitter',         'Class 9 — Entropy Splitter',          9,  1),
-  ('class09_svm_soft_margin',          'Class 9 — SVM Soft Margin',           9,  2),
-  ('class11_k_means_clustering',       'Class 11 — K-Means Clustering',       11, 1),
-  ('class11_pca',                      'Class 11 — PCA',                      11, 2),
-  ('class11_tsne',                     'Class 11 — t-SNE Visualizer',         11, 3),
-  ('class13_agent_environment_loop',   'Class 13 — Agent Environment Loop',   13, 1),
-  ('class13_bellman_gridworld',        'Class 13 — Bellman Gridworld',        13, 2),
-  ('class13_qlearning',                'Class 13 — Q-Learning',               13, 3),
-  ('class15_latent_space',             'Class 15 — Latent Space',             15, 1),
-  ('class15_self_attention',           'Class 15 — Self-Attention',           15, 2),
-  ('class16_final_exam',               'Class 16 — Final Exam',               16, 1)
+  ('class01_array_shape_transformer',          'Class 1 — Array Shape Transformer',                          1,  1),
+  ('class01_pixel_matrix_explorer',            'Class 1 — Pixel Matrix Explorer',                             1,  2),
+  ('class02_subgroup_bias_dragger',            'Class 2 — Subgroup Bias Dragger',                             2,  1),
+  ('class02_learning_curve_gap',               'Class 2 — Learning Curve Gap',                                2,  2),
+  ('class03_min_max_vs_z_score_normalizer',    'Class 3 — Min-Max vs Z-Score Normalizer',                     3,  1),
+  ('class03_z_score_gradient_descent',         'Class 3 — Z-Score Gradient Descent',                          3,  2),
+  ('class04_k_fold_carousel',                  'Class 4 — K-Fold Carousel',                                   4,  1),
+  ('class04_overfitting_polynomial',           'Class 4 — Overfitting Polynomial',                            4,  2),
+  ('class05_the_geometric_mse_square',         'Class 5 — Geometric MSE Square',                              5,  1),
+  ('class06_gradient_descent',                 'Class 6 — Gradient Descent',                                  6,  1),
+  ('class07_entropy_splitter',                 'Class 7 — Decision Trees: Entropy Splitter',                  7,  1),
+  ('class08_naive_bayes_knn',                  'Class 8 — Naive Bayes & K-NN Classifier',                     8,  1),
+  ('class09_kernel_trick',                     'Class 9 — The Kernel Trick',                                  9,  1),
+  ('class09_svm_soft_margin',                  'Class 9 — SVM Soft Margin (C Parameter)',                     9,  2),
+  ('class10_midterm_exam',                     'Class 10 — Midterm Exam (Classes 1–9)',                      10,  1),
+  ('class10_cheatsheet',                       'Class 10 — Midterm Cheatsheet',                              10,  2),
+  ('class11_search_visualizer',                'Class 11 — Search Algorithms (Uninformed & Informed)',        11,  1),
+  ('class12_constraint_propagation',           'Class 12 — Constraint Propagation & Minimax',                12,  1),
+  ('class13_k_means_clustering',               'Class 13 — k-Means Clustering',                              13,  1),
+  ('class13_principal_component_analysis',     'Class 13 — Principal Component Analysis (PCA)',              13,  2),
+  ('class13_t_sne_process_visualizer',         'Class 13 — t-SNE Process Visualizer',                         13,  3),
+  ('class14_extended_clustering',              'Class 14 — Extended Clustering (DBSCAN / GMM)',              14,  1),
+  ('class15_mae_rmse',                         'Class 15 — Outlier Penalty (MAE vs RMSE)',                   15,  1),
+  ('class15_r2_coefficient_of_determination',  'Class 15 — R² Coefficient of Determination',                 15,  2),
+  ('class15_roc_auc',                          'Class 15 — ROC Curve & AUC',                                 15,  3),
+  ('class15_visualization',                    'Class 15 — Bias-Variance & L2 Regularization',               15,  4),
+  ('class15_learning_curves',                  'Class 15 — Learning Curves Diagnostic',                      15,  5),
+  ('class16_agent_environment_loop',           'Class 16 — Agent-Environment Loop',                          16,  1),
+  ('class16_mdp',                              'Class 16 — Markov Decision Process',                         16,  2),
+  ('class16_bellman_gridworld',                'Class 16 — Bellman Gridworld',                               16,  3),
+  ('class16_epsilon_visualizer',               'Class 16 — The Bandit Lab (Exploration vs Exploitation)',    16,  4),
+  ('class16_qlearning',                        'Class 16 — Q-Learning Algorithm Update',                     16,  5),
+  ('class17_cosine_similarity',                'Class 17 — Recommender Systems (Cosine Similarity)',         17,  1),
+  ('class18_self_attention',                   'Class 18 — Self-Attention Web',                              18,  1),
+  ('class18_latent_space',                     'Class 18 — Latent Space Interpolation',                      18,  2),
+  ('class19_final_exam',                       'Class 19 — Final Exam (Classes 1–18)',                       19,  1)
 ) AS t(slug, label, class_num, seq)
 ON CONFLICT (course_id, exercise_slug) DO UPDATE SET
   label          = EXCLUDED.label,

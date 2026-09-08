@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Final Project &amp; Presentation Submission — Intro to AI · Week 19</title>
+  <meta name="description"
+    content="Week 19 Showcase: Final Project &amp; Presentation Submission for Introduction to AI. Showcase, Debate &amp; What's Next. Store links to your presentation deck, final project demo, and reflections.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/activity.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    #registration-overlay { transition: opacity 0.4s ease; }
+    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
+    #registration-overlay .reg-card {
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
+    }
+    #registration-overlay.hiding .reg-card {
+      transform: scale(0.95) translateY(-10px); opacity: 0;
+    }
+    .reg-input:focus {
+      outline: none; border-color: #c026d3;
+      box-shadow: 0 0 0 3px rgba(192, 38, 211, 0.15);
+    }
+    .reg-input.error {
+      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+    }
+    .form-input:focus {
+      outline: none; border-color: #c026d3;
+      box-shadow: 0 0 0 3px rgba(192, 38, 211, 0.15);
+    }
+    .form-input.error { border-color: #ef4444; }
+    .star-btn {
+      font-size: 28px;
+      cursor: pointer;
+      filter: grayscale(100%);
+      transition: filter 0.15s ease, transform 0.1s ease;
+    }
+    .star-btn:hover { transform: scale(1.2); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body class="bg-[#FAF5FF] text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- REGISTRATION & RETRIEVAL GATE -->
+  <div id="registration-overlay"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+    style="background: linear-gradient(135deg, #4c1d95 0%, #a21caf 55%, #701a75 100%);">
+
+    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
+        style="background: radial-gradient(circle, #f0abfc, transparent);"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
+        style="background: radial-gradient(circle, #c026d3, transparent);"></div>
+    </div>
+
+    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-9 max-h-[90vh] overflow-y-auto">
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 mx-auto rounded-2xl mb-3 flex items-center justify-center bg-fuchsia-100 text-fuchsia-600 shadow-sm">
+          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0v6" />
+          </svg>
+        </div>
+        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-1.5 bg-fuchsia-100 text-fuchsia-800">
+          Week 19 · Grand Showcase &amp; Debate
+        </div>
+        <h1 class="text-2xl font-black text-gray-900 tracking-tight">Final Project &amp; <span class="text-fuchsia-600">Presentation Submission</span></h1>
+        <p class="text-xs text-gray-500 mt-1 leading-relaxed">Enter your registered student name and email address to submit your final project &amp; slides.</p>
+      </div>
+
+      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
+        <div class="space-y-4 mb-6">
+          <div>
+            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Full Name</label>
+            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Alex Morgan"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name.</p>
+          </div>
+          <div>
+            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
+            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. alex@school.edu"
+              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email address.</p>
+          </div>
+        </div>
+        <button id="reg-submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-700 hover:to-purple-700">
+          <span id="reg-btn-label">Begin Final Submission &#8594;</span>
+        </button>
+      </form>
+      <p class="text-center text-[10px] text-gray-400 font-medium mt-5">Stored securely in the Intro to AI student repository.</p>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main-content" class="max-w-3xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <!-- Navigation & Header -->
+    <header class="mb-8 border-b border-fuchsia-200 pb-6">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
+        <div>
+          <a href="index.html"
+            class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-fuchsia-600 mb-3 hover:text-fuchsia-800 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            Back to Course Hub
+          </a>
+          <h1 class="text-3xl md:text-4xl font-black tracking-tight text-gray-900">
+            Final Project &amp; <span class="text-fuchsia-600">Presentation Submission 🎓🚀</span>
+          </h1>
+          <p class="text-gray-500 font-medium text-sm mt-1">Introduction to AI · Week 19 Showcase, Debate &amp; Link Registry</p>
+        </div>
+        <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-fuchsia-100 border border-fuchsia-200 text-fuchsia-800 shadow-sm self-start md:self-auto flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-fuchsia-500 animate-pulse"></span>
+          Week 19 Showcase
+        </div>
+      </div>
+    </header>
+
+    <!-- Showcase Overview Brief Card -->
+    <div class="rounded-3xl p-6 md:p-7 mb-8 border bg-gradient-to-r from-purple-900 via-fuchsia-900 to-purple-950 text-white shadow-xl border-fuchsia-700/40">
+      <div class="flex items-start gap-4">
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 bg-fuchsia-500/30 border border-fuchsia-400/40 text-fuchsia-200 shadow-inner">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="px-2.5 py-0.5 rounded-full bg-fuchsia-500/20 text-fuchsia-300 border border-fuchsia-400/30 text-[10px] font-black uppercase tracking-widest">
+              Class 19 Final Checklist
+            </span>
+          </div>
+          <h2 class="text-xl font-black text-white mb-2">Welcome to the Final Showcase &amp; Debate! 🎉</h2>
+          <p class="text-xs text-fuchsia-100/90 leading-relaxed mb-4">
+            Congratulations on completing Introduction to AI! Use this form to submit your presentation slides and final project link so your instructor and classmates can review and celebrate your work.
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+            <div class="bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/10 flex items-center gap-2.5">
+              <span class="text-base">📊</span>
+              <div>
+                <strong class="block text-white text-[11px]">1. Presentation Link</strong>
+                <span class="text-[10px] text-fuchsia-200">Google Slides / Canva / PDF</span>
+              </div>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/10 flex items-center gap-2.5">
+              <span class="text-base">🚀</span>
+              <div>
+                <strong class="block text-white text-[11px]">2. Final Project Link</strong>
+                <span class="text-[10px] text-fuchsia-200">Live Demo / Repo / Model (Optional)</span>
+              </div>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/10 flex items-center gap-2.5">
+              <span class="text-base">💡</span>
+              <div>
+                <strong class="block text-white text-[11px]">3. Key Reflection</strong>
+                <span class="text-[10px] text-fuchsia-200">Project Overview &amp; Learnings</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN SUBMISSION FORM -->
+    <form id="final_submission-form" onsubmit="submitExercise(event)" novalidate>
+
+      <!-- Section 1: Project Identity -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-6 border-b border-gray-100 pb-4">
+          <div class="w-9 h-9 rounded-xl text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-fuchsia-600 shadow-sm">1</div>
+          <div>
+            <h2 class="text-base font-black text-gray-900">Project Information</h2>
+            <p class="text-xs text-gray-500">Provide your project title and team details.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label for="project-title" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              Project Title <span class="text-red-500">*</span>
+            </label>
+            <input id="project-title" type="text" placeholder="e.g. AI Homework Helper &amp; Tutor Bot"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            <p id="project-title-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your project title.</p>
+          </div>
+          <div>
+            <label for="team-members" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              Team Members / Collaborators
+              <span class="text-gray-400 font-normal lowercase">(optional)</span>
+            </label>
+            <input id="team-members" type="text" placeholder="e.g. Solo project or Alex M., Sam K."
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Presentation & Project Links -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-6 border-b border-gray-100 pb-4">
+          <div class="w-9 h-9 rounded-xl text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-fuchsia-600 shadow-sm">2</div>
+          <div>
+            <h2 class="text-base font-black text-gray-900">Presentation &amp; Project Links</h2>
+            <p class="text-xs text-gray-500">Provide the links to your presentation deck and working project.</p>
+          </div>
+        </div>
+
+        <div class="space-y-5">
+          <div>
+            <label for="slide-link" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              Presentation Deck Link <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-gray-400 text-sm">📊</span>
+              <input id="slide-link" type="url" placeholder="https://docs.google.com/presentation/d/... or Canva link"
+                class="form-input w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+            </div>
+            <p class="text-[11px] text-gray-400 mt-1">Make sure access is set to <em>"Anyone with the link can view"</em>.</p>
+            <p id="slide-link-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your presentation deck URL.</p>
+          </div>
+
+          <div>
+            <label for="project-url" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              Final Project Link / Working Demo URL
+              <span class="text-gray-400 font-normal lowercase">(optional)</span>
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-gray-400 text-sm">🚀</span>
+              <input id="project-url" type="url" placeholder="https://my-ai-project.vercel.app or GitHub repo link"
+                class="form-input w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" />
+            </div>
+            <p class="text-[11px] text-gray-400 mt-1">Leave blank if your project was fully contained within your slide presentation.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Summary & Learnings -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-6 border-b border-gray-100 pb-4">
+          <div class="w-9 h-9 rounded-xl text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-fuchsia-600 shadow-sm">3</div>
+          <div>
+            <h2 class="text-base font-black text-gray-900">Project Overview &amp; Key Reflection</h2>
+            <p class="text-xs text-gray-500">Summarize your project in 2–3 sentences and share what you learned.</p>
+          </div>
+        </div>
+
+        <div class="space-y-5">
+          <div>
+            <label for="project-summary" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              Project Description &amp; Problem Solved <span class="text-red-500">*</span>
+            </label>
+            <textarea id="project-summary" rows="3"
+              placeholder="e.g. My project helps high school students practice interview questions using a voice-enabled AI bot that evaluates tone and response clarity."
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required></textarea>
+            <p id="project-summary-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe what your project does.</p>
+          </div>
+
+          <div>
+            <label for="key-learnings" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              Biggest Learning or Surprise from this Project <span class="text-red-500">*</span>
+            </label>
+            <textarea id="key-learnings" rows="3"
+              placeholder="e.g. The most surprising part was how sensitive the AI model was to small phrasing changes in our prompt template."
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required></textarea>
+            <p id="key-learnings-error" class="hidden text-xs text-red-500 font-medium mt-1">Please share your biggest learning.</p>
+          </div>
+
+          <div>
+            <label for="ai-tools-used" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+              AI Tools &amp; Technologies Used
+            </label>
+            <input id="ai-tools-used" type="text"
+              placeholder="e.g. Teachable Machine, Groq API, ElevenLabs, Claude, GitHub Pages"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 4: Rating & Feedback -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-8">
+        <div class="flex items-center gap-3 mb-6 border-b border-gray-100 pb-4">
+          <div class="w-9 h-9 rounded-xl text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-fuchsia-600 shadow-sm">4</div>
+          <div>
+            <h2 class="text-base font-black text-gray-900">Course Experience Rating</h2>
+            <p class="text-xs text-gray-500">How much did you enjoy this course and project journey?</p>
+          </div>
+        </div>
+
+        <div class="mb-5">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">Overall Enjoyment Rating</label>
+          <div class="flex items-center gap-2" id="star-rating">
+            <button type="button" class="star-btn" onclick="setRating(1)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(2)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(3)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(4)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(5)">⭐</button>
+            <span id="rating-label" class="text-xs font-bold text-gray-400 ml-2">Click a star to rate</span>
+          </div>
+        </div>
+
+        <div>
+          <label for="feedback" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">
+            Any Shoutouts or Feedback for the Instructor? <span class="text-gray-400 font-normal lowercase">(optional)</span>
+          </label>
+          <textarea id="feedback" rows="2"
+            placeholder="e.g. Really loved the interactive labs and the live chatbot building sessions!"
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all"></textarea>
+        </div>
+      </div>
+
+      <!-- Submit Section -->
+      <div class="text-center">
+        <p id="form-error" class="hidden text-sm text-red-500 font-bold mb-3">Please fill out all required fields marked with *</p>
+        <button id="submit-btn" type="submit"
+          class="w-full md:w-auto min-w-[280px] text-white font-black py-4 px-10 rounded-2xl shadow-xl transition-all active:scale-95 text-base tracking-wide flex items-center justify-center gap-2 mx-auto bg-gradient-to-r from-fuchsia-600 via-purple-600 to-indigo-600 hover:brightness-110">
+          <span id="submit-btn-label">🎓 Complete Final Submission</span>
+        </button>
+      </div>
+
+    </form>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 hidden">
+      <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-2xl">
+        <div class="w-16 h-16 bg-fuchsia-100 text-fuchsia-600 rounded-2xl mx-auto flex items-center justify-center text-3xl mb-4">
+          🎓
+        </div>
+        <h3 class="text-2xl font-black text-gray-900 mb-2">Submission Complete!</h3>
+        <p class="text-gray-500 text-xs leading-relaxed mb-6">
+          Your final project &amp; presentation link have been securely recorded. Congratulations on presenting at the Introduction to AI Showcase!
+        </p>
+        <a href="index.html" class="inline-block w-full bg-fuchsia-600 text-white font-bold py-3.5 rounded-xl hover:bg-fuchsia-700 transition-colors text-sm">
+          Return to Course Hub
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="../../assets/js/introai-shared.js"></script>
+  <script>
+    const TABLE = 'introai_week16_final_submission';
+    let currentRating = 5;
+
+    function handleRegistration(e) {
+      e.preventDefault();
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      let hasErr = false;
+
+      if (!name) { document.getElementById('reg-name-error').classList.remove('hidden'); hasErr = true; }
+      else { document.getElementById('reg-name-error').classList.add('hidden'); }
+
+      if (!email || !validateEmail(email)) { document.getElementById('reg-email-error').classList.remove('hidden'); hasErr = true; }
+      else { document.getElementById('reg-email-error').classList.add('hidden'); }
+
+      if (hasErr) return;
+
+      sessionStorage.setItem('introai_user_name', name);
+      sessionStorage.setItem('introai_user_email', email);
+
+      const overlay = document.getElementById('registration-overlay');
+      overlay.classList.add('hiding');
+      setTimeout(() => overlay.remove(), 400);
+    }
+
+    function setRating(val) {
+      currentRating = val;
+      const stars = document.querySelectorAll('#star-rating .star-btn');
+      stars.forEach((btn, idx) => {
+        if (idx < val) btn.classList.add('active');
+        else btn.classList.remove('active');
+      });
+      const labels = ['', '1 / 5 — Needs Work', '2 / 5 — Okay', '3 / 5 — Good', '4 / 5 — Great!', '5 / 5 — Amazing! 🌟'];
+      document.getElementById('rating-label').textContent = labels[val] || '';
+    }
+
+    async function submitExercise(e) {
+      e.preventDefault();
+      const name = sessionStorage.getItem('introai_user_name') || 'Anonymous';
+      const email = sessionStorage.getItem('introai_user_email') || 'anonymous@example.com';
+
+      const projectTitle = document.getElementById('project-title').value.trim();
+      const teamMembers = document.getElementById('team-members').value.trim();
+      const slideLink = document.getElementById('slide-link').value.trim();
+      const projectUrl = document.getElementById('project-url').value.trim();
+      const projectSummary = document.getElementById('project-summary').value.trim();
+      const keyLearnings = document.getElementById('key-learnings').value.trim();
+      const aiTools = document.getElementById('ai-tools-used').value.trim();
+      const feedback = document.getElementById('feedback').value.trim();
+
+      let hasErr = false;
+      if (!projectTitle) { document.getElementById('project-title-error').classList.remove('hidden'); hasErr = true; }
+      else { document.getElementById('project-title-error').classList.add('hidden'); }
+
+      if (!slideLink) { document.getElementById('slide-link-error').classList.remove('hidden'); hasErr = true; }
+      else { document.getElementById('slide-link-error').classList.add('hidden'); }
+
+      if (!projectSummary) { document.getElementById('project-summary-error').classList.remove('hidden'); hasErr = true; }
+      else { document.getElementById('project-summary-error').classList.add('hidden'); }
+
+      if (!keyLearnings) { document.getElementById('key-learnings-error').classList.remove('hidden'); hasErr = true; }
+      else { document.getElementById('key-learnings-error').classList.add('hidden'); }
+
+      if (hasErr) {
+        document.getElementById('form-error').classList.remove('hidden');
+        return;
+      }
+      document.getElementById('form-error').classList.add('hidden');
+
+      const submitBtn = document.getElementById('submit-btn');
+      submitBtn.disabled = true;
+      document.getElementById('submit-btn-label').innerHTML = '<span class="spinner"></span> Submitting…';
+
+      const payload = {
+        student_name: name,
+        student_email: email,
+        project_title: projectTitle,
+        team_members: teamMembers || null,
+        slide_link: slideLink,
+        project_url: projectUrl || null,
+        project_summary: projectSummary,
+        key_learnings: keyLearnings,
+        ai_tools_used: aiTools || null,
+        enjoyment_rating: currentRating,
+        feedback: feedback || null,
+        submitted_at: new Date().toISOString()
+      };
+
+      try {
+        // Submit to Schema v2 unified if available, and legacy table for backward-compat
+        if (typeof IntroAI !== 'undefined' && IntroAI.submitExercise) {
+          await IntroAI.submitExercise('week19_final_submission', payload);
+        }
+        await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        document.getElementById('success-modal').classList.remove('hidden');
+      } catch (err) {
+        console.error('Submission error:', err);
+        alert('There was an error saving your final submission. Please check your internet connection.');
+        submitBtn.disabled = false;
+        document.getElementById('submit-btn-label').textContent = '🎓 Complete Final Submission';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const storedName = sessionStorage.getItem('introai_user_name');
+      const storedEmail = sessionStorage.getItem('introai_user_email');
+      if (storedName && storedEmail) {
+        const overlay = document.getElementById('registration-overlay');
+        if (overlay) overlay.remove();
+      }
+      setRating(5);
+    });
+  </script>
+</body>
+
+</html>

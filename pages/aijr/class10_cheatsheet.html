@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Class 8 Exam - Cheatsheet</title>
+  <title>Class 10 Midterm - Cheatsheet (Classes 1–9)</title>
   <style>
     /* ── Print settings ── */
     @page {
@@ -282,33 +282,65 @@
       border-radius: 2px;
       padding: 0 4px;
       font-size: 8px;
-      font-weight: bold;
-      margin-right: 2px;
+      color: var(--teal);
     }
 
-    .divider {
+    .warn-tip {
+      background: #FFFBEB;
+      border-left: 3px solid var(--gold);
+      padding: 3px 6px;
+      font-size: 9.5px;
+      margin: 3px 0;
+      color: #78350F;
+      border-radius: 0 3px 3px 0;
+    }
+
+    /* Divider */
+    hr.divider {
       border: none;
-      border-top: 1px solid #e0e0e0;
+      border-top: 1px solid #e2e8f0;
       margin: 4px 0;
+    }
+
+    /* Section highlight chip */
+    .chip {
+      display: inline-block;
+      font-size: 8.5px;
+      font-weight: 600;
+      padding: 1px 4px;
+      border-radius: 3px;
+      background: #E2E8F0;
+      color: var(--navy);
+    }
+
+    .chip-green {
+      background: #DCFCE7;
+      color: #14532D;
+    }
+
+    .chip-red {
+      background: #FEE2E2;
+      color: #7F1D1D;
+    }
+
+    .chip-blue {
+      background: #DBEAFE;
+      color: #1E3A8A;
+    }
+
+    .chip-gold {
+      background: #FEF3C7;
+      color: #78350F;
     }
   </style>
 </head>
 
 <body>
 
-        <!-- Navigation -->
-        <nav class="mb-6 pt-4 no-print" style="max-width: 1000px; margin-left: auto; margin-right: auto;">
-            <a href="index.html" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 transition-colors" style="text-decoration: none; color: #9ca3af;">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                Back to Course Hub
-            </a>
-        </nav>
-
-
   <!-- ── TOP BAR ─────────────────────────────────────────────────────────── -->
   <div class="top-bar">
     <div>
-      <div class="title">Class 8 Midterm - Cheatsheet</div>
+      <div class="title">Class 10 Midterm - Cheatsheet (Classes 1–9)</div>
     </div>
   </div>
 
@@ -545,34 +577,49 @@ cm   = <span class="fn">confusion_matrix</span>(y_val, y_pred)   <span class="cm
         </div>
       </div>
 
-      <!-- K-MEANS -->
+      <!-- DECISION TREES & ENSEMBLES (CLASS 7) -->
       <div class="block">
-        <div class="block-header bh-gray">k-Means Clustering <span class="class-tag">Class 7</span></div>
+        <div class="block-header bh-gray">Decision Trees &amp; Ensembles <span class="class-tag">Class 7</span></div>
         <div class="block-body">
+          <div class="formula-row">
+            <span class="f-label">Entropy H(S)</span>
+            <span class="f-val">H = −Σ pᵢ log₂(pᵢ)</span>
+            <span class="f-note">H(0.5, 0.5) = 1.0 (max impurity); H=0 (pure)</span>
+          </div>
+          <div class="formula-row">
+            <span class="f-label">Information Gain</span>
+            <span class="f-val">IG = H(parent) − Σ (|Sᵥ|/|S|)·H(Sᵥ)</span>
+            <span class="f-note">choose split with highest IG</span>
+          </div>
+          <div class="tip">
+            <b>Ensembles:</b> Random Forest reduces variance via bagging (bootstrap + feature subsampling). Gradient Boosting / XGBoost reduces bias by sequentially training trees on residual errors.
+          </div>
+        </div>
+      </div>
+
+      <!-- NAIVE BAYES & K-NN (CLASS 8) -->
+      <div class="block">
+        <div class="block-header bh-gray">Naive Bayes &amp; K-NN <span class="class-tag">Class 8</span></div>
+        <div class="block-body">
+          <div class="formula-row">
+            <span class="f-label">Bayes Theorem</span>
+            <span class="f-val">P(C|X) ∝ P(C)·Π P(xᵢ|C)</span>
+            <span class="f-note">assumes conditional independence of features</span>
+          </div>
           <div class="formula-row">
             <span class="f-label">Euclidean dist</span>
             <span class="f-val">d = √(Σ(xᵢ − yᵢ)²)</span>
             <span class="f-note">e.g. d([1,2],[4,6]) = √(9+16) = 5</span>
           </div>
-          <div class="formula-row">
-            <span class="f-label">Assignment step</span>
-            <span class="f-val">each point → nearest centroid</span>
-          </div>
-          <div class="formula-row">
-            <span class="f-label">Update step</span>
-            <span class="f-val">new centroid = mean of assigned points</span>
-          </div>
           <div class="tip">
-            <b>Worked example:</b> data = [1, 3, 5, 9, 11], C₁=2, C₂=10<br>
-            Distances: 1→C₁=1, 1→C₂=9 → cluster 1 &nbsp;|&nbsp; 9→C₁=7, 9→C₂=1 → cluster 2<br>
-            Cluster 1 = {1,3,5} → new C₁ = 3.0 &nbsp;|&nbsp; Cluster 2 = {9,11} → new C₂ = 10.0
+            <b>K-NN:</b> Non-parametric. Small k = flexible, high variance (overfits noise). Large k = smoother boundary, high bias. Always scale features first!
           </div>
         </div>
       </div>
 
-      <!-- KERNEL TRICK -->
+      <!-- KERNEL TRICK & SVM -->
       <div class="block">
-        <div class="block-header bh-gray">Kernel Methods <span class="class-tag">Class 7</span></div>
+        <div class="block-header bh-gray">Kernel Methods &amp; SVM <span class="class-tag">Class 9</span></div>
         <div class="block-body">
           <div class="formula-row">
             <span class="f-label">Kernel trick</span>
@@ -594,8 +641,7 @@ cm   = <span class="fn">confusion_matrix</span>(y_val, y_pred)   <span class="cm
             <span class="f-val">⟨a, b⟩ = Σ aᵢbᵢ</span>
             <span class="f-note">⟨[2,3],[1,4]⟩ = 2+12 = 14</span>
           </div>
-          <div class="tip"><b>Q20:</b> The kernel trick allows SVM to compute dot products in feature space <b>without
-              explicitly mapping</b> the data.</div>
+          <div class="tip"><b>SVM Soft Margin:</b> Low C = wide soft margin, higher tolerance for violations. High C = narrow hard margin, strict penalty for misclassification.</div>
         </div>
       </div>
 
