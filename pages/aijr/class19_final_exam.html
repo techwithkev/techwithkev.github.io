@@ -1655,64 +1655,36 @@
     </div><!-- end test-inner -->
   </div><!-- end test-area -->
 
-  <!-- ══ RESULTS ══ -->
+  <!-- ══ SUBMISSION CONFIRMATION (STUDENT VIEW) ══ -->
   <div id="results-area">
     <div class="res-inner">
-
-      <div class="res-hero">
-        <div class="rh-l">
-          <h2>Assessment Complete</h2>
-          <div class="rname" id="r-name"></div>
-          <div class="rsub">Open-ended questions pending instructor review</div>
+      <div class="res-hero" style="text-align: center; display: block; padding: 48px 32px;">
+        <div style="font-size: 3.5rem; margin-bottom: 16px;">🎉</div>
+        <h2 style="font-size: 1.8rem; margin-bottom: 8px;">Assessment Submitted Successfully!</h2>
+        <p style="color: var(--muted); font-size: 1rem; max-width: 540px; margin: 0 auto 24px;">
+          Thank you, <strong id="r-name" style="color: var(--text);">Student</strong>. Your final exam responses have been securely received and recorded in the system.
+        </p>
+        <div class="stat-row" style="max-width: 500px; margin: 0 auto 28px; justify-content: center;">
+          <div class="stat-c" style="flex: 1;">
+            <div class="sl">Status</div>
+            <div class="sv" style="color: #4ade80; font-size: 1rem;">✅ Recorded</div>
+          </div>
+          <div class="stat-c" style="flex: 1;">
+            <div class="sl">Cohort</div>
+            <div class="sv" id="r-cohort" style="font-size: 0.95rem;">—</div>
+          </div>
+          <div class="stat-c" style="flex: 1;">
+            <div class="sl">Code</div>
+            <div class="sv" id="r-code" style="font-size: 0.95rem;">—</div>
+          </div>
         </div>
-        <div class="rh-r">
-          <div class="big-sc"><span id="r-score">—</span><span> / 60</span></div>
-          <div class="sc-lbl">auto-graded score</div>
-          <div class="pct-pill" id="r-pct">—%</div>
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 18px 24px; max-width: 540px; margin: 0 auto 32px; text-align: left; font-size: 0.88rem; color: #a1a1aa; line-height: 1.6;">
+          ℹ️ <strong>Instructor Review Notice:</strong> Your instructor will review your performance and release results through the teacher portal.
         </div>
-      </div>
-
-      <div class="stat-row">
-        <div class="stat-c">
-          <div class="sl">MCQ Score</div>
-          <div class="sv" id="r-mcq">—</div>
-        </div>
-        <div class="stat-c">
-          <div class="sl">MCQ Correct</div>
-          <div class="sv" id="r-mcqc">—</div>
-        </div>
-        <div class="stat-c">
-          <div class="sl">Code Score</div>
-          <div class="sv" id="r-blank">—</div>
-        </div>
-        <div class="stat-c">
-          <div class="sl">Upload</div>
-          <div class="sv" id="r-upload-icon" style="font-size:1.1rem;">⏳</div>
+        <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+          <a href="index.html" class="btn-lime" style="text-decoration: none; padding: 12px 28px; font-weight: 700;">Return to AI Junior Hub</a>
         </div>
       </div>
-
-      <div class="rev-sec">
-        <h3>MCQ Review — Questions 1–15</h3>
-        <div id="mcq-rev"></div>
-      </div>
-
-      <div class="rev-sec">
-        <h3>Code & Open-Ended — Questions 16–21</h3>
-        <p style="font-family:var(--mono);font-size:0.75rem;color:var(--muted);margin-bottom:14px;">Code answers
-          auto-graded · Open-ended answers scored by instructor</p>
-        <div id="oe-rev"></div>
-      </div>
-
-      <div id="upload-box"></div>
-
-      <div class="cta-banner">
-        <div>
-          <h3>Ready for the real competition?</h3>
-          <p>Review any topics where you lost marks and reattempt after consolidating your understanding.</p>
-        </div>
-        <button class="btn-lime" onclick="window.scrollTo(0,0)">Review Curriculum</button>
-      </div>
-
     </div>
   </div>
 
@@ -2046,77 +2018,19 @@
     }
 
     /* ══════════════════════════════════════════════════
-       SHOW RESULTS — consumes server response
-       breakdown shape mirrors what the Edge Function returns
+       SHOW RESULTS — Displays confirmation screen only
+       (All grading and rubrics are reserved for teacher portal)
        ══════════════════════════════════════════════════ */
-    function showResults({ mcqScore, blankScore, autoScore, breakdown, rubrics }) {
+    function showResults(result) {
       document.getElementById('test-area').style.display = 'none';
       document.getElementById('results-area').style.display = 'block';
       window.scrollTo(0, 0);
 
-      document.getElementById('r-name').textContent = studentName;
-      document.getElementById('r-score').textContent = autoScore;
-      document.getElementById('r-pct').textContent = Math.round((autoScore / 60) * 100) + '%';
-
-      const mcqCorrect = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
-        .filter(q => breakdown[`q${q}`]?.ok).length;
-      const ms = document.getElementById('r-mcq');
-      ms.textContent = mcqScore + ' / 30';
-      if (mcqScore >= 20) ms.classList.add('g');
-      document.getElementById('r-mcqc').textContent = mcqCorrect + ' / 15';
-      document.getElementById('r-blank').textContent = blankScore + ' / 15';
-
-      // Upload status — already saved by Edge Function
-      const box = document.getElementById('upload-box');
-      const ico = document.getElementById('r-upload-icon');
-      box.innerHTML = '<div class="upload-status success">✅ Results saved. Your instructor will review open-ended answers.</div>';
-      ico.textContent = '✅';
-
-      // MCQ review
-      const md = document.getElementById('mcq-rev'); md.innerHTML = '';
-      for (let q = 1; q <= 15; q++) {
-        const r = breakdown[`q${q}`];
-        const o = OPTS[`q${q}`] || {};
-        const sl = r.submitted ? `${r.submitted}) ${o[r.submitted] || r.submitted}` : 'No answer';
-        const cl = `${r.correctAnswer}) ${o[r.correctAnswer] || r.correctAnswer}`;
-        const d = document.createElement('div');
-        d.className = `rev-c ${r.ok ? 'ok' : 'bad'}`;
-        d.innerHTML = `<div class="rev-qn">Q${q} · MCQ · ${r.ok ? '+2 pts' : '0 pts'}</div>
-      <div class="rev-qt">${QLBLS[q]}</div>
-      <div class="pill-row">
-        <span class="pill ${r.ok ? 'sc' : 'sw'}">${r.ok ? '✓' : '✗'} ${sl}</span>
-        ${!r.ok ? `<span class="pill ca">✓ ${cl}</span>` : ''}
-      </div>`;
-        md.appendChild(d);
-      }
-
-      // OE/Blanks review
-      const od = document.getElementById('oe-rev'); od.innerHTML = '';
-      const qLabels = {
-        16: 'A* Search fill-in-blanks',
-        17: 'k-Means centroid update & inertia calculation',
-        18: 'Naive Bayes posterior calculation',
-        19: 'k-Means sklearn pipeline fill-in-blanks',
-        20: 'Q-learning update rule fill-in-blanks',
-        21: 'A* vs Q-Learning — open-ended justification',
-      };
-      [16, 17, 18, 19, 20, 21].forEach(q => {
-        const r = breakdown[`q${q}`];
-        const d = document.createElement('div');
-        d.className = 'rev-c man';
-        let inner = '';
-        if (r.type === 'blanks') {
-          inner = `<div class="pill-row"><span class="pill mn">Blanks: ${r.pts}/${5} pts (${r.cor}/${r.of} correct)</span></div>
-        <div class="b-detail">${r.items.map(b => `${b.ok ? '✅' : '❌'} <code>${b.id}</code>: "${b.val || '—'}"`).join('<br>')}</div>`;
-        } else {
-          inner = `<div class="pill-row"><span class="pill mn">Submitted · pending instructor review</span></div>
-        <div class="oe-ans">${esc(r.text || '(no answer)')}</div>`;
-        }
-        d.innerHTML = `<div class="rev-qn">Q${q} · ${r.type === 'blanks' ? 'Fill-in-blanks' : 'Open-ended / Calculation'} · 5 pts</div>
-      <div class="rev-qt">${qLabels[q]}</div>
-      ${inner}`;
-        od.appendChild(d);
-      });
+      document.getElementById('r-name').textContent = studentName || 'Student';
+      const cohortEl = document.getElementById('r-cohort');
+      if (cohortEl) cohortEl.textContent = validatedCohort || 'General';
+      const codeEl = document.getElementById('r-code');
+      if (codeEl) codeEl.textContent = validatedCode || '—';
     }
 
     function esc(s) {
