@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: 'en' }}">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  {%- seo -%}
+  <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ["Sora", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+  {%- feed_meta -%}
+</head>
+<body class="font-sans bg-[#F3F5FB] text-[#131722]">
+
+<nav class="flex items-center justify-between px-6 md:px-12 py-[18px] md:py-[22px]">
+  <a href="{{ '/' | relative_url }}" class="text-[17px] md:text-[19px] font-bold tracking-tight">Tech With Kev</a>
+  <div class="hidden md:flex items-center gap-8 text-sm text-[#57607A]">
+    <a class="hover:text-[#131722] transition-colors" href="{{ '/courses' | relative_url }}">Courses</a>
+    <a class="hover:text-[#131722] transition-colors" href="#">About</a>
+    <a class="hover:text-[#131722] transition-colors" href="{{ '/contact' | relative_url }}">Contact</a>
+  </div>
+  <button class="md:hidden text-[#131722]" id="mobile-menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+    <span class="material-symbols-outlined">menu</span>
+  </button>
+</nav>
+<div class="hidden md:hidden flex-col gap-1 px-6 pb-4 text-sm text-[#57607A]" id="mobile-menu">
+  <a class="py-2" href="{{ '/courses' | relative_url }}">Courses</a>
+  <a class="py-2" href="#">About</a>
+  <a class="py-2" href="{{ '/contact' | relative_url }}">Contact</a>
+</div>
+<script>
+  document.getElementById('mobile-menu-btn').addEventListener('click', function () {
+    var btn = this;
+    var menu = document.getElementById('mobile-menu');
+    var isHidden = menu.classList.toggle('hidden');
+    menu.classList.toggle('flex', !isHidden);
+    btn.setAttribute('aria-expanded', String(!isHidden));
+  });
+</script>
+
+<main aria-label="Content">
+  {{ content }}
+</main>
+
+<footer class="flex flex-col md:flex-row items-center justify-between gap-5 px-6 md:px-12 py-10 md:py-14">
+  <div class="text-base font-bold">Tech With Kev</div>
+  <a href="#" class="inline-flex items-center justify-center min-h-11 bg-[#1E4FD9] text-white px-7 py-[14px] rounded-full text-sm font-bold hover:brightness-110 transition">Register interest</a>
+</footer>
+
+</body>
+</html>

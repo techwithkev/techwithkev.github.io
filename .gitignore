@@ -15,3 +15,7 @@ pages/.DS_Store
 # Playwright test artifacts
 test-results/
 playwright-report/
+
+# Ruby / Jekyll build tooling
+.bundle/
+vendor/
