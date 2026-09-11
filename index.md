@@ -1,13 +1,13 @@
 ---
 layout: home
 title: Home
-description: "AI engineer and 18-year programming educator. Two AI courses for teens — Introduction to AI and AI Olympiads Junior — plus real interactive tools from the classroom."
+description: "Programming and math educator of 18 years. Two AI courses for teens — Introduction to AI and AI Olympiads Junior — plus real interactive tools from the classroom."
 ---
 
 <!-- Hero -->
 <section class="grid grid-cols-1 lg:grid-cols-[1.1fr_.9fr] gap-10 lg:gap-12 items-center px-6 md:px-12 pt-14 md:pt-24 pb-10 md:pb-16">
   <div>
-    <div class="inline-flex px-[14px] py-[7px] rounded-full bg-[#1E4FD9] text-white text-xs font-bold tracking-[.03em] mb-5">AI ENGINEER · TEACHER OF 18 YEARS</div>
+    <div class="inline-flex px-[14px] py-[7px] rounded-full bg-[#1E4FD9] text-white text-xs font-bold tracking-[.03em] mb-5">PROGRAMMING EDUCATOR · 18 YEARS</div>
     <h1 class="text-[32px] md:text-[40px] leading-[1.24] font-bold mb-5">Don&rsquo;t just teach your child how to use AI. Teach them how to think with it.</h1>
     <p class="text-[16px] md:text-[17px] leading-[1.6] text-[#57607A] mb-4 max-w-[520px]">I teach students how AI works, how to use it effectively, and how to build with it.</p>
     <p class="text-[16px] md:text-[17px] leading-[1.6] text-[#57607A] mb-7 max-w-[520px]">I&rsquo;ve spent 18 years teaching programming and math, and today I help enterprises put AI and data technology to work. I bring that real-world experience into every lesson.</p>
