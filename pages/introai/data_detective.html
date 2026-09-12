@@ -14,21 +14,6 @@
     rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/activity.css">
   <style>
-    #registration-overlay { transition: opacity 0.4s ease; }
-    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
-    #registration-overlay .reg-card {
-      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
-    }
-    #registration-overlay.hiding .reg-card {
-      transform: scale(0.95) translateY(-10px); opacity: 0;
-    }
-    .reg-input:focus {
-      outline: none; border-color: #10b981;
-      box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
-    }
-    .reg-input.error {
-      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
-    }
     .form-input:focus {
       outline: none; border-color: #10b981;
       box-shadow: 0 0 0 3px rgba(16,185,129,0.1);
@@ -64,60 +49,6 @@
 </head>
 
 <body class="bg-[#F9FAFB] text-gray-900 min-h-screen font-sans antialiased pb-20">
-
-  <!-- 1. REGISTRATION GATE OVERLAY -->
-  <div id="registration-overlay"
-    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
-    style="background: linear-gradient(135deg, #064e3b 0%, #047857 55%, #065f46 100%);">
-
-    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
-        style="background: radial-gradient(circle, #a7f3d0, transparent);"></div>
-      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
-        style="background: radial-gradient(circle, #34d399, transparent);"></div>
-    </div>
-
-    <div class="reg-card relative bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-emerald-100">
-      <div class="text-center mb-6">
-        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 mb-3 shadow-inner">
-          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </div>
-        <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 uppercase tracking-wider mb-2">
-          Intro to AI · Week 7
-        </span>
-        <h2 class="text-2xl font-extrabold text-gray-900">Be a Data Detective 🔍</h2>
-        <p class="text-xs text-gray-500 mt-1">Please enter your details to start the activity</p>
-      </div>
-
-      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Full Name <span class="text-red-500">*</span></label>
-          <input type="text" id="reg-name" placeholder="e.g. Alex Morgan"
-            class="reg-input w-full px-4 py-3 border border-gray-300 rounded-xl text-sm transition-all text-gray-900 placeholder-gray-400">
-          <p id="reg-name-err" class="text-xs text-red-500 mt-1 hidden">Please enter your full name.</p>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">School / Student Email <span class="text-red-500">*</span></label>
-          <input type="email" id="reg-email" placeholder="alex@school.edu"
-            class="reg-input w-full px-4 py-3 border border-gray-300 rounded-xl text-sm transition-all text-gray-900 placeholder-gray-400">
-          <p id="reg-email-err" class="text-xs text-red-500 mt-1 hidden">Please enter a valid email address.</p>
-        </div>
-
-        <button type="submit"
-          class="w-full py-3.5 px-6 rounded-xl text-sm font-bold text-white shadow-lg shadow-emerald-600/30 transition-all hover:bg-emerald-700 active:scale-[0.99] flex items-center justify-center gap-2"
-          style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
-          <span>Start Investigation</span>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-          </svg>
-        </button>
-      </form>
-    </div>
-  </div>
 
   <!-- 2. MAIN CONTENT CONTAINER -->
   <div id="main-content" class="max-w-3xl mx-auto px-4 pt-8">
@@ -167,7 +98,7 @@
     </div>
 
     <!-- MAIN FORM -->
-    <form id="detective-form" onsubmit="submitExercise(event)" novalidate>
+    <form id="detective-form" onsubmit="handleSubmit(event)" novalidate>
 
       <!-- STEP 1: DATASET SELECTOR & VIEWER -->
       <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
@@ -382,13 +313,23 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../../assets/js/introai-shared.js"></script>
   <script>
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const EXERCISE_SLUG = 'data_detective';
 
     let studentName = '';
     let studentEmail = '';
     let selectedDataTypes = [];
     let enjoymentRating = 0;
     let currentDataset = null;
+
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName  = session.name;
+      studentEmail = session.email;
+    })();
 
     const datasets = [
       {
@@ -608,13 +549,9 @@
       populateDatasetSelect();
       selectDataset(0);
 
-      const savedName = sessionStorage.getItem(INTROAI_NAME_KEY);
-      const savedEmail = sessionStorage.getItem(INTROAI_EMAIL_KEY);
-      if (savedName && savedEmail) {
-        document.getElementById('reg-name').value = savedName;
-        document.getElementById('reg-email').value = savedEmail;
-        applyRegistration(savedName, savedEmail);
-      }
+      const userBadge = document.getElementById('user-badge');
+      userBadge.textContent = `\u{1F464} ${studentName}`;
+      userBadge.classList.remove('hidden');
     });
 
     function populateDatasetSelect() {
@@ -647,51 +584,6 @@
       selectDataset(randomIndex);
     }
 
-    // Registration Gate Logic
-    function handleRegistration(ev) {
-      ev.preventDefault();
-      const name = document.getElementById('reg-name').value.trim();
-      const email = document.getElementById('reg-email').value.trim();
-      let valid = true;
-
-      if (!name) {
-        document.getElementById('reg-name-err').classList.remove('hidden');
-        document.getElementById('reg-name').classList.add('error');
-        valid = false;
-      } else {
-        document.getElementById('reg-name-err').classList.add('hidden');
-        document.getElementById('reg-name').classList.remove('error');
-      }
-
-      if (!email || !email.includes('@')) {
-        document.getElementById('reg-email-err').classList.remove('hidden');
-        document.getElementById('reg-email').classList.add('error');
-        valid = false;
-      } else {
-        document.getElementById('reg-email-err').classList.add('hidden');
-        document.getElementById('reg-email').classList.remove('error');
-      }
-
-      if (valid) {
-        sessionStorage.setItem(INTROAI_NAME_KEY, name);
-        sessionStorage.setItem(INTROAI_EMAIL_KEY, email);
-        applyRegistration(name, email);
-      }
-    }
-
-    function applyRegistration(name, email) {
-      studentName = name;
-      studentEmail = email;
-
-      const overlay = document.getElementById('registration-overlay');
-      overlay.classList.add('hiding');
-      setTimeout(() => overlay.classList.add('hidden'), 400);
-
-      const userBadge = document.getElementById('user-badge');
-      userBadge.textContent = `👤 ${name}`;
-      userBadge.classList.remove('hidden');
-    }
-
     // Data Type Toggle Buttons
     function toggleDataType(val, btn) {
       if (selectedDataTypes.includes(val)) {
@@ -716,7 +608,7 @@
     }
 
     // Form Submission
-    async function submitExercise(ev) {
+    async function handleSubmit(ev) {
       ev.preventDefault();
       const banner = document.getElementById('submit-error-banner');
       banner.classList.add('hidden');
@@ -801,8 +693,6 @@
       btn.innerHTML = `<span class="spinner"></span> <span>Submitting Report...</span>`;
 
       const payload = {
-        student_name: studentName,
-        student_email: studentEmail,
         dataset_chosen: currentDataset ? currentDataset.name : 'Unknown Dataset',
         data_types_identified: selectedDataTypes.join(', '),
         data_types_explanation: explanation,
@@ -810,19 +700,11 @@
         pattern_2_description: p2,
         ai_prediction_usecase: prediction,
         ai_pitfalls_reflections: pitfalls,
-        chart_visualization_idea: document.getElementById('chart-idea').value.trim() || 'None',
-        enjoyment_rating: enjoymentRating
+        chart_visualization_idea: document.getElementById('chart-idea').value.trim() || 'None'
       };
 
       try {
-        const { error } = await sb.from('introai_week07_data_detective').insert([payload]);
-
-        if (error) {
-          if (error.code === '23505' || error.message.includes('unique constraint') || error.message.includes('duplicate key')) {
-            throw new Error("⚠️ You have already submitted this activity!");
-          }
-          throw error;
-        }
+        await submitExercise(EXERCISE_SLUG, payload, { enjoymentRating: enjoymentRating || undefined });
 
         // Show Success Screen
         const firstName = studentName.split(' ')[0] || 'Detective';

@@ -14,21 +14,6 @@
     rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/activity.css">
   <style>
-    #registration-overlay { transition: opacity 0.4s ease; }
-    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
-    #registration-overlay .reg-card {
-      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
-    }
-    #registration-overlay.hiding .reg-card {
-      transform: scale(0.95) translateY(-10px); opacity: 0;
-    }
-    .reg-input:focus {
-      outline: none; border-color: #0891b2;
-      box-shadow: 0 0 0 3px rgba(8,145,178,0.15);
-    }
-    .reg-input.error {
-      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
-    }
     .form-input:focus {
       outline: none; border-color: #0891b2;
       box-shadow: 0 0 0 3px rgba(8,145,178,0.1);
@@ -53,60 +38,6 @@
 </head>
 
 <body class="bg-[#F9FAFB] text-gray-900 min-h-screen font-sans antialiased pb-20">
-
-  <!-- REGISTRATION GATE -->
-  <div id="registration-overlay"
-    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
-    style="background: linear-gradient(135deg, #164e63 0%, #0891b2 55%, #164e63 100%);">
-
-    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
-        style="background: radial-gradient(circle, #a5f3fc, transparent);"></div>
-      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
-        style="background: radial-gradient(circle, #06b6d4, transparent);"></div>
-    </div>
-
-    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
-      <div class="text-center mb-8">
-        <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center bg-cyan-100 text-cyan-600">
-          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </div>
-        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 bg-cyan-100 text-cyan-800">
-          Week 8 · Exercise 2
-        </div>
-        <h1 class="text-2xl font-black text-gray-900 tracking-tight">Bias Detective <span class="text-cyan-600">Stations 🕵️‍♀️</span></h1>
-        <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">Enter your details to log your station findings.</p>
-      </div>
-
-      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
-        <div class="space-y-4 mb-6">
-          <div>
-            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Full Name</label>
-            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Marcus Chen"
-              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
-            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name.</p>
-          </div>
-          <div>
-            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
-            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. marcus@school.edu"
-              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
-            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
-          </div>
-          <div>
-            <label for="reg-group" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Group Members (Optional, 3–4 students)</label>
-            <input id="reg-group" type="text" placeholder="e.g. Maya, Sam, Liam"
-              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" />
-          </div>
-        </div>
-        <button id="reg-submit-btn" type="submit"
-          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-700 hover:to-cyan-800">
-          <span id="reg-btn-label">Begin Case Stations &#8594;</span>
-        </button>
-      </form>
-    </div>
-  </div>
 
   <!-- MAIN CONTENT -->
   <div id="main-content" class="max-w-3xl mx-auto px-4 md:px-8 py-8 md:py-12">
@@ -175,8 +106,15 @@
       </div>
     </div>
 
+    <!-- Group Members (optional) -->
+    <div class="mb-6">
+      <label for="reg-group" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Group Members <span class="text-gray-400 normal-case font-medium">(optional)</span></label>
+      <input id="reg-group" type="text" placeholder="e.g. Jane Smith, Alex Lee"
+        class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" />
+    </div>
+
     <!-- FORM -->
-    <form id="stations-form" onsubmit="submitExercise(event)" novalidate>
+    <form id="stations-form" onsubmit="handleSubmit(event)" novalidate>
 
       <!-- Station 1 Card -->
       <div id="station-1" class="bg-white border-2 border-cyan-100 rounded-3xl p-6 md:p-8 shadow-md mb-8 transition-all hover:border-cyan-300">
@@ -618,10 +556,20 @@
 
   <script src="../../assets/js/introai-shared.js"></script>
   <script>
-    const TABLE = 'introai_week08_bias_detective_stations';
+    const EXERCISE_SLUG = 'week08_bias_detective_stations';
 
-    let studentName = '', studentEmail = '', groupMembers = '';
+    let studentName = '', studentEmail = '';
     let enjoymentRating = 0;
+
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName  = session.name;
+      studentEmail = session.email;
+    })();
 
     function toggleExhibit(exhibitId, btn) {
       const exhibit = document.getElementById(exhibitId);
@@ -634,44 +582,6 @@
     }
 
 
-    function handleRegistration(ev) {
-      ev.preventDefault();
-      const nameEl = document.getElementById('reg-name');
-      const emailEl = document.getElementById('reg-email');
-      const groupEl = document.getElementById('reg-group');
-      let ok = true;
-
-      nameEl.classList.remove('error');
-      emailEl.classList.remove('error');
-      document.getElementById('reg-name-error').classList.add('hidden');
-      document.getElementById('reg-email-error').classList.add('hidden');
-
-      if (!nameEl.value.trim()) { nameEl.classList.add('error'); document.getElementById('reg-name-error').classList.remove('hidden'); ok = false; }
-      if (!emailEl.value.trim() || !validateEmail(emailEl.value.trim())) { emailEl.classList.add('error'); document.getElementById('reg-email-error').classList.remove('hidden'); ok = false; }
-      if (!ok) return;
-
-      studentName = nameEl.value.trim();
-      studentEmail = emailEl.value.trim();
-      groupMembers = groupEl.value.trim();
-
-      sessionStorage.setItem(INTROAI_NAME_KEY, studentName);
-      sessionStorage.setItem(INTROAI_EMAIL_KEY, studentEmail);
-      sessionStorage.setItem('introai_w08_bias_detective_stations_group', groupMembers);
-
-      const overlay = document.getElementById('registration-overlay');
-      overlay.classList.add('hiding');
-      setTimeout(() => overlay.remove(), 400);
-    }
-
-    (function restoreSession() {
-      const n = sessionStorage.getItem(INTROAI_NAME_KEY);
-      const e = sessionStorage.getItem(INTROAI_EMAIL_KEY);
-      const g = sessionStorage.getItem('introai_w08_bias_detective_stations_group');
-      if (n && e) {
-        studentName = n; studentEmail = e; groupMembers = g || '';
-        document.getElementById('registration-overlay').remove();
-      }
-    })();
 
     function setRating(val) {
       enjoymentRating = val;

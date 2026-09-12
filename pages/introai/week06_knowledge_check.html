@@ -14,21 +14,6 @@
     rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/activity.css">
   <style>
-    #registration-overlay { transition: opacity 0.4s ease; }
-    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
-    #registration-overlay .reg-card {
-      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
-    }
-    #registration-overlay.hiding .reg-card {
-      transform: scale(0.95) translateY(-10px); opacity: 0;
-    }
-    .reg-input:focus {
-      outline: none; border-color: #6366f1;
-      box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
-    }
-    .reg-input.error {
-      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
-    }
     .form-input:focus {
       outline: none; border-color: #6366f1;
       box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
@@ -67,56 +52,6 @@
 </head>
 
 <body class="bg-[#F9FAFB] text-gray-900 min-h-screen font-sans antialiased pb-20">
-
-  <!-- REGISTRATION GATE -->
-  <div id="registration-overlay"
-    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
-    style="background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 55%, #1e1b4b 100%);">
-
-    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
-        style="background: radial-gradient(circle, #c7d2fe, transparent);"></div>
-      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
-        style="background: radial-gradient(circle, #6366f1, transparent);"></div>
-    </div>
-
-    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
-      <div class="text-center mb-8">
-        <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center bg-indigo-100 text-indigo-600">
-          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
-        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 bg-indigo-100 text-indigo-800">
-          Week 6 · Activity 4
-        </div>
-        <h1 class="text-2xl font-black text-gray-900 tracking-tight">Knowledge Check Quiz</h1>
-        <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">Enter your full name and email to start the quiz.</p>
-      </div>
-
-      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
-        <div class="space-y-4 mb-6">
-          <div>
-            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Full Name</label>
-            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Jane Smith"
-              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
-            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name.</p>
-          </div>
-          <div>
-            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
-            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. jane@school.edu"
-              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
-            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
-          </div>
-        </div>
-        <button id="reg-submit-btn" type="submit"
-          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700">
-          <span id="reg-btn-label">Start Quiz &#8594;</span>
-        </button>
-      </form>
-      <p class="text-center text-[10px] text-gray-400 font-medium mt-5">Saved to the Intro to AI student roster.</p>
-    </div>
-  </div>
 
   <!-- MAIN CONTENT -->
   <div id="main-content" class="max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
@@ -161,7 +96,7 @@
     </div>
 
     <!-- MAIN FORM -->
-    <form id="knowledge_check-form" onsubmit="submitExercise(event)" novalidate>
+    <form id="knowledge_check-form" onsubmit="handleSubmit(event)" novalidate>
 
       <!-- Question 1 -->
       <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
@@ -410,7 +345,7 @@
 
   <script src="../../assets/js/introai-shared.js"></script>
   <script>
-    const TABLE = 'introai_week06_knowledge_check';
+    const EXERCISE_SLUG = 'week06_knowledge_check';
 
     let studentName = '', studentEmail = '';
     let enjoymentRating = 0;
@@ -435,48 +370,18 @@
       q6: 'Diamond (Decision Step)'
     };
 
-    function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
-
     function esc(str) {
       return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    async function handleRegistration(ev) {
-      ev.preventDefault();
-      const nameEl = document.getElementById('reg-name');
-      const emailEl = document.getElementById('reg-email');
-      const nameErr = document.getElementById('reg-name-error');
-      const emailErr = document.getElementById('reg-email-error');
-      let ok = true;
-
-      nameEl.classList.remove('error'); nameErr.classList.add('hidden');
-      emailEl.classList.remove('error'); emailErr.classList.add('hidden');
-
-      if (!nameEl.value.trim()) { nameEl.classList.add('error'); nameErr.classList.remove('hidden'); ok = false; }
-      if (!emailEl.value.trim() || !validateEmail(emailEl.value.trim())) { emailEl.classList.add('error'); emailErr.classList.remove('hidden'); ok = false; }
-      if (!ok) return;
-
-      const btn = document.getElementById('reg-submit-btn');
-      btn.disabled = true;
-      document.getElementById('reg-btn-label').innerHTML = '<span class="spinner"></span> Starting\u2026';
-
-      studentName = nameEl.value.trim();
-      studentEmail = emailEl.value.trim();
-      sessionStorage.setItem(INTROAI_NAME_KEY, studentName);
-      sessionStorage.setItem(INTROAI_EMAIL_KEY, studentEmail);
-
-      const overlay = document.getElementById('registration-overlay');
-      overlay.classList.add('hiding');
-      setTimeout(() => overlay.remove(), 450);
-    }
-
-    (function restoreSession() {
-      const n = sessionStorage.getItem(INTROAI_NAME_KEY);
-      const e = sessionStorage.getItem(INTROAI_EMAIL_KEY);
-      if (n && e) {
-        studentName = n; studentEmail = e;
-        document.getElementById('registration-overlay').remove();
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
       }
+      studentName  = session.name;
+      studentEmail = session.email;
     })();
 
     function selectMCQ(qKey, val, btn) {
@@ -495,21 +400,7 @@
       document.getElementById('rating-error').classList.add('hidden');
     }
 
-    async function supabaseInsert(payload) {
-      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`,
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify(payload)
-      });
-      if (!resp.ok) { const t = await resp.text(); throw new Error(`HTTP ${resp.status}: ${t}`); }
-    }
-
-    async function submitExercise(ev) {
+    async function handleSubmit(ev) {
       ev.preventDefault();
       let ok = true;
 
@@ -553,8 +444,6 @@
       const pct = Math.round((score / 6) * 100);
 
       const payload = {
-        student_name:               studentName,
-        student_email:              studentEmail,
         q1_content_filtering:       mcqAnswers.q1,
         q2_collaborative_filtering: mcqAnswers.q2,
         q3_cold_start:              mcqAnswers.q3,
@@ -563,27 +452,21 @@
         q6_flowchart_shapes:        mcqAnswers.q6,
         score:                      score,
         pct:                        pct,
-        reflection_surprising:      refVal,
-        enjoyment_rating:           enjoymentRating,
-        submitted_at:               new Date().toISOString(),
+        reflection_surprising:      refVal
       };
 
       try {
-        await supabaseInsert(payload);
+        await submitExercise(EXERCISE_SLUG, payload, { enjoymentRating: enjoymentRating || undefined });
         document.getElementById('success-name').textContent = studentName.split(' ')[0];
         document.getElementById('success-score').textContent = `${score} / 6`;
         document.getElementById('success-pct').textContent = `${pct}% Correct`;
         document.getElementById('success-screen').classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } catch (err) {
-        console.error('[Week 6 Quiz] Supabase error:', err.message);
+        console.error('[Week 6 Quiz] Submission error:', err.message);
         btn.disabled = false;
         document.getElementById('submit-label').textContent = 'Submit Quiz \u2192';
-        if (err.message.includes('409') || err.message.includes('duplicate key')) {
-          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f You have already submitted this quiz!';
-        } else {
-          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f Network error. Please check your connection or notify your teacher.';
-        }
+        document.getElementById('form-error-text').textContent = '\u26a0\ufe0f Network error. Please check your connection or notify your teacher.';
         document.getElementById('form-error').classList.remove('hidden');
       }
     }

@@ -13,21 +13,6 @@
     rel="stylesheet">
   <link rel="stylesheet" href="../../assets/css/activity.css">
   <style>
-    #registration-overlay { transition: opacity 0.4s ease; }
-    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
-    #registration-overlay .reg-card {
-      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
-    }
-    #registration-overlay.hiding .reg-card {
-      transform: scale(0.95) translateY(-10px); opacity: 0;
-    }
-    .reg-input:focus {
-      outline: none; border-color: #0d9488;
-      box-shadow: 0 0 0 3px rgba(13,148,136,0.15);
-    }
-    .reg-input.error {
-      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
-    }
     .form-input:focus {
       outline: none; border-color: #0d9488;
       box-shadow: 0 0 0 3px rgba(13,148,136,0.12);
@@ -63,56 +48,6 @@
 </head>
 
 <body class="bg-[#F0FDF4]/30 text-gray-900 min-h-screen font-sans antialiased pb-20">
-
-  <!-- REGISTRATION GATE -->
-  <div id="registration-overlay"
-    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
-    style="background: linear-gradient(135deg, #042f2e 0%, #0f766e 55%, #115e59 100%);">
-
-    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
-        style="background: radial-gradient(circle, #99f6e4, transparent);"></div>
-      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
-        style="background: radial-gradient(circle, #14b8a6, transparent);"></div>
-    </div>
-
-    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
-      <div class="text-center mb-8">
-        <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center bg-teal-100 text-teal-600 shadow-sm">
-          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-          </svg>
-        </div>
-        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 bg-teal-100 text-teal-800">
-          Week 13 · Exercise 1
-        </div>
-        <h1 class="text-2xl font-black text-gray-900 tracking-tight">AI Career Mapping 💼</h1>
-        <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">Enter your details to research AI career paths and connect them to your goals.</p>
-      </div>
-
-      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
-        <div class="space-y-4 mb-6">
-          <div>
-            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Your Full Name</label>
-            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Jordan Lee"
-              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
-            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name.</p>
-          </div>
-          <div>
-            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
-            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. jordan@school.edu"
-              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
-            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
-          </div>
-        </div>
-        <button id="reg-submit-btn" type="submit"
-          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800">
-          <span id="reg-btn-label">Begin Career Mapping &#8594;</span>
-        </button>
-      </form>
-      <p class="text-center text-[10px] text-gray-400 font-medium mt-5">Saved to the Intro to AI student roster.</p>
-    </div>
-  </div>
 
   <!-- MAIN CONTENT -->
   <div id="main-content" class="max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
@@ -166,7 +101,7 @@
     </div>
 
     <!-- MAIN FORM -->
-    <form id="ai_career_mapping-form" onsubmit="submitExercise(event)" novalidate>
+    <form id="ai_career_mapping-form" onsubmit="handleSubmit(event)" novalidate>
 
       <!-- Step 1: Career Pick -->
       <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
@@ -342,16 +277,23 @@
     </div>
   </div>
 
+  <script src="../../assets/js/introai-shared.js"></script>
   <script>
-    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
-    const TABLE = 'introai_week13_ai_career_mapping';
+    const EXERCISE_SLUG = 'week13_ai_career_mapping';
 
     let studentName = '', studentEmail = '';
     let selectedCareerCategory = '';
     let enjoymentRating = 0;
 
-    function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName  = session.name;
+      studentEmail = session.email;
+    })();
 
     function setCareer(cat, btn) {
       selectedCareerCategory = cat;
@@ -359,44 +301,6 @@
       btn.classList.add('selected');
       document.getElementById('career-error').classList.add('hidden');
     }
-
-    async function handleRegistration(ev) {
-      ev.preventDefault();
-      const nameEl = document.getElementById('reg-name');
-      const emailEl = document.getElementById('reg-email');
-      const nameErr = document.getElementById('reg-name-error');
-      const emailErr = document.getElementById('reg-email-error');
-      let ok = true;
-
-      nameEl.classList.remove('error'); nameErr.classList.add('hidden');
-      emailEl.classList.remove('error'); emailErr.classList.add('hidden');
-
-      if (!nameEl.value.trim()) { nameEl.classList.add('error'); nameErr.classList.remove('hidden'); ok = false; }
-      if (!emailEl.value.trim() || !validateEmail(emailEl.value.trim())) { emailEl.classList.add('error'); emailErr.classList.remove('hidden'); ok = false; }
-      if (!ok) return;
-
-      const btn = document.getElementById('reg-submit-btn');
-      btn.disabled = true;
-      document.getElementById('reg-btn-label').innerHTML = '<span class="spinner"></span> Starting\u2026';
-
-      studentName = nameEl.value.trim();
-      studentEmail = emailEl.value.trim();
-      sessionStorage.setItem('introai_w13_ai_career_mapping_name', studentName);
-      sessionStorage.setItem('introai_w13_ai_career_mapping_email', studentEmail);
-
-      const overlay = document.getElementById('registration-overlay');
-      overlay.classList.add('hiding');
-      setTimeout(() => overlay.remove(), 450);
-    }
-
-    (function restoreSession() {
-      const n = sessionStorage.getItem('introai_w13_ai_career_mapping_name');
-      const e = sessionStorage.getItem('introai_w13_ai_career_mapping_email');
-      if (n && e) {
-        studentName = n; studentEmail = e;
-        document.getElementById('registration-overlay').remove();
-      }
-    })();
 
     function setRating(val) {
       enjoymentRating = val;
@@ -406,21 +310,7 @@
       document.getElementById('rating-error').classList.add('hidden');
     }
 
-    async function supabaseInsert(payload) {
-      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?on_conflict=student_email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`,
-          'Prefer': 'resolution=merge-duplicates,return=minimal'
-        },
-        body: JSON.stringify(payload)
-      });
-      if (!resp.ok) { const t = await resp.text(); throw new Error(`HTTP ${resp.status}: ${t}`); }
-    }
-
-    async function submitExercise(ev) {
+    async function handleSubmit(ev) {
       ev.preventDefault();
       let ok = true;
 
@@ -461,32 +351,24 @@
       document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting\u2026';
 
       const payload = {
-        student_name:              studentName,
-        student_email:             studentEmail,
         selected_career_category:  selectedCareerCategory,
         career_title:              document.getElementById('career-title').value.trim(),
         typical_day_desc:          document.getElementById('typical-day-desc').value.trim(),
         required_skills_classes:   document.getElementById('required-skills-classes').value.trim(),
         personal_connection:       document.getElementById('personal-connection').value.trim(),
-        surprising_discovery:      document.getElementById('surprising-discovery').value.trim(),
-        enjoyment_rating:          enjoymentRating,
-        submitted_at:              new Date().toISOString(),
+        surprising_discovery:      document.getElementById('surprising-discovery').value.trim()
       };
 
       try {
-        await supabaseInsert(payload);
+        await submitExercise(EXERCISE_SLUG, payload, { enjoymentRating: enjoymentRating || undefined });
         document.getElementById('success-name').textContent = studentName.split(' ')[0];
         document.getElementById('success-screen').classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } catch (err) {
-        console.error('[Week 13 AI Career Mapping] Supabase error:', err.message);
+        console.error('[Week 13 AI Career Mapping] Submission error:', err.message);
         btn.disabled = false;
         document.getElementById('submit-label').textContent = 'Submit Career Mapping \u2192';
-        if (err.message.includes('409') || err.message.includes('duplicate key')) {
-          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f You have already submitted this activity!';
-        } else {
-          document.getElementById('form-error-text').textContent = '\u26a0\ufe0f Network error submitting activity. Please try again.';
-        }
+        document.getElementById('form-error-text').textContent = '\u26a0\ufe0f Network error submitting activity. Please try again.';
         document.getElementById('form-error').classList.remove('hidden');
       }
     }
