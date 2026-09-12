@@ -114,7 +114,7 @@
     </div>
 
     <!-- Form -->
-    <form id="exercise-form" onsubmit="submitExercise(event)" novalidate>
+    <form id="exercise-form" onsubmit="handleSubmit(event)" novalidate>
 
       <!-- STEP 1: Tool / Website -->
       <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-5">
@@ -473,7 +473,7 @@
     }
 
     /* ══ FORM SUBMIT ══ */
-    async function submitExercise(ev) {
+    async function handleSubmit(ev) {
       ev.preventDefault();
 
       const errorEl = document.getElementById('form-error');

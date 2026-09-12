@@ -101,6 +101,7 @@ FROM introai, (VALUES
   ('week13_ai_career_mapping',  'Week 13 — AI Career Mapping',          13, 1),
   ('week13_will_ai_take_this_job','Week 13 — Will AI Take This Job?',   13, 2),
   ('week13_checkin',            'Week 13 — Build Check-In',             13, 3),
+  ('week13_progress_notes',     'Week 13 — Progress Notes',             13, 4),
   -- Week 14 (AI in Science & Discovery)
   ('week14_checkin',            'Week 14 — AI in Science & Discovery',  14, 1),
   ('week14_progress_notes',     'Week 14 — Progress Notes',             14, 2),
@@ -109,15 +110,6 @@ FROM introai, (VALUES
   -- Week 16 (Robotics & Physical AI)
   ('week16_final_submission',   'Week 16 — Robotics & Physical AI',     16, 1),
   -- Week 17 (Project Build Session)
-  ('week13_progress_notes',     'Week 13 — Progress Notes',             13, 4),
-  -- Week 14 (Inserted: AI in Science & Research)
-  ('week14_science_research',   'Week 14 — AI in Science & Research',   14, 1),
-  ('week14_progress_notes',     'Week 14 — Progress Notes',             14, 2),
-  -- Week 15 (Inserted: AI for Business & Entrepreneurship)
-  ('week15_business_entrepreneurship', 'Week 15 — AI for Business & Entrepreneurship', 15, 1),
-  -- Week 16 (Inserted: Robotics & Physical AI)
-  ('week16_robotics_physical_ai', 'Week 16 — Robotics & Physical AI',   16, 1),
-  -- Week 17 (Renumbered from 14: Project Build Session)
   ('week17_checkin',            'Week 17 — Project Build Session',      17, 1),
   ('week17_progress_notes',     'Week 17 — Progress Notes',             17, 2),
   -- Week 18 (Project Refinement & Rehearsal)
@@ -135,6 +127,14 @@ ON CONFLICT (course_id, exercise_slug) DO UPDATE SET
 --   not exercise_definitions (which are exclusively for Intro to AI student exercises).
 DELETE FROM exercise_definitions
 WHERE course_id = (SELECT id FROM courses WHERE slug = 'aijr');
+
+-- ── 4. CLEANUP: Orphaned slugs from an earlier week 14-19 renumbering attempt ──
+--   These slugs never matched any live page in pages/introai/ (the live page kept
+--   week14_checkin / week15_checkin / week16_final_submission instead). Remove them
+--   so they don't show up as phantom toggles in pages/teacher/exercise-visibility.html.
+DELETE FROM exercise_definitions
+WHERE course_id = (SELECT id FROM courses WHERE slug = 'introai')
+  AND exercise_slug IN ('week14_science_research', 'week15_business_entrepreneurship', 'week16_robotics_physical_ai');
 
 -- ── NOTE: Cohort creation ─────────────────────────────────────────────────────
 -- Create your real cohorts via the teacher dashboard (pages/teacher/cohorts.html).
