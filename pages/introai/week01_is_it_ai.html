@@ -440,12 +440,12 @@
       document.getElementById('progress-bar').style.width = `${progressPercent}%`;
       document.getElementById('progress-text').textContent = `Sorted ${currentCardIndex} / ${items.length}`;
 
-      // Reset Card display
+      // Reset Card display — use full className reset so feedback card is fully hidden
       const gameCard = document.getElementById('game-card');
       const feedbackCard = document.getElementById('feedback-card');
 
-      gameCard.classList.remove('opacity-0', 'pointer-events-none', 'scale-95');
-      feedbackCard.classList.add('opacity-0', 'pointer-events-none', 'scale-95');
+      gameCard.className = "bg-white border border-gray-200 p-8 rounded-3xl shadow-md flex flex-col justify-between items-center text-center cursor-grab active:cursor-grabbing card-transition h-full w-full absolute top-0 left-0";
+      feedbackCard.className = "bg-white border-2 border-gray-200 p-8 rounded-3xl shadow-lg flex flex-col justify-between items-center text-center card-transition h-full w-full absolute top-0 left-0 opacity-0 pointer-events-none transform scale-95";
 
       document.getElementById('card-badge').textContent = `Card ${currentCardIndex + 1} of ${items.length}`;
       document.getElementById('card-title').textContent = item.name;

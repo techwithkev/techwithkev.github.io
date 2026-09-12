@@ -96,6 +96,14 @@
     .btn-sm{padding:7px 13px;border-radius:7px;font-size:.78rem;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;}
     .btn-outline{background:none;border:1px solid var(--border);color:var(--text);}
     .btn-outline:hover{border-color:var(--gold);}
+    .btn-auto-refresh{position:relative;}
+    .btn-auto-refresh.active{border-color:var(--gold);color:var(--gold);}
+    .btn-auto-refresh.active::after{
+      content:'';position:absolute;top:3px;right:3px;
+      width:5px;height:5px;border-radius:50%;background:var(--gold);
+      animation:pulse-dot 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.6);}}
 
     /* ── Stats bar ── */
     .stats-bar{
@@ -244,8 +252,9 @@
           </div>
           <div class="toolbar">
             <input type="text" class="search-input" id="search-input" placeholder="Search students…" oninput="filterRows()" />
+            <button class="btn-sm btn-outline btn-auto-refresh" id="auto-refresh-btn" onclick="cycleAutoRefresh()" title="Auto-refresh">↺ Auto</button>
             <button class="btn-sm btn-outline" onclick="exportCSV()">↓ CSV</button>
-            <button class="btn-sm btn-outline" onclick="loadSubmissions()">↻</button>
+            <button class="btn-sm btn-outline" onclick="manualRefresh()">↻</button>
           </div>
         </div>
 
@@ -643,6 +652,58 @@
       }
       setTimeout(() => savingEl.classList.remove('visible'), 2000);
     }
+  }
+
+  // ── Auto-refresh ──────────────────────────────────────────────
+  var autoRefresh = {
+    intervals: [0, 30, 60, 300], // seconds; 0 = off
+    labels:    ['↺ Auto', '↺ 30s', '↺ 1m', '↺ 5m'],
+    idx: 0,
+    timer: null,
+    countdown: null,
+    remaining: 0
+  };
+
+  function cycleAutoRefresh() {
+    autoRefresh.idx = (autoRefresh.idx + 1) % autoRefresh.intervals.length;
+    applyAutoRefresh();
+  }
+
+  function applyAutoRefresh() {
+    // Clear existing timers
+    if (autoRefresh.timer)    { clearInterval(autoRefresh.timer);    autoRefresh.timer = null; }
+    if (autoRefresh.countdown){ clearInterval(autoRefresh.countdown); autoRefresh.countdown = null; }
+
+    var btn = document.getElementById('auto-refresh-btn');
+    var secs = autoRefresh.intervals[autoRefresh.idx];
+
+    if (!secs) {
+      btn.textContent = '↺ Auto';
+      btn.classList.remove('active');
+      return;
+    }
+
+    btn.classList.add('active');
+    autoRefresh.remaining = secs;
+
+    // Countdown display
+    function updateLabel() {
+      var m = Math.floor(autoRefresh.remaining / 60);
+      var s = autoRefresh.remaining % 60;
+      btn.textContent = m ? `↺ ${m}m${s ? s + 's' : ''}` : `↺ ${autoRefresh.remaining}s`;
+      autoRefresh.remaining--;
+    }
+    updateLabel();
+    autoRefresh.countdown = setInterval(function() {
+      if (autoRefresh.remaining <= 0) { autoRefresh.remaining = secs; loadSubmissions(); }
+      updateLabel();
+    }, 1000);
+  }
+
+  function manualRefresh() {
+    // Reset countdown on manual refresh
+    autoRefresh.remaining = autoRefresh.intervals[autoRefresh.idx];
+    loadSubmissions();
   }
 
   // ── Selection & Loading ──────────────────────────────────────
