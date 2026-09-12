@@ -762,7 +762,56 @@
 
     renderStats();
     renderTable();
+    refreshSidebarCounts(); // keep sidebar badges in sync
   }
+
+  async function refreshSidebarCounts() {
+    if (!activeCohortId || !activeCourse) return;
+
+    function applyCount(el, n) {
+      if (!el) return;
+      el.textContent = n;
+      if (n > 0) el.classList.add('count-active');
+      else       el.classList.remove('count-active');
+    }
+
+    if (activeCourse.slug === 'aijr') {
+      var [hwRes, midRes, finalRes] = await Promise.all([
+        sb.from('homework_submissions').select('id,class_number,cohort,cohort_id,access_code'),
+        sb.from('test_submissions').select('id,cohort,access_code'),
+        sb.from('caio_final_exam_results').select('id,cohort,access_code')
+      ]);
+      var hwCounts = {};
+      (hwRes.data || []).filter(matchesCohort).forEach(r => {
+        var n = Number(r.class_number);
+        if (n) hwCounts[n] = (hwCounts[n] || 0) + 1;
+      });
+      var midCount   = (midRes.data   || []).filter(matchesCohort).length;
+      var finalCount = (finalRes.data || []).filter(matchesCohort).length;
+
+      applyCount(document.querySelector('#item-midterm .count'),    midCount);
+      applyCount(document.querySelector('#item-final_exam .count'), finalCount);
+      AIJR_HOMEWORKS.forEach(hw => {
+        applyCount(document.querySelector(`#item-hw-${hw.classNum} .count`), hwCounts[hw.classNum] || 0);
+      });
+    } else {
+      // IntroAI: re-fetch counts per exercise for this cohort
+      var { data } = await sb
+        .from('exercise_submissions')
+        .select('exercise_id')
+        .eq('cohort_id', activeCohortId);
+      var counts = {};
+      (data || []).forEach(r => { counts[r.exercise_id] = (counts[r.exercise_id] || 0) + 1; });
+
+      document.querySelectorAll('#sidebar-items-list .item-row').forEach(row => {
+        var exId = row.dataset.exId;
+        if (!exId) return;
+        var countEl = row.querySelector('.count');
+        applyCount(countEl, counts[Number(exId)] || 0);
+      });
+    }
+  }
+
 
   // ── Render Stats & Headers ───────────────────────────────────
   function renderStats() {
