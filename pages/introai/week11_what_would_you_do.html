@@ -18,21 +18,6 @@
   <!-- Compiled Activity CSS -->
   <link rel="stylesheet" href="../../assets/css/activity.css">
   <style>
-    #registration-overlay { transition: opacity 0.4s ease; }
-    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
-    #registration-overlay .reg-card {
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
-    }
-    #registration-overlay.hiding .reg-card {
-      transform: scale(0.95) translateY(-10px); opacity: 0;
-    }
-    .reg-input:focus {
-      outline: none; border-color: #c026d3;
-      box-shadow: 0 0 0 3px rgba(192, 38, 211, 0.15);
-    }
-    .reg-input.error {
-      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
-    }
     .form-input:focus {
       outline: none; border-color: #c026d3;
       box-shadow: 0 0 0 3px rgba(192, 38, 211, 0.1);
@@ -81,56 +66,6 @@
 </head>
 
 <body class="bg-[#FDF4FF]/40 text-gray-900 min-h-screen font-sans antialiased pb-20">
-
-  <!-- REGISTRATION GATE -->
-  <div id="registration-overlay"
-    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
-    style="background: linear-gradient(135deg, #4a044e 0%, #a21caf 55%, #4a044e 100%);">
-
-    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
-        style="background: radial-gradient(circle, #f0abfc, transparent);"></div>
-      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
-        style="background: radial-gradient(circle, #c026d3, transparent);"></div>
-    </div>
-
-    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
-      <div class="text-center mb-8">
-        <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center bg-fuchsia-100 text-fuchsia-600 shadow-sm">
-          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-          </svg>
-        </div>
-        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 bg-fuchsia-100 text-fuchsia-800">
-          Week 11 · Ethics Discussion
-        </div>
-        <h1 class="text-2xl font-black text-gray-900 tracking-tight">What Would You Do? 🎭</h1>
-        <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">Enter your details to explore real-world deepfake ethical dilemmas.</p>
-      </div>
-
-      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
-        <div class="space-y-4 mb-6">
-          <div>
-            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Full Name</label>
-            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Alex Morgan"
-              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
-            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name.</p>
-          </div>
-          <div>
-            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
-            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. alex@school.edu"
-              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
-            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
-          </div>
-        </div>
-        <button id="reg-submit-btn" type="submit"
-          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-600 to-purple-700 hover:from-fuchsia-700 hover:to-purple-800">
-          <span id="reg-btn-label">Start Discussion &#8594;</span>
-        </button>
-      </form>
-      <p class="text-center text-[10px] text-gray-400 font-medium mt-5">Saved to Intro to AI course portal.</p>
-    </div>
-  </div>
 
   <!-- MAIN CONTENT -->
   <div id="main-content" class="max-w-3xl mx-auto px-4 md:px-8 py-8 md:py-12">
@@ -182,7 +117,7 @@
     </div>
 
     <!-- MAIN FORM -->
-    <form id="wwyd-form" onsubmit="submitExercise(event)" novalidate>
+    <form id="wwyd-form" onsubmit="handleSubmit(event)" novalidate>
 
       <!-- Scenario 1 -->
       <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
@@ -396,7 +331,7 @@
   <script src="../../assets/js/introai-shared.js"></script>
 
   <script>
-    const TABLE = 'introai_week11_what_would_you_do';
+    const EXERCISE_SLUG = 'week11_what_would_you_do';
 
     let studentName = '', studentEmail = '';
     let enjoymentRating = 0;
@@ -434,45 +369,17 @@
       document.getElementById('rating-error').classList.add('hidden');
     }
 
-    async function handleRegistration(ev) {
-      ev.preventDefault();
-      const nameEl = document.getElementById('reg-name');
-      const emailEl = document.getElementById('reg-email');
-      const nameErr = document.getElementById('reg-name-error');
-      const emailErr = document.getElementById('reg-email-error');
-      let ok = true;
-
-      nameEl.classList.remove('error'); nameErr.classList.add('hidden');
-      emailEl.classList.remove('error'); emailErr.classList.add('hidden');
-
-      if (!nameEl.value.trim()) { nameEl.classList.add('error'); nameErr.classList.remove('hidden'); ok = false; }
-      if (!emailEl.value.trim() || !validateEmail(emailEl.value.trim())) { emailEl.classList.add('error'); emailErr.classList.remove('hidden'); ok = false; }
-      if (!ok) return;
-
-      const btn = document.getElementById('reg-submit-btn');
-      btn.disabled = true;
-      document.getElementById('reg-btn-label').innerHTML = '<span class="spinner"></span> Starting\u2026';
-
-      studentName = nameEl.value.trim();
-      studentEmail = emailEl.value.trim();
-      saveStudentSession(studentName, studentEmail);
-
-      const overlay = document.getElementById('registration-overlay');
-      overlay.classList.add('hiding');
-      setTimeout(() => overlay.remove(), 450);
-    }
-
-    (function restoreSession() {
-      const { name, email } = getStudentSession();
-      if (name && email) {
-        studentName = name;
-        studentEmail = email;
-        const overlay = document.getElementById('registration-overlay');
-        if (overlay) overlay.remove();
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email) {
+        window.location.href = 'index.html';
+        return;
       }
+      studentName = session.name;
+      studentEmail = session.email;
     })();
 
-    async function submitExercise(ev) {
+    async function handleSubmit(ev) {
       ev.preventDefault();
       let ok = true;
 
@@ -518,21 +425,17 @@
       document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting\u2026';
 
       const payload = {
-        student_name: studentName,
-        student_email: studentEmail,
         scenario_1_choice: choices.s1Choice,
         scenario_1_analysis: document.getElementById('s1-analysis').value.trim(),
         scenario_2_choice: choices.s2Choice,
         scenario_2_analysis: document.getElementById('s2-analysis').value.trim(),
         scenario_3_choice: choices.s3Choice,
         scenario_3_analysis: document.getElementById('s3-analysis').value.trim(),
-        personal_rule_reflection: document.getElementById('rule-reflection').value.trim(),
-        enjoyment_rating: enjoymentRating,
-        submitted_at: new Date().toISOString()
+        personal_rule_reflection: document.getElementById('rule-reflection').value.trim()
       };
 
       try {
-        await supabaseUpsert(TABLE, payload, 'student_email');
+        await submitExercise(EXERCISE_SLUG, payload, { enjoymentRating });
         document.getElementById('success-name').textContent = studentName.split(' ')[0];
         document.getElementById('success-screen').classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });

@@ -56,63 +56,6 @@
 <body class="bg-[#F9FAFB] text-gray-900 min-h-screen font-sans antialiased pb-20">
 
   <!-- ══════════════════════════════════════════════════
-       CLASS & NAME IDENTITY GATE
-  ══════════════════════════════════════════════════ -->
-  <div id="identity-overlay"
-    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
-    style="background: linear-gradient(135deg, #1e1b18 0%, #451a03 55%, #1e1b18 100%);">
-
-    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
-        style="background: radial-gradient(circle, #ffedd5, transparent);"></div>
-      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
-        style="background: radial-gradient(circle, #d97706, transparent);"></div>
-    </div>
-
-    <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
-      <div class="text-center mb-8">
-        <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center bg-amber-100 text-amber-700">
-          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-          </svg>
-        </div>
-        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 bg-amber-100 text-amber-800">
-          Week 2 · Activity 2
-        </div>
-        <h1 class="text-2xl font-black text-gray-900 tracking-tight">AI Co-Writer <span class="text-amber-600">Story</span></h1>
-        <p class="text-sm text-gray-500 mt-1.5 leading-relaxed">Enter your details and Class Number to join your class's storybook.</p>
-      </div>
-
-      <form id="identity-form" onsubmit="handleIdentitySubmit(event)" novalidate>
-        <div class="space-y-4 mb-6">
-          <div>
-            <label for="reg-code" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Access Code</label>
-            <input id="reg-code" type="text" placeholder="e.g. CODE-1234"
-              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 placeholder-gray-400 transition-all uppercase" required />
-            <p id="reg-code-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid access code.</p>
-          </div>
-          <div>
-            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Full Name</label>
-            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Jane Smith"
-              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
-            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name.</p>
-          </div>
-          <div>
-            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
-            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. jane@school.edu"
-              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
-            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
-          </div>
-        </div>
-        <button id="reg-submit-btn" type="submit"
-          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-amber-600 to-orange-700 hover:from-amber-700 hover:to-orange-850">
-          <span id="reg-btn-label">Join Storybook →</span>
-        </button>
-      </form>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════════════
        MAIN WEB INTERFACE
   ══════════════════════════════════════════════════ -->
   <div id="main-content" class="max-w-3xl mx-auto px-4 md:px-8 py-8 md:py-12">
@@ -136,7 +79,6 @@
         <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-amber-50 border border-amber-200 text-amber-800 shadow-sm">
           Class: <span id="display-class">...</span>
         </div>
-        <button onclick="changeClass()" class="text-[10px] text-gray-400 hover:text-amber-700 transition-all underline">Change Class</button>
       </div>
     </header>
 
@@ -227,7 +169,8 @@
 
   <script src="../../assets/js/introai-shared.js"></script>
   <script>
-    /* ══ SUPABASE CONFIG ══ */
+    /* ══ EXERCISE CONFIG ══ */
+    const EXERCISE_SLUG = 'week02_co_writer_story';
     const TABLE = 'introai_week02_co_writer_story';
 
     /* ── State ── */
@@ -273,151 +216,19 @@
       if (!resp.ok) { const t = await resp.text(); throw new Error(`HTTP ${resp.status}: ${t}`); }
     }
 
-    async function validateAccessCode(code) {
-      const resp = await fetch(`${SUPABASE_URL}/rest/v1/access_codes?code=eq.${encodeURIComponent(code)}&select=id,purpose,max_uses,uses_count,is_active,cohort_id,class_id,cohorts(id,name,slug),classes(id,label,sequence_order)`, {
-        method: 'GET',
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`
-        }
-      });
-      if (!resp.ok) { const t = await resp.text(); throw new Error(`HTTP ${resp.status}: ${t}`); }
-      const data = await resp.json();
-      return data.length ? data[0] : null;
-    }
-
-    async function incrementCodeUses(id, newUsesCount) {
-      const resp = await fetch(`${SUPABASE_URL}/rest/v1/access_codes?id=eq.${id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`
-        },
-        body: JSON.stringify({ uses_count: newUsesCount })
-      });
-      if (!resp.ok) { const t = await resp.text(); throw new Error(`HTTP ${resp.status}: ${t}`); }
-    }
-
-    /* ══ IDENTITY / CLASS SETUP ══ */
-    async function handleIdentitySubmit(ev) {
-      ev.preventDefault();
-      const nameEl = document.getElementById('reg-name');
-      const emailEl = document.getElementById('reg-email');
-      const codeEl = document.getElementById('reg-code');
-      const codeErrEl = document.getElementById('reg-code-error');
-      let ok = true;
-
-      nameEl.classList.remove('error'); document.getElementById('reg-name-error').classList.add('hidden');
-      emailEl.classList.remove('error'); document.getElementById('reg-email-error').classList.add('hidden');
-      codeEl.classList.remove('error'); codeErrEl.classList.add('hidden');
-
-      const name = nameEl.value.trim();
-      const email = emailEl.value.trim();
-      const codeVal = codeEl.value.trim();
-
-      if (!name) { nameEl.classList.add('error'); document.getElementById('reg-name-error').classList.remove('hidden'); ok = false; }
-      if (!email) { emailEl.classList.add('error'); document.getElementById('reg-email-error').classList.remove('hidden'); ok = false; }
-      if (!codeVal) { codeEl.classList.add('error'); codeErrEl.textContent = 'Please enter an access code.'; codeErrEl.classList.remove('hidden'); ok = false; }
-
-      if (!ok) return;
-
-      const btn = document.getElementById('reg-submit-btn');
-      btn.disabled = true;
-      document.getElementById('reg-btn-label').innerHTML = '<span class="spinner"></span> Validating…';
-
-      try {
-        // Fetch and validate the access code from Supabase
-        const codeRecord = await validateAccessCode(codeVal);
-        
-        if (!codeRecord) {
-          codeEl.classList.add('error');
-          codeErrEl.textContent = 'Invalid access code. Please check with your teacher.';
-          codeErrEl.classList.remove('hidden');
-          btn.disabled = false;
-          document.getElementById('reg-btn-label').textContent = 'Join Storybook →';
-          return;
-        }
-
-        // Validate code belongs to Co-Writer Story class if class-scoped
-        if (codeRecord.class_id && codeRecord.classes && codeRecord.classes.sequence_order !== 2 && codeRecord.classes.sequence_order !== 102) {
-          codeEl.classList.add('error');
-          codeErrEl.textContent = `This code is for ${codeRecord.classes.label || 'another class'}, not for the Co-Writer Story activity.`;
-          codeErrEl.classList.remove('hidden');
-          btn.disabled = false;
-          document.getElementById('reg-btn-label').textContent = 'Join Storybook →';
-          return;
-        }
-
-        if (!codeRecord.is_active) {
-          codeEl.classList.add('error');
-          codeErrEl.textContent = 'This access code is inactive.';
-          codeErrEl.classList.remove('hidden');
-          btn.disabled = false;
-          document.getElementById('reg-btn-label').textContent = 'Join Storybook →';
-          return;
-        }
-
-        if (codeRecord.uses_count >= codeRecord.max_uses) {
-          codeEl.classList.add('error');
-          codeErrEl.textContent = 'This access code has reached its use limit.';
-          codeErrEl.classList.remove('hidden');
-          btn.disabled = false;
-          document.getElementById('reg-btn-label').textContent = 'Join Storybook →';
-          return;
-        }
-
-        // Increment the usage count
-        await incrementCodeUses(codeRecord.id, codeRecord.uses_count + 1);
-
-        // We use the cohort of the access code as the classNumber!
-        const classNum = codeRecord.cohorts?.slug || codeRecord.cohorts?.name || 'introai';
-
-        studentName = name;
-        studentEmail = email;
-        classNumber = classNum;
-
-        sessionStorage.setItem(INTROAI_NAME_KEY, name);
-        sessionStorage.setItem(INTROAI_EMAIL_KEY, email);
-        sessionStorage.setItem('introai_w02_story_class', classNum);
-        sessionStorage.setItem('introai_w02_story_code', codeVal);
-
-        document.getElementById('display-class').textContent = classNum;
-        document.getElementById('identity-overlay').classList.add('hiding');
-        setTimeout(() => {
-          document.getElementById('identity-overlay').remove();
-          loadStory();
-        }, 450);
-
-      } catch (err) {
-        console.error('[Identity Validation] Error:', err.message);
-        codeEl.classList.add('error');
-        codeErrEl.textContent = 'Network error during validation. Please try again.';
-        codeErrEl.classList.remove('hidden');
-        btn.disabled = false;
-        document.getElementById('reg-btn-label').textContent = 'Join Storybook →';
+    /* ══ SESSION ══ */
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.href = 'index.html';
+        return;
       }
-    }
+      studentName = session.name;
+      studentEmail = session.email;
+      classNumber = session.cohortId;
 
-    function changeClass() {
-      sessionStorage.removeItem('introai_w02_story_class');
-      sessionStorage.removeItem('introai_w02_story_code');
-      location.reload();
-    }
-
-    /* ── Restore session ── */
-    (function restoreSession() {
-      const n = sessionStorage.getItem(INTROAI_NAME_KEY);
-      const e = sessionStorage.getItem(INTROAI_EMAIL_KEY);
-      const c = sessionStorage.getItem('introai_w02_story_class');
-      if (n && e && c) {
-        studentName = n;
-        studentEmail = e;
-        classNumber = c;
-        document.getElementById('display-class').textContent = c;
-        document.getElementById('identity-overlay').remove();
-        loadStory();
-      }
+      document.getElementById('display-class').textContent = classNumber;
+      loadStory();
     })();
 
     /* ══ STORY RENDERING ══ */
@@ -502,10 +313,19 @@
 
         await insertParagraph(payload);
 
+        // Record participation as an exercise_submission too, so it shows in the
+        // teacher dashboard and respects cohort_exercise_visibility like other exercises.
+        submitExercise(EXERCISE_SLUG, {
+          class_number: classNumber,
+          prompt_used: promptVal || null,
+          story_text: txtVal,
+          sequence_order: sequenceOrder
+        }).catch(err => console.warn('[Week 2 Co-Writer] exercise_submissions record failed:', err.message));
+
         // Success - clean inputs
         txtEl.value = '';
         document.getElementById('prompt-used').value = '';
-        
+
         // Reload story display
         await loadStory();
         

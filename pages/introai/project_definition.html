@@ -66,8 +66,8 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div>
           <label for="student-name" class="block text-xs font-black text-gray-400 uppercase tracking-wider mb-2">Student Name</label>
-          <input type="text" id="student-name" placeholder="Full name"
-            class="w-full bg-white border border-gray-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition-all duration-200 shadow-sm">
+          <input type="text" id="student-name" placeholder="Full name" readonly
+            class="w-full bg-gray-50 border border-gray-200 px-4 py-3 rounded-xl text-gray-900 text-sm outline-none transition-all duration-200 shadow-sm">
         </div>
         <div>
           <label for="project-title" class="block text-xs font-black text-gray-400 uppercase tracking-wider mb-2">Project Title</label>
@@ -417,10 +417,23 @@
 
   <script src="../../assets/js/introai-shared.js"></script>
   <script>
-    /* ══ SUPABASE CONFIG ══ */
-    const TABLE = 'introai_project_tracker';
+    /* ══ EXERCISE CONFIG ══ */
+    const EXERCISE_SLUG = 'project_definition';
+    const TABLE_TRACKER = 'introai_project_tracker';
 
+    let studentName = '', studentEmail = '';
     let toolsList = [];
+
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName  = session.name;
+      studentEmail = session.email;
+      document.getElementById('student-name').value = studentName;
+    })();
 
     document.getElementById('submission-date').value = new Date().toISOString().split('T')[0];
 
@@ -499,17 +512,20 @@
       const pType = getRadio('project-type');
       const pTypeOther = getVal('project-type-other-text');
 
-      const sEmail = getVal('student-email') || getStudentSession().email || (getVal('student-name').toLowerCase().replace(/\s+/g, '') + '@student.edu');
-
-      const payload = {
-        student_name: getVal('student-name'),
-        student_email: sEmail,
+      const trackerPayload = {
+        student_name: studentName,
+        student_email: studentEmail,
         project_name: getVal('project-title'),
         project_goal: getVal('one-sentence') || getVal('project-title'),
+        updated_at: new Date().toISOString()
+      };
+
+      const exercisePayload = {
+        project_title: getVal('project-title'),
         submission_date: getVal('submission-date') || null,
         project_type: pType === 'Other' ? ('Other: ' + pTypeOther) : pType,
         one_sentence: getVal('one-sentence'),
-        ai_tools: JSON.stringify(toolsList),
+        ai_tools: toolsList,
         audience: getVal('audience'),
         problem_solved: getVal('problem-solved'),
         how_used: getVal('how-used'),
@@ -519,21 +535,19 @@
         feature_3: getVal('feature3'),
         success_looks_like: getVal('success-looks-like'),
         limitations: getVal('limitations'),
-        responsible_checks: JSON.stringify(getCheckboxes('responsible-checks')),
+        responsible_checks: getCheckboxes('responsible-checks'),
         responsible_choice: getVal('responsible-choice'),
         elevator_pitch: getVal('elevator-pitch'),
-        most_excited: getVal('most-excited'),
-        updated_at: new Date().toISOString()
+        most_excited: getVal('most-excited')
       };
 
-      if (!payload.student_name) { setStatus('⚠ Student name required', 'error'); return; }
-      if (!payload.project_name) { setStatus('⚠ Project title required', 'error'); return; }
+      if (!exercisePayload.project_title) { setStatus('⚠ Project title required', 'error'); return; }
 
       setStatus('Saving final project definition...', 'loading');
       document.getElementById('submit-btn').disabled = true;
 
       try {
-        const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?on_conflict=student_email`, {
+        await fetch(`${SUPABASE_URL}/rest/v1/${TABLE_TRACKER}?on_conflict=student_email`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -541,20 +555,14 @@
             'Authorization': `Bearer ${SUPABASE_KEY}`,
             'Prefer': 'resolution=merge-duplicates,return=minimal'
           },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(trackerPayload)
         });
 
-        if (!resp.ok) {
-          throw new Error(`HTTP ${resp.status}`);
-        }
+        await submitExercise(EXERCISE_SLUG, exercisePayload);
 
         setStatus('✓ Final project definition saved successfully!', 'success');
       } catch (e) {
-        if (e.message.includes('409') || e.message.includes('duplicate key')) {
-          setStatus('⚠ You have already submitted your project definition!', 'error');
-        } else {
-          setStatus('✗ ' + e.message, 'error');
-        }
+        setStatus('✗ ' + e.message, 'error');
       } finally {
         document.getElementById('submit-btn').disabled = false;
       }

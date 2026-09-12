@@ -60,8 +60,8 @@
         <div>
           <label for="student-name" class="block text-xs font-black text-gray-400 uppercase tracking-wider mb-2">Student
             Name</label>
-          <input type="text" id="student-name" placeholder="Full name"
-            class="w-full bg-white border border-gray-200 px-4 py-3 rounded-xl text-gray-900 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all duration-200 shadow-sm">
+          <input type="text" id="student-name" placeholder="Full name" readonly
+            class="w-full bg-gray-50 border border-gray-200 px-4 py-3 rounded-xl text-gray-900 text-sm outline-none transition-all duration-200 shadow-sm">
         </div>
         <div>
           <label for="project-title"
@@ -399,11 +399,23 @@
 
   <script src="../../assets/js/introai-shared.js"></script>
   <script>
-    /* ══ SUPABASE CONFIG ══ */
-    const TABLE = 'project_progress_notes';
+    /* ══ EXERCISE CONFIG ══ */
+    const EXERCISE_SLUG = 'week17_progress_notes';
 
+    let studentName = '', studentEmail = '';
     let confidenceRating = null;
     let toolsList = [];
+
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName  = session.name;
+      studentEmail = session.email;
+      document.getElementById('student-name').value = studentName;
+    })();
 
     document.getElementById('session-date').value = new Date().toISOString().split('T')[0];
 
@@ -518,7 +530,6 @@
       const phaseOther = getVal('phase-other-text');
 
       const payload = {
-        student_name: getVal('student-name'),
         project_title: getVal('project-title'),
         session_date: getVal('session-date') || null,
         slide_link: getVal('slide-link') || null,
@@ -536,28 +547,13 @@
         instructor_question: getVal('instructor-question'),
       };
 
-      if (!payload.student_name) { setStatus('⚠ Student name required', 'error'); return; }
       if (!payload.project_title) { setStatus('⚠ Project title required', 'error'); return; }
 
       setStatus('Saving...', 'loading');
       document.getElementById('submit-btn').disabled = true;
 
       try {
-        const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Prefer': 'return=minimal'
-          },
-          body: JSON.stringify(payload)
-        });
-
-        if (!resp.ok) {
-          throw new Error(`HTTP ${resp.status}`);
-        }
-
+        await submitExercise(EXERCISE_SLUG, payload);
         setStatus('✓ Saved successfully', 'success');
       } catch (e) {
         setStatus('✗ ' + e.message, 'error');
