@@ -60,6 +60,7 @@
       border-radius:20px;padding:1px 7px;color:var(--muted);flex-shrink:0;
     }
     .item-row.active .count{background:rgba(240,180,41,.12);border-color:rgba(240,180,41,.3);color:var(--gold);}
+    .count.count-active{color:var(--text);background:rgba(240,180,41,.15);border-color:rgba(240,180,41,.35);font-weight:600;}
 
     /* ── Drag-and-drop reorder ── */
     .drag-handle{
@@ -456,11 +457,11 @@
         <div class="nav-group-heading">Exams</div>
         <div class="item-row" id="item-midterm" onclick="selectItem('aijr_midterm', null, 'Class 10 — Midterm Exam (Classes 1–9)')">
           <span>Class 10 — Midterm Exam</span>
-          <span class="count">${midtermRows.length}</span>
+          <span class="count${midtermRows.length > 0 ? ' count-active' : ''}">${midtermRows.length}</span>
         </div>
         <div class="item-row" id="item-final_exam" onclick="selectItem('aijr_final_exam', null, 'Class 19 — Final Exam (Classes 1–18)')">
           <span>Class 19 — Final Exam</span>
-          <span class="count">${finalRows.length}</span>
+          <span class="count${finalRows.length > 0 ? ' count-active' : ''}">${finalRows.length}</span>
         </div>
       </div>
       <div class="nav-group" style="margin-top:16px;">
@@ -468,7 +469,7 @@
         ${AIJR_HOMEWORKS.map(hw => `
           <div class="item-row" id="item-hw-${hw.classNum}" onclick="selectItem('aijr_homework', ${hw.classNum}, '${hw.label.replace(/'/g,"\'")}')">
             <span>Class ${hw.classNum} Homework</span>
-            <span class="count">${hwCounts[hw.classNum] || 0}</span>
+            <span class="count${(hwCounts[hw.classNum] || 0) > 0 ? ' count-active' : ''}">${hwCounts[hw.classNum] || 0}</span>
           </div>
         `).join('')}
       </div>
@@ -548,8 +549,9 @@
           label.textContent = ex.label.replace(/^Week \d+ — /, '');
 
           var count = document.createElement('span');
-          count.className = 'count';
-          count.textContent = counts[ex.id] || 0;
+          var countVal = counts[ex.id] || 0;
+          count.className = 'count' + (countVal > 0 ? ' count-active' : '');
+          count.textContent = countVal;
 
           row.appendChild(handle);
           row.appendChild(label);

@@ -14,21 +14,6 @@
     rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/activity.css">
   <style>
-    #registration-overlay { transition: opacity 0.4s ease; }
-    #registration-overlay.hiding { opacity: 0; pointer-events: none; }
-    #registration-overlay .reg-card {
-      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
-    }
-    #registration-overlay.hiding .reg-card {
-      transform: scale(0.95) translateY(-10px); opacity: 0;
-    }
-    .reg-input:focus {
-      outline: none; border-color: #c026d3;
-      box-shadow: 0 0 0 3px rgba(192,38,211,0.15);
-    }
-    .reg-input.error {
-      border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
-    }
     .form-input:focus {
       outline: none; border-color: #c026d3;
       box-shadow: 0 0 0 3px rgba(192,38,211,0.1);
@@ -67,82 +52,6 @@
 </head>
 
 <body class="bg-[#FDF4FF] text-gray-900 min-h-screen font-sans antialiased pb-20">
-
-  <!-- REGISTRATION & RETRIEVAL GATE -->
-  <div id="registration-overlay"
-    class="fixed inset-0 z-[100] flex items-center justify-center p-4"
-    style="background: linear-gradient(135deg, #701a75 0%, #c026d3 55%, #86198f 100%);">
-
-    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-      <div class="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full opacity-20"
-        style="background: radial-gradient(circle, #f5d0fe, transparent);"></div>
-      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full opacity-15"
-        style="background: radial-gradient(circle, #e879f9, transparent);"></div>
-    </div>
-
-    <div class="reg-card relative bg-white rounded-3xl shadow-2xl w-full max-w-md px-8 py-10">
-      <div class="text-center mb-6">
-        <div class="w-16 h-16 mx-auto rounded-2xl mb-4 flex items-center justify-center bg-fuchsia-100 text-fuchsia-600">
-          <svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L5.594 15.12a2 2 0 00-1.15.124l-1.043.417A2 2 0 002 17.52V19a2 2 0 002 2h16a2 2 0 002-2v-1.48a2 2 0 00-1.572-1.956z" />
-          </svg>
-        </div>
-        <div class="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-2 bg-fuchsia-100 text-fuchsia-800">
-          Week 9 · Final Project POC
-        </div>
-        <h1 class="text-2xl font-black text-gray-900 tracking-tight">POC <span class="text-fuchsia-600">Brainstormer 💡</span></h1>
-        <p class="text-xs text-gray-500 mt-1 leading-relaxed">Map your AI interests &amp; design your project Proof of Concept.</p>
-      </div>
-
-      <!-- Mode Toggle: New Session vs Retrieve Existing -->
-      <div class="flex rounded-xl bg-gray-100 p-1 mb-6 text-xs font-bold">
-        <button id="toggle-new-btn" type="button" onclick="setRegMode('new')"
-          class="flex-1 py-2 rounded-lg text-center bg-white text-fuchsia-700 shadow-sm transition-all">
-          ✨ New POC Session
-        </button>
-        <button id="toggle-retrieve-btn" type="button" onclick="setRegMode('retrieve')"
-          class="flex-1 py-2 rounded-lg text-center text-gray-500 hover:text-gray-900 transition-all">
-          🔍 Retrieve Saved POC
-        </button>
-      </div>
-
-      <!-- Form for NEW registration -->
-      <form id="reg-form" onsubmit="handleRegistration(event)" novalidate>
-        <div class="space-y-4 mb-6">
-          <div>
-            <label for="reg-name" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Your Full Name</label>
-            <input id="reg-name" type="text" autocomplete="name" placeholder="e.g. Taylor Swift"
-              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
-            <p id="reg-name-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your full name.</p>
-          </div>
-          <div>
-            <label for="reg-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Email Address</label>
-            <input id="reg-email" type="email" autocomplete="email" placeholder="e.g. taylor@school.edu"
-              class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
-            <p id="reg-email-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter a valid email.</p>
-          </div>
-        </div>
-        <button id="reg-submit-btn" type="submit"
-          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-600 to-fuchsia-700 hover:from-fuchsia-700 hover:to-fuchsia-800">
-          <span id="reg-btn-label">Start Brainstorming &#8594;</span>
-        </button>
-      </form>
-
-      <!-- Form for RETRIEVING existing session -->
-      <form id="retrieve-form" onsubmit="handleRetrieval(event)" class="hidden" novalidate>
-        <div class="mb-6">
-          <label for="retrieve-email" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-1.5">Your Registered Email</label>
-          <input id="retrieve-email" type="email" placeholder="e.g. taylor@school.edu"
-            class="reg-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all" required />
-          <p id="retrieve-error" class="hidden text-xs text-red-500 font-medium mt-2.5">No saved POC found for this email. Try starting a new session!</p>
-        </div>
-        <button id="retrieve-submit-btn" type="submit"
-          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-fuchsia-700 hover:from-purple-700 hover:to-fuchsia-800">
-          <span id="retrieve-btn-label">Find &amp; Load My Saved POC 🔍</span>
-        </button>
-      </form>
-    </div>
-  </div>
 
   <!-- MAIN CONTENT -->
   <div id="main-content" class="max-w-3xl mx-auto px-4 md:px-8 py-8 md:py-12">
@@ -183,16 +92,13 @@
         <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2.5 text-center">⚖️ AI Ethics &amp; Bias</div>
         <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2.5 text-center">🎮 Game AI &amp; NPCs</div>
       </div>
-      <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10 text-xs leading-relaxed flex items-center justify-between">
-        <span><strong>Saved Progress:</strong> Your responses sync to the cloud so you can load them anytime by entering your email!</span>
-        <button type="button" onclick="openRetrieveModal()" class="ml-3 px-3 py-1 bg-white text-fuchsia-800 rounded-lg font-black hover:bg-fuchsia-100 transition-all flex-shrink-0 text-[11px]">
-          Load Saved 🔍
-        </button>
+      <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10 text-xs leading-relaxed">
+        <strong>Saved Progress:</strong> Your responses sync to the cloud automatically — come back anytime and your latest answers will be here.
       </div>
     </div>
 
     <!-- FORM -->
-    <form id="poc-form" onsubmit="submitExercise(event)" novalidate>
+    <form id="poc-form" onsubmit="handleSubmit(event)" novalidate>
 
       <!-- Step 1: Modality & Topic Interest Radar -->
       <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
@@ -488,7 +394,7 @@
 
   <script src="../../assets/js/introai-shared.js"></script>
   <script>
-    const TABLE = 'introai_week09_poc_brainstormer';
+    const EXERCISE_SLUG = 'week09_poc_brainstormer';
 
     let studentName = '', studentEmail = '';
     let enjoymentRating = 0;
@@ -496,18 +402,39 @@
     const modalityRatings = { llm: 0, image: 0, music: 0, vision: 0, ethics: 0, gameai: 0 };
     const choices = { targetDomain: '' };
 
-    function setRegMode(mode) {
-      const isNew = mode === 'new';
-      document.getElementById('reg-form').classList.toggle('hidden', !isNew);
-      document.getElementById('retrieve-form').classList.toggle('hidden', isNew);
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName  = session.name;
+      studentEmail = session.email;
+      prefillFromExistingSubmission();
+    })();
 
-      document.getElementById('toggle-new-btn').className = isNew
-        ? 'flex-1 py-2 rounded-lg text-center bg-white text-fuchsia-700 shadow-sm transition-all'
-        : 'flex-1 py-2 rounded-lg text-center text-gray-500 hover:text-gray-900 transition-all';
+    async function prefillFromExistingSubmission() {
+      const existing = await getMySubmission(EXERCISE_SLUG);
+      if (!existing || !existing.payload) return;
+      const data = existing.payload;
+      if (data.poc_title) document.getElementById('poc-title').value = data.poc_title;
+      if (data.poc_description) document.getElementById('poc-description').value = data.poc_description;
+      if (data.mvp_scope) document.getElementById('mvp-scope').value = data.mvp_scope;
+      if (data.primary_modality) document.getElementById('primary-modality').value = data.primary_modality;
+      if (data.secondary_modality) document.getElementById('secondary-modality').value = data.secondary_modality;
 
-      document.getElementById('toggle-retrieve-btn').className = !isNew
-        ? 'flex-1 py-2 rounded-lg text-center bg-white text-fuchsia-700 shadow-sm transition-all'
-        : 'flex-1 py-2 rounded-lg text-center text-gray-500 hover:text-gray-900 transition-all';
+      if (data.target_domain) {
+        choices.targetDomain = data.target_domain;
+        document.querySelectorAll('#target-domain-picker .opt-btn').forEach(b => {
+          if (b.textContent.includes(data.target_domain.split(' ')[0])) b.classList.add('selected');
+        });
+      }
+
+      if (data.modality_ratings) {
+        Object.keys(data.modality_ratings).forEach(k => setModalityRating(k, data.modality_ratings[k]));
+      }
+
+      if (existing.enjoyment_rating) setRating(existing.enjoyment_rating);
     }
 
     function setModalityRating(key, val) {
@@ -526,110 +453,6 @@
     }
 
 
-    function handleRegistration(ev) {
-      ev.preventDefault();
-      const nameEl = document.getElementById('reg-name');
-      const emailEl = document.getElementById('reg-email');
-      let ok = true;
-
-      nameEl.classList.remove('error');
-      emailEl.classList.remove('error');
-      document.getElementById('reg-name-error').classList.add('hidden');
-      document.getElementById('reg-email-error').classList.add('hidden');
-
-      if (!nameEl.value.trim()) { nameEl.classList.add('error'); document.getElementById('reg-name-error').classList.remove('hidden'); ok = false; }
-      if (!emailEl.value.trim() || !validateEmail(emailEl.value.trim())) { emailEl.classList.add('error'); document.getElementById('reg-email-error').classList.remove('hidden'); ok = false; }
-      if (!ok) return;
-
-      studentName = nameEl.value.trim();
-      studentEmail = emailEl.value.trim();
-
-      sessionStorage.setItem(INTROAI_NAME_KEY, studentName);
-      sessionStorage.setItem(INTROAI_EMAIL_KEY, studentEmail);
-
-      const overlay = document.getElementById('registration-overlay');
-      overlay.classList.add('hiding');
-      setTimeout(() => overlay.remove(), 400);
-    }
-
-    async function handleRetrieval(ev) {
-      ev.preventDefault();
-      const emailEl = document.getElementById('retrieve-email');
-      const emailVal = emailEl.value.trim();
-      const errEl = document.getElementById('retrieve-error');
-      errEl.classList.add('hidden');
-
-      if (!emailVal || !validateEmail(emailVal)) {
-        emailEl.classList.add('error'); return;
-      }
-
-      const btn = document.getElementById('retrieve-submit-btn');
-      btn.disabled = true;
-      document.getElementById('retrieve-btn-label').innerHTML = '<span class="spinner"></span> Searching…';
-
-      try {
-        const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?student_email=eq.${encodeURIComponent(emailVal)}`, {
-          headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-        });
-        const records = await resp.json();
-        if (!resp.ok || !records || !records.length) {
-          errEl.classList.remove('hidden');
-          btn.disabled = false;
-          document.getElementById('retrieve-btn-label').textContent = 'Find & Load My Saved POC 🔍';
-          return;
-        }
-
-        const data = records[0];
-        studentName = data.student_name;
-        studentEmail = data.student_email;
-
-        // Populate fields
-        if (data.poc_title) document.getElementById('poc-title').value = data.poc_title;
-        if (data.poc_description) document.getElementById('poc-description').value = data.poc_description;
-        if (data.mvp_scope) document.getElementById('mvp-scope').value = data.mvp_scope;
-        if (data.primary_modality) document.getElementById('primary-modality').value = data.primary_modality;
-        if (data.secondary_modality) document.getElementById('secondary-modality').value = data.secondary_modality;
-
-        if (data.target_domain) {
-          choices.targetDomain = data.target_domain;
-          document.querySelectorAll('#target-domain-picker .opt-btn').forEach(b => {
-            if (b.textContent.includes(data.target_domain.split(' ')[0])) b.classList.add('selected');
-          });
-        }
-
-        if (data.modality_ratings) {
-          try {
-            const parsed = typeof data.modality_ratings === 'string' ? JSON.parse(data.modality_ratings) : data.modality_ratings;
-            Object.keys(parsed).forEach(k => setModalityRating(k, parsed[k]));
-          } catch(e){}
-        }
-
-        if (data.enjoyment_rating) setRating(data.enjoyment_rating);
-
-        sessionStorage.setItem(INTROAI_NAME_KEY, studentName);
-        sessionStorage.setItem(INTROAI_EMAIL_KEY, studentEmail);
-
-        const overlay = document.getElementById('registration-overlay');
-        overlay.classList.add('hiding');
-        setTimeout(() => overlay.remove(), 400);
-      } catch(err) {
-        console.error('Retrieval error:', err);
-        errEl.classList.remove('hidden');
-        btn.disabled = false;
-        document.getElementById('retrieve-btn-label').textContent = 'Find & Load My Saved POC 🔍';
-      }
-    }
-
-    function openRetrieveModal() {
-      setRegMode('retrieve');
-      document.body.appendChild(document.getElementById('registration-overlay'));
-    }
-
-    (function restoreSession() {
-      const n = sessionStorage.getItem(INTROAI_NAME_KEY);
-      const e = sessionStorage.getItem(INTROAI_EMAIL_KEY);
-      if (n && e) { studentName = n; studentEmail = e; document.getElementById('registration-overlay').remove(); }
-    })();
 
     function setRating(val) {
       enjoymentRating = val;
@@ -639,21 +462,7 @@
       document.getElementById('rating-error').classList.add('hidden');
     }
 
-    async function supabaseUpsert(payload) {
-      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?on_conflict=student_email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`,
-          'Prefer': 'resolution=merge-duplicates,return=minimal'
-        },
-        body: JSON.stringify(payload)
-      });
-      if (!resp.ok) { const t = await resp.text(); throw new Error('HTTP ' + resp.status + ': ' + t); }
-    }
-
-    async function submitExercise(ev) {
+    async function handleSubmit(ev) {
       ev.preventDefault();
       let ok = true;
 
@@ -702,21 +511,17 @@
       document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Saving POC…';
 
       const payload = {
-        student_name: studentName,
-        student_email: studentEmail,
-        modality_ratings: JSON.stringify(modalityRatings),
+        modality_ratings: modalityRatings,
         primary_modality: primaryVal,
         secondary_modality: document.getElementById('secondary-modality').value,
         target_domain: choices.targetDomain,
         poc_title: document.getElementById('poc-title').value.trim(),
         poc_description: document.getElementById('poc-description').value.trim(),
-        mvp_scope: document.getElementById('mvp-scope').value.trim(),
-        enjoyment_rating: enjoymentRating,
-        submitted_at: new Date().toISOString()
+        mvp_scope: document.getElementById('mvp-scope').value.trim()
       };
 
       try {
-        await supabaseUpsert(payload);
+        await submitExercise(EXERCISE_SLUG, payload, { enjoymentRating: enjoymentRating || undefined });
 
         // Update card
         document.getElementById('success-name').textContent = studentName.split(' ')[0];
