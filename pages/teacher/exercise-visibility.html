@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exercise Visibility — Instructor Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../assets/js/teacher-shared.js"></script>
+  <style>
+    :root {
+      --navy:#0d1117;--surface:#161b22;--surface2:#1c2230;--surface3:#21262d;
+      --border:#30363d;--gold:#f0b429;--text:#e6edf3;--muted:#7d8590;
+      --green:#3fb950;--red:#f85149;--blue:#58a6ff;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);min-height:100vh;}
+    .site-header{border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;}
+    .back-link{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--gold);text-decoration:none;}
+    .back-link:hover{text-decoration:underline;}
+    .auth-badge{display:flex;align-items:center;gap:8px;font-size:.75rem;font-family:'DM Mono',monospace;color:var(--muted);}
+    .dot{width:7px;height:7px;border-radius:50%;background:var(--green);}
+    .logout-btn{background:none;border:1px solid var(--border);color:var(--red);font-size:.72rem;font-family:'DM Mono',monospace;padding:3px 9px;border-radius:5px;cursor:pointer;}
+    #login-gate{min-height:100vh;display:flex;align-items:center;justify-content:center;}
+    .login-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px 36px;width:400px;}
+    .login-card h2{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:20px;}
+    .field input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:.875rem;font-family:'DM Mono',monospace;outline:none;margin-bottom:10px;transition:border-color .15s;}
+    .field input:focus{border-color:var(--gold);}
+    .btn-gold{width:100%;background:var(--gold);color:#1a1200;font-weight:700;font-size:.9rem;padding:11px;border:none;border-radius:10px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+    .btn-gold:hover{opacity:.88;}
+    #login-error{color:var(--red);font-size:.78rem;margin-top:8px;}
+    #app{display:none;}
+    .page-wrap{max-width:1100px;margin:0 auto;padding:40px 32px;}
+    .page-label{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;}
+    .page-title{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;}
+    .page-title span{color:var(--gold);}
+    .page-subtitle{color:var(--muted);font-size:.875rem;margin-top:6px;margin-bottom:28px;}
+    .btn-sm{padding:6px 12px;border-radius:7px;font-size:.76rem;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:opacity .15s;}
+    .btn-primary{background:var(--gold);color:#1a1200;}
+    .btn-danger{background:rgba(248,81,73,.12);color:var(--red);border:1px solid rgba(248,81,73,.25);}
+    .btn-sm:hover{opacity:.82;}
+    .filter-bar{display:flex;gap:10px;margin-bottom:24px;align-items:center;flex-wrap:wrap;}
+    .filter-bar select{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:.83rem;font-family:'DM Mono',monospace;outline:none;min-width:260px;}
+    .filter-bar select:focus{border-color:var(--gold);}
+    .refresh-btn{background:none;border:1px solid var(--border);color:var(--text);padding:6px 12px;border-radius:7px;font-size:.78rem;cursor:pointer;font-family:'DM Mono',monospace;}
+    .refresh-btn:hover{border-color:var(--gold);}
+    .empty-state{padding:40px;text-align:center;color:var(--muted);font-size:.85rem;}
+    /* Week groups */
+    .week-group{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:14px;}
+    .week-group-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px;}
+    .week-group-title{font-family:'DM Mono',monospace;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);}
+    .week-group-count{font-size:.76rem;color:var(--muted);margin-left:10px;}
+    .week-actions{display:flex;gap:6px;}
+    .exercise-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;}
+    .exercise-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px;transition:border-color .15s,opacity .15s;}
+    .exercise-card.inactive{opacity:.55;border-color:rgba(248,81,73,.25);}
+    .exercise-card-title{font-size:.82rem;font-weight:600;}
+    .exercise-card-slug{font-family:'DM Mono',monospace;font-size:.66rem;color:var(--muted);margin-top:2px;}
+    /* Toggle switch */
+    .toggle-switch{position:relative;display:inline-block;width:38px;height:22px;flex-shrink:0;}
+    .toggle-switch input{opacity:0;width:0;height:0;position:absolute;}
+    .toggle-slider{position:absolute;inset:0;background:var(--surface3);border:1px solid var(--border);border-radius:22px;cursor:pointer;transition:.15s;}
+    .toggle-slider::before{content:'';position:absolute;width:16px;height:16px;left:2px;top:2px;background:var(--muted);border-radius:50%;transition:.15s;}
+    .toggle-switch input:checked + .toggle-slider{background:rgba(63,185,80,.18);border-color:var(--green);}
+    .toggle-switch input:checked + .toggle-slider::before{transform:translateX(16px);background:var(--green);}
+  </style>
+</head>
+<body>
+
+<!-- ── LOGIN ──────────────────────────────────────────────── -->
+<div id="login-gate">
+  <div class="login-card">
+    <h2>🔑 Teacher Sign-In</h2>
+    <div class="field"><input type="email"    id="l-email"    placeholder="teacher@school.ca" /></div>
+    <div class="field"><input type="password" id="l-password" placeholder="Password" /></div>
+    <button class="btn-gold" onclick="doLogin()">Sign In</button>
+    <div id="login-error"></div>
+  </div>
+</div>
+
+<!-- ── APP ───────────────────────────────────────────────── -->
+<div id="app">
+  <header class="site-header">
+    <a href="index.html" class="back-link">← Instructor Hub</a>
+    <div class="auth-badge">
+      <div class="dot"></div>
+      <span id="auth-label">signed in</span>
+      <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+    </div>
+  </header>
+
+  <div class="page-wrap">
+    <p class="page-label">Administration</p>
+    <h1 class="page-title">Exercise <span>Visibility</span></h1>
+    <p class="page-subtitle">Hide or show exercises per cohort. Hidden exercises disappear from the student dashboard immediately — no submissions are deleted.</p>
+
+    <div class="filter-bar">
+      <select id="ev-cohort">
+        <option value="">Loading cohorts…</option>
+      </select>
+      <button class="refresh-btn" onclick="loadExercises()">↻ Refresh</button>
+      <button class="btn-sm btn-primary" onclick="bulkSetAll(true)">Enable All</button>
+      <button class="btn-sm btn-danger" onclick="bulkSetAll(false)">Disable All</button>
+    </div>
+
+    <div id="exercise-list">
+      <div class="empty-state">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var sb = createTeacherClient();
+  var currentUser = null;
+  var allCohorts   = [];
+  var exerciseDefs = [];   // exercise_definitions for the selected cohort's course
+  var visibilityMap = {};  // exercise_id -> is_active
+
+  // ── Auth ─────────────────────────────────────────────────────
+  async function init() {
+    var session = await getTeacherSession();
+    if (session) { currentUser = session.user; setAuthed(); }
+  }
+  function setAuthed() {
+    document.getElementById('login-gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('auth-label').textContent = currentUser.email;
+    loadCohortDropdown();
+  }
+  async function doLogin() {
+    var { user, error } = await TeacherAuth.login(
+      document.getElementById('l-email').value.trim(),
+      document.getElementById('l-password').value
+    );
+    if (error) { document.getElementById('login-error').textContent = error; return; }
+    currentUser = user; setAuthed();
+  }
+  async function doLogout() { await TeacherAuth.logout(); location.reload(); }
+  ['l-email','l-password'].forEach(id =>
+    document.getElementById(id).addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); })
+  );
+
+  // ── Cohort dropdown ───────────────────────────────────────────
+  async function loadCohortDropdown() {
+    var { data } = await sb
+      .from('cohorts')
+      .select('id,name,term,course_id,courses(name)')
+      .eq('is_active', true)
+      .order('term', { ascending: false });
+
+    allCohorts = data || [];
+    var sel = document.getElementById('ev-cohort');
+
+    if (!allCohorts.length) {
+      sel.innerHTML = '<option value="">No cohorts found</option>';
+      document.getElementById('exercise-list').innerHTML =
+        '<div class="empty-state">No cohorts found. Create one in Cohorts &amp; Classes first.</div>';
+      return;
+    }
+
+    sel.innerHTML = allCohorts.map(c =>
+      `<option value="${c.id}">${esc(c.courses?.name || '')} — ${esc(c.name)}</option>`
+    ).join('');
+    sel.addEventListener('change', loadExercises);
+
+    await loadExercises();
+  }
+
+  function currentCohort() {
+    var id = document.getElementById('ev-cohort').value;
+    return allCohorts.find(c => String(c.id) === String(id));
+  }
+
+  // ── Load exercises + visibility for selected cohort ───────────
+  async function loadExercises() {
+    var cohort = currentCohort();
+    var listEl = document.getElementById('exercise-list');
+    if (!cohort) { listEl.innerHTML = '<div class="empty-state">Select a cohort.</div>'; return; }
+    listEl.innerHTML = '<div class="empty-state">Loading…</div>';
+
+    var [defsRes, visRes] = await Promise.all([
+      sb.from('exercise_definitions')
+        .select('id,exercise_slug,label,week_number,sequence_order')
+        .eq('course_id', cohort.course_id)
+        .eq('is_active', true)
+        .order('week_number', { ascending: true })
+        .order('sequence_order', { ascending: true }),
+      sb.from('cohort_exercise_visibility')
+        .select('exercise_id,is_active')
+        .eq('cohort_id', cohort.id)
+    ]);
+
+    exerciseDefs = defsRes.data || [];
+    visibilityMap = {};
+    (visRes.data || []).forEach(v => { visibilityMap[v.exercise_id] = v.is_active; });
+
+    renderExercises();
+  }
+
+  function isExerciseActive(exerciseId) {
+    return visibilityMap[exerciseId] !== false; // no row = visible by default
+  }
+
+  function renderExercises() {
+    var listEl = document.getElementById('exercise-list');
+    if (!exerciseDefs.length) {
+      listEl.innerHTML = '<div class="empty-state">No exercises found for this course.</div>';
+      return;
+    }
+
+    var byWeek = {};
+    exerciseDefs.forEach(ex => {
+      var w = ex.week_number || 0;
+      (byWeek[w] = byWeek[w] || []).push(ex);
+    });
+
+    listEl.innerHTML = Object.keys(byWeek).sort((a, b) => +a - +b).map(w => {
+      var items = byWeek[w];
+      var activeCount = items.filter(ex => isExerciseActive(ex.id)).length;
+
+      return `
+        <div class="week-group">
+          <div class="week-group-header">
+            <div>
+              <span class="week-group-title">Week ${esc(w)}</span>
+              <span class="week-group-count">${activeCount} / ${items.length} visible</span>
+            </div>
+            <div class="week-actions">
+              <button class="btn-sm btn-primary" onclick="bulkSetWeek(${w}, true)">Enable Week</button>
+              <button class="btn-sm btn-danger" onclick="bulkSetWeek(${w}, false)">Disable Week</button>
+            </div>
+          </div>
+          <div class="exercise-grid">
+            ${items.map(ex => {
+              var active = isExerciseActive(ex.id);
+              return `
+                <div class="exercise-card ${active ? '' : 'inactive'}">
+                  <div>
+                    <div class="exercise-card-title">${esc(ex.label)}</div>
+                    <div class="exercise-card-slug">${esc(ex.exercise_slug)}</div>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" ${active ? 'checked' : ''} onchange="toggleExercise(${ex.id}, this.checked)">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>`;
+            }).join('')}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function esc(s) {
+    var d = document.createElement('div');
+    d.textContent = (s === undefined || s === null) ? '' : String(s);
+    return d.innerHTML;
+  }
+
+  // ── Toggle handlers ────────────────────────────────────────────
+  async function toggleExercise(exerciseId, isActive) {
+    var cohort = currentCohort();
+    if (!cohort) return;
+
+    visibilityMap[exerciseId] = isActive;
+    renderExercises();
+
+    var { error } = await sb.from('cohort_exercise_visibility').upsert({
+      cohort_id: cohort.id, exercise_id: exerciseId,
+      is_active: isActive, updated_at: new Date().toISOString()
+    }, { onConflict: 'cohort_id,exercise_id' });
+
+    if (error) console.error('[exercise-visibility] Error saving toggle:', error);
+  }
+
+  async function bulkSetWeek(weekNum, isActive) {
+    var cohort = currentCohort();
+    if (!cohort) return;
+
+    var items = exerciseDefs.filter(ex => (ex.week_number || 0) === weekNum);
+    var rows = items.map(ex => {
+      visibilityMap[ex.id] = isActive;
+      return { cohort_id: cohort.id, exercise_id: ex.id, is_active: isActive, updated_at: new Date().toISOString() };
+    });
+    renderExercises();
+
+    var { error } = await sb.from('cohort_exercise_visibility').upsert(rows, { onConflict: 'cohort_id,exercise_id' });
+    if (error) console.error('[exercise-visibility] Error saving week toggle:', error);
+  }
+
+  async function bulkSetAll(isActive) {
+    var cohort = currentCohort();
+    if (!cohort || !exerciseDefs.length) return;
+
+    var rows = exerciseDefs.map(ex => {
+      visibilityMap[ex.id] = isActive;
+      return { cohort_id: cohort.id, exercise_id: ex.id, is_active: isActive, updated_at: new Date().toISOString() };
+    });
+    renderExercises();
+
+    var { error } = await sb.from('cohort_exercise_visibility').upsert(rows, { onConflict: 'cohort_id,exercise_id' });
+    if (error) console.error('[exercise-visibility] Error saving bulk toggle:', error);
+  }
+
+  init();
+</script>
+</body>
+</html>

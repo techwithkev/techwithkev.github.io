@@ -610,7 +610,6 @@
     var LS_COHORT_ID   = 'introai_cohort_id';
     var LS_COHORT_NAME = 'introai_cohort_name';
     var LS_COURSE_SLUG = 'introai_course_slug';
-    var LS_COHORT_SLUG = 'introai_student_cohort'; // legacy key used by filter table
 
     /* ── Session helpers ── */
     function getLocalSession() {
@@ -620,8 +619,7 @@
         code:       localStorage.getItem(LS_CODE)        || '',
         cohortId:   localStorage.getItem(LS_COHORT_ID)   || '',
         cohortName: localStorage.getItem(LS_COHORT_NAME) || '',
-        courseSlug: localStorage.getItem(LS_COURSE_SLUG) || 'introai',
-        cohortSlug: localStorage.getItem(LS_COHORT_SLUG) || ''
+        courseSlug: localStorage.getItem(LS_COURSE_SLUG) || 'introai'
       };
     }
 
@@ -632,7 +630,6 @@
       localStorage.setItem(LS_COHORT_ID,   String(cohortId));
       localStorage.setItem(LS_COHORT_NAME, cohortName || '');
       localStorage.setItem(LS_COURSE_SLUG, courseSlug || 'introai');
-      localStorage.setItem(LS_COHORT_SLUG, (cohortName || '').toLowerCase().replace(/\s+/g, '_'));
     }
 
     /* Copies localStorage → sessionStorage so child exercise pages see the session */
@@ -743,23 +740,27 @@
       var inactiveSet = new Set();
       var gotFilterData = false;
 
-      var cohortSlug = session.cohortSlug ||
-        (session.cohortName || '').toLowerCase().replace(/\s+/g, '_') || 'default';
-
-      try {
-        var resp = await fetch(
-          SUPABASE_URL + '/rest/v1/introai_cohort_exercises?cohort=eq.' + encodeURIComponent(cohortSlug),
-          { headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY } }
-        );
-        if (resp.ok) {
-          var data = await resp.json();
-          if (data && data.length > 0) {
-            gotFilterData = true;
-            data.forEach(function(r) { if (r.is_active === false) inactiveSet.add(r.exercise_id); });
+      if (session.cohortId) {
+        try {
+          var resp = await fetch(
+            SUPABASE_URL + '/rest/v1/cohort_exercise_visibility?cohort_id=eq.' + encodeURIComponent(session.cohortId) +
+              '&select=is_active,exercise_definitions(exercise_slug)',
+            { headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY } }
+          );
+          if (resp.ok) {
+            var data = await resp.json();
+            if (data && data.length > 0) {
+              gotFilterData = true;
+              data.forEach(function(r) {
+                if (r.is_active === false && r.exercise_definitions) {
+                  inactiveSet.add(r.exercise_definitions.exercise_slug);
+                }
+              });
+            }
           }
+        } catch (e) {
+          console.warn('[IntroAI] Cohort filter fetch failed:', e);
         }
-      } catch (e) {
-        console.warn('[IntroAI] Cohort filter fetch failed:', e);
       }
 
       var latestActiveWeek = 0;
@@ -807,7 +808,7 @@
     /* ── Sign Out ── */
     function handleSignOut() {
       if (!confirm('Sign out? You\'ll need to enter your access code again next time.')) return;
-      [LS_NAME, LS_EMAIL, LS_CODE, LS_COHORT_ID, LS_COHORT_NAME, LS_COURSE_SLUG, LS_COHORT_SLUG].forEach(function(k) {
+      [LS_NAME, LS_EMAIL, LS_CODE, LS_COHORT_ID, LS_COHORT_NAME, LS_COURSE_SLUG].forEach(function(k) {
         localStorage.removeItem(k);
         sessionStorage.removeItem(k);
       });
