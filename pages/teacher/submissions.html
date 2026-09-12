@@ -61,6 +61,21 @@
     }
     .item-row.active .count{background:rgba(240,180,41,.12);border-color:rgba(240,180,41,.3);color:var(--gold);}
 
+    /* ── Drag-and-drop reorder ── */
+    .drag-handle{
+      cursor:grab;color:var(--border);font-size:.9rem;line-height:1;
+      opacity:0;transition:opacity .12s;flex-shrink:0;user-select:none;
+      padding:0 2px;
+    }
+    .item-row:hover .drag-handle{opacity:1;}
+    .item-row.dragging{opacity:.35;background:var(--surface3);}
+    .item-row.drag-over{border-top:2px solid var(--gold);}
+    .reorder-saving{
+      font-family:'DM Mono',monospace;font-size:.65rem;color:var(--muted);
+      padding:4px 20px 8px;display:none;
+    }
+    .reorder-saving.visible{display:block;}
+
     /* ── Main panel ── */
     .main-panel{padding:32px;overflow-x:auto;}
     .panel-header-row{
@@ -451,7 +466,7 @@
       <div class="nav-group" style="margin-top:16px;">
         <div class="nav-group-heading">Homework (Classes 1–19)</div>
         ${AIJR_HOMEWORKS.map(hw => `
-          <div class="item-row" id="item-hw-${hw.classNum}" onclick="selectItem('aijr_homework', ${hw.classNum}, '${hw.label.replace(/'/g,"\\'")}')">
+          <div class="item-row" id="item-hw-${hw.classNum}" onclick="selectItem('aijr_homework', ${hw.classNum}, '${hw.label.replace(/'/g,"\'")}')">
             <span>Class ${hw.classNum} Homework</span>
             <span class="count">${hwCounts[hw.classNum] || 0}</span>
           </div>
@@ -494,19 +509,137 @@
       byWeek[wk].push(ex);
     });
 
-    list.innerHTML = Object.entries(byWeek)
+    var savingEl = document.createElement('div');
+    savingEl.className = 'reorder-saving';
+    savingEl.id = 'reorder-saving';
+    savingEl.textContent = '⏳ Saving order…';
+
+    list.innerHTML = '';
+    list.appendChild(savingEl);
+
+    Object.entries(byWeek)
       .sort(([a],[b]) => Number(a) - Number(b))
-      .map(([wk, exs]) => `
-        <div class="nav-group">
-          <div class="nav-group-heading">Week ${wk}</div>
-          ${exs.map(ex => `
-            <div class="item-row" id="item-ex-${ex.id}" onclick="selectItem('introai_exercise', ${ex.id}, '${ex.label.replace(/'/g,"\\'")}', '${ex.exercise_slug}')">
-              <span>${ex.label.replace(/^Week \d+ — /, '')}</span>
-              <span class="count">${counts[ex.id] || 0}</span>
-            </div>
-          `).join('')}
-        </div>
-      `).join('');
+      .forEach(([wk, exs]) => {
+        var group = document.createElement('div');
+        group.className = 'nav-group';
+        group.dataset.week = wk;
+
+        var heading = document.createElement('div');
+        heading.className = 'nav-group-heading';
+        heading.textContent = 'Week ' + wk;
+        group.appendChild(heading);
+
+        exs.forEach(ex => {
+          var row = document.createElement('div');
+          row.className = 'item-row';
+          row.id = 'item-ex-' + ex.id;
+          row.dataset.exId = ex.id;
+          row.dataset.exSlug = ex.exercise_slug;
+          row.dataset.exLabel = ex.label;
+          row.dataset.weekNum = wk;
+          row.draggable = true;
+
+          var handle = document.createElement('span');
+          handle.className = 'drag-handle';
+          handle.textContent = '⠿';
+          handle.title = 'Drag to reorder';
+
+          var label = document.createElement('span');
+          label.textContent = ex.label.replace(/^Week \d+ — /, '');
+
+          var count = document.createElement('span');
+          count.className = 'count';
+          count.textContent = counts[ex.id] || 0;
+
+          row.appendChild(handle);
+          row.appendChild(label);
+          row.appendChild(count);
+
+          // Click to select (avoid triggering on drag)
+          row.addEventListener('click', function(e) {
+            if (row.dataset.dragged === '1') { row.dataset.dragged = '0'; return; }
+            selectItem('introai_exercise', Number(ex.id), ex.label, ex.exercise_slug);
+          });
+
+          attachDragEvents(row);
+          group.appendChild(row);
+        });
+
+        list.appendChild(group);
+      });
+  }
+
+  // ── Drag-and-drop helpers ─────────────────────────────────────
+  var _dragSrc = null;
+
+  function attachDragEvents(row) {
+    row.addEventListener('dragstart', function(e) {
+      _dragSrc = row;
+      row.dataset.dragged = '1';
+      row.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', row.dataset.exId);
+    });
+    row.addEventListener('dragend', function() {
+      row.classList.remove('dragging');
+      document.querySelectorAll('.item-row.drag-over').forEach(el => el.classList.remove('drag-over'));
+      _dragSrc = null;
+    });
+    row.addEventListener('dragover', function(e) {
+      if (!_dragSrc || _dragSrc === row) return;
+      // Only allow reorder within same week group
+      if (_dragSrc.dataset.weekNum !== row.dataset.weekNum) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      document.querySelectorAll('.item-row.drag-over').forEach(el => el.classList.remove('drag-over'));
+      row.classList.add('drag-over');
+    });
+    row.addEventListener('dragleave', function() {
+      row.classList.remove('drag-over');
+    });
+    row.addEventListener('drop', function(e) {
+      e.preventDefault();
+      if (!_dragSrc || _dragSrc === row) return;
+      if (_dragSrc.dataset.weekNum !== row.dataset.weekNum) return;
+      row.classList.remove('drag-over');
+
+      // Reorder DOM
+      var parent = row.parentNode;
+      var allRows = Array.from(parent.querySelectorAll('.item-row'));
+      var srcIdx = allRows.indexOf(_dragSrc);
+      var tgtIdx = allRows.indexOf(row);
+      if (srcIdx < tgtIdx) {
+        parent.insertBefore(_dragSrc, row.nextSibling);
+      } else {
+        parent.insertBefore(_dragSrc, row);
+      }
+
+      saveExerciseOrder(parent);
+    });
+  }
+
+  async function saveExerciseOrder(groupEl) {
+    var rows = Array.from(groupEl.querySelectorAll('.item-row'));
+    var savingEl = document.getElementById('reorder-saving');
+    if (savingEl) { savingEl.textContent = '⏳ Saving order…'; savingEl.classList.add('visible'); }
+
+    var updates = rows.map((row, idx) => ({
+      id: Number(row.dataset.exId),
+      sequence_order: idx + 1
+    }));
+
+    var { error } = await sb.from('exercise_definitions')
+      .upsert(updates, { onConflict: 'id' });
+
+    if (savingEl) {
+      if (error) {
+        savingEl.textContent = '❌ Failed to save order';
+        console.error('Reorder save error:', error);
+      } else {
+        savingEl.textContent = '✓ Order saved';
+      }
+      setTimeout(() => savingEl.classList.remove('visible'), 2000);
+    }
   }
 
   // ── Selection & Loading ──────────────────────────────────────
