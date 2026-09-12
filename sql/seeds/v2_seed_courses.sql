@@ -101,6 +101,14 @@ FROM introai, (VALUES
   ('week13_ai_career_mapping',  'Week 13 — AI Career Mapping',          13, 1),
   ('week13_will_ai_take_this_job','Week 13 — Will AI Take This Job?',   13, 2),
   ('week13_checkin',            'Week 13 — Build Check-In',             13, 3),
+  -- Week 14 (AI in Science & Discovery)
+  ('week14_checkin',            'Week 14 — AI in Science & Discovery',  14, 1),
+  ('week14_progress_notes',     'Week 14 — Progress Notes',             14, 2),
+  -- Week 15 (AI Business Models & Startups)
+  ('week15_checkin',            'Week 15 — AI Business Models & Startups', 15, 1),
+  -- Week 16 (Robotics & Physical AI)
+  ('week16_final_submission',   'Week 16 — Robotics & Physical AI',     16, 1),
+  -- Week 17 (Project Build Session)
   ('week13_progress_notes',     'Week 13 — Progress Notes',             13, 4),
   -- Week 14 (Inserted: AI in Science & Research)
   ('week14_science_research',   'Week 14 — AI in Science & Research',   14, 1),
@@ -112,13 +120,10 @@ FROM introai, (VALUES
   -- Week 17 (Renumbered from 14: Project Build Session)
   ('week17_checkin',            'Week 17 — Project Build Session',      17, 1),
   ('week17_progress_notes',     'Week 17 — Progress Notes',             17, 2),
-  ('week14_checkin',            'Week 17 — Project Build Session (Legacy slug)', 17, 3),
-  -- Week 18 (Renumbered from 15: Project Build Session & Rehearsal)
+  -- Week 18 (Project Refinement & Rehearsal)
   ('week18_checkin',            'Week 18 — Project Build Session & Rehearsal', 18, 1),
-  ('week15_checkin',            'Week 18 — Project Build Session & Rehearsal (Legacy slug)', 18, 2),
-  -- Week 19 (Renumbered from 16: Showcase, Debate & What's Next)
-  ('week19_final_submission',   'Week 19 — Showcase, Debate & What''s Next', 19, 1),
-  ('week16_final_submission',   'Week 19 — Final Project Submission (Legacy slug)', 19, 2)
+  -- Week 19 (Showcase, Debate & What's Next)
+  ('week19_final_submission',   'Week 19 — Showcase, Debate & What''s Next', 19, 1)
 ) AS t(slug, label, week_num, seq)
 ON CONFLICT (course_id, exercise_slug) DO UPDATE SET
   label          = EXCLUDED.label,
