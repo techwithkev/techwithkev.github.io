@@ -623,13 +623,14 @@
     var savingEl = document.getElementById('reorder-saving');
     if (savingEl) { savingEl.textContent = '⏳ Saving order…'; savingEl.classList.add('visible'); }
 
-    var updates = rows.map((row, idx) => ({
-      id: Number(row.dataset.exId),
-      sequence_order: idx + 1
-    }));
+    var updates = rows.map((row, idx) =>
+      sb.from('exercise_definitions')
+        .update({ sequence_order: idx + 1 })
+        .eq('id', Number(row.dataset.exId))
+    );
 
-    var { error } = await sb.from('exercise_definitions')
-      .upsert(updates, { onConflict: 'id' });
+    var results = await Promise.all(updates);
+    var { error } = results.find(r => r.error) || {};
 
     if (savingEl) {
       if (error) {

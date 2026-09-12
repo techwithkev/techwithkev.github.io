@@ -591,21 +591,7 @@
       document.getElementById('rating-error').classList.add('hidden');
     }
 
-    async function supabaseInsert(payload) {
-      const resp = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`,
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify(payload)
-      });
-      if (!resp.ok) { const t = await resp.text(); throw new Error(`HTTP ${resp.status}: ${t}`); }
-    }
-
-    async function submitExercise(ev) {
+    async function handleSubmit(ev) {
       ev.preventDefault();
       let ok = true;
 
@@ -645,9 +631,7 @@
       document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting…';
 
       const payload = {
-        student_name: studentName,
-        student_email: studentEmail,
-        group_members: groupMembers || null,
+        group_members: document.getElementById('reg-group').value.trim() || null,
         st1_bias_source: document.getElementById('st1-source').value.trim(),
         st1_who_gets_hurt: document.getElementById('st1-hurt').value.trim(),
         st2_bias_source: document.getElementById('st2-source').value.trim(),
@@ -656,13 +640,11 @@
         st3_who_gets_hurt: document.getElementById('st3-hurt').value.trim(),
         st4_bias_source: document.getElementById('st4-source').value.trim(),
         st4_who_gets_hurt: document.getElementById('st4-hurt').value.trim(),
-        favorite_station_share: document.getElementById('favorite-station-share').value.trim(),
-        enjoyment_rating: enjoymentRating,
-        submitted_at: new Date().toISOString()
+        favorite_station_share: document.getElementById('favorite-station-share').value.trim()
       };
 
       try {
-        await supabaseInsert(payload);
+        await submitExercise(EXERCISE_SLUG, payload, { enjoymentRating: enjoymentRating || undefined });
         document.getElementById('success-name').textContent = studentName.split(' ')[0];
         document.getElementById('success-screen').classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -670,11 +652,7 @@
         console.error('Submission error:', err.message);
         btn.disabled = false;
         document.getElementById('submit-label').textContent = 'Submit Case Report →';
-        if (err.message.includes('409') || err.message.includes('duplicate key')) {
-          document.getElementById('form-error-text').textContent = '⚠️ You have already submitted this activity!';
-        } else {
-          document.getElementById('form-error-text').textContent = '⚠️ Network error submitting exercise. Please try again.';
-        }
+        document.getElementById('form-error-text').textContent = '⚠️ Network error submitting exercise. Please try again.';
         document.getElementById('form-error').classList.remove('hidden');
       }
     }
