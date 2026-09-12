@@ -30,11 +30,22 @@ ON CONFLICT (slug) DO UPDATE SET
 -- Matches the exercise_slug convention: {week_number}_{page_slug}
 -- sequence_order is ordering within the week (for display in dashboard).
 
+-- One-time fix: this row was originally seeded as 'week07_data_detective', but the
+-- live page's card uses data-exercise-id="data_detective" (pages/introai/data_detective.html).
+-- The mismatch meant the exercise could never be hidden via cohort_exercise_visibility.
+-- UPDATE (not delete+reinsert) so any existing visibility rows stay linked to this id.
+UPDATE exercise_definitions
+SET exercise_slug = 'data_detective'
+WHERE course_id = (SELECT id FROM courses WHERE slug = 'introai')
+  AND exercise_slug = 'week07_data_detective';
+
 WITH introai AS (SELECT id FROM courses WHERE slug = 'introai')
 INSERT INTO exercise_definitions (course_id, exercise_slug, label, week_number, sequence_order, is_active)
 SELECT
   introai.id, slug, label, week_num, seq, true
 FROM introai, (VALUES
+  -- Ongoing (not week-scoped)
+  ('project_definition',        'Project Definition',                NULL, 1),
   -- Week 1
   ('week01_is_it_ai',           'Week 1 — Is It AI?',                    1, 1),
   ('week01_ai_scavenger_hunt',  'Week 1 — AI Scavenger Hunt',            1, 2),
@@ -61,7 +72,7 @@ FROM introai, (VALUES
   ('week07_spot_the_bias',      'Week 7 — Spot the Bias',                7, 1),
   ('week07_data_audit',         'Week 7 — Data Audit',                   7, 2),
   ('week07_build_dataset',      'Week 7 — Build a Dataset',              7, 3),
-  ('week07_data_detective',     'Week 7 — Data Detective',               7, 4),
+  ('data_detective',            'Week 7 — Data Detective',               7, 4),
   -- Week 8
   ('week08_bias_card_twist',    'Week 8 — Bias Card Twist',              8, 1),
   ('week08_bias_detective_stations','Week 8 — Bias Detective Stations',  8, 2),
@@ -85,6 +96,7 @@ FROM introai, (VALUES
   ('week12_mini_chatbot',       'Week 12 — Mini Chatbot',               12, 1),
   ('week12_bot_vs_llm',         'Week 12 — Bot vs LLM',                 12, 2),
   ('week12_checkin',            'Week 12 — Build Check-In',             12, 3),
+  ('week12_progress_notes',     'Week 12 — Progress Notes',             12, 4),
   -- Week 13
   ('week13_ai_career_mapping',  'Week 13 — AI Career Mapping',          13, 1),
   ('week13_will_ai_take_this_job','Week 13 — Will AI Take This Job?',   13, 2),
@@ -97,6 +109,15 @@ FROM introai, (VALUES
   -- Week 16 (Robotics & Physical AI)
   ('week16_final_submission',   'Week 16 — Robotics & Physical AI',     16, 1),
   -- Week 17 (Project Build Session)
+  ('week13_progress_notes',     'Week 13 — Progress Notes',             13, 4),
+  -- Week 14 (Inserted: AI in Science & Research)
+  ('week14_science_research',   'Week 14 — AI in Science & Research',   14, 1),
+  ('week14_progress_notes',     'Week 14 — Progress Notes',             14, 2),
+  -- Week 15 (Inserted: AI for Business & Entrepreneurship)
+  ('week15_business_entrepreneurship', 'Week 15 — AI for Business & Entrepreneurship', 15, 1),
+  -- Week 16 (Inserted: Robotics & Physical AI)
+  ('week16_robotics_physical_ai', 'Week 16 — Robotics & Physical AI',   16, 1),
+  -- Week 17 (Renumbered from 14: Project Build Session)
   ('week17_checkin',            'Week 17 — Project Build Session',      17, 1),
   ('week17_progress_notes',     'Week 17 — Progress Notes',             17, 2),
   -- Week 18 (Project Refinement & Rehearsal)
