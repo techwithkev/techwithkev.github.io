@@ -225,6 +225,7 @@
       }
       studentName = session.name;
       studentEmail = session.email;
+      trackExerciseStart(EXERCISE_SLUG);
       classNumber = session.cohortId;
 
       document.getElementById('display-class').textContent = classNumber;

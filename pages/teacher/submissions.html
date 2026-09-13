@@ -61,6 +61,12 @@
     }
     .item-row.active .count{background:rgba(240,180,41,.12);border-color:rgba(240,180,41,.3);color:var(--gold);}
     .count.count-active{color:var(--text);background:rgba(240,180,41,.15);border-color:rgba(240,180,41,.35);font-weight:600;}
+    .started-pill{
+      font-family:'DM Mono',monospace;font-size:.62rem;
+      background:rgba(45,212,191,.12);border:1px solid rgba(45,212,191,.3);
+      border-radius:20px;padding:1px 6px;color:var(--teal);flex-shrink:0;display:none;
+    }
+    .started-pill.visible{display:inline-block;}
 
     /* ── Drag-and-drop reorder ── */
     .drag-handle{
@@ -562,8 +568,14 @@
           count.className = 'count' + (countVal > 0 ? ' count-active' : '');
           count.textContent = countVal;
 
+          var startedPill = document.createElement('span');
+          startedPill.className = 'started-pill';
+          startedPill.dataset.exId = ex.id;
+          startedPill.title = 'Students who opened but not yet submitted';
+
           row.appendChild(handle);
           row.appendChild(label);
+          row.appendChild(startedPill);
           row.appendChild(count);
 
           // Click to select (avoid triggering on drag)
@@ -795,19 +807,41 @@
         applyCount(document.querySelector(`#item-hw-${hw.classNum} .count`), hwCounts[hw.classNum] || 0);
       });
     } else {
-      // IntroAI: re-fetch counts per exercise for this cohort
-      var { data } = await sb
-        .from('exercise_submissions')
-        .select('exercise_id')
-        .eq('cohort_id', activeCohortId);
-      var counts = {};
-      (data || []).forEach(r => { counts[r.exercise_id] = (counts[r.exercise_id] || 0) + 1; });
+      // IntroAI: fetch submissions + starts in parallel
+      var [subRes, startRes] = await Promise.all([
+        sb.from('exercise_submissions').select('exercise_id').eq('cohort_id', activeCohortId),
+        sb.from('exercise_starts').select('exercise_slug,cohort_id').eq('cohort_id', activeCohortId)
+      ]);
+
+      // submission counts keyed by exercise_id
+      var subCounts = {};
+      (subRes.data || []).forEach(r => { subCounts[r.exercise_id] = (subCounts[r.exercise_id] || 0) + 1; });
+
+      // start counts keyed by exercise_slug
+      var startCountsBySlug = {};
+      (startRes.data || []).forEach(r => { startCountsBySlug[r.exercise_slug] = (startCountsBySlug[r.exercise_slug] || 0) + 1; });
 
       document.querySelectorAll('#sidebar-items-list .item-row').forEach(row => {
-        var exId = row.dataset.exId;
+        var exId   = row.dataset.exId;
+        var exSlug = row.dataset.exSlug;
         if (!exId) return;
-        var countEl = row.querySelector('.count');
-        applyCount(countEl, counts[Number(exId)] || 0);
+
+        var countEl   = row.querySelector('.count');
+        var startedEl = row.querySelector('.started-pill');
+        var subN      = subCounts[Number(exId)] || 0;
+        var startN    = startCountsBySlug[exSlug] || 0;
+        var pendingN  = Math.max(0, startN - subN); // started but not yet submitted
+
+        applyCount(countEl, subN);
+
+        if (startedEl) {
+          if (pendingN > 0) {
+            startedEl.textContent = pendingN + ' started';
+            startedEl.classList.add('visible');
+          } else {
+            startedEl.classList.remove('visible');
+          }
+        }
       });
     }
   }

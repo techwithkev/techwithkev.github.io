@@ -398,6 +398,39 @@ async function getMySubmission(exerciseSlug) {
   return rows && rows.length ? rows[0] : null;
 }
 
+/**
+ * Records that a student opened/started an exercise.
+ * Fire-and-forget — never throws, never blocks the page.
+ *
+ * Creates a row in `exercise_starts` on first visit; subsequent
+ * visits update `started_at` (so it reflects the most recent open).
+ * Uses upsert on (exercise_slug, student_email) so it's idempotent.
+ *
+ * @param {string} exerciseSlug - e.g. 'week01_is_it_ai'
+ * @returns {void}  (async, but not awaited by callers)
+ */
+function trackExerciseStart(exerciseSlug) {
+  var session = getStudentSession();
+  if (!session.email || !session.name) return; // no session yet
+
+  var row = {
+    exercise_slug: exerciseSlug,
+    student_email: session.email,
+    student_name:  session.name,
+    cohort_id:     session.cohortId ? Number(session.cohortId) : null,
+    started_at:    new Date().toISOString()
+  };
+
+  supabaseFetch(
+    '/rest/v1/exercise_starts?on_conflict=exercise_slug,student_email',
+    {
+      method: 'POST',
+      headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+      body: JSON.stringify(row)
+    }
+  ).catch(function() {}); // silent — never block the student
+}
+
 /* ════════════════════════════════════════════════════════════
  * STANDARD ACCESS CODE REGISTRATION GATE
  *
