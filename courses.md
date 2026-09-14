@@ -1,240 +1,86 @@
 ---
 layout: default
-title: Methodology
+title: Courses
+description: "Introduction to AI and AI Olympiads Junior — two 19-week courses for teens, built and taught by an enterprise AI engineer with 18 years in the classroom."
 ---
 
 <!-- Hero -->
-<section class="relative py-24 overflow-hidden">
-  <div class="absolute inset-0 bg-grid"></div>
-  <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-    <div class="lg:col-span-7 z-10">
-      <span class="text-[#006a6a] font-headline font-bold uppercase tracking-widest text-sm mb-4 block">Teaching Philosophy</span>
-      <h1 class="font-headline font-black text-6xl md:text-7xl text-primary leading-[0.9] tracking-tighter mb-8">
-        The Logic <br/>&amp; The Line.
-      </h1>
-      <p class="text-xl text-on-surface-variant max-w-xl leading-relaxed mb-10">
-        Education isn't about memorising formulas. It's about engineering a mind that can solve problems from first principles — whether in a Math exam or a Python terminal.
-      </p>
-      <div class="flex gap-4">
-        <div class="h-12 w-1 bg-[#c8f323]"></div>
-        <p class="font-headline font-medium text-lg italic text-primary">"I bridge the gap between abstract mathematical concepts and tangible digital execution."</p>
+<section class="px-6 md:px-12 pt-14 md:pt-20 pb-10 md:pb-14 max-w-[760px]">
+  <div class="inline-flex px-[14px] py-[7px] rounded-full bg-[#1E4FD9] text-white text-xs font-bold tracking-[.03em] mb-5">TWO COURSES · WAITLIST OPEN</div>
+  <h1 class="text-[32px] md:text-[40px] leading-[1.24] font-bold mb-5">Two courses. Equal attention.</h1>
+  <p class="text-[16px] md:text-[17px] leading-[1.6] text-[#57607A] max-w-[560px]">Neither course is running as a live cohort yet &mdash; both are built, both are taught by the same person, and both open for registration the moment the next cohort is scheduled. Register your interest below and I&rsquo;ll let you know first.</p>
+</section>
+
+<!-- Introduction to AI -->
+<section class="px-6 md:px-12 py-14 md:py-20 bg-white">
+  <div class="max-w-[900px]">
+    <h2 class="text-[26px] md:text-[32px] leading-[1.2] font-bold mb-3">Introduction to AI</h2>
+    <p class="text-[15px] md:text-[16px] leading-[1.6] text-[#57607A] mb-10 max-w-[620px]">A 19-week course for students with no coding background. Machine learning and modern AI, from first principles to how large language models work &mdash; taught through hands-on interactive activities, not lecture slides.</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+      <div class="bg-[#F3F5FB] rounded-[18px] p-6">
+        <div class="text-xs font-bold text-[#57607A] tracking-[.03em] mb-2">WEEKS 1&ndash;4 &middot; FOUNDATIONS</div>
+        <p class="text-sm leading-[1.6]">What Is AI?, Prompting &amp; Creative AI, AI Image Generation, AI Audio &amp; Music.</p>
+      </div>
+      <div class="bg-[#F3F5FB] rounded-[18px] p-6">
+        <div class="text-xs font-bold text-[#57607A] tracking-[.03em] mb-2">WEEKS 5&ndash;9 &middot; CORE AI &amp; ETHICS</div>
+        <p class="text-sm leading-[1.6]">Machine Learning, Recommendation Systems, AI Ethics &amp; Data Privacy, Advanced AI Ethics, Game AI &amp; Project Kickoff.</p>
+      </div>
+      <div class="bg-[#F3F5FB] rounded-[18px] p-6">
+        <div class="text-xs font-bold text-[#57607A] tracking-[.03em] mb-2">WEEKS 10&ndash;16 &middot; BUILD &amp; APPLICATIONS</div>
+        <p class="text-sm leading-[1.6]">Prototyping, Deepfakes &amp; Synthetic Media, Chatbot Programming, AI Career Mapping, AI in Science, AI for Business, Robotics &amp; Physical AI.</p>
+      </div>
+      <div class="bg-[#F3F5FB] rounded-[18px] p-6">
+        <div class="text-xs font-bold text-[#57607A] tracking-[.03em] mb-2">WEEKS 17&ndash;19 &middot; SHOWCASE</div>
+        <p class="text-sm leading-[1.6]">Project Build Session, Refinement &amp; Rehearsal, Showcase &amp; Celebration &mdash; students present a project they built themselves.</p>
       </div>
     </div>
-    <div class="lg:col-span-5 relative">
-      <div class="aspect-square rounded-xl bg-surface-container-high overflow-hidden shadow-2xl">
-        <img class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYeS_mW8KL7STHI59r6InU1ocwE8fMsOIRoHoX5CtkBPs5-OVD37yrcub6KsoiyBoKtYbcCY8SODh3kxI66NNAi4GEq_uNnbUGCWeXyOhZmIW6SCUXAQgVQPzxOlr7kzO7XADnPvk6U9mi_VMj_rt7yVJWnnmMrf7PqLwmhOlX2PCysIQ7t5_xoPaBt94oXJ3jU7w7f6mV4g2UpUX0qtua-P0a4N5xw2QP29wqL8V1oqQBZp_d4JwGOkAKU2-zN8rnWI6q2ASeAyU" alt="Kevin Ng">
-      </div>
-      <div class="absolute -bottom-6 -left-6 bg-primary p-8 rounded-lg shadow-xl hidden md:block">
-        <div class="flex flex-col gap-1">
-          <span class="text-[#c8f323] font-black text-4xl font-headline">19+</span>
-          <span class="text-white text-xs uppercase tracking-widest font-bold">Years of Teaching Experience</span>
-        </div>
-      </div>
-    </div>
+
+    <a href="{{ '/pages/register-interest.html' | relative_url }}?course=introai" class="inline-flex items-center justify-center min-h-11 bg-[#131722] text-[#F3F5FB] px-7 py-[15px] rounded-full text-sm font-bold hover:brightness-125 transition">Register interest &mdash; Introduction to AI</a>
   </div>
 </section>
 
-<!-- Credentials -->
-<section class="py-24 bg-surface-container-low">
-  <div class="max-w-7xl mx-auto px-6">
-    <div class="mb-16">
-      <h2 class="font-headline font-black text-4xl text-primary tracking-tight">Authority &amp; Credentials</h2>
-      <div class="h-1 w-24 bg-[#006a6a] mt-4"></div>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="md:col-span-2 bg-surface-container-lowest p-10 rounded-xl relative overflow-hidden">
-        <div class="absolute top-0 right-0 p-8 opacity-10">
-          <span class="material-symbols-outlined text-9xl">school</span>
-        </div>
-        <span class="text-[#006a6a] font-bold text-sm tracking-widest uppercase mb-6 block">Foundation</span>
-        <h3 class="font-headline font-bold text-3xl text-primary mb-4">Academic Excellence</h3>
-        <p class="text-on-surface-variant text-lg leading-relaxed mb-8 max-w-lg">Bachelor's Degree in Computing. Since 2007, Kevin has taught AP Computer Science, Java, Python, and AI Concepts — bringing real enterprise experience as a Lead Value Engineer directly into the classroom. Based in Toronto, he is a Gemini Certified Educator deeply invested in how emerging technologies shape the way we learn.</p>
-        <div class="flex gap-8 border-t border-outline-variant/20 pt-8">
-          <div>
-            <p class="text-primary font-black text-xl font-headline">Gemini Certified</p>
-            <p class="text-xs text-on-surface-variant uppercase font-bold">Educator</p>
-          </div>
-          <div>
-            <p class="text-primary font-black text-xl font-headline">500+ Students</p>
-            <p class="text-xs text-on-surface-variant uppercase font-bold">Mentored</p>
-          </div>
-        </div>
+<!-- AI Olympiads Junior -->
+<section class="px-6 md:px-12 py-14 md:py-20">
+  <div class="max-w-[900px]">
+    <h2 class="text-[26px] md:text-[32px] leading-[1.2] font-bold mb-3">AI Olympiads Junior</h2>
+    <p class="text-[15px] md:text-[16px] leading-[1.6] text-[#57607A] mb-10 max-w-[620px]">Competitive-programming problem solving for students prepping for CAIO. 19 classes covering the math and algorithms underneath modern machine learning &mdash; the same curriculum used to coach students for Waterloo&rsquo;s Canadian Computing Competition (CCC).</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+      <div class="bg-white rounded-[18px] p-6 shadow-[0_8px_24px_rgba(19,23,34,.06)]">
+        <div class="text-xs font-bold text-[#57607A] tracking-[.03em] mb-2">CLASSES 1&ndash;6 &middot; ML FOUNDATIONS</div>
+        <p class="text-sm leading-[1.6]">Data &amp; Tensors, Bias &amp; Variance, Feature Scaling, Validation &amp; Folds, Loss Functions &amp; MSE, Gradient Descent.</p>
       </div>
-      <div class="bg-primary text-white p-10 rounded-xl flex flex-col justify-between">
-        <div>
-          <span class="text-[#c8f323] font-bold text-sm tracking-widest uppercase mb-6 block">The Tech</span>
-          <h3 class="font-headline font-bold text-3xl mb-4">Full-Stack Logic</h3>
-          <p class="text-[#83bad6] text-sm leading-relaxed">Proficiency in Python isn't just about syntax. It's about data structures, algorithmic efficiency, and scalable thinking.</p>
-        </div>
-        <div class="mt-8 flex flex-wrap gap-2">
-          <span class="px-3 py-1 bg-[#004b63] rounded text-xs font-mono">def solve(math_problem):</span>
-          <span class="px-3 py-1 bg-[#3c4b00] text-[#c8f323] rounded text-xs font-mono">return code_logic</span>
-        </div>
+      <div class="bg-white rounded-[18px] p-6 shadow-[0_8px_24px_rgba(19,23,34,.06)]">
+        <div class="text-xs font-bold text-[#57607A] tracking-[.03em] mb-2">CLASSES 7&ndash;10 &middot; CLASSICAL MODELS &amp; MIDTERM</div>
+        <p class="text-sm leading-[1.6]">Decision Trees &amp; Ensembles, Naive Bayes &amp; K-NN, Kernel Methods &amp; SVM, Midterm Exam.</p>
       </div>
-      <div class="bg-surface-container-highest p-10 rounded-xl md:col-span-3">
-        <div class="grid md:grid-cols-2 gap-12 items-center">
-          <div>
-            <h3 class="font-headline font-bold text-3xl text-primary mb-4">The Teaching Philosophy</h3>
-            <p class="text-on-surface-variant text-lg leading-relaxed">I believe every student is an architect. My role is to provide the blueprints (concepts) and the building blocks (formulas &amp; code), and then challenge them to construct their own understanding. We move from <strong>Visual intuition</strong> to <strong>Abstract logic</strong> to <strong>Coded execution</strong>.</p>
-          </div>
-          <div class="grid grid-cols-2 gap-4">
-            <div class="bg-surface-container-lowest p-6 rounded-lg">
-              <span class="material-symbols-outlined text-[#006a6a] mb-2 block">precision_manufacturing</span>
-              <p class="text-primary font-bold text-sm uppercase">Precision</p>
-              <p class="text-xs text-on-surface-variant mt-1">Zero tolerance for vague definitions.</p>
-            </div>
-            <div class="bg-surface-container-lowest p-6 rounded-lg">
-              <span class="material-symbols-outlined text-[#006a6a] mb-2 block">insights</span>
-              <p class="text-primary font-bold text-sm uppercase">Data-Driven</p>
-              <p class="text-xs text-on-surface-variant mt-1">Measuring progress through weekly sprints.</p>
-            </div>
-          </div>
-        </div>
+      <div class="bg-white rounded-[18px] p-6 shadow-[0_8px_24px_rgba(19,23,34,.06)]">
+        <div class="text-xs font-bold text-[#57607A] tracking-[.03em] mb-2">CLASSES 11&ndash;17 &middot; SEARCH, CLUSTERING &amp; APPLIED</div>
+        <p class="text-sm leading-[1.6]">Search Algorithms, Adversarial Search &amp; CSPs, k-Means &amp; PCA, Extended Clustering, Evaluation &amp; Regularization, Reinforcement Learning, Recommender Systems.</p>
+      </div>
+      <div class="bg-white rounded-[18px] p-6 shadow-[0_8px_24px_rgba(19,23,34,.06)]">
+        <div class="text-xs font-bold text-[#57607A] tracking-[.03em] mb-2">CLASSES 18&ndash;19 &middot; MODERN AI &amp; FINAL</div>
+        <p class="text-sm leading-[1.6]">Generative AI &amp; LLMs, Final Exam.</p>
       </div>
     </div>
+
+    <a href="{{ '/pages/register-interest.html' | relative_url }}?course=aijr" class="inline-flex items-center justify-center min-h-11 bg-[#131722] text-[#F3F5FB] px-7 py-[15px] rounded-full text-sm font-bold hover:brightness-125 transition">Register interest &mdash; AI Olympiads Junior</a>
   </div>
 </section>
 
-<!-- Logic & Line Approach -->
-<section class="py-32">
-  <div class="max-w-7xl mx-auto px-6">
-    <div class="text-center max-w-2xl mx-auto mb-20">
-      <h2 class="font-headline font-black text-5xl text-primary mb-6">The 'Logic &amp; Line' Approach</h2>
-      <p class="text-on-surface-variant text-lg">A three-stage framework that bridges the gap between pure mathematics and modern programming.</p>
-    </div>
-    <div class="flex flex-col gap-12">
-      <!-- Step 1 -->
-      <div class="flex flex-col md:flex-row gap-12 items-center">
-        <div class="md:w-1/2">
-          <div class="w-16 h-16 bg-surface-container-high flex items-center justify-center rounded-lg mb-6">
-            <span class="text-2xl font-black text-primary font-headline">01</span>
-          </div>
-          <h4 class="font-headline font-bold text-2xl text-primary mb-4">Deconstruct the Variable</h4>
-          <p class="text-on-surface-variant leading-relaxed mb-6">Before writing a single line of code or solving an equation, we strip the problem down to its logical components. We identify the constants, the variables, and the constraints.</p>
-          <ul class="space-y-3">
-            <li class="flex items-center gap-3 text-sm font-semibold text-primary">
-              <span class="material-symbols-outlined text-[#006a6a] text-base">check_circle</span> Identifying Root Logic
-            </li>
-            <li class="flex items-center gap-3 text-sm font-semibold text-primary">
-              <span class="material-symbols-outlined text-[#006a6a] text-base">check_circle</span> Visualising Equation Flows
-            </li>
-          </ul>
-        </div>
-        <div class="md:w-1/2 h-64 bg-surface-container-low rounded-xl relative overflow-hidden group">
-          <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1_vWaPExaQXTw_qMwDIKgm5bkfLYmuFhE76f9fJdspw18EOwxQcTn9stX2LshlhidNjm1tDc8zb9jBB2px-tG8UJk_oFeXpJat-W0KZxEYAhO3MSYbEmjRV3XtjF75Zwg7z4yl3HNhdwhovUNa_XKu_KmUAtmiU7ODUOd9itI-4OWNgn3-jGP5irSASzIfRxdAVXjjtzqO0qzhkFHG9Lh3tg_Va__oNUg--99F90kvQV2rMbbCTeyiyCGExUzyohfQkmHSUHK4mU" alt="Math equations">
-          <div class="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent"></div>
-        </div>
-      </div>
-      <div class="hidden md:flex justify-center">
-        <div class="h-24 w-px bg-outline-variant/30"></div>
-      </div>
-      <!-- Step 2 -->
-      <div class="flex flex-col md:flex-row-reverse gap-12 items-center">
-        <div class="md:w-1/2">
-          <div class="w-16 h-16 bg-surface-container-high flex items-center justify-center rounded-lg mb-6">
-            <span class="text-2xl font-black text-primary font-headline">02</span>
-          </div>
-          <h4 class="font-headline font-bold text-2xl text-primary mb-4">Bridging to the Line</h4>
-          <p class="text-on-surface-variant leading-relaxed mb-6">This is where Math becomes alive. We translate mathematical logic into Python scripts. Loops become summations; functions become actual code.</p>
-          <div class="bg-primary p-6 rounded-lg shadow-lg">
-            <code class="text-[#c8f323] text-xs font-mono">
-              <span class="text-[#83bad6]"># Calculating Sigma in Python</span><br/>
-              total = sum(i for i in range(1, 101))
-            </code>
-          </div>
-        </div>
-        <div class="md:w-1/2 h-64 bg-surface-container-low rounded-xl relative overflow-hidden group">
-          <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDW8TTD_dxrLeWmiEwUaV6XkLq_9x8QvSvNMBCG5ZGKKbGcNHvVhlzKXO6RoPBHwiSW3rJVBZNCvUiX2j7yKDcsR8fuh4ry0NtUPlsoAjfkaXUAVIB6WmTOeqyIztimmn3_JfovqPkxIQYekfqeN_eSllF3R8z8FXegyotSOoFN5MPZtiGYDhX6daHbitLM3pdvxg32eQW83YIO60yHjTCGnTRVvMcJm5Xp7CKJxPOCxzyAZCWEiq0dJWLPM3QUiUj6mritwNYYa0I" alt="Python code">
-          <div class="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent"></div>
-        </div>
-      </div>
-    </div>
-  </div>
+<!-- Tools teaser -->
+<section class="px-6 md:px-12 py-14 md:py-20 bg-white">
+  <h2 class="text-[22px] md:text-[26px] font-bold mb-2">Both courses run on real, working tools.</h2>
+  <p class="text-[15px] text-[#57607A] mb-8 max-w-[560px]">Every visualizer and activity linked from these syllabi is already built and already used in the classroom &mdash; try a few yourself.</p>
+  <a href="{{ '/' | relative_url }}#courses" class="inline-flex items-center justify-center min-h-11 bg-[#F3F5FB] text-[#131722] px-7 py-[15px] rounded-full text-sm font-bold hover:brightness-95 transition">Poke at the tools &rarr;</a>
 </section>
 
-<!-- Success Stories -->
-<section class="py-24 bg-[#001f2b] text-white overflow-hidden">
-  <div class="max-w-7xl mx-auto px-6">
-    <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
-      <div class="max-w-xl">
-        <span class="text-[#c8f323] font-headline font-bold uppercase tracking-widest text-sm mb-4 block">Proof of Concept</span>
-        <h2 class="font-headline font-black text-4xl md:text-5xl leading-tight tracking-tight">Real Growth, Quantified.</h2>
-      </div>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div class="bg-white/5 backdrop-blur-sm p-10 rounded-xl">
-        <div class="flex justify-between items-start mb-12">
-          <div class="flex flex-col">
-            <span class="text-5xl font-black font-headline text-[#c8f323]">C5 → A1</span>
-            <span class="text-xs uppercase tracking-widest text-[#83bad6] font-bold mt-2">Secondary A-Math</span>
-          </div>
-          <span class="material-symbols-outlined text-4xl text-white/20">trending_up</span>
-        </div>
-        <p class="text-[#83bad6] text-sm leading-relaxed italic">"Before Kev, I was struggling with vectors. He showed me how to visualise them using Python scripts. It clicked instantly."</p>
-        <div class="mt-8 pt-8 border-t border-white/10 flex items-center gap-4">
-          <div class="w-10 h-10 rounded-full bg-surface-container-high"></div>
-          <div>
-            <p class="text-sm font-bold">Marcus T.</p>
-            <p class="text-[10px] uppercase font-bold text-[#83bad6]">Sec 4 Student</p>
-          </div>
-        </div>
-      </div>
-      <div class="bg-white/5 backdrop-blur-sm p-10 rounded-xl">
-        <div class="flex justify-between items-start mb-12">
-          <div class="flex flex-col">
-            <span class="text-5xl font-black font-headline text-[#c8f323]">D7 → B3</span>
-            <span class="text-xs uppercase tracking-widest text-[#83bad6] font-bold mt-2">Pure Math</span>
-          </div>
-          <span class="material-symbols-outlined text-4xl text-white/20">monitoring</span>
-        </div>
-        <p class="text-[#83bad6] text-sm leading-relaxed italic">"The 'Logic &amp; Line' method helped me stop memorising and start understanding the underlying mechanics of every problem."</p>
-        <div class="mt-8 pt-8 border-t border-white/10 flex items-center gap-4">
-          <div class="w-10 h-10 rounded-full bg-surface-container-high"></div>
-          <div>
-            <p class="text-sm font-bold">Sarah Lim</p>
-            <p class="text-[10px] uppercase font-bold text-[#83bad6]">Sec 4 Student</p>
-          </div>
-        </div>
-      </div>
-      <div class="bg-white/5 backdrop-blur-sm p-10 rounded-xl">
-        <div class="flex justify-between items-start mb-12">
-          <div class="flex flex-col">
-            <span class="text-5xl font-black font-headline text-[#c8f323]">U → A</span>
-            <span class="text-xs uppercase tracking-widest text-[#83bad6] font-bold mt-2">H2 Mathematics</span>
-          </div>
-          <span class="material-symbols-outlined text-4xl text-white/20">bolt</span>
-        </div>
-        <p class="text-[#83bad6] text-sm leading-relaxed italic">"Kevin's ability to explain A-Level calculus using coding analogies was a game changer for my finals."</p>
-        <div class="mt-8 pt-8 border-t border-white/10 flex items-center gap-4">
-          <div class="w-10 h-10 rounded-full bg-surface-container-high"></div>
-          <div>
-            <p class="text-sm font-bold">Jonathan Tan</p>
-            <p class="text-[10px] uppercase font-bold text-[#83bad6]">JC 2 Graduate</p>
-          </div>
-        </div>
-      </div>
-    </div>
+<!-- CTA banner -->
+<div class="px-6 md:px-12 py-10 md:py-14 bg-[#1E4FD9] flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+  <div>
+    <h3 class="text-xl font-bold text-white mb-1.5">Not sure which course fits?</h3>
+    <p class="text-sm text-white/85">Send a message and I&rsquo;ll help you figure out which one is the right starting point.</p>
   </div>
-</section>
-
-<!-- CTA -->
-<section class="py-32 relative overflow-hidden">
-  <div class="max-w-4xl mx-auto px-6 text-center">
-    <h3 class="font-headline font-black text-4xl md:text-5xl text-primary mb-8 tracking-tight">Ready to transition from guessing to engineering?</h3>
-    <div class="flex flex-col md:flex-row justify-center gap-6">
-      <a href="/pages/book.html" class="bg-primary text-white px-10 py-4 rounded-lg font-bold tracking-tight shadow-xl hover:brightness-110 active:scale-[0.98] transition-all font-headline">Book a Logic Assessment</a>
-      <a href="/assessments" class="bg-surface-container-high text-primary px-10 py-4 rounded-lg font-bold tracking-tight hover:bg-surface-container-highest transition-all font-headline">Take a Free Assessment</a>
-    </div>
-    <div class="mt-16 pt-8 border-t border-outline-variant/30 inline-flex items-center gap-8">
-      <div class="text-left">
-        <p class="text-xs font-bold uppercase tracking-widest text-[#006a6a]">Verified Trust</p>
-        <p class="text-xl font-headline font-bold text-primary">Gemini Certified Educator</p>
-      </div>
-      <div class="w-px h-10 bg-outline-variant/30"></div>
-      <div class="text-left">
-        <p class="text-xs font-bold uppercase tracking-widest text-[#006a6a]">Global Impact</p>
-        <p class="text-xl font-headline font-bold text-primary">500+ Students Mentored</p>
-      </div>
-    </div>
-  </div>
-</section>
+  <a href="{{ '/contact' | relative_url }}" class="inline-flex items-center justify-center min-h-11 bg-[#131722] text-white px-[26px] py-[13px] rounded-full text-sm font-bold whitespace-nowrap hover:brightness-125 transition">Get in touch</a>
+</div>

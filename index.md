@@ -1,5 +1,5 @@
 ---
-layout: home
+layout: default
 title: Home
 description: "Programming and math educator of 18 years. Two AI courses for teens — Introduction to AI and AI Olympiads Junior — plus real interactive tools from the classroom."
 ---
@@ -13,7 +13,7 @@ description: "Programming and math educator of 18 years. Two AI courses for teen
     <p class="text-[16px] md:text-[17px] leading-[1.6] text-[#57607A] mb-7 max-w-[520px]">I&rsquo;ve spent 18 years teaching programming and math, and today I help enterprises put AI and data technology to work. I bring that real-world experience into every lesson.</p>
     <div class="flex flex-wrap gap-3.5">
       <a href="#courses" class="inline-flex items-center justify-center min-h-11 bg-[#131722] text-[#F3F5FB] px-7 py-[15px] rounded-full text-sm font-bold hover:brightness-125 transition">See the courses</a>
-      <a href="#" class="inline-flex items-center justify-center min-h-11 bg-[#1E4FD9] text-white px-7 py-[15px] rounded-full text-sm font-bold hover:brightness-110 transition">Register interest</a>
+      <a href="{{ '/pages/register-interest.html' | relative_url }}" class="inline-flex items-center justify-center min-h-11 bg-[#1E4FD9] text-white px-7 py-[15px] rounded-full text-sm font-bold hover:brightness-110 transition">Register interest</a>
     </div>
   </div>
   <div class="bg-[#131722] rounded-[20px] p-7 aspect-[4/3] flex flex-col justify-between">
@@ -40,13 +40,13 @@ description: "Programming and math educator of 18 years. Two AI courses for teen
       <div class="w-11 h-11 rounded-xl bg-[#1E4FD9]/[.13]"></div>
       <h3 class="font-bold text-xl">Introduction to AI</h3>
       <p class="text-sm leading-[1.6] text-[#57607A]">Machine learning and modern AI, from first principles to how large language models work.</p>
-      <a href="#" class="mt-auto self-start inline-flex items-center justify-center min-h-11 bg-[#131722] text-[#F3F5FB] px-[22px] py-3 rounded-full text-[13px] font-bold hover:brightness-125 transition">Register interest</a>
+      <a href="{{ '/pages/register-interest.html' | relative_url }}?course=introai" class="mt-auto self-start inline-flex items-center justify-center min-h-11 bg-[#131722] text-[#F3F5FB] px-[22px] py-3 rounded-full text-[13px] font-bold hover:brightness-125 transition">Register interest</a>
     </div>
     <div class="bg-white rounded-[20px] p-8 flex flex-col gap-3.5 shadow-[0_8px_24px_rgba(19,23,34,.06)]">
       <div class="w-11 h-11 rounded-xl bg-[#1E4FD9]/[.13]"></div>
       <h3 class="font-bold text-xl">AI Olympiads Junior</h3>
       <p class="text-sm leading-[1.6] text-[#57607A]">Competitive-programming problem solving for students prepping for CAIO.</p>
-      <a href="#" class="mt-auto self-start inline-flex items-center justify-center min-h-11 bg-[#131722] text-[#F3F5FB] px-[22px] py-3 rounded-full text-[13px] font-bold hover:brightness-125 transition">Register interest</a>
+      <a href="{{ '/pages/register-interest.html' | relative_url }}?course=aijr" class="mt-auto self-start inline-flex items-center justify-center min-h-11 bg-[#131722] text-[#F3F5FB] px-[22px] py-3 rounded-full text-[13px] font-bold hover:brightness-125 transition">Register interest</a>
     </div>
   </div>
 </section>

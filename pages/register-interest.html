@@ -1,66 +1,58 @@
 ---
-layout: bare
-title: Book a Session — Tech With Kev
+layout: default
+title: Register Interest
+description: "Register your interest in Introduction to AI or AI Olympiads Junior and be the first to know when the next cohort opens."
 ---
 
-<div class="min-h-screen bg-[#f9f9fc] font-body">
-  <div class="max-w-2xl mx-auto px-6 py-12">
+<section class="px-6 md:px-12 py-14 md:py-20">
+  <div class="max-w-[560px] mx-auto">
+    <div class="inline-flex px-[14px] py-[7px] rounded-full bg-[#1E4FD9] text-white text-xs font-bold tracking-[.03em] mb-5">WAITLIST</div>
+    <h1 class="text-[32px] md:text-[40px] leading-[1.24] font-bold mb-4">Register your interest.</h1>
+    <p class="text-[16px] leading-[1.6] text-[#57607A] mb-10">Neither course is running as a live cohort yet. Leave your details and I&rsquo;ll email you the moment the next one opens &mdash; pricing included.</p>
 
-    <!-- Back link -->
-    <a href="/" class="inline-flex items-center gap-2 text-sm text-[#40484c] hover:text-[#003345] transition-colors mb-10 font-medium">
-      <span class="material-symbols-outlined" style="font-size:18px;">arrow_back</span>
-      Tech With Kev
-    </a>
-
-    <!-- Header -->
-    <div class="mb-10">
-      <span class="text-[#006a6a] font-headline font-bold uppercase tracking-widest text-xs mb-3 block">1-on-1 Session</span>
-      <h1 class="font-headline font-black text-4xl text-[#003345] tracking-tight mb-3 leading-tight">Book a Session</h1>
-      <p class="text-[#40484c] text-base">Pick a time that works for you. Sessions are 60 minutes via video call.</p>
-    </div>
-
-    <!-- Calendly widget -->
-    <!-- TODO: Replace YOUR_CALENDLY_URL with your Calendly event link -->
-    <div class="bg-white border border-[#c0c7cd] rounded-xl overflow-hidden mb-8" style="min-height: 660px;">
-      <div class="calendly-inline-widget"
-           data-url="YOUR_CALENDLY_URL"
-           style="min-width:320px;height:660px;"></div>
-      <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
-      <noscript>
-        <p class="text-center p-8 text-[#40484c]">
-          To book, visit <a href="YOUR_CALENDLY_URL" class="text-[#006a6a]">your Calendly page</a> directly.
-        </p>
-      </noscript>
-    </div>
-
-    <!-- Divider -->
-    <div class="flex items-center gap-3 my-6">
-      <div class="flex-1 h-px bg-[#c0c7cd]"></div>
-      <span class="text-xs font-bold uppercase tracking-widest text-[#71787d] font-headline">or pay in advance</span>
-      <div class="flex-1 h-px bg-[#c0c7cd]"></div>
-    </div>
-
-    <!-- Payment card -->
-    <!-- TODO: Replace YOUR_STRIPE_PAYMENT_LINK with your Stripe payment link URL -->
-    <div class="bg-white border border-[#c0c7cd] rounded-xl p-8">
-      <div class="flex items-start justify-between mb-4">
+    <div class="bg-white rounded-[20px] p-8 shadow-[0_8px_24px_rgba(19,23,34,.06)]">
+      <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST" class="flex flex-col gap-5">
+        <input type="hidden" name="_subject" value="Register interest — Tech With Kev">
         <div>
-          <h2 class="font-headline font-bold text-xl text-[#003345] mb-1">Pay before your session</h2>
-          <p class="text-[#40484c] text-sm">Secure checkout via Stripe. Once payment is confirmed, book your slot above.</p>
+          <label for="name" class="block text-sm font-bold mb-2">Your name</label>
+          <input type="text" name="name" id="name" placeholder="e.g. Mrs. Tan" required
+            class="w-full px-4 py-3 border border-[#c7cede] rounded-xl text-sm focus:outline-none focus:border-[#1E4FD9] focus:ring-1 focus:ring-[#1E4FD9] bg-white transition-colors">
         </div>
-        <span class="material-symbols-outlined text-[#006a6a]">lock</span>
-      </div>
-      <a href="YOUR_STRIPE_PAYMENT_LINK" target="_blank" rel="noopener"
-         class="inline-flex items-center gap-2 mt-4 px-6 py-3 architect-gradient text-white font-bold font-headline rounded-lg hover:brightness-110 active:scale-[0.98] transition-all">
-        Pay now
-        <span class="material-symbols-outlined" style="font-size:18px;">arrow_forward</span>
-      </a>
+        <div>
+          <label for="email" class="block text-sm font-bold mb-2">Email address</label>
+          <input type="email" name="email" id="email" placeholder="your@email.com" required
+            class="w-full px-4 py-3 border border-[#c7cede] rounded-xl text-sm focus:outline-none focus:border-[#1E4FD9] focus:ring-1 focus:ring-[#1E4FD9] bg-white transition-colors">
+        </div>
+        <div>
+          <label for="course" class="block text-sm font-bold mb-2">Which course?</label>
+          <select name="course" id="course" class="w-full px-4 py-3 border border-[#c7cede] rounded-xl text-sm focus:outline-none focus:border-[#1E4FD9] focus:ring-1 focus:ring-[#1E4FD9] bg-white transition-colors text-[#57607A]">
+            <option value="introai">Introduction to AI</option>
+            <option value="aijr">AI Olympiads Junior</option>
+            <option value="either">Either / not sure yet</option>
+          </select>
+        </div>
+        <div>
+          <label for="message" class="block text-sm font-bold mb-2">Anything else? <span class="font-normal text-[#8b93ac]">(optional)</span></label>
+          <textarea name="message" id="message" placeholder="Questions, scheduling constraints, anything I should know." rows="4"
+            class="w-full px-4 py-3 border border-[#c7cede] rounded-xl text-sm focus:outline-none focus:border-[#1E4FD9] focus:ring-1 focus:ring-[#1E4FD9] bg-white transition-colors resize-y"></textarea>
+        </div>
+        <button type="submit" class="w-full min-h-11 py-[15px] bg-[#1E4FD9] text-white font-bold rounded-full hover:brightness-110 transition">Register interest</button>
+      </form>
     </div>
 
-    <!-- Footer note -->
-    <p class="text-center mt-8 text-sm text-[#71787d]">
-      Questions? <a href="/contact" class="text-[#006a6a] hover:underline">Get in touch</a> and I'll get back to you within 24 hours.
+    <p class="text-center mt-8 text-sm text-[#8b93ac]">
+      Questions? <a href="{{ '/contact' | relative_url }}" class="text-[#1E4FD9] font-semibold hover:underline">Get in touch</a> instead.
     </p>
-
   </div>
-</div>
+</section>
+
+<script>
+  (function () {
+    var params = new URLSearchParams(window.location.search);
+    var course = params.get('course');
+    var select = document.getElementById('course');
+    if (course && select && select.querySelector('option[value="' + course + '"]')) {
+      select.value = course;
+    }
+  })();
+</script>

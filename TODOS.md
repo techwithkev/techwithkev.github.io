@@ -6,23 +6,26 @@ These are placeholder values in the code that need real IDs before the funnel is
 
 | # | File | Line | Find | Replace with |
 |---|------|------|------|-------------|
-| 1 | `pages/book.html` | 95 | `YOUR_CALENDLY_URL` | Your Calendly event link (e.g. `https://calendly.com/techwithkev/60min`) |
-| 2 | `pages/book.html` | 117 | `YOUR_STRIPE_PAYMENT_LINK` | Your Stripe payment link URL |
-| 3 | `pages/python/python_functions.html` | 2171 | `YOUR_FORM_UID/YOUR_EMBED_ID.js` | ConvertKit embed script URL (from ConvertKit → Forms → Embed → HTML/JS tab) |
-| 4 | `pages/g9_math_prerequisite_assessment.html` | 1770 | `YOUR_FORM_UID/YOUR_EMBED_ID.js` | ConvertKit embed script URL (same form as above) |
-| 5 | `contact.md` | 10 | `YOUR_FORM_ID` | Formspree form ID (from formspree.io dashboard) |
+| 1 | `pages/python/python_functions.html` | 2171 | `YOUR_FORM_UID/YOUR_EMBED_ID.js` | ConvertKit embed script URL (from ConvertKit → Forms → Embed → HTML/JS tab) |
+| 2 | `pages/g9_math_prerequisite_assessment.html` | 1770 | `YOUR_FORM_UID/YOUR_EMBED_ID.js` | ConvertKit embed script URL (same form as above) |
+| 3 | `contact.md` | `YOUR_FORM_ID` | `YOUR_FORM_ID` | Formspree form ID (from formspree.io dashboard) — same form ID also needed in `pages/register-interest.html` |
+| 4 | `pages/register-interest.html` | `YOUR_FORM_ID` | `YOUR_FORM_ID` | Same Formspree form ID as `contact.md` (shared endpoint, tagged via a hidden `_subject` field) |
+
+**Removed (2026-09-14):** the Calendly and Stripe placeholders that used to live in `pages/book.html` are gone — 1-on-1 tutoring booking was retired when the site repositioned around the two AI courses (Introduction to AI, AI Olympiads Junior) on a waitlist model. That file is now `pages/register-interest.html`, a lightweight Formspree form; no Calendly/Stripe setup is needed.
 
 ## Setup checklist
 
-- [ ] Create Calendly account → set up "60-min Tutoring Session" event → copy event link
-- [ ] Create Stripe payment link for a 1-on-1 session → copy URL
 - [ ] Sign up for ConvertKit → create a form → go to Embed → copy the JS script `src` URL
-- [ ] Sign up for Formspree → create a form → copy the form ID from the action URL
+- [ ] Sign up for Formspree → create a form → copy the form ID from the action URL → use it in both `contact.md` and `pages/register-interest.html`
+
+## New from the site rebrand (2026-09-14)
+
+- [ ] **Design and build the "AI & logic readiness" quiz.** The homepage's "Take the quiz →" CTA (quiz banner section) and `index.md`'s copy both reference this, but it's still a placeholder `#` link. This needs real question content from Kevin first — it's a new small interactive tool, not a reskin of an existing page. `assessments.md` was retired (redirects to `/courses`) rather than becoming this quiz, since its content was 1-on-1-tutoring-specific and didn't fit.
 
 ## Deferred (not blocking launch)
 
 - Fix G9 Math answer key: `q13` explanation contradicts the `correct` field (says A but walks through to C)
-- Brand identity: assessment pages use a different visual language from the main site (dark theme vs white)
+- Brand identity: `pages/g9_math_prerequisite_assessment.html` and `pages/python_functions.html` still use the old visual language (dark theme vs the new Sora/light site) — untouched by the 2026-09-14 rebrand since they're standalone diagnostic tools, not marketing pages.
 
 ## From /plan-eng-review — pages/ architecture audit (2026-08-15)
 

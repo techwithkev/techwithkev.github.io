@@ -112,18 +112,19 @@ Gradually update student exercise pages in `pages/introai/` and `pages/aijr/` to
 
 ## 🌐 Phase 5: Public Marketing & Funnel Overhaul
 
-- [ ] **[TASK-5.1] Homepage Rebuild (`index.md` / `index.html`):**
-  - Personal brand landing page for Kevin Ng (Educator, AI Engineer, Competitive Programming Coach).
-  - Feature courses: *Introduction to AI* and *AI Olympiads Junior*.
-  - Testimonial carousel and student achievements.
-- [ ] **[TASK-5.2] Course Catalog & Pricing Pages (`courses.md`, `pricing.md`):**
-  - Sync curriculum descriptions with latest 16-week syllabus.
-  - Clear enrollment call-to-actions linking to booking/payment.
+- [x] **[TASK-5.1] Homepage Rebuild (`index.md` / `index.html`):** (2026-09-11)
+  - Personal brand landing page for Kevin Ng (enterprise AI engineer + 18-year educator).
+  - Features both courses: *Introduction to AI* and *AI Olympiads Junior*, waitlist framing (no live cohort yet).
+  - Testimonial and tool screenshots still placeholder — see `TODOS.md`.
+- [x] **[TASK-5.2] Course Catalog & Pricing Pages (`courses.md`, `pricing.md`):** (2026-09-14)
+  - Rewrote around the two AI courses (real 19-week/19-class curricula pulled from `pages/introai/index.html` and `pages/aijr/index.html`), dropped the old 1-on-1 tutoring content entirely.
+  - `pricing.md` is now a "pricing TBD" waitlist page — no live cohort means no real price yet.
+  - Also shipped as part of this pass: `contact.md` rewrite, new `about.md`, `assessments.md` retired (redirects to `/courses`), `pages/book.html` → `pages/register-interest.html` (Calendly/Stripe booking flow replaced by a Formspree waitlist form), `_layouts/home.html` merged back into `_layouts/default.html` (one shared layout again, new brand).
 - [ ] **[TASK-5.3] Replace Integration Placeholders (see `TODOS.md`):**
-  - Calendly link in `pages/book.html`.
-  - Stripe payment links.
+  - ~~Calendly link~~ / ~~Stripe payment link~~ — obsolete, removed with `pages/book.html` (1-on-1 tutoring retired).
   - ConvertKit lead capture form IDs in `pages/python/` and `pages/g9_math_prerequisite_assessment.html`.
-  - Formspree ID in `contact.md`.
+  - Formspree ID — now shared by `contact.md` and `pages/register-interest.html`.
+- [ ] **[TASK-5.4] Build the "AI & logic readiness" quiz** (new, 2026-09-14): homepage and `courses.md` both point at this eventually; needs real question content from Kevin before it can be built. See `TODOS.md`.
 
 ---
 
