@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guided Prompt Practice — Intro to AI · Week 2</title>
+  <meta name="description"
+    content="Activity 1: Guided Prompt Practice. Craft prompts across 3 distinct scenarios using Task, Context, Persona, Format, and Tone.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/activity.css">
+  <style>
+    /* Form elements */
+    .form-input:focus {
+      outline: none;
+      border-color: #f97316;
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
+    }
+    .form-input.error {
+      border-color: #ef4444;
+      background-color: #fef2f2;
+    }
+
+    /* Option toggle buttons */
+    .opt-btn {
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+    .opt-btn:hover {
+      transform: translateY(-1px);
+      border-color: #fdba74;
+    }
+    .opt-btn.selected {
+      border-color: #f97316 !important;
+      background: #fff7ed !important;
+      color: #c2410c !important;
+      font-weight: 700;
+      box-shadow: 0 2px 6px rgba(249, 115, 22, 0.15);
+    }
+
+    /* Evaluation pill buttons */
+    .eval-btn {
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .eval-btn:hover {
+      transform: translateY(-1px);
+    }
+    .eval-btn.selected {
+      font-weight: 800;
+    }
+    .eval-btn.selected-great {
+      background-color: #10b981 !important;
+      color: white !important;
+      border-color: #059669 !important;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+    }
+    .eval-btn.selected-tweaks {
+      background-color: #f59e0b !important;
+      color: white !important;
+      border-color: #d97706 !important;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25);
+    }
+    .eval-btn.selected-failed {
+      background-color: #ef4444 !important;
+      color: white !important;
+      border-color: #dc2626 !important;
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
+    }
+
+    /* Star rating */
+    .star-btn {
+      font-size: 26px;
+      cursor: pointer;
+      filter: grayscale(100%);
+      transition: filter 0.15s ease, transform 0.1s ease;
+      background: none;
+      border: none;
+      padding: 2px 4px;
+    }
+    .star-btn:hover {
+      transform: scale(1.2);
+    }
+    .star-btn.active {
+      filter: grayscale(0%);
+    }
+
+    /* Spinner */
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+
+<body class="bg-[#F9FAFB] text-gray-900 min-h-screen font-sans antialiased pb-24">
+
+  <!-- ══ MAIN CONTENT ══ -->
+  <div id="main-content" class="max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <!-- Header -->
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+      <div>
+        <a href="index.html"
+          class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-orange-600 mb-3 hover:text-orange-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">
+          Guided <span class="text-orange-500">Prompt Practice</span>
+        </h1>
+        <p class="text-gray-500 font-medium italic mt-1">Module 1 · Foundations &amp; Thinking · Week 2</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-orange-50 border border-orange-200 text-orange-800 shadow-sm self-start md:self-auto">
+        Week 2 · Activity 1
+      </div>
+    </header>
+
+    <!-- Overview & Instructions Banner -->
+    <div class="bg-gradient-to-br from-orange-500 to-amber-600 rounded-3xl p-6 md:p-8 mb-8 text-white shadow-lg">
+      <div class="flex items-start gap-4 mb-6">
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 bg-white/20 backdrop-blur-md text-white border border-white/30 shadow-inner">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-white/20 border border-white/30 text-orange-50 mb-2">
+            Activity 1 · Guided Prompt Practice
+          </div>
+          <h2 class="text-2xl font-black tracking-tight text-white mb-2">
+            Your Turn! Practice Using the 5 Elements
+          </h2>
+          <p class="text-orange-100 text-sm leading-relaxed">
+            Great prompts aren't just one sentence — they combine 5 key building blocks to give the AI crystal-clear guidance.
+          </p>
+        </div>
+      </div>
+
+      <!-- Instructions Checklist -->
+      <div class="bg-black/15 backdrop-blur-sm rounded-2xl p-5 border border-white/20 mb-6">
+        <h3 class="text-xs font-black uppercase tracking-widest text-orange-200 mb-3">Activity Instructions:</h3>
+        <ul class="space-y-2 text-sm text-white/95 font-medium">
+          <li class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded-full bg-white text-orange-600 font-black text-xs flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
+            <span><strong>Read the scenario:</strong> Study each real-world situation and its required goals.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded-full bg-white text-orange-600 font-black text-xs flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
+            <span><strong>Craft a prompt:</strong> Combine the 5 elements (Task, Context, Persona, Format, Tone).</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded-full bg-white text-orange-600 font-black text-xs flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
+            <span><strong>Test in your chatbot:</strong> Paste and run your prompt in ChatGPT, Claude, Gemini, etc.</span>
+          </li>
+          <li class="flex items-start gap-2.5">
+            <span class="w-5 h-5 rounded-full bg-white text-orange-600 font-black text-xs flex items-center justify-center flex-shrink-0 mt-0.5">4</span>
+            <span><strong>Note down results:</strong> Record the output and briefly evaluate how well it adhered to constraints.</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- The 5 Elements Reference Pills -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs">
+        <div class="bg-white/10 rounded-xl p-3 border border-white/20">
+          <div class="font-black text-orange-200 uppercase tracking-wider mb-0.5">1. Task</div>
+          <div class="text-white/90">What specific action must the AI perform?</div>
+        </div>
+        <div class="bg-white/10 rounded-xl p-3 border border-white/20">
+          <div class="font-black text-orange-200 uppercase tracking-wider mb-0.5">2. Context</div>
+          <div class="text-white/90">Background info, constraints &amp; situation.</div>
+        </div>
+        <div class="bg-white/10 rounded-xl p-3 border border-white/20">
+          <div class="font-black text-orange-200 uppercase tracking-wider mb-0.5">3. Persona</div>
+          <div class="text-white/90">Who should the AI act or speak as?</div>
+        </div>
+        <div class="bg-white/10 rounded-xl p-3 border border-white/20">
+          <div class="font-black text-orange-200 uppercase tracking-wider mb-0.5">4. Format</div>
+          <div class="text-white/90">Email, dialogue, list, table, word limit?</div>
+        </div>
+        <div class="bg-white/10 rounded-xl p-3 border border-white/20 col-span-2 sm:col-span-1">
+          <div class="font-black text-orange-200 uppercase tracking-wider mb-0.5">5. Tone</div>
+          <div class="text-white/90">Emotional mood: polite, humorous, eerie, etc.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN FORM -->
+    <form id="prompt-practice-form" onsubmit="handleSubmit(event)" novalidate>
+
+      <!-- ══════════════════════════════════════════════════════════
+           SCENARIO 1: The Urgent Homework Extension Request
+           ══════════════════════════════════════════════════════════ -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-8" id="card-sc1">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-9 h-9 rounded-xl text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-orange-500 shadow-md">
+            1
+          </div>
+          <div>
+            <span class="text-[10px] font-black uppercase tracking-widest text-orange-600 bg-orange-50 px-2.5 py-0.5 rounded-full border border-orange-200">
+              Scenario 1 · Academic Communication
+            </span>
+            <h2 class="text-lg font-black text-gray-900 mt-0.5">The Urgent Homework Extension Request 📄</h2>
+          </div>
+        </div>
+
+        <!-- Scenario Brief -->
+        <div class="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-4 md:p-5 mb-6 text-sm text-amber-950 leading-relaxed">
+          <p class="font-semibold text-amber-900 mb-2">The Situation:</p>
+          <p class="text-xs md:text-sm text-gray-800 leading-relaxed mb-4">
+            You caught a severe flu the evening before your Grade 9 Physics lab report is due (tomorrow morning at <strong>8:00 AM</strong>).
+            Your teacher, <strong>Mr. Henderson</strong>, is famously strict about punctuality, but values honesty and proactive communication.
+            You have already completed <strong>75%</strong> of the lab data and calculations, but need <strong>48 more hours</strong> to recover and type up your discussion section.
+          </p>
+
+          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-3.5 border border-amber-200/60">
+            <h4 class="text-xs font-black uppercase tracking-wider text-amber-900 mb-2">Target Element Constraints:</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-700">
+              <div class="flex items-start gap-1.5">
+                <span class="text-orange-600 font-bold">• Task:</span> Request a 48-hour extension on the physics lab report
+              </div>
+              <div class="flex items-start gap-1.5">
+                <span class="text-orange-600 font-bold">• Context:</span> Due tomorrow 8 AM, sudden flu, 75% done
+              </div>
+              <div class="flex items-start gap-1.5">
+                <span class="text-orange-600 font-bold">• Persona:</span> Responsible, respectful high school student
+              </div>
+              <div class="flex items-start gap-1.5">
+                <span class="text-orange-600 font-bold">• Format:</span> Email with Subject Line, 2 short paragraphs &amp; sign-off
+              </div>
+              <div class="flex items-start gap-1.5 sm:col-span-2">
+                <span class="text-orange-600 font-bold">• Tone:</span> Courteous, humble, apologetic, and proactive
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chatbot Selector 1 -->
+        <div class="mb-5">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            Which Chatbot are you testing with? <span class="text-red-500">*</span>
+          </label>
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-2" id="sc1-chatbot-picker">
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50 text-center" onclick="setChatbot(1, 'ChatGPT', this)">🤖 ChatGPT</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50 text-center" onclick="setChatbot(1, 'Gemini', this)">✨ Gemini</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50 text-center" onclick="setChatbot(1, 'Claude', this)">🧠 Claude</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50 text-center" onclick="setChatbot(1, 'Copilot', this)">💼 Copilot</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50 text-center" onclick="setChatbot(1, 'Other', this)">💬 Other</button>
+          </div>
+          <p id="sc1-chatbot-error" class="hidden text-xs text-red-500 font-medium mt-1">Please select which chatbot you used.</p>
+        </div>
+
+        <!-- Prompt Input 1 -->
+        <div class="mb-5">
+          <label for="sc1-prompt" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            Your Crafted Prompt <span class="text-red-500">*</span>
+          </label>
+          <p class="text-xs text-gray-500 mb-2">Combine the 5 elements naturally into your prompt instructions:</p>
+          <textarea id="sc1-prompt" rows="3"
+            placeholder="e.g. Act as a polite, responsible student writing an email to their strict physics teacher Mr. Henderson. I have a severe flu the night before our lab report is due tomorrow at 8 AM. Write a courteous 2-paragraph email asking for a 48-hour extension, mentioning I already finished 75%..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-y"
+            oninput="clearErr('sc1-prompt')"></textarea>
+          <p id="sc1-prompt-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your prompt for Scenario 1.</p>
+        </div>
+
+        <!-- Chatbot Output 1 -->
+        <div class="mb-5">
+          <label for="sc1-response" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            Chatbot Output <span class="text-red-500">*</span>
+          </label>
+          <p class="text-xs text-gray-500 mb-2">Paste the exact response the AI generated:</p>
+          <textarea id="sc1-response" rows="4"
+            placeholder="Paste the generated email response here..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-mono text-gray-950 placeholder-gray-400 transition-all resize-y"
+            oninput="clearErr('sc1-response')"></textarea>
+          <p id="sc1-response-error" class="hidden text-xs text-red-500 font-medium mt-1">Please paste the chatbot's response.</p>
+        </div>
+
+        <!-- Evaluation & Notes 1 -->
+        <div class="border-t border-gray-100 pt-4">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            How well did it work? <span class="text-red-500">*</span>
+          </label>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3" id="sc1-eval-picker">
+            <button type="button" class="eval-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-700 bg-gray-50 text-center" onclick="setEval(1, 'great', this)">🌟 Worked Great</button>
+            <button type="button" class="eval-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-700 bg-gray-50 text-center" onclick="setEval(1, 'tweaks', this)">✏️ Needed Minor Tweaks</button>
+            <button type="button" class="eval-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-700 bg-gray-50 text-center" onclick="setEval(1, 'failed', this)">⚠️ Missed Constraints</button>
+          </div>
+          <p id="sc1-eval-error" class="hidden text-xs text-red-500 font-medium mb-3">Please rate how well the prompt worked.</p>
+
+          <label for="sc1-notes" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            Brief Notes / Reflection
+          </label>
+          <input type="text" id="sc1-notes"
+            placeholder="e.g. Tone was perfectly respectful, but I had to clarify the exact 48-hour new date."
+            class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 placeholder-gray-400 transition-all">
+        </div>
+      </div>
+
+
+      <!-- ══════════════════════════════════════════════════════════
+           SCENARIO 2: The Underground Fantasy Alchemist
+           ══════════════════════════════════════════════════════════ -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-8" id="card-sc2">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-9 h-9 rounded-xl text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-orange-500 shadow-md">
+            2
+          </div>
+          <div>
+            <span class="text-[10px] font-black uppercase tracking-widest text-orange-600 bg-orange-50 px-2.5 py-0.5 rounded-full border border-orange-200">
+              Scenario 2 · Creative Roleplay &amp; Game Design
+            </span>
+            <h2 class="text-lg font-black text-gray-900 mt-0.5">The Underground Fantasy Alchemist 🧙‍♂️</h2>
+          </div>
+        </div>
+
+        <!-- Scenario Brief -->
+        <div class="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-4 md:p-5 mb-6 text-sm text-amber-950 leading-relaxed">
+          <p class="font-semibold text-amber-900 mb-2">The Situation:</p>
+          <p class="text-xs md:text-sm text-gray-800 leading-relaxed mb-4">
+            You are writing lore and NPC dialogue for a fantasy RPG video game.
+            The adventurer walks into a shadowy, candle-lit curiosities shop hidden under a cobblestone alleyway during a violent thunderstorm.
+            The shopkeeper is <strong>Pip</strong>, an ancient, eccentric goblin alchemist who speaks in whimsical riddles and rhymes, is obsessed with shiny glass beads, and sells bizarre magical concoctions with hilarious side effects.
+          </p>
+
+          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-3.5 border border-amber-200/60">
+            <h4 class="text-xs font-black uppercase tracking-wider text-amber-900 mb-2">Target Element Constraints:</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-700">
+              <div class="flex items-start gap-1.5">
+                <span class="text-orange-600 font-bold">• Task:</span> Greet player in-character &amp; list 3 wacky potions for sale
+              </div>
+              <div class="flex items-start gap-1.5">
+                <span class="text-orange-600 font-bold">• Context:</span> Underground shop during thunderstorm, Pip never breaks character
+              </div>
+              <div class="flex items-start gap-1.5">
+                <span class="text-orange-600 font-bold">• Persona:</span> Pip — ancient, eccentric, rhyming goblin alchemist
+              </div>
+              <div class="flex items-start gap-1.5">
+                <span class="text-orange-600 font-bold">• Format:</span> 1 paragraph dialogue greeting + 3 bullet points with [Name, Effect, Side Effect, Cost in trinkets]
+              </div>
+              <div class="flex items-start gap-1.5 sm:col-span-2">
+                <span class="text-orange-600 font-bold">• Tone:</span> Whimsical, mysterious, quirky, slightly mischievous
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chatbot Selector 2 -->
+        <div class="mb-5">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            Which Chatbot are you testing with? <span class="text-red-500">*</span>
+          </label>
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-2" id="sc2-chatbot-picker">
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50 text-center" onclick="setChatbot(2, 'ChatGPT', this)">🤖 ChatGPT</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50 text-center" onclick="setChatbot(2, 'Gemini', this)">✨ Gemini</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50 text-center" onclick="setChatbot(2, 'Claude', this)">🧠 Claude</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50 text-center" onclick="setChatbot(2, 'Copilot', this)">💼 Copilot</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50 text-center" onclick="setChatbot(2, 'Other', this)">💬 Other</button>
+          </div>
+          <p id="sc2-chatbot-error" class="hidden text-xs text-red-500 font-medium mt-1">Please select which chatbot you used.</p>
+        </div>
+
+        <!-- Prompt Input 2 -->
+        <div class="mb-5">
+          <label for="sc2-prompt" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            Your Crafted Prompt <span class="text-red-500">*</span>
+          </label>
+          <p class="text-xs text-gray-500 mb-2">Combine the 5 elements to keep the AI strictly in-character:</p>
+          <textarea id="sc2-prompt" rows="3"
+            placeholder="e.g. You are roleplaying as Pip, an ancient, mischievous goblin alchemist who speaks in curious rhymes. The player has just walked into your subterranean potion shop during a thunderstorm. Greet them in character (1 paragraph), then list 3 bizarre magical potions. For each potion include Name, Effect, Funny Side Effect, and Cost in shiny objects..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-y"
+            oninput="clearErr('sc2-prompt')"></textarea>
+          <p id="sc2-prompt-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your prompt for Scenario 2.</p>
+        </div>
+
+        <!-- Chatbot Output 2 -->
+        <div class="mb-5">
+          <label for="sc2-response" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            Chatbot Output <span class="text-red-500">*</span>
+          </label>
+          <p class="text-xs text-gray-500 mb-2">Paste the generated character greeting and potion list:</p>
+          <textarea id="sc2-response" rows="4"
+            placeholder="Paste the dialogue and potion list here..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-mono text-gray-950 placeholder-gray-400 transition-all resize-y"
+            oninput="clearErr('sc2-response')"></textarea>
+          <p id="sc2-response-error" class="hidden text-xs text-red-500 font-medium mt-1">Please paste the chatbot's response.</p>
+        </div>
+
+        <!-- Evaluation & Notes 2 -->
+        <div class="border-t border-gray-100 pt-4">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            How well did it work? <span class="text-red-500">*</span>
+          </label>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3" id="sc2-eval-picker">
+            <button type="button" class="eval-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-700 bg-gray-50 text-center" onclick="setEval(2, 'great', this)">🌟 Worked Great</button>
+            <button type="button" class="eval-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-700 bg-gray-50 text-center" onclick="setEval(2, 'tweaks', this)">✏️ Needed Minor Tweaks</button>
+            <button type="button" class="eval-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-700 bg-gray-50 text-center" onclick="setEval(2, 'failed', this)">⚠️ Missed Constraints</button>
+          </div>
+          <p id="sc2-eval-error" class="hidden text-xs text-red-500 font-medium mb-3">Please rate how well the prompt worked.</p>
+
+          <label for="sc2-notes" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            Brief Notes / Reflection
+          </label>
+          <input type="text" id="sc2-notes"
+            placeholder="e.g. The rhyming persona worked amazingly; side effects were hilarious!"
+            class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 placeholder-gray-400 transition-all">
+        </div>
+      </div>
+
+
+      <!-- ══════════════════════════════════════════════════════════
+           SCENARIO 3: Explaining AI to a 5th Grader
+           ══════════════════════════════════════════════════════════ -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-8" id="card-sc3">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-9 h-9 rounded-xl text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-orange-500 shadow-md">
+            3
+          </div>
+          <div>
+            <span class="text-[10px] font-black uppercase tracking-widest text-orange-600 bg-orange-50 px-2.5 py-0.5 rounded-full border border-orange-200">
+              Scenario 3 · Educational Analogy &amp; Clarity
+            </span>
+            <h2 class="text-lg font-black text-gray-900 mt-0.5">Explaining AI to a 5th Grader 🧠</h2>
+          </div>
+        </div>
+
+        <!-- Scenario Brief -->
+        <div class="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-4 md:p-5 mb-6 text-sm text-amber-950 leading-relaxed">
+          <p class="font-semibold text-amber-900 mb-2">The Situation:</p>
+          <p class="text-xs md:text-sm text-gray-800 leading-relaxed mb-4">
+            Your 10-year-old cousin sees you playing with an AI tool and asks with wide eyes:
+            <em>"How does the computer actually know how to write stories and answer questions? Does it have a tiny human brain inside?"</em>
+            You want to engineer a prompt that instructs the AI to explain <strong>Machine Learning / how AI learns from patterns</strong> using a fun real-world analogy (like a master chef baking cookies or an athlete practicing basketball shots).
+          </p>
+
+          <div class="bg-white/80 backdrop-blur-sm rounded-xl p-3.5 border border-amber-200/60">
+            <h4 class="text-xs font-black uppercase tracking-wider text-amber-900 mb-2">Target Element Constraints:</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-gray-700">
+              <div class="flex items-start gap-1.5">
+                <span class="text-orange-600 font-bold">• Task:</span> Explain how AI models learn from training data
+              </div>
+              <div class="flex items-start gap-1.5">
+                <span class="text-orange-600 font-bold">• Context:</span> Audience is a 10-year-old child; use a cooking or sports analogy; ZERO technical jargon
+              </div>
+              <div class="flex items-start gap-1.5">
+                <span class="text-orange-600 font-bold">• Persona:</span> Enthusiastic, friendly youth science mentor
+              </div>
+              <div class="flex items-start gap-1.5">
+                <span class="text-orange-600 font-bold">• Format:</span> Exactly 3 short paragraphs + 2-3 emojis + 1-sentence "Golden Rule" takeaway at the end
+              </div>
+              <div class="flex items-start gap-1.5 sm:col-span-2">
+                <span class="text-orange-600 font-bold">• Tone:</span> Warm, cheerful, super clear, and encouraging
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chatbot Selector 3 -->
+        <div class="mb-5">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            Which Chatbot are you testing with? <span class="text-red-500">*</span>
+          </label>
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-2" id="sc3-chatbot-picker">
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50 text-center" onclick="setChatbot(3, 'ChatGPT', this)">🤖 ChatGPT</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50 text-center" onclick="setChatbot(3, 'Gemini', this)">✨ Gemini</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50 text-center" onclick="setChatbot(3, 'Claude', this)">🧠 Claude</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50 text-center" onclick="setChatbot(3, 'Copilot', this)">💼 Copilot</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50 text-center" onclick="setChatbot(3, 'Other', this)">💬 Other</button>
+          </div>
+          <p id="sc3-chatbot-error" class="hidden text-xs text-red-500 font-medium mt-1">Please select which chatbot you used.</p>
+        </div>
+
+        <!-- Prompt Input 3 -->
+        <div class="mb-5">
+          <label for="sc3-prompt" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            Your Crafted Prompt <span class="text-red-500">*</span>
+          </label>
+          <p class="text-xs text-gray-500 mb-2">Combine the 5 elements with strict formatting constraints:</p>
+          <textarea id="sc3-prompt" rows="3"
+            placeholder="e.g. Act as an energetic, friendly science club mentor explaining how AI learns to a curious 10-year-old. Explain machine learning using a cooking recipe analogy without any technical buzzwords. Format your explanation in exactly 3 short paragraphs with fun emojis, followed by a 1-sentence Golden Rule summary..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-y"
+            oninput="clearErr('sc3-prompt')"></textarea>
+          <p id="sc3-prompt-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your prompt for Scenario 3.</p>
+        </div>
+
+        <!-- Chatbot Output 3 -->
+        <div class="mb-5">
+          <label for="sc3-response" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            Chatbot Output <span class="text-red-500">*</span>
+          </label>
+          <p class="text-xs text-gray-500 mb-2">Paste the generated explanation:</p>
+          <textarea id="sc3-response" rows="4"
+            placeholder="Paste the 3 paragraphs and takeaway here..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-mono text-gray-950 placeholder-gray-400 transition-all resize-y"
+            oninput="clearErr('sc3-response')"></textarea>
+          <p id="sc3-response-error" class="hidden text-xs text-red-500 font-medium mt-1">Please paste the chatbot's response.</p>
+        </div>
+
+        <!-- Evaluation & Notes 3 -->
+        <div class="border-t border-gray-100 pt-4">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            How well did it work? <span class="text-red-500">*</span>
+          </label>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3" id="sc3-eval-picker">
+            <button type="button" class="eval-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-700 bg-gray-50 text-center" onclick="setEval(3, 'great', this)">🌟 Worked Great</button>
+            <button type="button" class="eval-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-700 bg-gray-50 text-center" onclick="setEval(3, 'tweaks', this)">✏️ Needed Minor Tweaks</button>
+            <button type="button" class="eval-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-700 bg-gray-50 text-center" onclick="setEval(3, 'failed', this)">⚠️ Missed Constraints</button>
+          </div>
+          <p id="sc3-eval-error" class="hidden text-xs text-red-500 font-medium mb-3">Please rate how well the prompt worked.</p>
+
+          <label for="sc3-notes" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            Brief Notes / Reflection
+          </label>
+          <input type="text" id="sc3-notes"
+            placeholder="e.g. The chef baking cookies analogy made complete sense; it followed the 3-paragraph limit."
+            class="form-input w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 placeholder-gray-400 transition-all">
+        </div>
+      </div>
+
+
+      <!-- ══════════════════════════════════════════════════════════
+           WRAP-UP & REFLECTION CARD
+           ══════════════════════════════════════════════════════════ -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-8">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-9 h-9 rounded-xl text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-orange-500 shadow-md">
+            ⭐
+          </div>
+          <div>
+            <span class="text-[10px] font-black uppercase tracking-widest text-orange-600 bg-orange-50 px-2.5 py-0.5 rounded-full border border-orange-200">
+              Final Reflection
+            </span>
+            <h2 class="text-lg font-black text-gray-900 mt-0.5">Prompt Engineering Takeaway</h2>
+          </div>
+        </div>
+
+        <div class="mb-6">
+          <label for="takeaway" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            Which of the 5 elements (Task, Context, Persona, Format, Tone) made the biggest difference in your results, and why? <span class="text-red-500">*</span>
+          </label>
+          <textarea id="takeaway" rows="3"
+            placeholder="e.g. Specifying the Format (paragraphs and bullets) made the output much more usable, and setting the Persona completely changed how natural the tone sounded..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"
+            oninput="clearErr('takeaway')"></textarea>
+          <p id="takeaway-error" class="hidden text-xs text-red-500 font-medium mt-1">Please share your takeaway reflection.</p>
+        </div>
+
+        <!-- Enjoyment Rating -->
+        <div class="border-t border-gray-100 pt-5">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            How much did you enjoy this prompt engineering exercise?
+          </label>
+          <div class="flex items-center gap-1.5" id="star-picker">
+            <button type="button" class="star-btn" onclick="setRating(1)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(2)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(3)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(4)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(5)">⭐</button>
+            <span id="star-label" class="text-xs font-bold text-gray-500 ml-2">Click to rate</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Section -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm text-center">
+        <p class="text-xs text-gray-500 mb-5 max-w-md mx-auto">
+          Make sure you've tested all 3 scenarios with your chatbot and entered your prompts, responses, and reflections before submitting.
+        </p>
+
+        <button type="submit" id="submit-btn"
+          class="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-10 py-4 rounded-2xl font-black text-sm text-white shadow-lg shadow-orange-500/20 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 active:scale-[0.98] transition-all cursor-pointer">
+          <span id="submit-label">Submit Exercise →</span>
+        </button>
+
+        <div id="form-error" class="hidden mt-4 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-medium text-left">
+          <p class="font-bold mb-1">⚠️ Incomplete fields</p>
+          <p id="form-error-text">Please make sure you have filled in all required prompts, chatbots, responses, and ratings across all 3 scenarios.</p>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- ══ SUCCESS OVERLAY ══ -->
+  <div id="success-screen" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm">
+    <div class="bg-white border border-gray-100 rounded-3xl p-8 md:p-10 max-w-lg w-full text-center shadow-2xl animate-fade-in">
+      <div class="w-16 h-16 rounded-3xl flex items-center justify-center mx-auto mb-6 bg-orange-100 text-orange-600 text-3xl shadow-inner">
+        🎉
+      </div>
+      <h2 class="text-2xl md:text-3xl font-black text-gray-900 mb-2">
+        Great Job, <span id="success-name" class="text-orange-500">Student</span>!
+      </h2>
+      <p class="text-gray-600 text-sm leading-relaxed mb-6">
+        Your prompt engineering practice for all 3 scenarios has been saved and submitted to your teacher.
+      </p>
+
+      <div class="bg-orange-50 border border-orange-100 rounded-2xl p-4 mb-8 text-left text-xs text-orange-950">
+        <p class="font-bold text-orange-900 mb-1.5">What you practiced today:</p>
+        <ul class="space-y-1 text-orange-800">
+          <li>✓ <strong>Academic Communication</strong> — polite, formal tone with constraints</li>
+          <li>✓ <strong>Creative NPC Roleplay</strong> — immersive goblin persona &amp; formatting</li>
+          <li>✓ <strong>Educational Analogy</strong> — child-friendly clarity &amp; structure</li>
+        </ul>
+      </div>
+
+      <a href="index.html"
+        class="inline-flex items-center justify-center gap-2 w-full py-4 px-6 rounded-xl text-white font-black text-sm bg-gradient-to-r from-orange-500 to-amber-600 shadow-md hover:shadow-lg transition-all active:scale-95">
+        Return to Course Hub
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <script src="../../assets/js/introai-shared.js"></script>
+  <script>
+    /* ══ EXERCISE CONFIG ══ */
+    const EXERCISE_SLUG = 'week02_prompt_practice';
+
+    /* ── State ── */
+    let studentName = '', studentEmail = '';
+    const state = {
+      sc1: { chatbot: '', eval: '' },
+      sc2: { chatbot: '', eval: '' },
+      sc3: { chatbot: '', eval: '' },
+      enjoymentRating: null
+    };
+
+    /* ── Require session from course hub (index.html) ── */
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName  = session.name;
+      studentEmail = session.email;
+      trackExerciseStart(EXERCISE_SLUG);
+    })();
+
+    /* ══ SELECTION HANDLERS ══ */
+    function setChatbot(scenarioNum, botName, btn) {
+      state[`sc${scenarioNum}`].chatbot = botName;
+      document.querySelectorAll(`#sc${scenarioNum}-chatbot-picker .opt-btn`).forEach(b => {
+        b.classList.toggle('selected', b === btn);
+      });
+      document.getElementById(`sc${scenarioNum}-chatbot-error`).classList.add('hidden');
+    }
+
+    function setEval(scenarioNum, evalType, btn) {
+      state[`sc${scenarioNum}`].eval = evalType;
+      document.querySelectorAll(`#sc${scenarioNum}-eval-picker .eval-btn`).forEach(b => {
+        b.classList.remove('selected', 'selected-great', 'selected-tweaks', 'selected-failed');
+      });
+      btn.classList.add('selected', `selected-${evalType}`);
+      document.getElementById(`sc${scenarioNum}-eval-error`).classList.add('hidden');
+    }
+
+    function setRating(val) {
+      state.enjoymentRating = val;
+      const stars = document.querySelectorAll('#star-picker .star-btn');
+      stars.forEach((s, idx) => {
+        s.classList.toggle('active', idx < val);
+      });
+      const labels = ['Not my thing', 'It was okay', 'Pretty good', 'Really liked it!', 'Loved it! 🔥'];
+      document.getElementById('star-label').textContent = `${val}/5 — ${labels[val - 1]}`;
+    }
+
+    function clearErr(fieldId) {
+      const val = document.getElementById(fieldId).value.trim();
+      const errEl = document.getElementById(`${fieldId}-error`);
+      if (errEl) errEl.classList.toggle('hidden', !!val);
+      document.getElementById(fieldId).classList.toggle('error', !val);
+    }
+
+    /* ══ FORM SUBMISSION ══ */
+    async function handleSubmit(ev) {
+      ev.preventDefault();
+      let isValid = true;
+      let firstErrorEl = null;
+
+      function markError(id, isErr) {
+        const errEl = document.getElementById(`${id}-error`);
+        if (errEl) errEl.classList.toggle('hidden', !isErr);
+        const inputEl = document.getElementById(id);
+        if (inputEl) inputEl.classList.toggle('error', isErr);
+        if (isErr && !firstErrorEl) {
+          firstErrorEl = inputEl || errEl;
+        }
+      }
+
+      // Check Scenario 1
+      const sc1Prompt = document.getElementById('sc1-prompt').value.trim();
+      const sc1Response = document.getElementById('sc1-response').value.trim();
+      markError('sc1-prompt', !sc1Prompt);
+      if (!sc1Prompt) isValid = false;
+      markError('sc1-response', !sc1Response);
+      if (!sc1Response) isValid = false;
+      if (!state.sc1.chatbot) {
+        document.getElementById('sc1-chatbot-error').classList.remove('hidden');
+        if (!firstErrorEl) firstErrorEl = document.getElementById('card-sc1');
+        isValid = false;
+      }
+      if (!state.sc1.eval) {
+        document.getElementById('sc1-eval-error').classList.remove('hidden');
+        if (!firstErrorEl) firstErrorEl = document.getElementById('card-sc1');
+        isValid = false;
+      }
+
+      // Check Scenario 2
+      const sc2Prompt = document.getElementById('sc2-prompt').value.trim();
+      const sc2Response = document.getElementById('sc2-response').value.trim();
+      markError('sc2-prompt', !sc2Prompt);
+      if (!sc2Prompt) isValid = false;
+      markError('sc2-response', !sc2Response);
+      if (!sc2Response) isValid = false;
+      if (!state.sc2.chatbot) {
+        document.getElementById('sc2-chatbot-error').classList.remove('hidden');
+        if (!firstErrorEl) firstErrorEl = document.getElementById('card-sc2');
+        isValid = false;
+      }
+      if (!state.sc2.eval) {
+        document.getElementById('sc2-eval-error').classList.remove('hidden');
+        if (!firstErrorEl) firstErrorEl = document.getElementById('card-sc2');
+        isValid = false;
+      }
+
+      // Check Scenario 3
+      const sc3Prompt = document.getElementById('sc3-prompt').value.trim();
+      const sc3Response = document.getElementById('sc3-response').value.trim();
+      markError('sc3-prompt', !sc3Prompt);
+      if (!sc3Prompt) isValid = false;
+      markError('sc3-response', !sc3Response);
+      if (!sc3Response) isValid = false;
+      if (!state.sc3.chatbot) {
+        document.getElementById('sc3-chatbot-error').classList.remove('hidden');
+        if (!firstErrorEl) firstErrorEl = document.getElementById('card-sc3');
+        isValid = false;
+      }
+      if (!state.sc3.eval) {
+        document.getElementById('sc3-eval-error').classList.remove('hidden');
+        if (!firstErrorEl) firstErrorEl = document.getElementById('card-sc3');
+        isValid = false;
+      }
+
+      // Check Final Reflection
+      const takeaway = document.getElementById('takeaway').value.trim();
+      markError('takeaway', !takeaway);
+      if (!takeaway) isValid = false;
+
+      if (!isValid) {
+        document.getElementById('form-error').classList.remove('hidden');
+        if (firstErrorEl) {
+          firstErrorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
+      }
+
+      document.getElementById('form-error').classList.add('hidden');
+      const submitBtn = document.getElementById('submit-btn');
+      submitBtn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting…';
+
+      const payload = {
+        scenario_1: {
+          chatbot: state.sc1.chatbot,
+          prompt: sc1Prompt,
+          response: sc1Response,
+          evaluation: state.sc1.eval,
+          notes: document.getElementById('sc1-notes').value.trim() || null
+        },
+        scenario_2: {
+          chatbot: state.sc2.chatbot,
+          prompt: sc2Prompt,
+          response: sc2Response,
+          evaluation: state.sc2.eval,
+          notes: document.getElementById('sc2-notes').value.trim() || null
+        },
+        scenario_3: {
+          chatbot: state.sc3.chatbot,
+          prompt: sc3Prompt,
+          response: sc3Response,
+          evaluation: state.sc3.eval,
+          notes: document.getElementById('sc3-notes').value.trim() || null
+        },
+        key_element_takeaway: takeaway
+      };
+
+      try {
+        await submitExercise(EXERCISE_SLUG, payload, {
+          enjoymentRating: state.enjoymentRating
+        });
+      } catch (err) {
+        console.error('[Week 2] Submission error:', err);
+        submitBtn.disabled = false;
+        document.getElementById('submit-label').textContent = 'Submit Exercise →';
+        document.getElementById('form-error-text').textContent = '⚠️ Network error submitting your exercise: ' + (err.message || 'Please retry.');
+        document.getElementById('form-error').classList.remove('hidden');
+        return;
+      }
+
+      // Show success screen
+      document.getElementById('success-name').textContent = studentName.split(' ')[0] || 'Student';
+      document.getElementById('success-screen').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+
+</html>

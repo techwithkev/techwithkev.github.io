@@ -53,8 +53,9 @@ FROM introai, (VALUES
   ('week01_ai_self_assessment', 'Week 1 — AI Self-Assessment',           1, 4),
   -- Week 2
   ('week02_creative_prompting', 'Week 2 — Creative Prompting',           2, 1),
-  ('week02_persona_detective',  'Week 2 — Persona Detective',            2, 2),
-  ('week02_co_writer_story',    'Week 2 — Co-Writer Story',              2, 3),
+  ('week02_prompt_practice',    'Week 2 — Guided Prompt Practice',       2, 2),
+  ('week02_persona_detective',  'Week 2 — Persona Detective',            2, 3),
+  ('week02_co_writer_story',    'Week 2 — Co-Writer Story',              2, 4),
   -- Week 3
   ('week03_ai_pictionary',      'Week 3 — AI Pictionary',                3, 1),
   ('week03_prompt_comparison',  'Week 3 — Prompt Comparison',            3, 2),
