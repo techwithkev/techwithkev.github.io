@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Analyzer — Instructor Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../assets/js/teacher-shared.js"></script>
+  <style>
+    :root{--navy:#0d1117;--surface:#161b22;--surface2:#1c2230;--border:#30363d;--gold:#f0b429;--text:#e6edf3;--muted:#7d8590;--green:#3fb950;--red:#f85149;--blue:#58a6ff;--purple:#bc8cff;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--text);min-height:100vh;}
+    .site-header{border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;}
+    .back-link{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--gold);text-decoration:none;}
+    .back-link:hover{text-decoration:underline;}
+    .auth-badge{display:flex;align-items:center;gap:8px;font-size:.75rem;font-family:'DM Mono',monospace;color:var(--muted);}
+    .dot{width:7px;height:7px;border-radius:50%;background:var(--green);}
+    .logout-btn{background:none;border:1px solid var(--border);color:var(--red);font-size:.72rem;font-family:'DM Mono',monospace;padding:3px 9px;border-radius:5px;cursor:pointer;}
+    #login-gate{min-height:100vh;display:flex;align-items:center;justify-content:center;}
+    .login-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px 36px;width:400px;}
+    .login-card h2{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:20px;}
+    .field input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:.875rem;font-family:'DM Mono',monospace;outline:none;margin-bottom:10px;}
+    .field input:focus{border-color:var(--gold);}
+    .btn-gold{width:100%;background:var(--gold);color:#1a1200;font-weight:700;font-size:.9rem;padding:11px;border:none;border-radius:10px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+    #login-error{color:var(--red);font-size:.78rem;margin-top:8px;}
+    #app{display:none;}
+    .page-wrap{max-width:1200px;margin:0 auto;padding:40px 32px;}
+    .page-label{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--purple);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;}
+    .page-title{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;}
+    .page-title span{color:var(--purple);}
+    .page-subtitle{color:var(--muted);font-size:.875rem;margin-top:6px;margin-bottom:32px;}
+    .controls{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;align-items:center;}
+    .sel{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:.82rem;font-family:'DM Mono',monospace;outline:none;}
+    .sel:focus{border-color:var(--purple);}
+    .btn-sm{padding:7px 14px;border-radius:7px;font-size:.78rem;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;}
+    .btn-outline{background:none;border:1px solid var(--border);color:var(--text);}
+    .btn-outline:hover{border-color:var(--purple);}
+    .btn-purple{background:var(--purple);color:#1a0b33;}
+    .btn-purple:disabled{opacity:.5;cursor:not-allowed;}
+    .stats-row{display:flex;gap:14px;margin-bottom:28px;flex-wrap:wrap;}
+    .stat-chip{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 20px;}
+    .stat-chip .val{font-family:'DM Mono',monospace;font-size:1.3rem;font-weight:700;color:var(--purple);}
+    .stat-chip .lbl{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;}
+    .section-title{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;margin:32px 0 6px;}
+    .section-note{color:var(--muted);font-size:.78rem;margin-bottom:14px;}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+    @media (max-width:860px){.grid-2{grid-template-columns:1fr;}.page-wrap{padding:28px 16px;}}
+    .panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+    .panel-pad{padding:20px;}
+    .data-table{width:100%;border-collapse:collapse;font-size:.83rem;}
+    .data-table th{text-align:left;padding:11px 16px;font-family:'DM Mono',monospace;font-size:.67rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border-bottom:1px solid var(--border);}
+    .data-table td{padding:12px 16px;border-bottom:1px solid rgba(48,54,61,.5);vertical-align:middle;}
+    .data-table tr:last-child td{border-bottom:none;}
+    .mono{font-family:'DM Mono',monospace;}
+    .muted{color:var(--muted);}
+    .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.7rem;font-family:'DM Mono',monospace;}
+    .badge-red{background:rgba(248,81,73,.1);color:var(--red);border:1px solid rgba(248,81,73,.2);}
+    .badge-purple{background:rgba(188,140,255,.1);color:var(--purple);border:1px solid rgba(188,140,255,.25);}
+    .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-family:'DM Mono',monospace;font-size:.75rem;}
+    .bar-row .k{width:36px;color:var(--muted);}
+    .bar-track{flex:1;height:10px;background:var(--surface2);border-radius:5px;overflow:hidden;}
+    .bar-fill{height:100%;background:var(--purple);border-radius:5px;}
+    .bar-row .n{width:64px;text-align:right;color:var(--muted);}
+    .empty-state{padding:36px;text-align:center;color:var(--muted);font-size:.85rem;}
+    .error-state{padding:20px;color:var(--red);font-size:.85rem;}
+    .reflection{padding:14px 16px;border-bottom:1px solid rgba(48,54,61,.5);}
+    .reflection:last-child{border-bottom:none;}
+    .reflection .head{display:flex;justify-content:space-between;gap:12px;font-size:.82rem;font-weight:600;margin-bottom:6px;}
+    .reflection .stars{color:var(--gold);font-family:'DM Mono',monospace;letter-spacing:.1em;}
+    .reflection .ans{font-size:.8rem;color:var(--muted);line-height:1.5;margin-top:4px;white-space:pre-wrap;word-break:break-word;}
+    .reflection .ans b{color:var(--text);font-weight:500;}
+    .ai-out{font-size:.88rem;line-height:1.7;}
+    .ai-out strong{color:var(--purple);}
+    .ai-out li{margin-left:20px;list-style:disc;}
+    .ai-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;}
+  </style>
+</head>
+<body>
+
+<!-- ── LOGIN ──────────────────────────────────────────────── -->
+<div id="login-gate">
+  <div class="login-card">
+    <h2>🔑 Teacher Sign-In</h2>
+    <div class="field"><input type="email"    id="l-email"    placeholder="teacher@school.ca" /></div>
+    <div class="field"><input type="password" id="l-password" placeholder="Password" /></div>
+    <button class="btn-gold" onclick="doLogin()">Sign In</button>
+    <div id="login-error"></div>
+  </div>
+</div>
+
+<!-- ── APP ───────────────────────────────────────────────── -->
+<div id="app">
+  <header class="site-header">
+    <a href="index.html" class="back-link">← Instructor Hub</a>
+    <div class="auth-badge">
+      <div class="dot"></div>
+      <span id="auth-label">signed in</span>
+      <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+    </div>
+  </header>
+
+  <div class="page-wrap">
+    <p class="page-label">Analytics</p>
+    <h1 class="page-title">AI <span>Analyzer</span></h1>
+    <p class="page-subtitle">Cohort enjoyment, students falling behind, and an AI-written progress report for any student.</p>
+
+    <div class="controls">
+      <select class="sel" id="course-sel" onchange="onCourseChange()">
+        <option value="">Loading…</option>
+      </select>
+      <select class="sel" id="cohort-sel" onchange="loadCohort()">
+        <option value="">Select a cohort</option>
+      </select>
+      <button class="btn-sm btn-outline" onclick="loadCohort()">↻</button>
+    </div>
+
+    <div class="stats-row" id="stats-row"></div>
+
+    <h2 class="section-title">Enjoyment Ratings</h2>
+    <p class="section-note">Student 1–5 ratings, across every submission in this cohort.</p>
+    <div class="grid-2">
+      <div class="panel panel-pad" id="enjoy-dist"><div class="empty-state">Select a cohort.</div></div>
+      <div class="panel">
+        <table class="data-table">
+          <thead><tr><th>Exercise</th><th>Submissions</th><th>Avg</th></tr></thead>
+          <tbody id="enjoy-tbody"><tr><td colspan="3" class="empty-state">Select a cohort.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <h2 class="section-title">Falling Behind</h2>
+    <p class="section-note" id="flag-note"></p>
+    <div class="panel">
+      <table class="data-table">
+        <thead><tr><th>Student</th><th>Completed</th><th>Last Submission</th><th></th></tr></thead>
+        <tbody id="flag-tbody"><tr><td colspan="4" class="empty-state">Select a cohort.</td></tr></tbody>
+      </table>
+    </div>
+
+    <h2 class="section-title">Student Report</h2>
+    <p class="section-note">Read a student's written answers, then generate an AI-written summary. Only the student's first name and their answers are sent to the AI service — no email address.</p>
+    <div class="controls">
+      <select class="sel" id="student-sel" onchange="loadStudent()">
+        <option value="">Select a student</option>
+      </select>
+      <button class="btn-sm btn-purple" id="ai-btn" onclick="runAnalyzer()" disabled>✨ Generate AI summary</button>
+    </div>
+    <div class="grid-2">
+      <div class="panel" id="reflections"><div class="empty-state">Select a student to see their answers.</div></div>
+      <div class="panel panel-pad" id="ai-panel"><div class="empty-state">The AI summary appears here.</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var sb = createTeacherClient();
+  var currentUser = null;
+  var FLAG_BELOW_PCT = 50;      // flag students who completed less than this % of the cohort's visible exercises
+  var PAGE_SIZE = 1000;         // Supabase REST row cap per request
+  var MAX_ANSWER_KEYS = 12;     // answers per submission sent to the AI
+  var defsById = {};            // exercise_id -> exercise_definitions row (current course)
+  var students = [];            // [{ email, name, done, expected, last }]
+  var loadSeq = 0;              // guards against out-of-order responses when switching cohort
+  var studentSeq = 0;           // same, for the selected student / AI request
+  var studentSubs = [];         // full submissions (with payload) for the selected student
+  var lastReport = '';          // raw AI markdown, for the copy button
+
+  // ── Auth ─────────────────────────────────────────────────────
+  async function init() {
+    var session = await getTeacherSession();
+    if (session) { currentUser = session.user; setAuthed(); }
+  }
+  function setAuthed() {
+    document.getElementById('login-gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('auth-label').textContent = currentUser.email;
+    loadCourses();
+  }
+  async function doLogin() {
+    var { user, error } = await TeacherAuth.login(
+      document.getElementById('l-email').value.trim(),
+      document.getElementById('l-password').value
+    );
+    if (error) { document.getElementById('login-error').textContent = error; return; }
+    currentUser = user; setAuthed();
+  }
+  async function doLogout() { await TeacherAuth.logout(); location.reload(); }
+  ['l-email','l-password'].forEach(id =>
+    document.getElementById(id).addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); })
+  );
+
+  // ── Courses + Cohorts ─────────────────────────────────────────
+  async function loadCourses() {
+    var { data, error } = await sb.from('courses').select('id,name').eq('is_active',true).order('name');
+    if (error) { showError('Could not load courses: ' + error.message); return; }
+    document.getElementById('course-sel').innerHTML = (data||[]).map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');
+    if (data && data.length) await onCourseChange();
+  }
+
+  async function onCourseChange() {
+    var courseId = document.getElementById('course-sel').value;
+    var [cohortRes, defsRes] = await Promise.all([
+      sb.from('cohorts').select('id,name,term').eq('course_id',courseId).eq('is_active',true).order('term',{ascending:false}),
+      sb.from('exercise_definitions').select('id,label,week_number,sequence_order').eq('course_id',courseId).eq('is_active',true)
+        .order('week_number',{ascending:true}).order('sequence_order',{ascending:true})
+    ]);
+    if (cohortRes.error || defsRes.error) { showError('Could not load cohorts: ' + (cohortRes.error || defsRes.error).message); return; }
+
+    defsById = {};
+    (defsRes.data||[]).forEach(d => { defsById[d.id] = d; });
+
+    var cohorts = cohortRes.data || [];
+    document.getElementById('cohort-sel').innerHTML = cohorts.length
+      ? cohorts.map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('')
+      : '<option value="">No cohorts</option>';
+    await loadCohort();
+  }
+
+  // ── Paging helper (REST caps a single request at 1000 rows) ───
+  async function fetchAll(buildQuery) {
+    var rows = [];
+    for (var from = 0; ; from += PAGE_SIZE) {
+      var { data, error } = await buildQuery().range(from, from + PAGE_SIZE - 1);
+      if (error) throw error;
+      rows = rows.concat(data);
+      if (data.length < PAGE_SIZE) return rows;
+    }
+  }
+
+  // ── Cohort analysis ───────────────────────────────────────────
+  async function loadCohort() {
+    var cohortId = document.getElementById('cohort-sel').value;
+    var seq = ++loadSeq;
+    resetStudentPanels();
+    if (!cohortId) { renderEmpty('Select a cohort.'); return; }
+    renderEmpty('Loading…');
+
+    try {
+      var [visRes, rosterRes, subs] = await Promise.all([
+        sb.from('cohort_exercise_visibility').select('exercise_id,is_active').eq('cohort_id', cohortId),
+        sb.from('v_cohort_roster').select('student_email,student_name').eq('cohort_id', cohortId).limit(PAGE_SIZE),
+        fetchAll(() => sb.from('exercise_submissions')
+          .select('id,exercise_id,student_email,student_name,enjoyment_rating,submitted_at')
+          .eq('cohort_id', cohortId).order('id'))
+      ]);
+      if (visRes.error) throw visRes.error;
+      if (rosterRes.error) throw rosterRes.error;
+      if (seq !== loadSeq) return;
+
+      // Exercises are visible unless the cohort has an explicit is_active=false row.
+      var hidden = new Set(visRes.data.filter(v => !v.is_active).map(v => v.exercise_id));
+      var visibleIds = new Set(Object.keys(defsById).map(Number).filter(id => !hidden.has(id)));
+
+      // Roster lists every registered student (including zero submissions); add any submitter missing from it.
+      var byEmail = {};
+      rosterRes.data.forEach(r => { byEmail[r.student_email] = { email: r.student_email, name: r.student_name, done: new Set(), last: null }; });
+      subs.forEach(s => {
+        var st = byEmail[s.student_email] || (byEmail[s.student_email] = { email: s.student_email, name: s.student_name, done: new Set(), last: null });
+        if (visibleIds.has(s.exercise_id)) st.done.add(s.exercise_id);
+        if (!st.last || s.submitted_at > st.last) st.last = s.submitted_at;
+      });
+      students = Object.values(byEmail).map(st => ({ email: st.email, name: st.name, done: st.done.size, expected: visibleIds.size, last: st.last }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+      renderStats(subs);
+      renderEnjoyment(subs);
+      renderFlagged();
+      renderStudentSelect();
+    } catch (err) {
+      if (seq === loadSeq) renderEmpty('', 'Could not load cohort data: ' + err.message);
+    }
+  }
+
+  function renderEmpty(msg, errMsg) {
+    var html = errMsg ? `<div class="error-state">${esc(errMsg)}</div>` : `<div class="empty-state">${esc(msg)}</div>`;
+    document.getElementById('stats-row').innerHTML = '';
+    document.getElementById('enjoy-dist').innerHTML = html;
+    document.getElementById('enjoy-tbody').innerHTML = `<tr><td colspan="3">${html}</td></tr>`;
+    document.getElementById('flag-note').textContent = '';
+    document.getElementById('flag-tbody').innerHTML = `<tr><td colspan="4">${html}</td></tr>`;
+    document.getElementById('student-sel').innerHTML = '<option value="">Select a student</option>';
+  }
+
+  function showError(msg) { renderEmpty('', msg); }
+
+  function ratings(subs) { return subs.map(s => s.enjoyment_rating).filter(r => r != null); }
+
+  function renderStats(subs) {
+    var rs = ratings(subs);
+    var avg = rs.length ? (rs.reduce((a, b) => a + b, 0) / rs.length).toFixed(2) : '—';
+    var flagged = students.filter(isFlagged).length;
+    document.getElementById('stats-row').innerHTML = `
+      <div class="stat-chip"><div class="val">${students.length}</div><div class="lbl">Students</div></div>
+      <div class="stat-chip"><div class="val">${subs.length}</div><div class="lbl">Submissions</div></div>
+      <div class="stat-chip"><div class="val">${avg}${rs.length ? ' / 5' : ''}</div><div class="lbl">Avg Enjoyment</div></div>
+      <div class="stat-chip"><div class="val">${flagged}</div><div class="lbl">Falling Behind</div></div>`;
+  }
+
+  function renderEnjoyment(subs) {
+    var rs = ratings(subs);
+    if (!rs.length) {
+      document.getElementById('enjoy-dist').innerHTML = '<div class="empty-state">No enjoyment ratings yet.</div>';
+      document.getElementById('enjoy-tbody').innerHTML = '<tr><td colspan="3" class="empty-state">No enjoyment ratings yet.</td></tr>';
+      return;
+    }
+    var counts = [0, 0, 0, 0, 0, 0];
+    rs.forEach(r => { counts[r]++; });
+    document.getElementById('enjoy-dist').innerHTML = [5, 4, 3, 2, 1].map(n => `
+      <div class="bar-row">
+        <span class="k">${n} ★</span>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.round(counts[n] / rs.length * 100)}%;"></div></div>
+        <span class="n">${counts[n]} (${Math.round(counts[n] / rs.length * 100)}%)</span>
+      </div>`).join('');
+
+    var perEx = {};
+    subs.forEach(s => {
+      if (s.enjoyment_rating == null) return;
+      var e = perEx[s.exercise_id] || (perEx[s.exercise_id] = { n: 0, sum: 0 });
+      e.n++; e.sum += s.enjoyment_rating;
+    });
+    document.getElementById('enjoy-tbody').innerHTML = Object.keys(perEx).map(Number)
+      .sort((a, b) => exerciseOrder(a) - exerciseOrder(b))
+      .map(id => `<tr><td>${esc(exerciseLabel(id))}</td><td class="mono">${perEx[id].n}</td><td class="mono">${(perEx[id].sum / perEx[id].n).toFixed(2)}</td></tr>`)
+      .join('');
+  }
+
+  function exerciseLabel(id) { return defsById[id] ? defsById[id].label : 'Exercise #' + id; }
+  function exerciseOrder(id) { var d = defsById[id]; return d ? (d.week_number || 0) * 1000 + (d.sequence_order || 0) : Infinity; }
+
+  function isFlagged(st) { return st.expected > 0 && (st.done / st.expected) * 100 < FLAG_BELOW_PCT; }
+
+  function renderFlagged() {
+    var flagged = students.filter(isFlagged).sort((a, b) => a.done - b.done);
+    var expected = students.length ? students[0].expected : 0;
+    document.getElementById('flag-note').textContent =
+      `Students who have completed under ${FLAG_BELOW_PCT}% of the ${expected} exercises currently visible to this cohort.`;
+    document.getElementById('flag-tbody').innerHTML = flagged.length
+      ? flagged.map(st => `
+        <tr>
+          <td><span style="font-weight:600;">${esc(st.name)}</span></td>
+          <td><span class="badge badge-red">${st.done} / ${st.expected}</span></td>
+          <td class="muted">${fmtDate(st.last)}</td>
+          <td><button class="btn-sm btn-outline" data-email="${esc(st.email)}">Analyze →</button></td>
+        </tr>`).join('')
+      : `<tr><td colspan="4" class="empty-state">${expected ? 'Nobody is falling behind. 🎉' : 'No visible exercises for this cohort.'}</td></tr>`;
+  }
+
+  document.getElementById('flag-tbody').addEventListener('click', function (e) {
+    var btn = e.target.closest('button[data-email]');
+    if (!btn) return;
+    document.getElementById('student-sel').value = btn.dataset.email;
+    loadStudent();
+    document.getElementById('reflections').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // ── Student report ────────────────────────────────────────────
+  function renderStudentSelect() {
+    document.getElementById('student-sel').innerHTML = '<option value="">Select a student</option>' +
+      students.map(st => `<option value="${esc(st.email)}">${esc(st.name)}</option>`).join('');
+  }
+
+  function resetStudentPanels() {
+    studentSeq++;
+    studentSubs = [];
+    lastReport = '';
+    document.getElementById('ai-btn').disabled = true;
+    document.getElementById('reflections').innerHTML = '<div class="empty-state">Select a student to see their answers.</div>';
+    document.getElementById('ai-panel').innerHTML = '<div class="empty-state">The AI summary appears here.</div>';
+  }
+
+  async function loadStudent() {
+    var email = document.getElementById('student-sel').value;
+    var cohortId = document.getElementById('cohort-sel').value;
+    resetStudentPanels();
+    var seq = studentSeq;
+    if (!email) return;
+    document.getElementById('reflections').innerHTML = '<div class="empty-state">Loading…</div>';
+
+    var { data, error } = await sb.from('exercise_submissions')
+      .select('exercise_id,payload,enjoyment_rating,submitted_at')
+      .eq('cohort_id', cohortId).eq('student_email', email).order('submitted_at').limit(PAGE_SIZE);
+    if (seq !== studentSeq) return;
+    if (error) { document.getElementById('reflections').innerHTML = `<div class="error-state">Could not load answers: ${esc(error.message)}</div>`; return; }
+
+    studentSubs = data;
+    if (!data.length) {
+      document.getElementById('reflections').innerHTML = '<div class="empty-state">This student has no submissions yet.</div>';
+      return;
+    }
+    document.getElementById('reflections').innerHTML = data.map(s => {
+      var answers = answerEntries(s.payload).map(([k, v]) => `<div class="ans"><b>${esc(k)}:</b> ${esc(clip(v, 300))}</div>`).join('');
+      var stars = s.enjoyment_rating ? '★'.repeat(s.enjoyment_rating) + '☆'.repeat(5 - s.enjoyment_rating) : '';
+      return `<div class="reflection">
+        <div class="head"><span>${esc(exerciseLabel(s.exercise_id))}</span><span class="stars">${stars}</span></div>
+        ${answers || '<div class="ans">No written answers.</div>'}
+      </div>`;
+    }).join('');
+    document.getElementById('ai-btn').disabled = false;
+  }
+
+  // Payload keys that identify the student are never shown to the AI or in the reflection list.
+  function answerEntries(payload) {
+    return Object.entries(payload || {})
+      .filter(([k, v]) => !/email|name/i.test(k) && v !== null && v !== '' && typeof v !== 'undefined')
+      .slice(0, MAX_ANSWER_KEYS)
+      .map(([k, v]) => [k, typeof v === 'object' ? JSON.stringify(v) : String(v)]);
+  }
+
+  function clip(s, n) { return s.length > n ? s.slice(0, n) + '…' : s; }
+
+  async function runAnalyzer() {
+    var sel = document.getElementById('student-sel');
+    var st = students.find(x => x.email === sel.value);
+    if (!st || !studentSubs.length) return;
+
+    var btn = document.getElementById('ai-btn');
+    var panel = document.getElementById('ai-panel');
+    var seq = studentSeq;
+    btn.disabled = true;
+    panel.innerHTML = '<div class="empty-state">✨ Analyzing…</div>';
+
+    var summary = studentSubs.map(s => {
+      var d = defsById[s.exercise_id] || {};
+      return {
+        exercise_id: String(s.exercise_id),
+        exercise_title: exerciseLabel(s.exercise_id),
+        week: d.week_number,
+        submitted_at: s.submitted_at,
+        enjoyment_rating: s.enjoyment_rating,
+        score: typeof (s.payload || {}).score === 'number' ? s.payload.score : null,
+        key_answers: Object.fromEntries(answerEntries(s.payload))
+      };
+    });
+
+    try {
+      var res = await teacherFetch('/functions/v1/ai-dashboard', {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'student_analyzer',
+          payload: { student_name: st.name.split(' ')[0], submissions_summary: summary }
+        })
+      });
+      var body = await res.json().catch(() => ({}));
+      if (!res.ok || body.error) throw new Error(body.error || 'Request failed (' + res.status + ')');
+      if (seq !== studentSeq) return;   // teacher switched student while waiting
+      lastReport = body.analysis || '';
+      panel.innerHTML = `
+        <div class="ai-head">
+          <span class="badge badge-purple">${summary.length} submission${summary.length === 1 ? '' : 's'} analyzed</span>
+          <button class="btn-sm btn-outline" onclick="copyReport(this)">Copy</button>
+        </div>
+        <div class="ai-out">${renderMarkdown(lastReport) || '<span class="muted">(No commentary generated)</span>'}</div>`;
+    } catch (err) {
+      if (seq === studentSeq) panel.innerHTML = `<div class="error-state">Could not generate summary: ${esc(err.message)}</div>`;
+    } finally {
+      if (seq === studentSeq) btn.disabled = false;
+    }
+  }
+
+  function copyReport(btn) {
+    navigator.clipboard.writeText(lastReport).then(
+      () => { btn.textContent = 'Copied ✓'; setTimeout(() => { btn.textContent = 'Copy'; }, 1500); },
+      () => { btn.textContent = 'Copy failed'; }
+    );
+  }
+
+  // Escape first, then apply the few markdown forms the prompt asks for — model output is never trusted as HTML.
+  function renderMarkdown(md) {
+    return esc(md)
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/^\s*[-*]\s+(.*)$/gm, '<li>$1</li>')
+      .replace(/<\/li>\n/g, '</li>')
+      .replace(/\n/g, '<br>');
+  }
+
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function fmtDate(ts){if(!ts)return'Never';return new Date(ts).toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'});}
+
+  init();
+</script>
+</body>
+</html>
