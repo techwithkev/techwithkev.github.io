@@ -1,0 +1,27 @@
+/* Custom utilities used alongside Tailwind CDN */
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  line-height: 1;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.architect-gradient {
+  background: linear-gradient(135deg, #003345 0%, #004b63 100%);
+}
+
+.math-grid-bg {
+  background-image: radial-gradient(circle, #c0c7cd 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.05;
+  pointer-events: none;
+}
+
+.bg-grid {
+  background-image: radial-gradient(#003345 0.5px, transparent 0.5px);
+  background-size: 24px 24px;
+  opacity: 0.03;
+  pointer-events: none;
+}
+
+/*# sourceMappingURL=main.css.map */
