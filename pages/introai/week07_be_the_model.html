@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Be the Model | Intro to AI · Week 7</title>
+  <meta name="description"
+    content="Week 7 Activity: Be the Model! Learn from a few labeled examples, predict new cases, then see how more training data changes your accuracy.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/activity.css">
+  <style>
+    .form-input:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+    .form-input.error { border-color: #ef4444; }
+    .pick-btn { transition: all 0.15s ease; cursor: pointer; }
+    .pick-btn:hover { transform: translateY(-1px); }
+    .pick-btn.right { border-color: #16a34a !important; background: #f0fdf4 !important; color: #166534 !important; }
+    .pick-btn.wrong { border-color: #ef4444 !important; background: #fef2f2 !important; color: #991b1b !important; }
+    .star-btn { font-size: 26px; cursor: pointer; filter: grayscale(100%); transition: filter 0.15s ease, transform 0.1s ease; }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; animation: spin 0.65s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <div id="main-content" class="max-w-3xl mx-auto px-4 pt-8">
+
+    <header class="mb-6">
+      <a href="index.html" class="inline-flex items-center text-xs font-bold text-indigo-600 hover:text-indigo-700 transition-colors mb-3">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        Back to Course Hub
+      </a>
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <div class="inline-flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-indigo-100 text-indigo-800">Week 7 Activity</span>
+            <span class="text-xs text-gray-500 font-medium">Data Usage in AI</span>
+          </div>
+          <h1 class="text-3xl font-black text-gray-900 mt-1 tracking-tight">Be the Model 🤖</h1>
+        </div>
+        <div id="user-badge" class="hidden text-xs bg-indigo-50 border border-indigo-200 text-indigo-800 px-3 py-1.5 rounded-full font-bold"></div>
+      </div>
+    </header>
+
+    <div class="bg-gradient-to-br from-indigo-600 to-blue-700 text-white rounded-3xl p-6 shadow-xl mb-8">
+      <h2 class="text-lg font-extrabold mb-1">Your Mission</h2>
+      <p class="text-xs text-indigo-100 mb-4 leading-relaxed">
+        A game studio wants to predict which players will <strong>buy the new game</strong>. You are the AI.
+        Study the training examples, then predict new players. Then do it again with more data and see what changes.
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-medium">
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-indigo-200 block mb-0.5">Round 1</span>Learn from only 3 examples.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-indigo-200 block mb-0.5">Round 2</span>Learn from 12 examples.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-indigo-200 block mb-0.5">Reflect</span>Compare your accuracy.</div>
+      </div>
+    </div>
+
+    <form id="model-form" onsubmit="handleSubmit(event)" novalidate>
+
+      <!-- ROUND CARD (re-rendered for round 1 and 2) -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
+          <div class="flex items-center gap-3">
+            <div id="round-badge" class="w-8 h-8 rounded-full bg-indigo-600 text-white font-black flex items-center justify-center text-sm shadow">1</div>
+            <div>
+              <h3 id="round-title" class="text-base font-bold text-gray-900"></h3>
+              <p id="round-sub" class="text-xs text-gray-500"></p>
+            </div>
+          </div>
+          <div id="score-pill" class="text-xs font-black px-3 py-1.5 rounded-full bg-gray-100 text-gray-600">Score: 0 / 0</div>
+        </div>
+
+        <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Training data (the AI's experience)</p>
+        <div class="overflow-x-auto rounded-xl border border-gray-200 mb-5">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-gray-100 text-gray-700 font-bold">
+              <tr><th class="p-2">Player</th><th class="p-2">Favorite Genre</th><th class="p-2">Hours/Week</th><th class="p-2">Bought?</th></tr>
+            </thead>
+            <tbody id="train-body" class="divide-y divide-gray-100 font-mono text-gray-600"></tbody>
+          </table>
+        </div>
+
+        <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Now predict these new players</p>
+        <div id="test-list" class="space-y-3"></div>
+
+        <div id="round-result" class="hidden mt-5 p-4 rounded-2xl border text-xs leading-relaxed"></div>
+
+        <button type="button" id="next-btn" onclick="nextRound()"
+          class="hidden mt-4 w-full py-3 rounded-xl text-sm font-black text-white bg-indigo-600 hover:bg-indigo-700 shadow-md transition-all active:scale-95">
+          Start Round 2 with more data →
+        </button>
+      </div>
+
+      <!-- REFLECTION -->
+      <div id="reflect-card" class="hidden">
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 rounded-full bg-indigo-600 text-white font-black flex items-center justify-center text-sm shadow">3</div>
+            <div>
+              <h3 class="text-base font-bold text-gray-900">What did you learn?</h3>
+              <p class="text-xs text-gray-500">Think like a data scientist</p>
+            </div>
+          </div>
+          <div id="compare-box" class="mb-4 grid grid-cols-2 gap-3 text-center"></div>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">What rule did you use to predict? <span class="text-red-500">*</span></label>
+              <textarea id="rule-used" rows="2" placeholder="e.g. RPG players who play 10+ hours usually buy."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="rule-err" class="text-xs text-red-500 mt-1 hidden">Please describe your rule.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Why did more data change your results (or not)? <span class="text-red-500">*</span></label>
+              <textarea id="more-data" rows="2" placeholder="e.g. With only 3 examples I was guessing. With 12 I could see the pattern."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="more-err" class="text-xs text-red-500 mt-1 hidden">Please explain what more data did.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Which player broke the pattern, and why might that happen in real life? <span class="text-red-500">*</span></label>
+              <textarea id="exception" rows="2" placeholder="e.g. Maya plays 18 hours of RPGs but didn't buy. Maybe she can't afford it."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="exc-err" class="text-xs text-red-500 mt-1 hidden">Please describe the exception.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-8 text-center">
+          <h3 class="text-sm font-bold text-gray-900 mb-1">Activity Enjoyment Rating</h3>
+          <p class="text-xs text-gray-500 mb-3">How fun was playing the AI?</p>
+          <div id="star-rating" class="flex justify-center gap-2 mb-4">
+            <button type="button" class="star-btn" onclick="setRating(1)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(2)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(3)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(4)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(5)">⭐</button>
+          </div>
+          <p id="rating-err" class="text-xs text-red-500 mb-3 hidden">Please select a star rating.</p>
+          <div id="submit-error-banner" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-medium"></div>
+          <button type="submit" id="submit-btn"
+            class="w-full py-4 px-8 rounded-2xl text-base font-extrabold text-white shadow-xl transition-all hover:bg-indigo-700 active:scale-[0.99] flex items-center justify-center gap-2 bg-indigo-600">
+            <span>Submit Results 🚀</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div id="success-screen" class="hidden fixed inset-0 z-[120] bg-white flex items-center justify-center p-4">
+    <div class="max-w-md w-full text-center">
+      <div class="w-20 h-20 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+      </div>
+      <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800 mb-2">Model Trained! 🤖</span>
+      <h2 class="text-3xl font-black text-gray-900 mb-2">Great Job, <span id="success-first-name">Student</span>!</h2>
+      <p class="text-xs text-gray-600 mb-6 leading-relaxed">Your results have been recorded in the class database.</p>
+      <a href="index.html" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg transition-all">
+        <span>Back to Course Hub</span>
+      </a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../assets/js/introai-shared.js"></script>
+  <script>
+    const EXERCISE_SLUG = 'week07_be_the_model';
+
+    let studentName = '', studentEmail = '';
+    let enjoymentRating = 0;
+
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName = session.name;
+      studentEmail = session.email;
+      trackExerciseStart(EXERCISE_SLUG);
+    })();
+
+    // Hidden truth: RPG fans who play 10+ hours buy. Puzzle fans don't. Two exceptions are planted in the tests.
+    const ALL_TRAIN = [
+      ['Alex', 'RPG', 15, 'Yes'], ['Beth', 'RPG', 12, 'Yes'], ['Chris', 'Puzzle', 3, 'No'],
+      ['Dana', 'RPG', 20, 'Yes'], ['Evan', 'Puzzle', 4, 'No'], ['Faye', 'RPG', 2, 'No'],
+      ['Gus', 'Sports', 6, 'No'], ['Hana', 'RPG', 11, 'Yes'], ['Ivan', 'Puzzle', 14, 'No'],
+      ['Jade', 'Sports', 16, 'Yes'], ['Kofi', 'RPG', 3, 'No'], ['Lena', 'Puzzle', 5, 'No']
+    ];
+    const TESTS = [
+      { who: 'Mina', genre: 'RPG', hours: 14, answer: 'Yes' },
+      { who: 'Omar', genre: 'Puzzle', hours: 2, answer: 'No' },
+      { who: 'Priya', genre: 'RPG', hours: 4, answer: 'No' },
+      { who: 'Quinn', genre: 'Sports', hours: 18, answer: 'Yes' },
+      { who: 'Maya', genre: 'RPG', hours: 18, answer: 'No' }, // exception: breaks the pattern
+      { who: 'Theo', genre: 'Puzzle', hours: 13, answer: 'No' }
+    ];
+    const ROUNDS = [
+      { title: 'Round 1: Only 3 Examples', sub: 'A tiny dataset. Do your best.', train: ALL_TRAIN.slice(0, 3) },
+      { title: 'Round 2: 12 Examples', sub: 'Same test players, much more experience.', train: ALL_TRAIN }
+    ];
+
+    let round = 0;
+    let scores = [0, 0];
+    let answered = 0;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const badge = document.getElementById('user-badge');
+      badge.textContent = '\u{1F464} ' + studentName;
+      badge.classList.remove('hidden');
+      renderRound();
+    });
+
+    function renderRound() {
+      const r = ROUNDS[round];
+      answered = 0;
+      document.getElementById('round-badge').textContent = round + 1;
+      document.getElementById('round-title').textContent = r.title;
+      document.getElementById('round-sub').textContent = r.sub;
+      document.getElementById('score-pill').textContent = 'Score: 0 / ' + TESTS.length;
+      document.getElementById('round-result').classList.add('hidden');
+      document.getElementById('next-btn').classList.add('hidden');
+
+      document.getElementById('train-body').innerHTML = r.train.map(t =>
+        '<tr><td class="p-2">' + t[0] + '</td><td class="p-2">' + t[1] + '</td><td class="p-2">' + t[2] + '</td>' +
+        '<td class="p-2 font-bold ' + (t[3] === 'Yes' ? 'text-green-600' : 'text-red-500') + '">' + t[3] + '</td></tr>'
+      ).join('');
+
+      document.getElementById('test-list').innerHTML = TESTS.map((t, i) =>
+        '<div class="flex items-center justify-between flex-wrap gap-2 border border-gray-200 rounded-2xl p-3" id="test-' + i + '">' +
+        '<div class="text-xs"><span class="font-black text-gray-900">' + t.who + '</span> ' +
+        '<span class="text-gray-500">· ' + t.genre + ' · ' + t.hours + ' hrs/week</span></div>' +
+        '<div class="flex gap-2">' +
+        '<button type="button" class="pick-btn border border-gray-200 rounded-xl px-4 py-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="guess(' + i + ',\'Yes\',this)">Will buy</button>' +
+        '<button type="button" class="pick-btn border border-gray-200 rounded-xl px-4 py-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="guess(' + i + ',\'No\',this)">Won\'t buy</button>' +
+        '</div></div>'
+      ).join('');
+    }
+
+    function guess(i, pick, btn) {
+      const row = document.getElementById('test-' + i);
+      if (row.dataset.done) return;
+      row.dataset.done = '1';
+      const correct = TESTS[i].answer === pick;
+      if (correct) scores[round]++;
+      btn.classList.add(correct ? 'right' : 'wrong');
+      // Show the truth by marking the correct button when wrong
+      if (!correct) {
+        [...row.querySelectorAll('.pick-btn')].forEach(b => {
+          if ((b.textContent === 'Will buy') === (TESTS[i].answer === 'Yes')) b.classList.add('right');
+        });
+      }
+      row.querySelectorAll('.pick-btn').forEach(b => b.disabled = true);
+      answered++;
+      document.getElementById('score-pill').textContent = 'Score: ' + scores[round] + ' / ' + TESTS.length;
+      if (answered === TESTS.length) finishRound();
+    }
+
+    function finishRound() {
+      const pct = Math.round((scores[round] / TESTS.length) * 100);
+      const box = document.getElementById('round-result');
+      box.className = 'mt-5 p-4 rounded-2xl border text-xs leading-relaxed ' +
+        (pct >= 80 ? 'bg-green-50 border-green-200 text-green-900' : 'bg-amber-50 border-amber-200 text-amber-900');
+      const r1 = pct >= 80
+        ? 'Nice score, but with only 3 examples that could be luck. Could you explain WHY?'
+        : 'With so few examples, the pattern is hard to see. A real AI would struggle too.';
+      box.innerHTML = '<strong>Accuracy: ' + pct + '%.</strong> ' + (round === 0
+        ? r1
+        : 'More examples make a pattern easier to trust. But look at Maya: even a good model gets some cases wrong.');
+      box.classList.remove('hidden');
+      if (round === 0) {
+        document.getElementById('next-btn').classList.remove('hidden');
+      } else {
+        showReflection();
+      }
+    }
+
+    function nextRound() {
+      round = 1;
+      renderRound();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showReflection() {
+      const pct = i => Math.round((scores[i] / TESTS.length) * 100);
+      document.getElementById('compare-box').innerHTML =
+        '<div class="rounded-2xl border border-gray-200 p-3"><p class="text-[10px] font-black uppercase tracking-widest text-gray-400">3 examples</p><p class="text-2xl font-mono font-black text-gray-900">' + pct(0) + '%</p></div>' +
+        '<div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-3"><p class="text-[10px] font-black uppercase tracking-widest text-indigo-500">12 examples</p><p class="text-2xl font-mono font-black text-indigo-700">' + pct(1) + '%</p></div>';
+      const card = document.getElementById('reflect-card');
+      card.classList.remove('hidden');
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#star-rating .star-btn').forEach((s, idx) => s.classList.toggle('active', idx < val));
+      document.getElementById('rating-err').classList.add('hidden');
+    }
+
+    function checkField(id, errId) {
+      const el = document.getElementById(id);
+      const ok = !!el.value.trim();
+      el.classList.toggle('error', !ok);
+      document.getElementById(errId).classList.toggle('hidden', ok);
+      return ok;
+    }
+
+    async function handleSubmit(ev) {
+      ev.preventDefault();
+      const banner = document.getElementById('submit-error-banner');
+      banner.classList.add('hidden');
+
+      let valid = true;
+      valid = checkField('rule-used', 'rule-err') && valid;
+      valid = checkField('more-data', 'more-err') && valid;
+      valid = checkField('exception', 'exc-err') && valid;
+      if (enjoymentRating === 0) { document.getElementById('rating-err').classList.remove('hidden'); valid = false; }
+      if (!valid) {
+        banner.textContent = 'Please fill out all required fields marked in red.';
+        banner.classList.remove('hidden');
+        return;
+      }
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> <span>Submitting...</span>';
+
+      const payload = {
+        round1_correct: scores[0],
+        round2_correct: scores[1],
+        total_test_cases: TESTS.length,
+        rule_used: document.getElementById('rule-used').value.trim(),
+        more_data_reflection: document.getElementById('more-data').value.trim(),
+        exception_reflection: document.getElementById('exception').value.trim()
+      };
+
+      try {
+        await submitExercise(EXERCISE_SLUG, payload, { enjoymentRating: enjoymentRating || undefined });
+        document.getElementById('success-first-name').textContent = studentName.split(' ')[0] || 'Student';
+        document.getElementById('success-screen').classList.remove('hidden');
+      } catch (err) {
+        console.error('Submission error:', err);
+        banner.textContent = err.message || 'Failed to submit exercise. Please try again.';
+        banner.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerHTML = '<span>Submit Results 🚀</span>';
+      }
+    }
+  </script>
+</body>
+
+</html>

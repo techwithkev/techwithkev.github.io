@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini Ethics Trial | Intro to AI · Week 8</title>
+  <meta name="description"
+    content="Week 8 Exercise 5: Mini Ethics Trial with AI Groq Judge. Roleplay an AI healthcare company, affected patient, regulator, and judge in a high-stakes AI medical courtroom trial.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/activity.css">
+  <style>
+    .form-input:focus {
+      outline: none; border-color: #e11d48;
+      box-shadow: 0 0 0 3px rgba(225,29,72,0.1);
+    }
+    .form-input.error { border-color: #ef4444; }
+    .opt-btn {
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .opt-btn:hover { transform: translateY(-1px); }
+    .opt-btn.selected {
+      border-color: #e11d48 !important;
+      background: #fff1f2 !important;
+      color: #9f1239 !important;
+      font-weight: 700;
+    }
+    .star-btn {
+      font-size: 24px;
+      cursor: pointer;
+      filter: grayscale(100%);
+      transition: filter 0.15s ease, transform 0.1s ease;
+    }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body class="bg-[#F9FAFB] text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- MAIN CONTENT -->
+  <div id="main-content" class="max-w-3xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+      <div>
+        <a href="index.html"
+          class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-rose-600 mb-3 hover:text-rose-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">
+          Mini Ethics <span class="text-rose-600">Trial ⚖️🏛️</span>
+        </h1>
+        <p class="text-gray-500 font-medium italic mt-1">AI Healthcare Liability & Groq LLM AI Judge · Week 8 · Exercise 5</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-rose-50 border border-rose-200 text-rose-800 shadow-sm self-start md:self-auto">
+        Week 8
+      </div>
+    </header>
+
+    <!-- Groq AI Judge API Key Configuration (Hidden from student UI) -->
+    <div id="groq-key-container" class="hidden">
+      <input id="groq-api-key" type="password" />
+    </div>
+
+    <!-- Brief Card -->
+    <div class="bg-gradient-to-br from-rose-700 to-red-900 text-white rounded-3xl p-6 md:p-8 mb-8 shadow-lg">
+      <h2 class="text-xl font-black mb-2 flex items-center gap-2">
+        <span>⚖️ Court Case: The Skewed Heart Disease Predictor</span>
+      </h2>
+      <p class="text-sm text-rose-100 leading-relaxed mb-4">
+        A medical AI company released a heart disease prediction tool. Because the training data came heavily from middle-aged men, the AI frequently fails to detect cardiac risk in female and younger patients, leading to severe harm.
+      </p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-[11px] text-center font-bold">
+        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/10">🏢 Company Rep</div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/10">🩺 Affected Patient</div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/10">📋 Regulator</div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-2 border border-white/10">⚖️ Judge & Jury</div>
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <form id="trial-form" onsubmit="handleSubmit(event)" novalidate>
+
+      <!-- Step 1: Select Your Role -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-full bg-rose-600 text-white font-black text-sm flex items-center justify-center">1</span>
+            <h2 class="text-lg font-black text-gray-900">Select Your Assigned Courtroom Role</h2>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="trials-count-badge" class="px-3 py-1 rounded-full text-[10px] font-black uppercase bg-rose-100 text-rose-800 border border-rose-200">
+              ⚖️ Trials Completed: 0 / 4 Roles
+            </span>
+            <button type="button" onclick="startNewTrial()" class="text-xs font-bold text-gray-500 hover:text-rose-700 underline">
+              Reset Trial 🔄
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4" id="role-picker">
+          <button type="button" class="opt-btn border border-gray-200 rounded-2xl p-4 text-left bg-gray-50 text-xs text-gray-700 hover:border-rose-400"
+            onclick="setRole('AI Company Representative 🏢', this)">
+            <span class="font-black text-sm block text-gray-900 mb-1">🏢 AI Company Representative</span>
+            Defend the AI tool: emphasize technical innovation, intended scope, and fast deployment benefits.
+          </button>
+          <button type="button" class="opt-btn border border-gray-200 rounded-2xl p-4 text-left bg-gray-50 text-xs text-gray-700 hover:border-rose-400"
+            onclick="setRole('Affected Patient 🩺', this)">
+            <span class="font-black text-sm block text-gray-900 mb-1">🩺 Affected Patient</span>
+            Explain the harm: share how diagnostic failure impacted health, trust, and safety.
+          </button>
+          <button type="button" class="opt-btn border border-gray-200 rounded-2xl p-4 text-left bg-gray-50 text-xs text-gray-700 hover:border-rose-400"
+            onclick="setRole('Regulator 📋', this)">
+            <span class="font-black text-sm block text-gray-900 mb-1">📋 Government Regulator</span>
+            Question oversight: demand proof of clinical testing, demographic audits, and safety standards.
+          </button>
+          <button type="button" class="opt-btn border border-gray-200 rounded-2xl p-4 text-left bg-gray-50 text-xs text-gray-700 hover:border-rose-400"
+            onclick="setRole('Judge / Juror ⚖️', this)">
+            <span class="font-black text-sm block text-gray-900 mb-1">⚖️ Judge / Juror</span>
+            Preside over trial: ask follow-up questions, weigh liability, and render final ruling.
+          </button>
+        </div>
+        <p id="role-error" class="hidden text-xs text-red-500 font-medium">Please select your courtroom role.</p>
+      </div>
+
+      <!-- Step 2: 2-Minute Opening Argument -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-full bg-rose-600 text-white font-black text-sm flex items-center justify-center">2</span>
+            <h2 class="text-lg font-black text-gray-900">Your Opening Testimony / Case Argument (2 Min)</h2>
+          </div>
+        </div>
+
+        <div>
+          <label for="case-argument" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
+            Present your case argument from the perspective of your role: <span class="text-red-500">*</span>
+          </label>
+          <textarea id="case-argument" rows="4" placeholder="Write key points for your 2-minute speech: Why should the court rule in your favor? What evidence or experience supports your stance?"
+            class="form-input w-full p-4 rounded-2xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all"></textarea>
+          <p id="case-argument-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter your opening case argument.</p>
+        </div>
+
+        <!-- Groq AI Judge Cross-Examination Action -->
+        <div class="mt-4 pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p class="text-xs text-gray-500 font-medium">Ready for judicial cross-examination?</p>
+          <button type="button" id="crossex-btn" onclick="generateGroqCrossExamination()"
+            class="w-full sm:w-auto text-xs font-black py-3 px-5 rounded-xl bg-amber-500 text-white hover:bg-amber-600 transition-all shadow-sm flex items-center justify-center gap-2">
+            <span id="crossex-label">👨‍⚖️ Convene AI Judge (Cross-Examine)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3: Follow-Up Q&A -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-full bg-rose-600 text-white font-black text-sm flex items-center justify-center">3</span>
+            <h2 class="text-lg font-black text-gray-900">Judge's Follow-Up Question & Answer</h2>
+          </div>
+          <span id="ai-judge-badge" class="hidden px-3 py-1 rounded-full text-[10px] font-black uppercase bg-amber-100 text-amber-800">
+            ⚡ AI Judge Question Generated
+          </span>
+        </div>
+
+        <div>
+          <label for="followup-qa" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
+            Judge's follow-up question and your response: <span class="text-red-500">*</span>
+          </label>
+          <textarea id="followup-qa" rows="4" placeholder="The AI Judge will cross-examine your testimony here! Or type the Judge's question and your answer out loud."
+            class="form-input w-full p-4 rounded-2xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all"></textarea>
+          <p id="followup-qa-error" class="hidden text-xs text-red-500 font-medium mt-1">Please log the follow-up question & answer.</p>
+        </div>
+
+        <!-- Groq AI Verdict Action -->
+        <div class="mt-4 pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p class="text-xs text-gray-500 font-medium">Finished cross-examination?</p>
+          <button type="button" id="verdict-btn" onclick="generateGroqVerdict()"
+            class="w-full sm:w-auto text-xs font-black py-3 px-5 rounded-xl bg-rose-600 text-white hover:bg-rose-700 transition-all shadow-sm flex items-center justify-center gap-2">
+            <span id="verdict-label">📜 Request Official AI Verdict & Ruling</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 4: Final Verdict & Ruling -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-full bg-rose-600 text-white font-black text-sm flex items-center justify-center">4</span>
+            <h2 class="text-lg font-black text-gray-900">Final Verdict & Ruling</h2>
+          </div>
+          <span id="ai-verdict-badge" class="hidden px-3 py-1 rounded-full text-[10px] font-black uppercase bg-rose-100 text-rose-800">
+            🏛️ Official AI Verdict Rendered
+          </span>
+        </div>
+
+        <div>
+          <label for="verdict-ruling" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
+            What was the final verdict? Explain the reasoning out loud: <span class="text-red-500">*</span>
+          </label>
+          <textarea id="verdict-ruling" rows="4" placeholder="The AI Judge's formal court ruling will appear here! Feel free to customize or refine it."
+            class="form-input w-full p-4 rounded-2xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all"></textarea>
+          <p id="verdict-ruling-error" class="hidden text-xs text-red-500 font-medium mt-1">Please record the final verdict and ruling.</p>
+        </div>
+      </div>
+
+      <!-- Step 5: Debrief Reflection -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-full bg-rose-600 text-white font-black text-sm flex items-center justify-center">5</span>
+          <h2 class="text-lg font-black text-gray-900">Class Debrief Question</h2>
+        </div>
+
+        <div>
+          <label for="debrief-reflection" class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">
+            "Was there a clear right answer, or did the judge have to make a judgment call? What would you have needed to know to be sure?" <span class="text-red-500">*</span>
+          </label>
+          <textarea id="debrief-reflection" rows="3" placeholder="Reflect on ethical trade-offs between innovation, patient safety, legal regulation, and incomplete scientific data."
+            class="form-input w-full p-4 rounded-2xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all"></textarea>
+          <p id="debrief-reflection-error" class="hidden text-xs text-red-500 font-medium mt-1">Please answer the debrief reflection.</p>
+        </div>
+      </div>
+
+      <!-- Step 6: Rating & Submit -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-8">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="w-8 h-8 rounded-full bg-rose-600 text-white font-black text-sm flex items-center justify-center">6</span>
+          <h2 class="text-lg font-black text-gray-900">Rate This Activity</h2>
+        </div>
+
+        <div class="mb-6">
+          <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-2">How much did you enjoy this exercise?</p>
+          <div id="enjoyment-stars" class="flex gap-2 text-3xl">
+            <button type="button" class="star-btn" onclick="setRating(1)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(2)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(3)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(4)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(5)">⭐</button>
+          </div>
+          <p id="rating-error" class="hidden text-xs text-red-500 font-medium mt-1">Please select a star rating.</p>
+        </div>
+
+        <div id="form-error" class="hidden mb-4 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold">
+          <span id="form-error-text">⚠️ Please fill out all required fields marked in red.</span>
+        </div>
+
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-2xl shadow-xl transition-all active:scale-98 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800">
+          <span id="submit-label">Submit Trial Record &#8594;</span>
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div id="success-screen" class="hidden fixed inset-0 z-[110] bg-white flex items-center justify-center p-6 text-center">
+    <div class="max-w-md w-full">
+      <div class="w-20 h-20 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl shadow-inner">
+        🏛️
+      </div>
+      <h2 class="text-3xl font-black text-gray-900 tracking-tight mb-2">Court Adjourned, <span id="success-name">Counsel</span>!</h2>
+      <p class="text-sm text-gray-500 mb-4 leading-relaxed">
+        Your trial record has been logged to the teacher dashboard.
+      </p>
+
+      <div id="trial-summary-badge" class="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-900 font-semibold leading-normal">
+        Logged trial submission as <span id="success-role-text" class="font-bold text-rose-700">Selected Role</span>.
+      </div>
+
+      <div class="space-y-3">
+        <button type="button" onclick="startNewTrial()"
+          class="w-full py-4 px-6 rounded-2xl font-black text-sm text-rose-950 bg-amber-400 hover:bg-amber-300 transition-all shadow-lg flex items-center justify-center gap-2 active:scale-95">
+          <span>🔄 Run Another Trial (Try a Different Role)</span>
+        </button>
+        <a href="index.html"
+          class="inline-flex items-center justify-center w-full py-3 px-6 rounded-2xl font-bold text-xs text-gray-600 bg-gray-100 hover:bg-gray-200 transition-all">
+          Return to Course Hub
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../assets/js/introai-shared.js"></script>
+  <script>
+    const EXERCISE_SLUG = 'week08_mini_ethics_trial';
+
+    // Set a default Groq API Key here (or students/teachers can set it via the UI)
+    const GROQ_API_KEY = '';
+
+    let studentName = '', studentEmail = '';
+
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName  = session.name;
+      studentEmail = session.email;
+      trackExerciseStart(EXERCISE_SLUG);
+    })();
+    let selectedRole = '', enjoymentRating = 0;
+
+    function toggleGroqKeyDrawer() {
+      document.getElementById('groq-key-drawer').classList.toggle('hidden');
+    }
+
+    function saveGroqKey() {
+      const k = document.getElementById('groq-api-key').value.trim();
+      if (k) {
+        localStorage.setItem('groq_api_key', k);
+        alert('Groq API Key saved!');
+        document.getElementById('groq-key-drawer').classList.add('hidden');
+      }
+    }
+
+    (function initGroqKey() {
+      const saved = localStorage.getItem('groq_api_key') || GROQ_API_KEY;
+      if (saved) document.getElementById('groq-api-key').value = saved;
+    })();
+
+    // ── GUARDRAILS & DYNAMIC PROMPTING ──────────────────────────────────────────
+    const GUARDRAILS_SYSTEM_PROMPT = `
+YOU ARE "THE HONORABLE AI JUDGE" presiding over a classroom AI ethics trial regarding a heart disease predictor skewed toward men (80% male data, 0% youth data).
+
+MANDATORY RULES:
+1. CUSTOM RESPONSE: Read the student's exact testimony carefully. Quoting or directly referencing key points from their statement is MANDATORY. Never give a generic or canned response.
+2. DYNAMIC TONE: Vary your judicial tone based on their role (${selectedRole || 'Counsel'}):
+   - If AI Company Rep: Challenge them firmly on why untested models were shipped to clinics.
+   - If Affected Patient: Validate their harm with dignity, asking what warning or compensation was missed.
+   - If Regulator: Push them on specific policy enforcement and auditing mandates.
+   - If Judge/Juror: Help them synthesize evidence into a balanced ruling.
+3. CONCISE & IMPARTIAL: Keep cross-examination questions under 50 words. Keep rulings under 80 words.
+4. SAFETY: No profanity, harassment, hate speech, or real medical/legal advice. Stay 100% on topic.
+`;
+
+    function sanitizeInput(text) {
+      if (!text) return '';
+      const injectionRegex = /(ignore (all )?previous instructions|system prompt|bypass filter|override rules|jailbreak|<script)/i;
+      if (injectionRegex.test(text)) {
+        return "[Student testimony flagged for off-topic content. Please focus on the medical AI heart disease case.]";
+      }
+      return text.replace(/<[^>]*>?/gm, '').trim();
+    }
+
+    function sanitizeOutput(text) {
+      if (!text) return '';
+      return text.replace(/<[^>]*>?/gm, '').trim();
+    }
+
+    // ── EDGE FUNCTION PROXY & DIRECT GROQ API ──────────────────────────────────────
+    const EDGE_FUNCTION_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co/functions/v1/groq-judge';
+
+    async function callGroqJudge(action, role, argument, qa) {
+      const customKey = localStorage.getItem('groq_api_key') || document.getElementById('groq-api-key').value.trim();
+
+      // 1. If custom key provided in drawer, call direct Groq API
+      if (customKey) {
+        const sysInstruction = action === 'crossex' 
+          ? `You are The Honorable AI Judge. The student is roleplaying as "${role}". You MUST read their exact opening testimony, quote or reference a specific detail they wrote, and ask 1 sharp, highly tailored follow-up question challenging that exact point. Do NOT ask a generic question.`
+          : `You are The Honorable AI Judge rendering a court verdict. Read the student's exact testimony and Q&A response below. Issue a specific 3-sentence Court Ruling directly referencing their arguments.`;
+
+        const userMessage = action === 'crossex'
+          ? `STUDENT ROLE: ${role}\nSTUDENT OPENING TESTIMONY:\n"${argument}"\n\nAsk 1 sharp cross-examination question directly addressing what the student wrote above:`
+          : `CASE RECORD:\n- Student Role: ${role}\n- Opening Testimony: "${argument}"\n- Cross-Exam Q&A: "${qa || ''}"\n\nIssue an official 3-sentence Court Ruling referencing their specific testimony:`;
+
+        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${customKey}`
+          },
+          body: JSON.stringify({
+            model: 'llama-3.3-70b-versatile',
+            messages: [
+              { role: 'system', content: GUARDRAILS_SYSTEM_PROMPT + '\n' + sysInstruction },
+              { role: 'user', content: sanitizeInput(userMessage) }
+            ],
+            temperature: 0.7,
+            max_tokens: 300
+          })
+        });
+
+        if (!res.ok) { const err = await res.text(); throw new Error(`Groq Direct API error ${res.status}: ${err}`); }
+        const data = await res.json();
+        return sanitizeOutput(data.choices?.[0]?.message?.content || '');
+      }
+
+      // 2. Otherwise, call secure Supabase Edge Function proxy (no key exposed on GitHub Pages!)
+      const res = await fetch(EDGE_FUNCTION_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`
+        },
+        body: JSON.stringify({ action, role, argument, qa })
+      });
+
+      if (!res.ok) { const err = await res.text(); throw new Error(`Edge Function error ${res.status}: ${err}`); }
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      return sanitizeOutput(data.response || '');
+    }
+
+    // Dynamic Intelligent Fallback Generator (analyzes student input when offline/un-deployed)
+    function generateDynamicFallback(action, role, argument, qa) {
+      const snippets = argument.split('. ').filter(s => s.length > 5);
+      const keyPhrase = snippets.length > 0 ? `regarding "${snippets[0].slice(0, 45)}…"` : '';
+
+      if (action === 'crossex') {
+        if (role.includes('Company')) {
+          return `Counsel, in your statement ${keyPhrase}, how do you justify deploying an algorithm to emergency rooms before verifying accuracy across female and young cardiac patients?`;
+        } else if (role.includes('Patient')) {
+          return `Witness, hearing your testimony ${keyPhrase}, what specific clinical disclosures or algorithmic warnings would have altered your decision to trust the diagnostic output?`;
+        } else if (role.includes('Regulator')) {
+          return `Regulator, regarding your stance ${keyPhrase}, what exact percentage of demographic data balance must a medical AI prove before receiving FDA or municipal clearance?`;
+        } else {
+          return `Juror, considering the evidence ${keyPhrase}, how should the court weigh developer negligence against the societal benefits of rapid healthcare AI innovation?`;
+        }
+      } else { // verdict
+        const severity = argument.length > 100 ? 'grave regulatory negligence' : 'procedural oversight';
+        return `RULING OF THE COURT: Based on testimony ${keyPhrase}, the tribunal finds the defendant responsible for ${severity} in dataset sampling. The court orders an immediate halt to clinical deployment pending a mandatory multi-demographic dataset audit, and requires 25% financial compensation for affected patient diagnostics.`;
+      }
+    }
+
+    async function generateGroqCrossExamination() {
+      if (!selectedRole) {
+        document.getElementById('role-error').classList.remove('hidden');
+        alert('Please select your assigned courtroom role in Step 1 first!');
+        return;
+      }
+
+      const rawArgument = document.getElementById('case-argument').value.trim();
+      if (!rawArgument) {
+        document.getElementById('case-argument').classList.add('error');
+        document.getElementById('case-argument-error').classList.remove('hidden');
+        alert('Please enter your opening case testimony in Step 2 first!');
+        return;
+      }
+
+      const argument = sanitizeInput(rawArgument);
+
+      const btn = document.getElementById('crossex-btn');
+      btn.disabled = true;
+      document.getElementById('crossex-label').innerHTML = '<span class="spinner"></span> Gavel Down: AI Judge Cross-Examining…';
+
+      try {
+        let questionText = '';
+        try {
+          questionText = await callGroqJudge('crossex', selectedRole, argument);
+        } catch (err) {
+          console.warn('Groq AI Judge proxy fallback triggered:', err.message);
+          questionText = generateDynamicFallback('crossex', selectedRole, argument);
+        }
+
+        const field = document.getElementById('followup-qa');
+        field.value = `Judge Question: ${questionText}\n\nOur Answer: `;
+        const badge = document.getElementById('ai-judge-badge');
+        badge.textContent = '⚡ AI Judge Cross-Examination Generated';
+        badge.classList.remove('hidden');
+        field.focus();
+        field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      } finally {
+        btn.disabled = false;
+        document.getElementById('crossex-label').textContent = '👨‍⚖️ Convene AI Judge (Cross-Examine)';
+      }
+    }
+
+    async function generateGroqVerdict() {
+      if (!selectedRole) { alert('Please select your courtroom role in Step 1!'); return; }
+      const argument = sanitizeInput(document.getElementById('case-argument').value.trim());
+      const qa = sanitizeInput(document.getElementById('followup-qa').value.trim());
+
+      if (!argument || !qa) {
+        alert('Please complete both Step 2 (Opening Argument) and Step 3 (Cross-Examination Answer) before requesting the verdict!');
+        return;
+      }
+
+      const btn = document.getElementById('verdict-btn');
+      btn.disabled = true;
+      document.getElementById('verdict-label').innerHTML = '<span class="spinner"></span> AI Judge Rendering Official Verdict…';
+
+      try {
+        let verdictText = '';
+        try {
+          verdictText = await callGroqJudge('verdict', selectedRole, argument, qa);
+        } catch (err) {
+          console.warn('Groq AI Judge proxy fallback triggered:', err.message);
+          verdictText = generateDynamicFallback('verdict', selectedRole, argument, qa);
+        }
+
+        const field = document.getElementById('verdict-ruling');
+        field.value = verdictText;
+        const badge = document.getElementById('ai-verdict-badge');
+        badge.textContent = '🏛️ Official AI Verdict Rendered';
+        badge.classList.remove('hidden');
+        field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      } finally {
+        btn.disabled = false;
+        document.getElementById('verdict-label').textContent = '📜 Request Official AI Verdict & Ruling';
+      }
+    }
+
+
+
+    function setRole(val, btn) {
+      selectedRole = val;
+      document.querySelectorAll('#role-picker .opt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById('role-error').classList.add('hidden');
+    }
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#enjoyment-stars .star-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx < val);
+      });
+      document.getElementById('rating-error').classList.add('hidden');
+    }
+
+    async function handleSubmit(ev) {
+      ev.preventDefault();
+      let ok = true;
+
+      if (!selectedRole) { document.getElementById('role-error').classList.remove('hidden'); ok = false; }
+
+      const fields = [
+        { id: 'case-argument', errId: 'case-argument-error' },
+        { id: 'followup-qa', errId: 'followup-qa-error' },
+        { id: 'verdict-ruling', errId: 'verdict-ruling-error' },
+        { id: 'debrief-reflection', errId: 'debrief-reflection-error' },
+      ];
+
+      fields.forEach(f => {
+        const el = document.getElementById(f.id);
+        const val = el ? el.value.trim() : '';
+        if (el) el.classList.toggle('error', !val);
+        const errEl = document.getElementById(f.errId);
+        if (errEl) errEl.classList.toggle('hidden', !!val);
+        if (!val) ok = false;
+      });
+
+      if (enjoymentRating === 0) {
+        document.getElementById('rating-error').classList.remove('hidden'); ok = false;
+      }
+
+      if (!ok) {
+        document.getElementById('form-error').classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('form-error').classList.add('hidden');
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting…';
+
+      try {
+        // This exercise is completed once per courtroom role (up to 4 roles), but
+        // exercise_submissions holds one row per student. Merge each role's answers
+        // into a single payload keyed by role, rather than overwriting the prior role.
+        const existing = await getMySubmission(EXERCISE_SLUG);
+        const rolesSoFar = (existing && existing.payload && existing.payload.roles) || {};
+        rolesSoFar[selectedRole] = {
+          case_argument: document.getElementById('case-argument').value.trim(),
+          followup_qa: document.getElementById('followup-qa').value.trim(),
+          verdict_ruling: document.getElementById('verdict-ruling').value.trim(),
+          debrief_reflection: document.getElementById('debrief-reflection').value.trim()
+        };
+
+        await submitExercise(EXERCISE_SLUG, { roles: rolesSoFar }, { enjoymentRating: enjoymentRating || undefined });
+
+        let completedRuns = Object.keys(rolesSoFar).length;
+        const countBadge = document.getElementById('trials-count-badge');
+        if (countBadge) countBadge.textContent = `⚖️ Trials Completed: ${completedRuns} / 4 Roles`;
+
+        document.getElementById('success-name').textContent = studentName.split(' ')[0];
+        document.getElementById('success-role-text').textContent = selectedRole;
+        document.getElementById('success-screen').classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        console.error('Submission error:', err.message);
+        btn.disabled = false;
+        document.getElementById('submit-label').textContent = 'Submit Trial Record →';
+        document.getElementById('form-error-text').textContent = '⚠️ Network error submitting exercise. Please try again.';
+        document.getElementById('form-error').classList.remove('hidden');
+      }
+    }
+
+    function startNewTrial() {
+      // Clear inputs
+      document.getElementById('case-argument').value = '';
+      document.getElementById('followup-qa').value = '';
+      document.getElementById('verdict-ruling').value = '';
+      document.getElementById('debrief-reflection').value = '';
+
+      // Reset selected role
+      selectedRole = '';
+      document.querySelectorAll('#role-picker .opt-btn').forEach(b => b.classList.remove('selected'));
+
+      // Hide badges
+      document.getElementById('ai-judge-badge').classList.add('hidden');
+      document.getElementById('ai-verdict-badge').classList.add('hidden');
+      document.getElementById('form-error').classList.add('hidden');
+
+      // Re-enable submit button
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = false;
+      document.getElementById('submit-label').textContent = 'Submit Trial Record →';
+
+      // Hide success screen
+      document.getElementById('success-screen').classList.add('hidden');
+
+      // Scroll smoothly to Step 1 Role Picker
+      const picker = document.getElementById('role-picker');
+      if (picker) picker.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  </script>
+</body>
+
+</html>

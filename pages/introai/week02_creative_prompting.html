@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creative Prompting | Intro to AI · Week 2</title>
+  <meta name="description"
+    content="Guided Practice: Creative Prompting. Craft a prompt with specific constraints to make a chatbot write a funny robot toast poem.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/activity.css">
+  <style>
+    /* Form elements */
+    .form-input:focus {
+      outline: none; border-color: #f97316;
+      box-shadow: 0 0 0 3px rgba(249,115,22,0.1);
+    }
+    .form-input.error { border-color: #ef4444; }
+
+    /* Interactive prompt builder block */
+    .prompt-block {
+      transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+    }
+    .prompt-block:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(249,115,22,0.08);
+    }
+
+    /* Option toggle buttons */
+    .opt-btn {
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .opt-btn:hover { transform: translateY(-1px); }
+    .opt-btn.selected {
+      border-color: #f97316 !important;
+      background: #fff7ed !important;
+      color: #c2410c !important;
+      font-weight: 700;
+    }
+
+    /* Toggle switches */
+    .toggle-pill {
+      transition: all 0.15s ease;
+    }
+    .toggle-pill.active {
+      background-color: #10b981;
+      color: white;
+      border-color: #10b981;
+    }
+    .toggle-pill.inactive {
+      background-color: #fee2e2;
+      color: #991b1b;
+      border-color: #fca5a5;
+    }
+
+    /* Spinner */
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body class="bg-[#F9FAFB] text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- ══ MAIN CONTENT ══
+       Session (name, email, cohort) comes from the course hub gate: see requireSession() below. -->
+  <div id="main-content" class="max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <!-- Header -->
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+      <div>
+        <a href="index.html"
+          class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-orange-600 mb-3 hover:text-orange-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">
+          Creative <span class="text-orange-500">Prompting</span>
+        </h1>
+        <p class="text-gray-500 font-medium italic mt-1">Module 1 · Foundations &amp; Thinking · Week 2</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-orange-50 border border-orange-200 text-orange-800 shadow-sm self-start md:self-auto">
+        Week 2
+      </div>
+    </header>
+
+    <!-- Guided Scenario Brief -->
+    <div class="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-100 rounded-3xl p-6 mb-8 shadow-sm">
+      <div class="flex gap-4">
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 bg-orange-500 text-white shadow-md">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-lg font-black text-orange-950 mb-1">Guided Practice: Creative Scenario</h2>
+          <p class="text-sm text-orange-900 leading-relaxed mb-4">
+            Create a prompt that instructs an AI chatbot to write a short, funny poem about a robot trying and failing to make toast. The robot must be the narrator.
+          </p>
+          <div class="grid grid-cols-2 gap-3 text-xs font-medium text-orange-800 bg-white/70 backdrop-blur-sm p-4 rounded-xl border border-orange-100/50">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-orange-500"></span>
+              <strong>Task:</strong> Write a poem
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-orange-500"></span>
+              <strong>Tone:</strong> Funny
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-orange-500"></span>
+              <strong>Persona:</strong> Frustrated robot
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-orange-500"></span>
+              <strong>Format:</strong> Poem, 4-6 lines
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN FORM -->
+    <form id="prompt-form" onsubmit="handleSubmit(event)" novalidate>
+
+      <!-- STEP 1: Prompt Builder Helper -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-orange-500">1</div>
+          <h2 class="text-base font-black text-gray-900">Plan &amp; Draft Your Prompt</h2>
+        </div>
+        <p class="text-xs text-gray-500 mb-6">
+          Write a single prompt containing all 4 required constraints. Try combining them naturally:
+        </p>
+
+        <!-- Prompt input -->
+        <div class="mb-4">
+          <label for="initial-prompt" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            Your Prompt <span class="text-red-500">*</span>
+          </label>
+          <textarea id="initial-prompt" rows="3"
+            placeholder="e.g. Write a funny 4-line poem from the perspective of a frustrated robot who just burned a piece of toast..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"
+            oninput="checkStep1()"></textarea>
+          <p id="prompt-error" class="hidden text-xs text-red-500 font-medium mt-1">Please write your prompt.</p>
+        </div>
+
+        <!-- Chatbot Used -->
+        <div>
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-3">Which Chatbot did you use?</label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="chatbot-picker">
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="setChatbot('ChatGPT')">🤖 ChatGPT</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="setChatbot('Gemini')">✨ Gemini</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="setChatbot('Claude')">🧠 Claude</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="setChatbot('Copilot')">💼 Copilot</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="setChatbot('Other')">💬 Other</button>
+          </div>
+          <p id="chatbot-error" class="hidden text-xs text-red-500 font-medium mt-2">Please choose a chatbot.</p>
+        </div>
+      </div>
+
+      <!-- STEP 2: Chatbot Response -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-orange-500">2</div>
+          <h2 class="text-base font-black text-gray-900">Record Chatbot's Response</h2>
+        </div>
+        <p class="text-xs text-gray-500 mb-4">
+          Copy and paste the exact poem or response the chatbot returned:
+        </p>
+
+        <div>
+          <textarea id="initial-response" rows="5"
+            placeholder="Paste the robot poem here..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-mono text-gray-950 placeholder-gray-400 transition-all resize-none"
+            oninput="checkStep2()"></textarea>
+          <p id="response-error" class="hidden text-xs text-red-500 font-medium mt-1">Please paste the chatbot's response.</p>
+        </div>
+      </div>
+
+      <!-- STEP 3: Evaluation Checklist -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-orange-500">3</div>
+          <h2 class="text-base font-black text-gray-900">Evaluate Constraints</h2>
+        </div>
+        <p class="text-xs text-gray-500 mb-5">
+          Review the chatbot's poem and tick whether it successfully met each constraint:
+        </p>
+
+        <div class="space-y-3.5 mb-5">
+          <!-- Constraint 1: Task -->
+          <div class="flex items-center justify-between p-3.5 rounded-xl bg-gray-50 border border-gray-100">
+            <div>
+              <p class="text-sm font-bold text-gray-900">Task Met?</p>
+              <p class="text-xs text-gray-400">Did it write a poem about failing to make toast?</p>
+            </div>
+            <button type="button" id="toggle-task" onclick="toggleConstraint('task')"
+              class="toggle-pill px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wider border transition-all active:scale-95 inactive">
+              Fail
+            </button>
+          </div>
+
+          <!-- Constraint 2: Tone -->
+          <div class="flex items-center justify-between p-3.5 rounded-xl bg-gray-50 border border-gray-100">
+            <div>
+              <p class="text-sm font-bold text-gray-900">Tone Met?</p>
+              <p class="text-xs text-gray-400">Was the poem funny or humorous?</p>
+            </div>
+            <button type="button" id="toggle-tone" onclick="toggleConstraint('tone')"
+              class="toggle-pill px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wider border transition-all active:scale-95 inactive">
+              Fail
+            </button>
+          </div>
+
+          <!-- Constraint 3: Persona -->
+          <div class="flex items-center justify-between p-3.5 rounded-xl bg-gray-50 border border-gray-100">
+            <div>
+              <p class="text-sm font-bold text-gray-900">Persona Met?</p>
+              <p class="text-xs text-gray-400">Was it narrated from the frustrated robot's point of view?</p>
+            </div>
+            <button type="button" id="toggle-persona" onclick="toggleConstraint('persona')"
+              class="toggle-pill px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wider border transition-all active:scale-95 inactive">
+              Fail
+            </button>
+          </div>
+
+          <!-- Constraint 4: Format -->
+          <div class="flex items-center justify-between p-3.5 rounded-xl bg-gray-50 border border-gray-100">
+            <div>
+              <p class="text-sm font-bold text-gray-900">Format Met?</p>
+              <p class="text-xs text-gray-400">Did it limit the length to exactly 4–6 lines?</p>
+            </div>
+            <button type="button" id="toggle-format" onclick="toggleConstraint('format')"
+              class="toggle-pill px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wider border transition-all active:scale-95 inactive">
+              Fail
+            </button>
+          </div>
+        </div>
+
+        <!-- Line Count Input -->
+        <div>
+          <label for="actual-line-count" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            How many lines did it actually write? <span class="text-red-500">*</span>
+          </label>
+          <input id="actual-line-count" type="number" min="0" placeholder="e.g. 4, 6, 8..."
+            class="form-input w-28 px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-bold text-gray-900 transition-all" />
+          <p id="line-count-error" class="hidden text-xs text-red-500 font-medium mt-1">Please enter the actual line count.</p>
+        </div>
+      </div>
+
+      <!-- STEP 4: Refinement (Optional) -->
+      <div id="refinement-section" class="hidden bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-orange-500">4</div>
+          <h2 class="text-base font-black text-gray-900">Refine Your Prompt</h2>
+        </div>
+        <p class="text-xs text-gray-500 mb-5">
+          If the chatbot failed to meet any constraint (e.g. wrote too many lines), write a refined prompt to correct it, run it, and record the new output below:
+        </p>
+
+        <div class="mb-4">
+          <label for="refined-prompt" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">Refined Prompt</label>
+          <textarea id="refined-prompt" rows="2"
+            placeholder="e.g. Limit the poem to exactly 4 lines maximum. Do not write more than 4 lines."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"></textarea>
+        </div>
+
+        <div>
+          <label for="refined-response" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">Refined Chatbot Response</label>
+          <textarea id="refined-response" rows="4"
+            placeholder="Paste the new response..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-mono text-gray-950 placeholder-gray-400 transition-all resize-none"></textarea>
+        </div>
+      </div>
+
+      <!-- STEP 5: Reflection -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-8">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-orange-50">★</div>
+          <h2 class="text-base font-black text-gray-900">Key Takeaway</h2>
+        </div>
+        <div>
+          <label for="takeaway" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            What did you learn about prompting constraints?
+            <span class="normal-case text-gray-400 font-medium ml-1">(optional)</span>
+          </label>
+          <textarea id="takeaway" rows="3"
+            placeholder="e.g. I realized that the chatbot often ignores specific line limits unless you emphasize them..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"></textarea>
+        </div>
+      </div>
+
+      <!-- Submit Section -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm">
+        <p id="form-error" class="hidden text-sm font-medium text-red-500 mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+          <span id="form-error-text">Please complete all required fields.</span>
+        </p>
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700">
+          <span id="submit-label">Submit Exercise →</span>
+        </button>
+        <p class="text-center text-xs text-gray-400 font-medium mt-3">Your teacher will be able to review your prompt and evaluation.</p>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- ══ SUCCESS SCREEN ══ -->
+  <div id="success-screen"
+    class="hidden fixed inset-0 z-[90] bg-[#F9FAFB] flex items-center justify-center p-4">
+    <div class="text-center max-w-md bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+      <div class="w-20 h-20 mx-auto rounded-2xl mb-6 flex items-center justify-center bg-orange-100 text-orange-600 shadow-sm">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <div class="inline-block px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 bg-orange-50 text-orange-800">
+        Exercise Complete!
+      </div>
+      <h2 class="text-3xl font-black text-gray-900 mb-3 tracking-tight">
+        Awesome, <span id="success-name" class="text-orange-600"></span>!
+      </h2>
+      <p class="text-gray-500 mb-8 leading-relaxed text-sm">
+        Your prompt analysis has been successfully recorded. Your teacher can now view your robot poem and constraint scores on their dashboard.
+      </p>
+      <a href="index.html"
+        class="inline-flex items-center gap-2 text-white font-black py-3.5 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm bg-gradient-to-r from-orange-500 to-amber-600">
+        Return to Course Hub
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <script src="../../assets/js/introai-shared.js"></script>
+  <script>
+    /* ══ EXERCISE CONFIG ══ */
+    const EXERCISE_SLUG = 'week02_creative_prompting';
+
+    /* ── State ── */
+    let studentName = '', studentEmail = '';
+    let selectedChatbot = '';
+    const constraints = { task: false, tone: false, persona: false, format: false };
+
+    /* ── Require a session from the course hub (index.html) ── */
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName  = session.name;
+      studentEmail = session.email;
+      trackExerciseStart(EXERCISE_SLUG);
+    })();
+
+    /* ══ CHATBOT SELECTION ══ */
+    function setChatbot(val) {
+      selectedChatbot = val;
+      document.querySelectorAll('#chatbot-picker .opt-btn').forEach(b => {
+        b.classList.toggle('selected', b.textContent.includes(val));
+      });
+      document.getElementById('chatbot-error').classList.add('hidden');
+    }
+
+    /* ══ CONSTRAINT CHECKLIST ══ */
+    function toggleConstraint(type) {
+      constraints[type] = !constraints[type];
+      const btn = document.getElementById(`toggle-${type}`);
+      if (constraints[type]) {
+        btn.className = 'toggle-pill px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wider border transition-all active:scale-95 active';
+        btn.textContent = 'Pass';
+      } else {
+        btn.className = 'toggle-pill px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wider border transition-all active:scale-95 inactive';
+        btn.textContent = 'Fail';
+      }
+      checkShowRefinement();
+    }
+
+    function checkShowRefinement() {
+      // Show refinement if any constraint is "Fail" (false)
+      const hasFailed = Object.values(constraints).some(v => v === false);
+      const refinementSec = document.getElementById('refinement-section');
+      if (hasFailed) {
+        refinementSec.classList.remove('hidden');
+      } else {
+        refinementSec.classList.add('hidden');
+      }
+    }
+
+    function checkStep1() {
+      const val = document.getElementById('initial-prompt').value.trim();
+      document.getElementById('prompt-error').classList.toggle('hidden', !!val);
+    }
+
+    function checkStep2() {
+      const val = document.getElementById('initial-response').value.trim();
+      document.getElementById('response-error').classList.toggle('hidden', !!val);
+    }
+
+    /* ══ SUBMIT EXERCISE ══ */
+    async function handleSubmit(ev) {
+      ev.preventDefault();
+      let ok = true;
+
+      const pVal = document.getElementById('initial-prompt').value.trim();
+      const rVal = document.getElementById('initial-response').value.trim();
+      const lVal = document.getElementById('actual-line-count').value.trim();
+
+      document.getElementById('prompt-error').classList.toggle('hidden', !!pVal);
+      document.getElementById('response-error').classList.toggle('hidden', !!rVal);
+      document.getElementById('line-count-error').classList.toggle('hidden', !!lVal);
+
+      if (!pVal) ok = false;
+      if (!rVal) ok = false;
+      if (!lVal) ok = false;
+      if (!selectedChatbot) {
+        document.getElementById('chatbot-error').classList.remove('hidden');
+        ok = false;
+      }
+
+      if (!ok) {
+        const err = document.getElementById('form-error');
+        err.classList.remove('hidden');
+        document.querySelector('.form-input.error, [id$="-error"]:not(.hidden), #chatbot-error:not(.hidden)')
+          ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      document.getElementById('form-error').classList.add('hidden');
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting…';
+
+      const payload = {
+        chatbot_used:      selectedChatbot,
+        initial_prompt:    pVal,
+        initial_response:  rVal,
+        followed_task:     constraints.task,
+        followed_tone:     constraints.tone,
+        followed_persona:  constraints.persona,
+        followed_format:   constraints.format,
+        actual_line_count: parseInt(lVal, 10),
+        refined_prompt:    document.getElementById('refined-prompt').value.trim() || null,
+        refined_response:  document.getElementById('refined-response').value.trim() || null,
+        learning_takeaway: document.getElementById('takeaway').value.trim() || null
+      };
+
+      try {
+        await submitExercise(EXERCISE_SLUG, payload);
+      } catch (err) {
+        console.error('[Week 2] Submission error:', err.message);
+        btn.disabled = false;
+        document.getElementById('submit-label').innerHTML = 'Submit Exercise →';
+        document.getElementById('form-error-text').textContent = '⚠ Network error. Please try again or notify your teacher.';
+        document.getElementById('form-error').classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('success-name').textContent = studentName.split(' ')[0];
+      document.getElementById('success-screen').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+
+</body>
+
+</html>

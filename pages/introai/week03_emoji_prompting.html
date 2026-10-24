@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emoji Prompting Challenge | Intro to AI · Week 3</title>
+  <meta name="description"
+    content="Activity 2: Emoji Prompting Challenge. Roll 3 random emojis, engineer a detailed multi-element prompt (Subject, Style, Lighting, Setting, Mood), and see how AI blends them!">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/activity.css">
+  <style>
+    .form-input:focus {
+      outline: none;
+      border-color: #f59e0b;
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+    }
+
+    .form-input.error {
+      border-color: #ef4444;
+    }
+
+    .opt-btn {
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+
+    .opt-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .opt-btn.selected {
+      border-color: #f59e0b !important;
+      background: #fef3c7 !important;
+      color: #92400e !important;
+      font-weight: 700;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .prompt-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* Emoji Slot Box Animation */
+    .emoji-slot {
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .emoji-slot.rolling {
+      animation: slotJiggle 0.15s infinite alternate ease-in-out;
+      opacity: 0.6;
+      transform: scale(0.92);
+    }
+
+    .emoji-slot.locked {
+      border-color: #f59e0b !important;
+      background: #fffbeb !important;
+    }
+
+    @keyframes slotJiggle {
+      0% {
+        transform: translateY(-4px) scale(0.95);
+      }
+      100% {
+        transform: translateY(4px) scale(1.02);
+      }
+    }
+
+    /* Upload Zone */
+    .upload-zone {
+      border: 2px dashed #fcd34d;
+      border-radius: 16px;
+      padding: 20px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: #fdfaf3;
+    }
+
+    .upload-zone:hover,
+    .upload-zone.drag-over {
+      border-color: #f59e0b;
+      background: #fef3c7;
+    }
+
+    .upload-zone .zone-thumb {
+      max-height: 160px;
+      max-width: 100%;
+      border-radius: 12px;
+      object-fit: contain;
+      margin: 0 auto 8px;
+    }
+
+    /* Star rating pill */
+    .rating-pill {
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .rating-pill:hover {
+      transform: translateY(-2px);
+    }
+
+    .rating-pill.selected {
+      border-color: #f59e0b !important;
+      background: #f59e0b !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    }
+  </style>
+</head>
+
+<body class="bg-[#F9FAFB] text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- MAIN CONTENT -->
+  <div id="main-content" class="max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <!-- Header -->
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+      <div>
+        <a href="index.html"
+          class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-amber-600 mb-3 hover:text-amber-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">
+          Emoji <span class="text-amber-500">Prompting</span>
+        </h1>
+        <p class="text-gray-500 font-medium italic mt-1">Activity 2 &middot; Emoji Synthesis &amp; Prompt Engineering &middot; Week 3</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-amber-50 border border-amber-200 text-amber-800 shadow-sm self-start md:self-auto">
+        Week 3
+      </div>
+    </header>
+
+    <!-- Challenge Brief Card -->
+    <div class="rounded-3xl p-6 mb-8 border bg-gradient-to-r from-amber-50 via-orange-50 to-yellow-50 border-amber-200 shadow-sm">
+      <div class="flex gap-4">
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 bg-amber-500 text-white shadow-md text-2xl">
+          🎲
+        </div>
+        <div>
+          <h2 class="text-lg font-black text-amber-950 mb-1">The Emoji-to-Masterpiece Challenge</h2>
+          <p class="text-sm text-amber-900 leading-relaxed mb-3">
+            Can you turn 3 wildly unrelated emojis into a breathtaking, cohesive AI image? Roll your 3 mystery emojis, engineer a detailed formula prompt, and see how well the AI model weaves them together!
+          </p>
+          <ul class="text-xs text-amber-900 space-y-1 bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-amber-200/60">
+            <li>1. <strong>Roll 3 Emojis:</strong> Click the randomizer button below to generate your mystery combo.</li>
+            <li>2. <strong>Engineer the Prompt:</strong> Pick your <em>Art Style</em>, <em>Lighting</em>, <em>Setting</em>, and <em>Mood</em>.</li>
+            <li>3. <strong>Generate &amp; Test:</strong> Copy your prompt into Craiyon or your AI image tool to see the result.</li>
+            <li>4. <strong>Evaluate:</strong> Upload your creation and rate how cleanly the AI blended all 3 concepts!</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 1: EMOJI RANDOMIZER -->
+    <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-amber-500">1</div>
+          <h2 class="text-base font-black text-gray-900">Roll Your 3 Mystery Emojis</h2>
+        </div>
+        <span class="text-[11px] font-bold text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full">Step 1 of 4</span>
+      </div>
+
+      <!-- Emoji Display Slots -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5" id="emoji-slots-container">
+        
+        <!-- Slot 1: Character / Subject -->
+        <div id="slot-card-0" class="emoji-slot p-4 rounded-2xl border-2 border-gray-200 bg-gray-50 flex flex-col items-center justify-center text-center relative group">
+          <span class="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1">1. Character / Subject</span>
+          <div id="slot-icon-0" class="text-5xl my-2 select-none">❓</div>
+          <span id="slot-name-0" class="text-xs font-bold text-gray-600">Click Roll below</span>
+          <button type="button" onclick="toggleLock(0)" id="lock-btn-0"
+            class="hidden mt-2 text-[10px] font-bold px-2 py-1 rounded-md border border-gray-200 text-gray-500 hover:bg-gray-100 flex items-center gap-1">
+            <span id="lock-icon-0">🔓</span> <span id="lock-text-0">Lock</span>
+          </button>
+        </div>
+
+        <!-- Slot 2: Object / Item -->
+        <div id="slot-card-1" class="emoji-slot p-4 rounded-2xl border-2 border-gray-200 bg-gray-50 flex flex-col items-center justify-center text-center relative group">
+          <span class="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1">2. Object / Item</span>
+          <div id="slot-icon-1" class="text-5xl my-2 select-none">❓</div>
+          <span id="slot-name-1" class="text-xs font-bold text-gray-600">Click Roll below</span>
+          <button type="button" onclick="toggleLock(1)" id="lock-btn-1"
+            class="hidden mt-2 text-[10px] font-bold px-2 py-1 rounded-md border border-gray-200 text-gray-500 hover:bg-gray-100 flex items-center gap-1">
+            <span id="lock-icon-1">🔓</span> <span id="lock-text-1">Lock</span>
+          </button>
+        </div>
+
+        <!-- Slot 3: Environment / Theme -->
+        <div id="slot-card-2" class="emoji-slot p-4 rounded-2xl border-2 border-gray-200 bg-gray-50 flex flex-col items-center justify-center text-center relative group">
+          <span class="text-[10px] font-black uppercase tracking-wider text-gray-400 mb-1">3. Setting / Theme</span>
+          <div id="slot-icon-2" class="text-5xl my-2 select-none">❓</div>
+          <span id="slot-name-2" class="text-xs font-bold text-gray-600">Click Roll below</span>
+          <button type="button" onclick="toggleLock(2)" id="lock-btn-2"
+            class="hidden mt-2 text-[10px] font-bold px-2 py-1 rounded-md border border-gray-200 text-gray-500 hover:bg-gray-100 flex items-center gap-1">
+            <span id="lock-icon-2">🔓</span> <span id="lock-text-2">Lock</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Controls -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+        <button type="button" id="roll-btn" onclick="rollEmojis()"
+          class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black rounded-xl text-sm shadow-md active:scale-95 transition-all flex items-center justify-center gap-2">
+          <span>🎲</span> <span id="roll-btn-label">Roll 3 Random Emojis</span>
+        </button>
+        <button type="button" id="copy-emojis-btn" onclick="copyDrawnEmojis()"
+          class="hidden px-4 py-3.5 border border-gray-200 hover:bg-gray-50 text-gray-700 font-bold rounded-xl text-xs transition-all flex items-center gap-1.5">
+          <span>📋</span> Copy Emojis
+        </button>
+      </div>
+      <p id="emoji-error" class="hidden text-xs text-red-500 font-medium mt-2 text-center">Please roll your 3 emojis first to start the challenge.</p>
+    </div>
+
+    <!-- MAIN FORM -->
+    <form id="emoji-prompting-form" onsubmit="handleSubmit(event)" novalidate>
+
+      <!-- STEP 2: BUILD YOUR PROMPT -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-amber-500">2</div>
+            <h2 class="text-base font-black text-gray-900">Engineer Your Prompt Formula</h2>
+          </div>
+          <span class="text-[11px] font-bold text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full">Step 2 of 4</span>
+        </div>
+
+        <p class="text-xs text-gray-500 mb-5 leading-relaxed">
+          Incorporate your 3 emojis into a cohesive story. Select an option from each category below to shape the visual aesthetic.
+        </p>
+
+        <!-- Art Style -->
+        <div class="mb-5">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            🎨 Art Style <span class="text-red-500">*</span>
+          </label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="artstyle-picker">
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('artStyle', '3D Pixar Animation', this)">🧸 3D Pixar</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('artStyle', 'Anime Studio Ghibli', this)">⛩️ Anime / Ghibli</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('artStyle', 'Cyberpunk Neon', this)">🌆 Cyberpunk</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('artStyle', '16-bit Pixel Art', this)">👾 Pixel Art</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('artStyle', 'Watercolor Painting', this)">🖌️ Watercolor</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('artStyle', 'Comic Book / Pop Art', this)">💥 Comic Book</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('artStyle', 'Photorealistic Cinema', this)">📷 Cinematic Photo</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('artStyle', 'Claymation / Puppet', this)">🧶 Claymation</button>
+          </div>
+          <p id="artstyle-error" class="hidden text-xs text-red-500 font-medium mt-1.5">Please choose an art style.</p>
+        </div>
+
+        <!-- Lighting -->
+        <div class="mb-5">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            💡 Lighting <span class="text-red-500">*</span>
+          </label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="lighting-picker">
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('lighting', 'Golden Hour Sunset', this)">🌅 Golden Sunset</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('lighting', 'Neon Rim Lighting', this)">🔮 Neon Rim Light</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('lighting', 'Dramatic Cinematic Shadow', this)">🎬 Dramatic Cinema</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('lighting', 'Soft Dreamy Daylight', this)">☀️ Soft Daylight</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('lighting', 'Bioluminescent Glow', this)">✨ Bioluminescent</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('lighting', 'Moody Storm Lighting', this)">⚡ Stormy / Dark</button>
+          </div>
+          <p id="lighting-error" class="hidden text-xs text-red-500 font-medium mt-1.5">Please choose a lighting style.</p>
+        </div>
+
+        <!-- Setting / Backdrop -->
+        <div class="mb-5">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            🗺️ Setting / Environment <span class="text-red-500">*</span>
+          </label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="setting-picker">
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('setting', 'Deep Outer Space', this)">🌌 Outer Space</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('setting', 'Enchanted Mystic Forest', this)">🌲 Mystic Forest</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('setting', 'Futuristic Cyber City', this)">🏙️ Cyber City</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('setting', 'Tropical Secret Island', this)">🏝️ Tropical Island</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('setting', 'Ancient Floating Castle', this)">🏰 Floating Castle</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('setting', 'Volcano / Magma World', this)">🌋 Volcano Realm</button>
+          </div>
+          <p id="setting-error" class="hidden text-xs text-red-500 font-medium mt-1.5">Please choose a setting.</p>
+        </div>
+
+        <!-- Mood -->
+        <div class="mb-6">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            🎭 Mood &amp; Atmosphere <span class="text-red-500">*</span>
+          </label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="mood-picker">
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('mood', 'Epic & Heroic', this)">⚡ Epic &amp; Heroic</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('mood', 'Funny & Whimsical', this)">😂 Funny / Goofy</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('mood', 'Mysterious & Curious', this)">🕵️ Mysterious</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setOption('mood', 'Magical & Dreamy', this)">🪄 Dreamy &amp; Magic</button>
+          </div>
+          <p id="mood-error" class="hidden text-xs text-red-500 font-medium mt-1.5">Please choose a mood.</p>
+        </div>
+
+        <!-- Prompt Preview Box -->
+        <div id="prompt-preview-box" class="hidden mb-5 p-3.5 rounded-xl bg-amber-50 border border-amber-200">
+          <div class="flex items-center justify-between mb-2">
+            <p class="text-[10px] font-black uppercase tracking-widest text-amber-700">Your Selected Recipe Elements</p>
+            <button type="button" onclick="autoGenerateStarter()" class="text-[11px] font-bold text-amber-700 hover:text-amber-900 underline">
+              ✨ Insert starter prompt
+            </button>
+          </div>
+          <div id="prompt-preview-tags" class="flex flex-wrap gap-1.5"></div>
+        </div>
+
+        <!-- Final Prompt Textarea -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label for="prompt-used" class="block text-xs font-black uppercase tracking-widest text-gray-400">
+              Your Complete Image Prompt <span class="text-red-500">*</span>
+            </label>
+            <button type="button" onclick="copyFinalPrompt()" class="text-[11px] font-bold text-amber-600 hover:text-amber-800 flex items-center gap-1">
+              📋 Copy Prompt
+            </button>
+          </div>
+          <textarea id="prompt-used" rows="4"
+            placeholder="e.g. A 3D Pixar-style scene featuring a wizard cat riding a hoverboard through a futuristic neon city at sunset, holding a glowing slice of pizza, highly detailed, vibrant colors, 4K..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"></textarea>
+          <p id="prompt-error" class="hidden text-xs text-red-500 font-medium mt-1">Please write your complete image prompt.</p>
+          <p id="copy-toast" class="hidden text-xs text-green-600 font-bold mt-1">✓ Copied to clipboard! Ready to paste into your AI tool.</p>
+        </div>
+      </div>
+
+      <!-- STEP 3: AI TOOL & RESULT -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-amber-500">3</div>
+            <h2 class="text-base font-black text-gray-900">AI Tool &amp; Generated Output</h2>
+          </div>
+          <span class="text-[11px] font-bold text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full">Step 3 of 4</span>
+        </div>
+
+        <div class="mb-5">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2.5">Which AI tool did you use?</label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="aitool-picker">
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="setAITool('Craiyon (Free)')">🔮 Craiyon</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="setAITool('ChatGPT / DALL-E')">🤖 ChatGPT</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="setAITool('Google Gemini')">✨ Gemini</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="setAITool('Adobe Firefly')">🔥 Adobe Firefly</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="setAITool('Midjourney')">🖼️ Midjourney</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="setAITool('Other / Canva')">🎨 Other / Canva</button>
+          </div>
+          <p id="aitool-error" class="hidden text-xs text-red-500 font-medium mt-2">Please choose which AI tool you used.</p>
+        </div>
+
+        <!-- Upload generated image -->
+        <div class="mb-5">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            Upload your AI-generated masterpiece <span class="text-gray-300">(optional)</span>
+          </label>
+          <div class="upload-zone" id="pic-upload-zone"
+            ondragover="handleDragOver(event,'pic-upload-zone')"
+            ondragleave="handleDragLeave('pic-upload-zone')"
+            ondrop="handleDrop(event,'pic-img','pic-upload-zone')"
+            onclick="document.getElementById('pic-img').click()">
+            <input type="file" id="pic-img" accept="image/*" class="hidden"
+              onchange="previewImage(this,'pic-upload-zone','pic-img-preview','pic-img-thumb')">
+            <div id="pic-img-placeholder">
+              <span class="text-3xl block mb-1.5">🖼️</span>
+              <p class="text-xs font-bold text-gray-600">Click or drag &amp; drop your AI image here</p>
+              <p class="text-[10px] text-gray-400 mt-0.5">PNG, JPG, WEBP &middot; Max 5 MB</p>
+            </div>
+            <div id="pic-img-preview" class="hidden flex flex-col items-center gap-2">
+              <img id="pic-img-thumb" class="zone-thumb" src="" alt="Generated image preview">
+              <button type="button" class="text-[10px] font-bold text-red-500 hover:text-red-700 bg-red-50 px-2 py-1 rounded"
+                onclick="removeImage('pic-img','pic-upload-zone','pic-img-preview',event)">&#10005; Remove image</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label for="result-notes" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            Observations: Did the AI combine the emojis cleanly, or did it produce weird glitches?
+          </label>
+          <textarea id="result-notes" rows="2"
+            placeholder="e.g. The frog and guitar were rendered perfectly, but it placed the pizza floating in the sky like a moon!"
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"></textarea>
+        </div>
+      </div>
+
+      <!-- STEP 4: BLEND RATING & REFLECTION -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-8">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-amber-500">4</div>
+            <h2 class="text-base font-black text-gray-900">AI Blend Score &amp; Reflection</h2>
+          </div>
+          <span class="text-[11px] font-bold text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full">Step 4 of 4</span>
+        </div>
+
+        <!-- Rating scale -->
+        <div class="mb-5">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            How well did the AI blend ALL 3 emojis into one unified image? <span class="text-red-500">*</span>
+          </label>
+          <div class="grid grid-cols-1 sm:grid-cols-5 gap-2" id="blend-rating-group">
+            <button type="button" class="rating-pill border border-gray-200 rounded-xl py-3 px-2 text-center text-xs font-bold text-gray-700 bg-gray-50" onclick="setBlendRating(1, this)">
+              <div class="text-base mb-0.5">⭐</div>
+              1 - Missed 2 emojis
+            </button>
+            <button type="button" class="rating-pill border border-gray-200 rounded-xl py-3 px-2 text-center text-xs font-bold text-gray-700 bg-gray-50" onclick="setBlendRating(2, this)">
+              <div class="text-base mb-0.5">⭐⭐</div>
+              2 - Included only 2
+            </button>
+            <button type="button" class="rating-pill border border-gray-200 rounded-xl py-3 px-2 text-center text-xs font-bold text-gray-700 bg-gray-50" onclick="setBlendRating(3, this)">
+              <div class="text-base mb-0.5">⭐⭐⭐</div>
+              3 - Clunky blend
+            </button>
+            <button type="button" class="rating-pill border border-gray-200 rounded-xl py-3 px-2 text-center text-xs font-bold text-gray-700 bg-gray-50" onclick="setBlendRating(4, this)">
+              <div class="text-base mb-0.5">⭐⭐⭐⭐</div>
+              4 - Great blend!
+            </button>
+            <button type="button" class="rating-pill border border-gray-200 rounded-xl py-3 px-2 text-center text-xs font-bold text-gray-700 bg-gray-50" onclick="setBlendRating(5, this)">
+              <div class="text-base mb-0.5">⭐⭐⭐⭐⭐</div>
+              5 - Flawless masterpiece
+            </button>
+          </div>
+          <p id="rating-error" class="hidden text-xs text-red-500 font-medium mt-1.5">Please select a blend score.</p>
+        </div>
+
+        <!-- Reflection -->
+        <div>
+          <label for="reflection" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            Prompt Troubleshooting: Which emoji was hardest for the AI, and how did/would you fix it? <span class="text-red-500">*</span>
+          </label>
+          <textarea id="reflection" rows="3"
+            placeholder="e.g. The volcano was hard to see in the background until I changed the framing to 'wide angle landscape' and specified 'glowing lava in distance'..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"></textarea>
+          <p id="reflection-error" class="hidden text-xs text-red-500 font-medium mt-1">Please provide a short reflection.</p>
+        </div>
+      </div>
+
+      <!-- Submit Section -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-12">
+        <p id="form-error" class="hidden text-sm font-medium text-red-500 mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+          <span id="form-error-text">Please complete all required fields.</span>
+        </p>
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600">
+          <span id="submit-label">Submit Emoji Challenge Entry &#8594;</span>
+        </button>
+        <p class="text-center text-xs text-gray-400 font-medium mt-3">Your prompt and results will be saved to your student portfolio &amp; teacher dashboard.</p>
+      </div>
+
+    </form>
+
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div id="success-screen"
+    class="hidden fixed inset-0 z-[90] bg-[#F9FAFB] flex items-center justify-center p-4">
+    <div class="text-center max-w-md bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+      <div class="w-20 h-20 mx-auto rounded-2xl mb-6 flex items-center justify-center bg-amber-100 text-amber-600 shadow-sm text-4xl">
+        🎉
+      </div>
+      <div class="inline-block px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 bg-amber-50 text-amber-800">
+        Challenge Completed!
+      </div>
+      <h2 class="text-3xl font-black text-gray-900 mb-3 tracking-tight">
+        Awesome prompt, <span id="success-name" class="text-amber-600"></span>!
+      </h2>
+      <p class="text-gray-500 mb-8 leading-relaxed text-sm">
+        Your emoji synthesis prompt and AI evaluation have been submitted. Your teacher dashboard will feature your creation!
+      </p>
+      <a href="index.html"
+        class="inline-flex items-center gap-2 text-white font-black py-3.5 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600">
+        Return to Course Hub
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <script src="../../assets/js/introai-shared.js"></script>
+  <script>
+    /* EXERCISE CONFIG */
+    const EXERCISE_SLUG = 'week03_emoji_prompting';
+
+    /* CURATED EMOJI POOLS FOR GRADE 7/8 */
+    const EMOJI_POOLS = [
+      // Pool 0: Characters / Subjects / Protagonists
+      [
+        { emoji: '🧙‍♂️', name: 'Wizard / Sorcerer' },
+        { emoji: '🐱', name: 'Fluffy Cat' },
+        { emoji: '🤖', name: 'Futuristic Robot' },
+        { emoji: '🐸', name: 'Gentleman Frog' },
+        { emoji: '🦕', name: 'Baby Dinosaur' },
+        { emoji: '🐙', name: 'Giant Octopus' },
+        { emoji: '🦊', name: 'Cyber Fox' },
+        { emoji: '👨‍🚀', name: 'Astronaut' },
+        { emoji: '🦹', name: 'Secret Villain' },
+        { emoji: '🐼', name: 'Kung Fu Panda' },
+        { emoji: '🦄', name: 'Mystic Unicorn' },
+        { emoji: '🦆', name: 'Spy Duck in Sunglasses' },
+        { emoji: '🐉', name: 'Dragon Guardian' },
+        { emoji: '🐵', name: 'Skater Monkey' },
+        { emoji: '🐶', name: 'Golden Retriever Detective' }
+      ],
+      // Pool 1: Objects / Props / Vehicles
+      [
+        { emoji: '🍕', name: 'Giant Cheesy Pizza' },
+        { emoji: '🛹', name: 'Rocket Skateboard' },
+        { emoji: '🎸', name: 'Electric Rock Guitar' },
+        { emoji: '🧋', name: 'Glowing Bubble Tea' },
+        { emoji: '🍦', name: 'Triple-Scoop Ice Cream' },
+        { emoji: '🎮', name: 'Retro Game Controller' },
+        { emoji: '🚀', name: 'Spaceship Shuttle' },
+        { emoji: '🎨', name: 'Magic Paint Palette' },
+        { emoji: '🍔', name: 'Towering Cheeseburger' },
+        { emoji: '🚲', name: 'Vintage Bicycle' },
+        { emoji: '💎', name: 'Shining Power Crystal' },
+        { emoji: '👑', name: 'Ancient Golden Crown' },
+        { emoji: '🎧', name: 'Neon Headphones' },
+        { emoji: '🌮', name: 'Cosmic Taco' },
+        { emoji: '🔮', name: 'Prophecy Orb' }
+      ],
+      // Pool 2: Settings / Environments / Chaos Elements
+      [
+        { emoji: '🌌', name: 'Deep Galaxy / Outer Space' },
+        { emoji: '🌋', name: 'Active Magma Volcano' },
+        { emoji: '🏝️', name: 'Tropical Island Paradise' },
+        { emoji: '🏰', name: 'Floating Sky Castle' },
+        { emoji: '⛈️', name: 'Electric Thunderstorm' },
+        { emoji: '🎡', name: 'Neon Cyberpunk Carnival' },
+        { emoji: '🌲', name: 'Glowing Mushroom Forest' },
+        { emoji: '❄️', name: 'Crystal Ice Glacier' },
+        { emoji: '🌊', name: 'Underwater Coral Metropolis' },
+        { emoji: '🏜️', name: 'Sunset Desert Dunes' },
+        { emoji: '🏙️', name: 'Skyscraper Rooftops' },
+        { emoji: '🍭', name: 'Candy & Sweets Realm' }
+      ]
+    ];
+
+    /* State */
+    let studentName = '', studentEmail = '';
+    let drawnEmojis = [null, null, null];
+    let slotLocked = [false, false, false];
+    let isRolling = false;
+    let selectedAITool = '';
+    let selectedBlendRating = null;
+    let selections = { artStyle: '', lighting: '', setting: '', mood: '' };
+
+    /* Require session or redirect */
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName = session.name;
+      studentEmail = session.email;
+      trackExerciseStart(EXERCISE_SLUG);
+    })();
+
+    /* EMOJI RANDOMIZER WITH ANIMATION */
+    function rollEmojis() {
+      if (isRolling) return;
+      isRolling = true;
+      document.getElementById('emoji-error').classList.add('hidden');
+
+      const rollBtn = document.getElementById('roll-btn');
+      rollBtn.disabled = true;
+      document.getElementById('roll-btn-label').textContent = 'Rolling... 🎲';
+
+      // Start animation on unlocked slots
+      for (let i = 0; i < 3; i++) {
+        if (!slotLocked[i]) {
+          document.getElementById(`slot-card-${i}`).classList.add('rolling');
+        }
+      }
+
+      let ticks = 0;
+      const interval = setInterval(() => {
+        ticks++;
+        for (let i = 0; i < 3; i++) {
+          if (!slotLocked[i]) {
+            const randItem = EMOJI_POOLS[i][Math.floor(Math.random() * EMOJI_POOLS[i].length)];
+            document.getElementById(`slot-icon-${i}`).textContent = randItem.emoji;
+            document.getElementById(`slot-name-${i}`).textContent = randItem.name;
+          }
+        }
+
+        if (ticks >= 12) {
+          clearInterval(interval);
+          finalizeRoll();
+        }
+      }, 90);
+    }
+
+    function finalizeRoll() {
+      for (let i = 0; i < 3; i++) {
+        if (!slotLocked[i]) {
+          const finalItem = EMOJI_POOLS[i][Math.floor(Math.random() * EMOJI_POOLS[i].length)];
+          drawnEmojis[i] = finalItem;
+          document.getElementById(`slot-icon-${i}`).textContent = finalItem.emoji;
+          document.getElementById(`slot-name-${i}`).textContent = finalItem.name;
+          document.getElementById(`slot-card-${i}`).classList.remove('rolling');
+          document.getElementById(`lock-btn-${i}`).classList.remove('hidden');
+        }
+      }
+
+      isRolling = false;
+      const rollBtn = document.getElementById('roll-btn');
+      rollBtn.disabled = false;
+      document.getElementById('roll-btn-label').textContent = '⚡ Re-roll Unlocked Emojis';
+      document.getElementById('copy-emojis-btn').classList.remove('hidden');
+
+      updatePromptPreview();
+    }
+
+    function toggleLock(slotIdx) {
+      if (!drawnEmojis[slotIdx]) return;
+      slotLocked[slotIdx] = !slotLocked[slotIdx];
+      const card = document.getElementById(`slot-card-${slotIdx}`);
+      const icon = document.getElementById(`lock-icon-${slotIdx}`);
+      const txt = document.getElementById(`lock-text-${slotIdx}`);
+
+      if (slotLocked[slotIdx]) {
+        card.classList.add('locked');
+        icon.textContent = '🔒';
+        txt.textContent = 'Locked';
+      } else {
+        card.classList.remove('locked');
+        icon.textContent = '🔓';
+        txt.textContent = 'Lock';
+      }
+    }
+
+    function copyDrawnEmojis() {
+      if (!drawnEmojis[0]) return;
+      const text = drawnEmojis.map(e => `${e.emoji} (${e.name})`).join(' + ');
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copy-emojis-btn');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<span>✓</span> Copied!';
+        setTimeout(() => { btn.innerHTML = orig; }, 2000);
+      });
+    }
+
+    /* OPTION SELECTORS */
+    const PICKER_MAP = {
+      artStyle: 'artstyle-picker',
+      lighting: 'lighting-picker',
+      setting: 'setting-picker',
+      mood: 'mood-picker'
+    };
+    const ERROR_MAP = {
+      artStyle: 'artstyle-error',
+      lighting: 'lighting-error',
+      setting: 'setting-error',
+      mood: 'mood-error'
+    };
+    const TAG_COLORS = {
+      artStyle: 'bg-amber-100 text-amber-900 border border-amber-300',
+      lighting: 'bg-yellow-100 text-yellow-900 border border-yellow-300',
+      setting: 'bg-emerald-100 text-emerald-900 border border-emerald-300',
+      mood: 'bg-rose-100 text-rose-900 border border-rose-300'
+    };
+    const TAG_LABELS = { artStyle: '🎨 Style:', lighting: '💡 Lighting:', setting: '🗺️ Setting:', mood: '🎭 Mood:' };
+
+    function setOption(field, value, btn) {
+      selections[field] = value;
+      document.querySelectorAll(`#${PICKER_MAP[field]} .opt-btn`).forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById(ERROR_MAP[field]).classList.add('hidden');
+      updatePromptPreview();
+    }
+
+    function updatePromptPreview() {
+      const box = document.getElementById('prompt-preview-box');
+      const tags = document.getElementById('prompt-preview-tags');
+      const emojiTags = drawnEmojis.filter(Boolean).map((e, idx) => 
+        `<span class="prompt-tag bg-orange-100 text-orange-900 border border-orange-300">${e.emoji} ${esc(e.name)}</span>`
+      ).join('');
+
+      const optionTags = Object.entries(selections)
+        .filter(([, v]) => v)
+        .map(([k, v]) => `<span class="prompt-tag ${TAG_COLORS[k]}">${TAG_LABELS[k]} ${esc(v)}</span>`)
+        .join('');
+
+      if (!emojiTags && !optionTags) {
+        box.classList.add('hidden');
+        return;
+      }
+      box.classList.remove('hidden');
+      tags.innerHTML = emojiTags + optionTags;
+    }
+
+    function autoGenerateStarter() {
+      if (!drawnEmojis[0] || !drawnEmojis[1] || !drawnEmojis[2]) {
+        alert('Please roll your 3 emojis first in Step 1!');
+        return;
+      }
+
+      const style = selections.artStyle || '3D Pixar animation style';
+      const lighting = selections.lighting || 'dramatic golden hour lighting';
+      const setting = selections.setting || 'in a futuristic neon world';
+      const mood = selections.mood || 'epic and whimsical atmosphere';
+
+      const starter = `A ${style} image of ${drawnEmojis[0].name.toLowerCase()} interacting with ${drawnEmojis[1].name.toLowerCase()} in ${setting}, featuring ${lighting}, with a ${mood}, intricate details, vibrant colors, 4k resolution`;
+
+      document.getElementById('prompt-used').value = starter;
+      document.getElementById('prompt-error').classList.add('hidden');
+    }
+
+    function copyFinalPrompt() {
+      const promptText = document.getElementById('prompt-used').value.trim();
+      if (!promptText) {
+        document.getElementById('prompt-error').classList.remove('hidden');
+        return;
+      }
+      navigator.clipboard.writeText(promptText).then(() => {
+        const toast = document.getElementById('copy-toast');
+        toast.classList.remove('hidden');
+        setTimeout(() => toast.classList.add('hidden'), 3500);
+      });
+    }
+
+    function setAITool(val) {
+      selectedAITool = val;
+      document.querySelectorAll('#aitool-picker .opt-btn').forEach(b => {
+        b.classList.toggle('selected', b.textContent.includes(val.split('/')[0].trim()) || b.textContent.includes(val));
+      });
+      document.getElementById('aitool-error').classList.add('hidden');
+    }
+
+    function setBlendRating(val, btn) {
+      selectedBlendRating = val;
+      document.querySelectorAll('#blend-rating-group .rating-pill').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById('rating-error').classList.add('hidden');
+    }
+
+    /* IMAGE UPLOAD & PREVIEW */
+    function handleDragOver(ev, zoneId) {
+      ev.preventDefault();
+      document.getElementById(zoneId).classList.add('drag-over');
+    }
+    function handleDragLeave(zoneId) {
+      document.getElementById(zoneId).classList.remove('drag-over');
+    }
+    function handleDrop(ev, inputId, zoneId) {
+      ev.preventDefault();
+      document.getElementById(zoneId).classList.remove('drag-over');
+      const file = ev.dataTransfer.files[0];
+      if (!file) return;
+      const input = document.getElementById(inputId);
+      const dt = new DataTransfer(); dt.items.add(file); input.files = dt.files;
+      input.dispatchEvent(new Event('change'));
+    }
+    function previewImage(input, zoneId, previewId, thumbId) {
+      const file = input.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image is too large. Please choose a file under 5 MB.');
+        input.value = ''; return;
+      }
+      const reader = new FileReader();
+      reader.onload = e => {
+        document.getElementById(thumbId).src = e.target.result;
+        document.getElementById(`${zoneId.replace('-zone','')}-placeholder`).classList.add('hidden');
+        document.getElementById(previewId).classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+    function removeImage(inputId, zoneId, previewId, ev) {
+      ev.stopPropagation();
+      document.getElementById(inputId).value = '';
+      document.getElementById(previewId).classList.add('hidden');
+      document.getElementById(`${zoneId.replace('-zone','')}-placeholder`).classList.remove('hidden');
+    }
+    async function uploadToStorage(file, folder) {
+      const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const path = `week03/${folder}/${Date.now()}_${safe}`;
+      const resp = await fetch(`${SUPABASE_URL}/storage/v1/object/introai-uploads/${path}`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': file.type,
+          'x-upsert': 'true'
+        },
+        body: file
+      });
+      if (!resp.ok) throw new Error(`Upload failed: ${resp.status}`);
+      return `${SUPABASE_URL}/storage/v1/object/public/introai-uploads/${path}`;
+    }
+
+    /* SUBMIT HANDLER */
+    async function handleSubmit(ev) {
+      ev.preventDefault();
+      let ok = true;
+
+      if (!drawnEmojis[0] || !drawnEmojis[1] || !drawnEmojis[2]) {
+        document.getElementById('emoji-error').classList.remove('hidden');
+        document.getElementById('slot-card-0').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      Object.keys(selections).forEach(f => {
+        const hasVal = !!selections[f];
+        document.getElementById(ERROR_MAP[f]).classList.toggle('hidden', hasVal);
+        if (!hasVal) ok = false;
+      });
+
+      const pVal = document.getElementById('prompt-used').value.trim();
+      document.getElementById('prompt-error').classList.toggle('hidden', !!pVal);
+      if (!pVal) ok = false;
+
+      if (!selectedAITool) {
+        document.getElementById('aitool-error').classList.remove('hidden');
+        ok = false;
+      }
+
+      if (selectedBlendRating === null) {
+        document.getElementById('rating-error').classList.remove('hidden');
+        ok = false;
+      }
+
+      const refVal = document.getElementById('reflection').value.trim();
+      document.getElementById('reflection-error').classList.toggle('hidden', !!refVal);
+      if (!refVal) ok = false;
+
+      if (!ok) {
+        document.getElementById('form-error').classList.remove('hidden');
+        document.querySelector('[id$="-error"]:not(.hidden)')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      document.getElementById('form-error').classList.add('hidden');
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Processing image...';
+
+      let generatedImageUrl = null;
+      try {
+        const picFile = document.getElementById('pic-img').files[0];
+        if (picFile) generatedImageUrl = await uploadToStorage(picFile, 'emoji_prompting');
+      } catch (err) {
+        console.warn('[Week 3 EP] Image upload error:', err.message);
+      }
+
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting...';
+
+      const payload = {
+        drawn_emojis: drawnEmojis.map(e => `${e.emoji} ${e.name}`),
+        art_style: selections.artStyle,
+        lighting: selections.lighting,
+        setting: selections.setting,
+        mood: selections.mood,
+        prompt_used: pVal,
+        ai_tool_used: selectedAITool,
+        result_notes: document.getElementById('result-notes').value.trim() || null,
+        generated_image_url: generatedImageUrl,
+        blend_score: selectedBlendRating,
+        reflection: refVal
+      };
+
+      try {
+        await submitExercise(EXERCISE_SLUG, payload, { enjoymentRating: selectedBlendRating });
+      } catch (err) {
+        console.error('[Week 3 EP] Submit error:', err.message);
+        btn.disabled = false;
+        document.getElementById('submit-label').textContent = 'Submit Emoji Challenge Entry \u2192';
+        document.getElementById('form-error-text').textContent = '\u26A0 Network error. Please try again or ask your teacher.';
+        document.getElementById('form-error').classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('success-name').textContent = studentName.split(' ')[0];
+      document.getElementById('success-screen').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function esc(str) {
+      return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+
+</body>
+
+</html>

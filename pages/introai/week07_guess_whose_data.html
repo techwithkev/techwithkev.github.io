@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guess Whose Data | Intro to AI · Week 7</title>
+  <meta name="description"
+    content="Week 7 Activity: Guess Whose Data! Reveal anonymous data clues one at a time and see how few it takes to figure out who someone is.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/activity.css">
+  <style>
+    .form-input:focus { outline: none; border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.1); }
+    .form-input.error { border-color: #ef4444; }
+    .persona-btn { transition: all 0.15s ease; cursor: pointer; }
+    .persona-btn:hover { transform: translateY(-1px); }
+    .persona-btn.right { border-color: #16a34a !important; background: #f0fdf4 !important; color: #166534 !important; }
+    .persona-btn.wrong { border-color: #ef4444 !important; background: #fef2f2 !important; color: #991b1b !important; }
+    .clue { animation: pop 0.25s ease; }
+    @keyframes pop { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    .star-btn { font-size: 26px; cursor: pointer; filter: grayscale(100%); transition: filter 0.15s ease, transform 0.1s ease; }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; animation: spin 0.65s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <div id="main-content" class="max-w-3xl mx-auto px-4 pt-8">
+
+    <header class="mb-6">
+      <a href="index.html" class="inline-flex items-center text-xs font-bold text-violet-600 hover:text-violet-700 transition-colors mb-3">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        Back to Course Hub
+      </a>
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <div class="inline-flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-violet-100 text-violet-800">Week 7 Activity</span>
+            <span class="text-xs text-gray-500 font-medium">Data Privacy</span>
+          </div>
+          <h1 class="text-3xl font-black text-gray-900 mt-1 tracking-tight">Guess Whose Data 🔍</h1>
+        </div>
+        <div id="user-badge" class="hidden text-xs bg-violet-50 border border-violet-200 text-violet-800 px-3 py-1.5 rounded-full font-bold"></div>
+      </div>
+    </header>
+
+    <div class="bg-gradient-to-br from-violet-600 to-purple-700 text-white rounded-3xl p-6 shadow-xl mb-8">
+      <h2 class="text-lg font-extrabold mb-1">Your Mission</h2>
+      <p class="text-xs text-violet-100 mb-4 leading-relaxed">
+        These data trails have <strong>no names</strong>. Reveal one clue at a time and guess who the person is.
+        The fewer clues you need, the more points you earn. Then think about what that means for your own privacy.
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-medium">
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-violet-200 block mb-0.5">1. Reveal</span>Click to uncover a clue.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-violet-200 block mb-0.5">2. Guess</span>Lock in your answer early for more points.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-violet-200 block mb-0.5">3. Reflect</span>Is "anonymous" really anonymous?</div>
+      </div>
+    </div>
+
+    <form id="guess-form" onsubmit="handleSubmit(event)" novalidate>
+
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
+          <div class="flex items-center gap-3">
+            <div id="case-badge" class="w-8 h-8 rounded-full bg-violet-600 text-white font-black flex items-center justify-center text-sm shadow">1</div>
+            <div>
+              <h3 id="case-title" class="text-base font-bold text-gray-900"></h3>
+              <p class="text-xs text-gray-500">Who does this data trail belong to?</p>
+            </div>
+          </div>
+          <div id="points-pill" class="text-xs font-black px-3 py-1.5 rounded-full bg-gray-100 text-gray-600">Points: 0</div>
+        </div>
+
+        <div id="clue-list" class="space-y-2 mb-4"></div>
+
+        <button type="button" id="reveal-btn" onclick="revealClue()"
+          class="w-full py-3 rounded-xl text-sm font-black text-violet-700 bg-violet-50 border border-violet-200 hover:bg-violet-100 transition-all active:scale-95 mb-4">
+          🔓 Reveal next clue
+        </button>
+
+        <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Your guess</p>
+        <div id="persona-options" class="grid grid-cols-2 gap-2"></div>
+
+        <div id="case-result" class="hidden mt-4 p-4 rounded-2xl border text-xs leading-relaxed"></div>
+
+        <button type="button" id="next-case-btn" onclick="nextCase()"
+          class="hidden mt-4 w-full py-3 rounded-xl text-sm font-black text-white bg-violet-600 hover:bg-violet-700 shadow-md transition-all active:scale-95">
+          Next trail →
+        </button>
+      </div>
+
+      <div id="reflect-card" class="hidden">
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 rounded-full bg-violet-600 text-white font-black flex items-center justify-center text-sm shadow">★</div>
+            <div>
+              <h3 class="text-base font-bold text-gray-900">Final Score: <span id="final-points" class="font-mono"></span></h3>
+              <p class="text-xs text-gray-500">Now think about your own data trail</p>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Which clue gave the persona away fastest, and why? <span class="text-red-500">*</span></label>
+              <textarea id="best-clue" rows="2" placeholder="e.g. The 3am gaming sessions. Few other personas play that late."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="clue-err" class="text-xs text-red-500 mt-1 hidden">Please answer this question.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">If a company removed your name, would your data still be private? <span class="text-red-500">*</span></label>
+              <textarea id="anon-view" rows="2" placeholder="e.g. No. My location and schedule are like a fingerprint."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="anon-err" class="text-xs text-red-500 mt-1 hidden">Please share your view.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Name one setting or habit you could change to share less data. <span class="text-red-500">*</span></label>
+              <textarea id="action" rows="2" placeholder="e.g. Turn off location for apps that don't need it."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="action-err" class="text-xs text-red-500 mt-1 hidden">Please name one action.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-8 text-center">
+          <h3 class="text-sm font-bold text-gray-900 mb-1">Activity Enjoyment Rating</h3>
+          <p class="text-xs text-gray-500 mb-3">How fun was this detective game?</p>
+          <div id="star-rating" class="flex justify-center gap-2 mb-4">
+            <button type="button" class="star-btn" onclick="setRating(1)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(2)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(3)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(4)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(5)">⭐</button>
+          </div>
+          <p id="rating-err" class="text-xs text-red-500 mb-3 hidden">Please select a star rating.</p>
+          <div id="submit-error-banner" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-medium"></div>
+          <button type="submit" id="submit-btn"
+            class="w-full py-4 px-8 rounded-2xl text-base font-extrabold text-white shadow-xl transition-all hover:bg-violet-700 active:scale-[0.99] flex items-center justify-center gap-2 bg-violet-600">
+            <span>Submit Results 🚀</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div id="success-screen" class="hidden fixed inset-0 z-[120] bg-white flex items-center justify-center p-4">
+    <div class="max-w-md w-full text-center">
+      <div class="w-20 h-20 bg-violet-100 text-violet-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+      </div>
+      <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-violet-100 text-violet-800 mb-2">Cases Closed! 🔍</span>
+      <h2 class="text-3xl font-black text-gray-900 mb-2">Great Job, <span id="success-first-name">Detective</span>!</h2>
+      <p class="text-xs text-gray-600 mb-6 leading-relaxed">Your results have been recorded in the class database.</p>
+      <a href="index.html" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-violet-600 hover:bg-violet-700 text-white font-bold text-sm rounded-xl shadow-lg transition-all">
+        <span>Back to Course Hub</span>
+      </a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../assets/js/introai-shared.js"></script>
+  <script>
+    const EXERCISE_SLUG = 'week07_guess_whose_data';
+
+    let studentName = '', studentEmail = '';
+    let enjoymentRating = 0;
+
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName = session.name;
+      studentEmail = session.email;
+      trackExerciseStart(EXERCISE_SLUG);
+    })();
+
+    // Clues are ordered vague -> specific. Points = clues left unrevealed + 1 when correct.
+    const PERSONAS = ['Competitive gamer', 'Marathon runner', 'Night-shift nurse', 'K-pop superfan'];
+    const CASES = [
+      {
+        title: 'Trail A', answer: 'Competitive gamer',
+        clues: [
+          '📱 Phone: screen time averages 9 hours/day',
+          '🛒 Bought: mechanical keyboard, energy drinks',
+          '🕒 Most active: 11pm – 4am',
+          '🔍 Searches: "lower ping", "best aim trainer"',
+          '🎵 Streams: lo-fi beats and game soundtracks',
+          '💬 Chats: "gg", "carry me", "ranked tonight?"'
+        ],
+        reveal: 'Notice that no single clue was a name, but together they point to one kind of person.'
+      },
+      {
+        title: 'Trail B', answer: 'Marathon runner',
+        clues: [
+          '❤️ Resting heart rate: 48 bpm',
+          '📍 Location: same park loop at 5:45am, 6 days/week',
+          '🛒 Bought: running shoes every 3 months, energy gels',
+          '🔍 Searches: "knee pain after long run"',
+          '📅 Calendar: "Race day" circled in 6 weeks',
+          '🍝 Orders: big pasta dinners the night before weekends'
+        ],
+        reveal: 'Location + schedule is a powerful fingerprint. Even "anonymous" location data can point to one home address.'
+      },
+      {
+        title: 'Trail C', answer: 'Night-shift nurse',
+        clues: [
+          '😴 Sleep: 9am – 3pm most days',
+          '📍 Location: a hospital 5 nights/week, 7pm – 7am',
+          '🛒 Bought: compression socks, blackout curtains',
+          '🔍 Searches: "how to sleep after night shift"',
+          '☕ Orders: coffee at 6:50pm daily',
+          '📞 Calls: short calls to a number labeled "Ward 4"'
+        ],
+        reveal: 'Sensitive details such as health or workplace can be inferred even when never directly shared.'
+      },
+      {
+        title: 'Trail D', answer: 'K-pop superfan',
+        clues: [
+          '🎵 Streams: 6 hours of music/day',
+          '🛒 Bought: light stick, photocards, album box set',
+          '🔍 Searches: "comeback date", "concert tickets presale"',
+          '📺 Watches: fan-cam videos and dance practice clips',
+          '💬 Posts: lots of purple heart emojis',
+          '✈️ Booked: flight and hotel near a stadium in another city'
+        ],
+        reveal: 'Companies use data like this to target ads and prices. Useful for you, but also profitable for them.'
+      }
+    ];
+
+    let caseIdx = 0;
+    let revealed = 0;
+    let points = 0;
+    let caseLocked = false;
+    const log = []; // per-case results
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const badge = document.getElementById('user-badge');
+      badge.textContent = '\u{1F464} ' + studentName;
+      badge.classList.remove('hidden');
+      renderCase();
+    });
+
+    function renderCase() {
+      const c = CASES[caseIdx];
+      revealed = 0;
+      caseLocked = false;
+      document.getElementById('case-badge').textContent = caseIdx + 1;
+      document.getElementById('case-title').textContent = c.title + ' of ' + CASES.length;
+      document.getElementById('clue-list').innerHTML = '';
+      document.getElementById('case-result').classList.add('hidden');
+      document.getElementById('next-case-btn').classList.add('hidden');
+      document.getElementById('reveal-btn').classList.remove('hidden');
+      document.getElementById('persona-options').innerHTML = PERSONAS.map(p =>
+        '<button type="button" class="persona-btn border border-gray-200 rounded-xl p-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="guess(\'' + p + '\',this)">' + p + '</button>'
+      ).join('');
+      revealClue(); // always start with the first clue showing
+    }
+
+    function revealClue() {
+      const c = CASES[caseIdx];
+      if (caseLocked || revealed >= c.clues.length) return;
+      const div = document.createElement('div');
+      div.className = 'clue text-xs bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 font-mono text-gray-700';
+      div.textContent = c.clues[revealed];
+      document.getElementById('clue-list').appendChild(div);
+      revealed++;
+      if (revealed >= c.clues.length) document.getElementById('reveal-btn').classList.add('hidden');
+    }
+
+    function guess(pick, btn) {
+      if (caseLocked) return;
+      caseLocked = true;
+      const c = CASES[caseIdx];
+      const correct = pick === c.answer;
+      const earned = correct ? (c.clues.length - revealed) + 1 : 0;
+      points += earned;
+      log.push({ trail: c.title, correct: correct, clues_used: revealed });
+
+      btn.classList.add(correct ? 'right' : 'wrong');
+      document.querySelectorAll('.persona-btn').forEach(b => {
+        if (b.textContent === c.answer) b.classList.add('right');
+        b.disabled = true;
+      });
+      document.getElementById('reveal-btn').classList.add('hidden');
+      document.getElementById('points-pill').textContent = 'Points: ' + points;
+
+      const box = document.getElementById('case-result');
+      box.className = 'mt-4 p-4 rounded-2xl border text-xs leading-relaxed ' +
+        (correct ? 'bg-green-50 border-green-200 text-green-900' : 'bg-red-50 border-red-200 text-red-900');
+      box.innerHTML = (correct
+        ? '<strong>Correct in ' + revealed + ' clue' + (revealed === 1 ? '' : 's') + '! +' + earned + ' points.</strong> '
+        : '<strong>Not quite. It was the ' + c.answer + '.</strong> ') + c.reveal;
+      box.classList.remove('hidden');
+
+      const nextBtn = document.getElementById('next-case-btn');
+      nextBtn.textContent = caseIdx === CASES.length - 1 ? 'See my final score →' : 'Next trail →';
+      nextBtn.classList.remove('hidden');
+    }
+
+    function nextCase() {
+      if (caseIdx === CASES.length - 1) {
+        document.getElementById('final-points').textContent = points + ' / ' + maxPoints();
+        const card = document.getElementById('reflect-card');
+        card.classList.remove('hidden');
+        document.getElementById('next-case-btn').classList.add('hidden');
+        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+      caseIdx++;
+      renderCase();
+    }
+
+    // Best possible: correct after only the first clue (which is auto-shown).
+    function maxPoints() {
+      return CASES.reduce((sum, c) => sum + (c.clues.length - 1) + 1, 0);
+    }
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#star-rating .star-btn').forEach((s, idx) => s.classList.toggle('active', idx < val));
+      document.getElementById('rating-err').classList.add('hidden');
+    }
+
+    function checkField(id, errId) {
+      const el = document.getElementById(id);
+      const ok = !!el.value.trim();
+      el.classList.toggle('error', !ok);
+      document.getElementById(errId).classList.toggle('hidden', ok);
+      return ok;
+    }
+
+    async function handleSubmit(ev) {
+      ev.preventDefault();
+      const banner = document.getElementById('submit-error-banner');
+      banner.classList.add('hidden');
+
+      let valid = true;
+      valid = checkField('best-clue', 'clue-err') && valid;
+      valid = checkField('anon-view', 'anon-err') && valid;
+      valid = checkField('action', 'action-err') && valid;
+      if (enjoymentRating === 0) { document.getElementById('rating-err').classList.remove('hidden'); valid = false; }
+      if (!valid) {
+        banner.textContent = 'Please fill out all required fields marked in red.';
+        banner.classList.remove('hidden');
+        return;
+      }
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> <span>Submitting...</span>';
+
+      const payload = {
+        total_points: points,
+        max_points: maxPoints(),
+        trails_correct: log.filter(l => l.correct).length,
+        clues_used_per_trail: log.map(l => l.trail + ': ' + l.clues_used).join(', '),
+        fastest_clue_reflection: document.getElementById('best-clue').value.trim(),
+        anonymous_data_view: document.getElementById('anon-view').value.trim(),
+        privacy_action: document.getElementById('action').value.trim()
+      };
+
+      try {
+        await submitExercise(EXERCISE_SLUG, payload, { enjoymentRating: enjoymentRating || undefined });
+        document.getElementById('success-first-name').textContent = studentName.split(' ')[0] || 'Detective';
+        document.getElementById('success-screen').classList.remove('hidden');
+      } catch (err) {
+        console.error('Submission error:', err);
+        banner.textContent = err.message || 'Failed to submit exercise. Please try again.';
+        banner.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerHTML = '<span>Submit Results 🚀</span>';
+      }
+    }
+  </script>
+</body>
+
+</html>
