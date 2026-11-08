@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Access Code Generator | AI Junior Competition</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #F4F7FA;
+      color: #1B2A4A;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    main {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    header {
+      background: #1B2A4A;
+      color: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    header h1 {
+      margin: 0 0 0.5rem;
+      font-size: 1.8rem;
+    }
+
+    header p {
+      margin: 0;
+      opacity: 0.9;
+      font-size: 0.95rem;
+    }
+
+    .header-user {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .logout-btn {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.15s;
+      display: block;
+      margin-top: 0.5rem;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* ── Auth gate ─────────────────────────────────────────────────── */
+    #auth-gate {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background: #F4F7FA;
+    }
+
+    .auth-card {
+      background: #fff;
+      padding: 3rem 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 32px rgba(27, 42, 74, 0.12);
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .auth-card h2 {
+      font-size: 1.8rem;
+      color: #1B2A4A;
+      margin: 0 0 0.5rem;
+      font-weight: 700;
+    }
+
+    .auth-card .subtitle {
+      color: #5B6E85;
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+
+    .auth-card input {
+      width: 100%;
+      padding: 0.85rem;
+      margin-bottom: 1rem;
+      border: 1.5px solid #dde4ed;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s;
+      box-sizing: border-box;
+    }
+
+    .auth-card input:focus {
+      border-color: #0D6E8A;
+      background: #f9fbfc;
+    }
+
+    .auth-card button {
+      width: 100%;
+      padding: 0.9rem;
+      background: #1B2A4A;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .auth-card button:hover {
+      background: #0D6E8A;
+    }
+
+    .auth-card button:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+
+    /* ── Generator form ────────────────────────────────────────────── */
+    #generator-form {
+      display: none;
+    }
+
+    .form-group {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      border: 1px solid #dde4ed;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #0D6E8A;
+    }
+
+    select,
+    input[type="number"] {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1.5px solid #dde4ed;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-family: inherit;
+      margin-bottom: 1rem;
+      box-sizing: border-box;
+    }
+
+    select:focus,
+    input[type="number"]:focus {
+      outline: none;
+      border-color: #0D6E8A;
+      background: #f9fbfc;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    button {
+      flex: 1;
+      padding: 0.85rem;
+      background: #1B2A4A;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    button:hover {
+      background: #0D6E8A;
+    }
+
+    button:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+
+    .secondary-btn {
+      background: #0D6E8A;
+    }
+
+    .secondary-btn:hover {
+      background: #02A89E;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 1rem;
+      border: 1.5px solid #dde4ed;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.95rem;
+      resize: vertical;
+      min-height: 300px;
+      margin-bottom: 1rem;
+      box-sizing: border-box;
+    }
+
+    .output-section {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      border: 1px solid #dde4ed;
+      margin-bottom: 1rem;
+    }
+
+    .output-section h3 {
+      margin: 0 0 1rem;
+      color: #1B2A4A;
+    }
+
+    .status {
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .status.show {
+      display: block;
+    }
+
+    .status.success {
+      background: #e8f8f0;
+      color: #1A6B3C;
+      border: 1px solid #a3d9b8;
+    }
+
+    .status.error {
+      background: #fee8e8;
+      color: #B00020;
+      border: 1px solid #f5c2c2;
+    }
+
+    .status.info {
+      background: #e8f0fe;
+      color: #1a4db5;
+      border: 1px solid #bed1f7;
+    }
+
+    /* ── Active Codes Panel ─────────────────────────────────────────── */
+    .codes-panel {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #dde4ed;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+
+    .codes-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #dde4ed;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .codes-panel-header h3 {
+      margin: 0;
+      color: #1B2A4A;
+      font-size: 1rem;
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-bar input, .filter-bar select {
+      padding: 0.4rem 0.7rem;
+      border: 1.5px solid #dde4ed;
+      border-radius: 5px;
+      font-size: 0.82rem;
+      font-family: inherit;
+      color: #1B2A4A;
+      background: #F4F7FA;
+      margin-bottom: 0;
+      width: auto;
+    }
+
+    .filter-bar input:focus, .filter-bar select:focus {
+      outline: none;
+      border-color: #0D6E8A;
+    }
+
+    .codes-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .codes-table th {
+      text-align: left;
+      padding: 0.6rem 1rem;
+      background: #F4F7FA;
+      color: #5B6E85;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border-bottom: 1px solid #dde4ed;
+    }
+
+    .codes-table td {
+      padding: 0.6rem 1rem;
+      border-bottom: 1px solid #f0f4f8;
+      vertical-align: middle;
+      color: #1B2A4A;
+    }
+
+    .codes-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .codes-table tr:hover td {
+      background: #f9fbfc;
+    }
+
+    .code-mono {
+      font-family: 'Courier New', monospace;
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: 0.06em;
+      color: #1B2A4A;
+    }
+
+    .badge-active {
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-active.on  { background: #e8f8f0; color: #1A6B3C; }
+    .badge-active.off { background: #fee8e8; color: #B00020; }
+
+    .uses-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .uses-bar {
+      flex: 1;
+      height: 5px;
+      background: #dde4ed;
+      border-radius: 3px;
+      overflow: hidden;
+      min-width: 50px;
+    }
+
+    .uses-bar-fill {
+      height: 100%;
+      background: #0D6E8A;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    .uses-bar-fill.full { background: #B00020; }
+
+    .uses-label {
+      font-size: 0.78rem;
+      color: #5B6E85;
+      white-space: nowrap;
+    }
+
+    .tbl-action-btn {
+      padding: 0.28rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border: 1px solid;
+      cursor: pointer;
+      transition: background 0.15s;
+      flex: unset;
+      margin: 0;
+    }
+
+    .tbl-action-btn.edit-btn  { background: #e8f0fe; color: #1a4db5; border-color: #bed1f7; }
+    .tbl-action-btn.edit-btn:hover { background: #bed1f7; }
+    .tbl-action-btn.toggle-btn { background: #e8f8f0; color: #1A6B3C; border-color: #a3d9b8; }
+    .tbl-action-btn.toggle-btn.deactivate { background: #fff8e1; color: #7a5500; border-color: #ffe082; }
+    .tbl-action-btn.toggle-btn:hover { opacity: 0.8; }
+    .tbl-action-btn.del-btn   { background: #fee8e8; color: #B00020; border-color: #f5c2c2; }
+    .tbl-action-btn.del-btn:hover { background: #f5c2c2; }
+    .tbl-action-btn.save-btn  { background: #1A6B3C; color: #fff; border-color: #1A6B3C; }
+    .tbl-action-btn.save-btn:hover { background: #145530; }
+    .tbl-action-btn.cancel-btn { background: #f0f4f8; color: #5B6E85; border-color: #dde4ed; }
+    .tbl-action-btn.cancel-btn:hover { background: #dde4ed; }
+
+    .inline-edit-input {
+      padding: 0.3rem 0.5rem;
+      border: 1.5px solid #0D6E8A;
+      border-radius: 4px;
+      font-size: 0.82rem;
+      font-family: inherit;
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 0;
+    }
+
+    .action-group {
+      display: flex;
+      gap: 0.35rem;
+      align-items: center;
+    }
+
+    .codes-empty {
+      text-align: center;
+      padding: 2.5rem;
+      color: #5B6E85;
+      font-size: 0.88rem;
+    }
+
+    .panel-footer {
+      padding: 0.6rem 1.5rem;
+      background: #F4F7FA;
+      border-top: 1px solid #dde4ed;
+      font-size: 0.75rem;
+      color: #5B6E85;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+  <!-- ── Auth Gate ── -->
+  <div id="auth-gate">
+    <div class="auth-card">
+      <h2>🔑 Teacher Access</h2>
+      <p class="subtitle">Log in to generate homework access codes</p>
+
+      <input type="email" id="teacher-email" placeholder="teacher@school.edu" autocomplete="email">
+      <input type="password" id="teacher-password" placeholder="Password" autocomplete="current-password">
+
+      <div id="auth-error" style="color: #B00020; font-size: 0.9rem; margin-bottom: 1rem; display: none;"></div>
+
+      <button onclick="loginWithEmail()" id="login-btn">Login</button>
+    </div>
+  </div>
+
+  <!-- ── Generator Form ── -->
+  <div id="generator-form">
+    <header>
+      <h1>🔑 Access Code Generator</h1>
+      <p>AI Junior Competition: Create homework access codes for your students</p>
+      <div class="header-user">
+        <div id="logged-in-as"></div>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+    </header>
+
+    <main>
+        <label for="class-selector">Select Class:</label>
+        <div style="display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 1rem;">
+          <select id="class-selector" style="margin-bottom: 0; flex: 1;">
+            <option value="" disabled selected>Loading classes…</option>
+          </select>
+          <button type="button" onclick="showAddClassModal()" style="margin-bottom: 0; flex-shrink: 0; max-width: 140px; padding: 0.75rem 1rem; background: #0D6E8A; font-size: 0.9rem; line-height: 1.2;">+ Add Class</button>
+        </div>
+
+        <label for="cohort-input">Cohort (group label):</label>
+        <div class="flex gap-2 mb-1">
+          <input type="text" id="cohort-input" list="cohort-suggestions"
+            placeholder="e.g. aijr-winter-2025" autocomplete="off"
+            style="margin-bottom:0; flex: 1;">
+          <a href="manage_cohorts.html" target="_blank" class="secondary-btn" style="padding: 0.75rem 1rem; border-radius: 6px; text-decoration: none; font-size: 0.9rem; text-align: center; display: inline-block; flex-shrink: 0; font-weight: 600; background: #0D6E8A; color: #fff; border: none; cursor: pointer; transition: background 0.15s;">Manage Cohorts</a>
+        </div>
+        <datalist id="cohort-suggestions"></datalist>
+        <div style="font-size:0.8rem;color:#5B6E85;margin-bottom:1rem">
+          This label is stored on every code and forwarded to homework submissions.
+          Students never see it: it lets you filter by cohort in the dashboard.
+        </div>
+
+        <label for="num-codes">Number of codes:</label>
+        <input type="number" id="num-codes" value="1" min="1" max="500">
+
+        <label for="max-uses">Max uses per code:</label>
+        <input type="number" id="max-uses" value="30" min="1" max="999">
+
+        <div class="button-group">
+          <button onclick="generateCodes()">Generate Codes</button>
+          <button class="secondary-btn" onclick="resetForm()">Reset</button>
+        </div>
+      </div>
+
+      <div id="status-message" class="status"></div>
+
+      <div class="output-section" id="output-section" style="display: none;">
+        <h3>Access Codes (Copy and Share with Students)</h3>
+        <textarea id="codes-output" readonly></textarea>
+        <div class="button-group">
+          <button onclick="copyCodes()">Copy All Codes</button>
+          <button class="secondary-btn" onclick="downloadCodesTxt()">Download TXT</button>
+        </div>
+      </div>
+
+      <!-- ── Active Codes Panel ── -->
+      <div class="codes-panel" id="active-codes-panel" style="display:none;">
+        <div class="codes-panel-header">
+          <h3>🗂 Active Access Codes</h3>
+          <div class="filter-bar">
+            <input type="text" id="filter-code" placeholder="Search code…" oninput="filterCodesTable()">
+            <select id="filter-class" onchange="filterCodesTable()">
+              <option value="">All Classes</option>
+            </select>
+            <select id="filter-cohort" onchange="filterCodesTable()">
+              <option value="">All Cohorts</option>
+            </select>
+            <select id="filter-status" onchange="filterCodesTable()">
+              <option value="">All Statuses</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+            <button class="tbl-action-btn edit-btn" onclick="loadActiveCodes()" style="padding:0.35rem 0.8rem;">↻ Refresh</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="codes-table" id="codes-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Class</th>
+                <th>Cohort</th>
+                <th>Usage</th>
+                <th>Max Uses</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="codes-tbody">
+              <tr><td colspan="8" class="codes-empty">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel-footer" id="codes-panel-footer"></div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // ── Supabase config ────────────────────────────────────────────────────────
+    const SUPABASE_URL = 'https://zhbcjvwkxhkbcmfiplfr.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoYmNqdndreGhrYmNtZmlwbGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNjgxNDAsImV4cCI6MjA4OTk0NDE0MH0.aszEBypZLI0ZQbF3g9NdXsbWqRVcXhlZRz4kNiqW-68';
+
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+      auth: { persistSession: false }
+    });
+
+    // ── Auth state ─────────────────────────────────────────────────────────────
+    let isAuthenticated = false;
+    let authUser = null;
+
+    // ── Utility functions ──────────────────────────────────────────────────────
+    function showStatus(message, type) {
+      const statusEl = document.getElementById('status-message');
+      statusEl.textContent = message;
+      statusEl.className = `status show ${type}`;
+      statusEl.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ── Authentication ────────────────────────────────────────────────────────
+    async function initAuth() {
+      try {
+        const { data: { session } } = await db.auth.getSession();
+        if (session?.user) {
+          setAuthenticatedState(session.user);
+        }
+      } catch (err) {
+        console.error('Auth init error:', err);
+      }
+    }
+
+    function setAuthenticatedState(user) {
+      isAuthenticated = true;
+      authUser = user;
+      document.getElementById('auth-gate').style.display = 'none';
+      document.getElementById('generator-form').style.display = 'block';
+      document.getElementById('logged-in-as').textContent = `👤 ${user.email}`;
+      loadClasses();
+      loadCohorts();
+      loadActiveCodes();
+    }
+
+    // ── Active codes state ────────────────────────────────────────────────────
+    let allCodes = [];
+
+    // ── Load all active codes ─────────────────────────────────────────────────
+    async function loadActiveCodes() {
+      document.getElementById('active-codes-panel').style.display = 'block';
+      document.getElementById('codes-tbody').innerHTML =
+        '<tr><td colspan="8" class="codes-empty">⏳ Loading codes…</td></tr>';
+
+      const { data, error } = await db
+        .from('access_codes')
+        .select('id, code, uses_count, max_uses, is_active, created_at, cohorts(name, slug), classes(label, sequence_order)')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        document.getElementById('codes-tbody').innerHTML =
+          `<tr><td colspan="8" class="codes-empty" style="color:#B00020;">Failed to load codes: ${error.message}</td></tr>`;
+        return;
+      }
+
+      allCodes = (data || []).map(c => ({
+        ...c,
+        cohort: c.cohorts?.name || c.cohorts?.slug || c.cohort || '-',
+        class_number: c.classes?.sequence_order || c.class_number || 'All'
+      }));
+
+      // Populate filter dropdowns
+      const classes = [...new Set(allCodes.map(c => c.class_number))].filter(c => c !== 'All').sort((a,b)=>a-b);
+      const cohorts = [...new Set(allCodes.map(c => c.cohort))].filter(Boolean).sort();
+      const classFilter = document.getElementById('filter-class');
+      const cohortFilter = document.getElementById('filter-cohort');
+      const currentClass = classFilter.value;
+      const currentCohort = cohortFilter.value;
+      classFilter.innerHTML = '<option value="">All Classes</option>' +
+        classes.map(c => `<option value="${c}" ${String(c)===currentClass?'selected':''}>Class ${c}</option>`).join('');
+      cohortFilter.innerHTML = '<option value="">All Cohorts</option>' +
+        cohorts.map(c => `<option value="${c}" ${c===currentCohort?'selected':''}>` + c + '</option>').join('');
+
+      renderCodesTable(allCodes);
+    }
+
+    function renderCodesTable(codes) {
+      const tbody = document.getElementById('codes-tbody');
+      const footer = document.getElementById('codes-panel-footer');
+
+      if (!codes.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="codes-empty">No codes match your filters.</td></tr>';
+        footer.textContent = '';
+        return;
+      }
+
+      tbody.innerHTML = codes.map(c => {
+        const pct = c.max_uses > 0 ? Math.min((c.uses_count / c.max_uses) * 100, 100) : 0;
+        const isFull = c.uses_count >= c.max_uses;
+        const created = new Date(c.created_at).toLocaleDateString();
+        return `
+          <tr id="row-${c.id}">
+            <td><span class="code-mono">${c.code}</span></td>
+            <td>Class ${c.class_number}</td>
+            <td>${c.cohort}</td>
+            <td>
+              <div class="uses-bar-wrap">
+                <div class="uses-bar"><div class="uses-bar-fill${isFull?' full':''}" style="width:${pct}%"></div></div>
+                <span class="uses-label">${c.uses_count}</span>
+              </div>
+            </td>
+            <td>${c.max_uses}</td>
+            <td><span class="badge-active ${c.is_active?'on':'off'}">${c.is_active?'Active':'Inactive'}</span></td>
+            <td style="color:#5B6E85;font-size:0.78rem;">${created}</td>
+            <td>
+              <div class="action-group">
+                <button class="tbl-action-btn edit-btn" onclick="startEdit('${c.id}')">Edit</button>
+                <button class="tbl-action-btn toggle-btn ${c.is_active?'deactivate':''}" onclick="toggleCode('${c.id}', ${c.is_active})">${c.is_active?'Deactivate':'Activate'}</button>
+                <button class="tbl-action-btn del-btn" onclick="deleteCode('${c.id}', '${c.code}')">Delete</button>
+              </div>
+            </td>
+          </tr>
+          <tr id="edit-row-${c.id}" style="display:none;background:#f9fbfc;">
+            <td colspan="8" style="padding:1rem 1.5rem;">
+              <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end;">
+                <div style="flex:1;min-width:120px;">
+                  <label style="font-size:0.72rem;color:#5B6E85;margin-bottom:0.3rem;">Max Uses</label>
+                  <input class="inline-edit-input" type="number" id="edit-maxuses-${c.id}" value="${c.max_uses}" min="1" max="999">
+                </div>
+                <div style="flex:2;min-width:160px;">
+                  <label style="font-size:0.72rem;color:#5B6E85;margin-bottom:0.3rem;">Cohort</label>
+                  <input class="inline-edit-input" type="text" id="edit-cohort-${c.id}" value="${c.cohort}">
+                </div>
+                <div class="action-group">
+                  <button class="tbl-action-btn save-btn" onclick="saveEdit('${c.id}')">Save</button>
+                  <button class="tbl-action-btn cancel-btn" onclick="cancelEdit('${c.id}')">Cancel</button>
+                </div>
+              </div>
+            </td>
+          </tr>`;
+      }).join('');
+
+      footer.textContent = `Showing ${codes.length} of ${allCodes.length} codes`;
+    }
+
+    function filterCodesTable() {
+      const codeQ   = document.getElementById('filter-code').value.trim().toUpperCase();
+      const classQ  = document.getElementById('filter-class').value;
+      const cohortQ = document.getElementById('filter-cohort').value;
+      const statusQ = document.getElementById('filter-status').value;
+
+      const filtered = allCodes.filter(c => {
+        if (codeQ   && !c.code.toUpperCase().includes(codeQ)) return false;
+        if (classQ  && String(c.class_number) !== classQ)     return false;
+        if (cohortQ && c.cohort !== cohortQ)                  return false;
+        if (statusQ === 'active'   && !c.is_active)           return false;
+        if (statusQ === 'inactive' && c.is_active)            return false;
+        return true;
+      });
+      renderCodesTable(filtered);
+    }
+
+    function startEdit(id) {
+      document.getElementById(`edit-row-${id}`).style.display = 'table-row';
+    }
+
+    function cancelEdit(id) {
+      document.getElementById(`edit-row-${id}`).style.display = 'none';
+    }
+
+    async function saveEdit(id) {
+      const maxUses = parseInt(document.getElementById(`edit-maxuses-${id}`).value);
+      const cohort  = document.getElementById(`edit-cohort-${id}`).value.trim();
+
+      if (!cohort) { alert('Cohort cannot be empty.'); return; }
+      if (!maxUses || maxUses < 1) { alert('Max uses must be at least 1.'); return; }
+
+      const { error } = await db
+        .from('access_codes')
+        .update({ max_uses: maxUses, cohort })
+        .eq('id', id);
+
+      if (error) { alert(`Save failed: ${error.message}`); return; }
+      loadActiveCodes();
+    }
+
+    async function toggleCode(id, currentlyActive) {
+      const { error } = await db
+        .from('access_codes')
+        .update({ is_active: !currentlyActive })
+        .eq('id', id);
+
+      if (error) { alert(`Update failed: ${error.message}`); return; }
+      loadActiveCodes();
+    }
+
+    async function deleteCode(id, code) {
+      if (!confirm(`Permanently delete code "${code}"? This cannot be undone.`)) return;
+
+      const { error } = await db
+        .from('access_codes')
+        .delete()
+        .eq('id', id);
+
+      if (error) { alert(`Delete failed: ${error.message}`); return; }
+      loadActiveCodes();
+    }
+
+    // ── Load classes from class_config ────────────────────────────────────────
+    async function loadClasses() {
+      const select = document.getElementById('class-selector');
+      select.innerHTML = '<option value="" disabled selected>Loading…</option>';
+
+      try {
+        const { data, error } = await db
+          .from('class_config')
+          .select('class_number, title')
+          .order('class_number', { ascending: true });
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+          select.innerHTML = '<option value="" disabled selected>No classes found</option>';
+          return;
+        }
+
+        select.innerHTML = data.map(cls =>
+          `<option value="${cls.class_number}">Class ${cls.class_number}${
+            cls.title ? `: ${cls.title}` : ''
+          }</option>`
+        ).join('');
+
+      } catch (err) {
+        console.error('Failed to load classes:', err);
+        // Fall back to a static placeholder so the form is still usable
+        select.innerHTML = '<option value="" disabled selected>Error loading classes</option>';
+        showStatus(`Could not load class list: ${err.message}`, 'error');
+      }
+    }
+
+    // ── Load cohorts dynamically ──────────────────────────────────────────────
+    async function loadCohorts() {
+      const datalist = document.getElementById('cohort-suggestions');
+      datalist.innerHTML = '';
+
+      try {
+        const { data, error } = await db
+          .from('cohorts')
+          .select('name')
+          .order('name', { ascending: true });
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          datalist.innerHTML = data.map(c => `<option value="${c.name}">`).join('');
+        }
+      } catch (err) {
+        console.error('Failed to load cohorts:', err);
+      }
+    }
+
+    async function loginWithEmail() {
+      const email = document.getElementById('teacher-email').value.trim();
+      const password = document.getElementById('teacher-password').value;
+      const loginBtn = document.getElementById('login-btn');
+      const authErr = document.getElementById('auth-error');
+
+      authErr.style.display = 'none';
+
+      if (!email || !password) {
+        authErr.textContent = 'Email and password required.';
+        authErr.style.display = 'block';
+        return;
+      }
+
+      loginBtn.disabled = true;
+      loginBtn.textContent = '⏳ Logging in…';
+
+      try {
+        const { data, error } = await db.auth.signInWithPassword({ email, password });
+
+        if (error) {
+          authErr.textContent = `Login failed: ${error.message}`;
+          authErr.style.display = 'block';
+          loginBtn.disabled = false;
+          loginBtn.textContent = 'Login';
+          return;
+        }
+
+        setAuthenticatedState(data.user);
+        document.getElementById('teacher-email').value = '';
+        document.getElementById('teacher-password').value = '';
+
+      } catch (err) {
+        console.error('Login error:', err);
+        authErr.textContent = `Error: ${err.message}`;
+        authErr.style.display = 'block';
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Login';
+      }
+    }
+
+    function logout() {
+      db.auth.signOut().then(() => {
+        isAuthenticated = false;
+        authUser = null;
+        document.getElementById('auth-gate').style.display = 'flex';
+        document.getElementById('generator-form').style.display = 'none';
+        document.getElementById('teacher-email').value = '';
+        document.getElementById('teacher-password').value = '';
+        document.getElementById('codes-output').value = '';
+        document.getElementById('output-section').style.display = 'none';
+        document.getElementById('status-message').className = 'status';
+      });
+    }
+
+    // Allow Enter key on password input
+    document.getElementById('teacher-password').addEventListener('keydown', e => {
+      if (e.key === 'Enter') loginWithEmail();
+    });
+
+    // ── Code Generation ───────────────────────────────────────────────────────
+    async function generateCodes() {
+      if (!isAuthenticated) {
+        showStatus('Not authenticated. Please log in.', 'error');
+        return;
+      }
+
+      const classNum = parseInt(document.getElementById('class-selector').value);
+      const cohort = document.getElementById('cohort-input').value.trim();
+      const numCodes = parseInt(document.getElementById('num-codes').value);
+      const maxUses = parseInt(document.getElementById('max-uses').value);
+
+      if (!cohort) {
+        showStatus('Please enter a cohort label (e.g. aijr-winter-2025).', 'error');
+        document.getElementById('cohort-input').focus();
+        return;
+      }
+
+      if (numCodes < 1 || numCodes > 500) {
+        showStatus('Number of codes must be between 1 and 500.', 'error');
+        return;
+      }
+
+      showStatus(`⏳ Generating ${numCodes} codes for Class ${classNum} · ${cohort}…`, 'info');
+
+      const codes = [];
+      const codeSet = new Set();
+
+      // Generate unique random alphanumeric codes
+      while (codes.length < numCodes) {
+        const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+        if (!codeSet.has(code)) {
+          codes.push(code);
+          codeSet.add(code);
+        }
+      }
+
+      // Prepare rows for database
+      const rows = codes.map(code => ({
+        code,
+        class_number: classNum,
+        cohort,
+        max_uses: maxUses,
+        uses_count: 0,
+        is_active: true,
+        created_by: authUser.id,
+      }));
+
+      try {
+        // Insert into database
+        const { error } = await db.from('access_codes').insert(rows);
+
+        if (error) {
+          showStatus(`Error: ${error.message}`, 'error');
+          return;
+        }
+
+        // Display codes
+        document.getElementById('codes-output').value = codes.join('\n');
+        document.getElementById('output-section').style.display = 'block';
+        showStatus(`✓ Generated ${numCodes} access codes: Class ${classNum} · cohort "${cohort}". Copy and share with your students.`, 'success');
+        loadActiveCodes(); // Refresh the active codes panel
+
+      } catch (err) {
+        console.error('Generation error:', err);
+        showStatus(`Error: ${err.message || 'Unknown error'}`, 'error');
+      }
+    }
+
+    function copyCodes() {
+      const textarea = document.getElementById('codes-output');
+      textarea.select();
+      navigator.clipboard.writeText(textarea.value).then(() => {
+        showStatus('✓ Codes copied to clipboard!', 'success');
+      }).catch(err => {
+        showStatus('Error copying to clipboard', 'error');
+      });
+    }
+
+    function downloadCodesTxt() {
+      const text = document.getElementById('codes-output').value;
+      const classNum = document.getElementById('class-selector').value;
+      const cohort = document.getElementById('cohort-input').value.trim() || 'codes';
+      const blob = new Blob([text], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `access_codes_class${classNum}_${cohort}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showStatus('✓ Downloaded!', 'success');
+    }
+
+    function showAddClassModal() {
+      // Suggest next logical class number
+      const select = document.getElementById('class-selector');
+      const currentNums = Array.from(select.options)
+        .map(opt => parseInt(opt.value))
+        .filter(n => !isNaN(n));
+      const nextNum = currentNums.length ? Math.max(...currentNums) + 1 : 1;
+      document.getElementById('new-class-num').value = nextNum;
+      
+      document.getElementById('new-class-title').value = '';
+      document.getElementById('new-class-subtitle').value = '';
+      document.getElementById('new-class-desc').value = '';
+      document.getElementById('new-class-hw').value = '';
+      document.getElementById('new-class-error').style.display = 'none';
+      document.getElementById('class-modal').style.display = 'flex';
+    }
+
+    function closeClassModal() {
+      document.getElementById('class-modal').style.display = 'none';
+    }
+
+    async function saveNewClass() {
+      const numVal = parseInt(document.getElementById('new-class-num').value);
+      const titleVal = document.getElementById('new-class-title').value.trim();
+      const subtitleVal = document.getElementById('new-class-subtitle').value.trim();
+      const descVal = document.getElementById('new-class-desc').value.trim();
+      const hwVal = document.getElementById('new-class-hw').value.trim();
+      const errDiv = document.getElementById('new-class-error');
+
+      errDiv.style.display = 'none';
+
+      if (isNaN(numVal) || numVal <= 0) {
+        errDiv.textContent = 'Please enter a valid Class Number.';
+        errDiv.style.display = 'block';
+        return;
+      }
+      if (!titleVal) {
+        errDiv.textContent = 'Please enter a Class Title.';
+        errDiv.style.display = 'block';
+        return;
+      }
+      if (!subtitleVal) {
+        errDiv.textContent = 'Please enter a Subtitle.';
+        errDiv.style.display = 'block';
+        return;
+      }
+
+      // Check if class number already exists in the select dropdown list
+      const select = document.getElementById('class-selector');
+      const exists = Array.from(select.options).some(opt => parseInt(opt.value) === numVal);
+      if (exists) {
+        errDiv.textContent = `Class Number ${numVal} already exists. Please choose a different number.`;
+        errDiv.style.display = 'block';
+        return;
+      }
+
+      try {
+        const payload = {
+          class_number: numVal,
+          title: titleVal,
+          subtitle: subtitleVal,
+          description: descVal || null,
+          homework_title: hwVal || null,
+          module_badge: 'Intro AI',
+          difficulty_badge: 'Beginner'
+        };
+
+        const { error } = await db
+          .from('class_config')
+          .insert(payload);
+
+        if (error) throw error;
+
+        alert('New class successfully added!');
+        closeClassModal();
+        await loadClasses();
+        // Select the newly added class
+        document.getElementById('class-selector').value = String(numVal);
+      } catch (err) {
+        console.error('[Add Class] Error:', err);
+        errDiv.textContent = `Database error: ${err.message}`;
+        errDiv.style.display = 'block';
+      }
+    }
+
+    function resetForm() {
+      document.getElementById('class-selector').value = '10';
+      document.getElementById('cohort-input').value = '';
+      document.getElementById('num-codes').value = '1';
+      document.getElementById('max-uses').value = '30';
+      document.getElementById('codes-output').value = '';
+      document.getElementById('output-section').style.display = 'none';
+      document.getElementById('status-message').className = 'status';
+      document.getElementById('status-message').textContent = '';
+    }
+
+    // ── Init on page load ──────────────────────────────────────────────────────
+    initAuth();
+  </script>
+  <!-- Add Class Modal -->
+  <div id="class-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 1rem;">
+    <div style="background: #fff; padding: 2rem; border-radius: 8px; max-width: 500px; width: 100%; box-shadow: 0 4px 20px rgba(0,0,0,0.15); box-sizing: border-box;">
+      <h2 style="margin-top: 0; font-size: 1.4rem; color: #1B2A4A; margin-bottom: 1.5rem;">Add New Class</h2>
+      
+      <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+        <div style="flex: 1;">
+          <label for="new-class-num" style="display: block; font-weight: 600; margin-bottom: 0.25rem; font-size: 0.85rem; color: #0D6E8A;">Class Number</label>
+          <input type="number" id="new-class-num" placeholder="e.g. 18" style="width: 100%; padding: 0.5rem; border: 1px solid #dde4ed; border-radius: 4px; box-sizing: border-box;" required />
+        </div>
+        <div style="flex: 2;">
+          <label for="new-class-title" style="display: block; font-weight: 600; margin-bottom: 0.25rem; font-size: 0.85rem; color: #0D6E8A;">Class Title</label>
+          <input type="text" id="new-class-title" placeholder="e.g. Adv AI Techniques" style="width: 100%; padding: 0.5rem; border: 1px solid #dde4ed; border-radius: 4px; box-sizing: border-box;" required />
+        </div>
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <label for="new-class-subtitle" style="display: block; font-weight: 600; margin-bottom: 0.25rem; font-size: 0.85rem; color: #0D6E8A;">Subtitle</label>
+        <input type="text" id="new-class-subtitle" placeholder="e.g. Module 3: Deep Learning" style="width: 100%; padding: 0.5rem; border: 1px solid #dde4ed; border-radius: 4px; box-sizing: border-box;" required />
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <label for="new-class-desc" style="display: block; font-weight: 600; margin-bottom: 0.25rem; font-size: 0.85rem; color: #0D6E8A;">Description</label>
+        <input type="text" id="new-class-desc" placeholder="Brief outline..." style="width: 100%; padding: 0.5rem; border: 1px solid #dde4ed; border-radius: 4px; box-sizing: border-box;" />
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <label for="new-class-hw" style="display: block; font-weight: 600; margin-bottom: 0.25rem; font-size: 0.85rem; color: #0D6E8A;">Homework Title</label>
+        <input type="text" id="new-class-hw" placeholder="e.g. Neural Networks Intro" style="width: 100%; padding: 0.5rem; border: 1px solid #dde4ed; border-radius: 4px; box-sizing: border-box;" />
+      </div>
+
+      <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+        <button type="button" onclick="closeClassModal()" style="background: #e2e8f0; color: #475569; max-width: 100px; padding: 0.5rem 1rem;">Cancel</button>
+        <button type="button" onclick="saveNewClass()" style="background: #0D6E8A; max-width: 120px; padding: 0.5rem 1rem;">Save Class</button>
+      </div>
+      <div id="new-class-error" style="color: #ef4444; font-size: 0.85rem; margin-top: 1rem; display: none;"></div>
+    </div>
+  </div>
+</body>
+
+</html>

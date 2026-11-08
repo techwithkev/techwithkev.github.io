@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fair or Foul? | Intro to AI · Week 9</title>
+  <meta name="description"
+    content="Week 9 Activity: Fair or Foul? Rate six real game-AI dilemmas, then see how consent and transparency change your verdict.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/activity.css">
+  <style>
+    .form-input:focus { outline: none; border-color: #d97706; box-shadow: 0 0 0 3px rgba(217,119,6,0.1); }
+    .form-input.error { border-color: #ef4444; }
+    .rate-btn { transition: all 0.15s ease; cursor: pointer; }
+    .rate-btn:hover { transform: translateY(-1px); }
+    .rate-btn.sel { border-color: #d97706 !important; background: #fffbeb !important; color: #92400e !important; font-weight: 800; }
+    .star-btn { font-size: 26px; cursor: pointer; filter: grayscale(100%); transition: filter 0.15s ease, transform 0.1s ease; }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; animation: spin 0.65s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <div id="main-content" class="max-w-3xl mx-auto px-4 pt-8">
+
+    <header class="mb-6">
+      <a href="index.html" class="inline-flex items-center text-xs font-bold text-amber-600 hover:text-amber-700 transition-colors mb-3">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        Back to Course Hub
+      </a>
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <div class="inline-flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800">Week 9 Activity</span>
+            <span class="text-xs text-gray-500 font-medium">Ethics in Game AI</span>
+          </div>
+          <h1 class="text-3xl font-black text-gray-900 mt-1 tracking-tight">Fair or Foul? ⚖️</h1>
+        </div>
+        <div id="user-badge" class="hidden text-xs bg-amber-50 border border-amber-200 text-amber-800 px-3 py-1.5 rounded-full font-bold"></div>
+      </div>
+    </header>
+
+    <div class="bg-gradient-to-br from-amber-500 to-orange-600 text-white rounded-3xl p-6 shadow-xl mb-8">
+      <h2 class="text-lg font-extrabold mb-1">Your Mission</h2>
+      <p class="text-xs text-amber-100 mb-4 leading-relaxed">
+        Six situations from the real games industry. Rate each one from <strong>1 (totally fair)</strong> to <strong>5 (foul play)</strong>.
+        Then we add a twist, <em>players are told and gave consent</em>, and you rate them again. Which verdicts change?
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-medium">
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-amber-200 block mb-0.5">Round 1</span>Rate each case as it is.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-amber-200 block mb-0.5">Round 2</span>Rate again with disclosure and consent.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-amber-200 block mb-0.5">Rule</span>Write one rule for a Game AI code of conduct.</div>
+      </div>
+    </div>
+
+    <form id="foul-form" onsubmit="handleSubmit(event)" novalidate>
+
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
+          <div class="flex items-center gap-3">
+            <div id="round-badge" class="w-8 h-8 rounded-full bg-amber-500 text-white font-black flex items-center justify-center text-sm shadow">1</div>
+            <div>
+              <h3 id="round-title" class="text-base font-bold text-gray-900"></h3>
+              <p id="round-sub" class="text-xs text-gray-500"></p>
+            </div>
+          </div>
+          <div id="progress-pill" class="text-xs font-black px-3 py-1.5 rounded-full bg-gray-100 text-gray-600">0 / 6 rated</div>
+        </div>
+
+        <div id="cases" class="space-y-4"></div>
+
+        <p id="rate-err" class="text-xs text-red-500 mt-3 hidden">Please rate every case.</p>
+        <button type="button" id="round-btn" onclick="finishRound()"
+          class="mt-4 w-full py-3 rounded-xl text-sm font-black text-white bg-amber-500 hover:bg-amber-600 shadow-md transition-all active:scale-95">
+          Lock in my ratings
+        </button>
+      </div>
+
+      <div id="shift-card" class="hidden bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-full bg-amber-500 text-white font-black flex items-center justify-center text-sm shadow">★</div>
+          <div>
+            <h3 class="text-base font-bold text-gray-900">What changed your mind?</h3>
+            <p class="text-xs text-gray-500">Round 1 verdict → Round 2 verdict</p>
+          </div>
+        </div>
+        <div id="shift-list" class="space-y-2 text-xs"></div>
+      </div>
+
+      <div id="reflect-card" class="hidden">
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Which case had the biggest change, and why did consent or disclosure matter? <span class="text-red-500">*</span></label>
+              <textarea id="biggest" rows="2" placeholder="e.g. The voice clone. If the actor agreed and got paid, it's just a tool. Without that, it's theft."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="biggest-err" class="text-xs text-red-500 mt-1 hidden">Please answer this question.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Which case stayed "foul" even with consent, and why? <span class="text-red-500">*</span></label>
+              <textarea id="still-foul" rows="2" placeholder="e.g. The microtransaction timing. Telling me doesn't fix it, because it is designed to exploit me."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="foul-err" class="text-xs text-red-500 mt-1 hidden">Please answer this question.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Write ONE rule for a Game AI Code of Conduct. <span class="text-red-500">*</span></label>
+              <textarea id="rule" rows="2" placeholder="e.g. Games must never use AI to time purchase prompts around a player's frustration."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="rule-err" class="text-xs text-red-500 mt-1 hidden">Please write a rule.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-8 text-center">
+          <h3 class="text-sm font-bold text-gray-900 mb-1">Activity Enjoyment Rating</h3>
+          <p class="text-xs text-gray-500 mb-3">How engaging was the debate?</p>
+          <div id="star-rating" class="flex justify-center gap-2 mb-4">
+            <button type="button" class="star-btn" onclick="setRating(1)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(2)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(3)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(4)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(5)">⭐</button>
+          </div>
+          <p id="rating-err" class="text-xs text-red-500 mb-3 hidden">Please select a star rating.</p>
+          <div id="submit-error-banner" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-medium"></div>
+          <button type="submit" id="submit-btn"
+            class="w-full py-4 px-8 rounded-2xl text-base font-extrabold text-white shadow-xl transition-all hover:bg-amber-600 active:scale-[0.99] flex items-center justify-center gap-2 bg-amber-500">
+            <span>Submit Results 🚀</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div id="success-screen" class="hidden fixed inset-0 z-[120] bg-white flex items-center justify-center p-4">
+    <div class="max-w-md w-full text-center">
+      <div class="w-20 h-20 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+      </div>
+      <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 mb-2">Verdict Delivered! ⚖️</span>
+      <h2 class="text-3xl font-black text-gray-900 mb-2">Great Job, <span id="success-first-name">Student</span>!</h2>
+      <p class="text-xs text-gray-600 mb-6 leading-relaxed">Your results have been recorded in the class database.</p>
+      <a href="index.html" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm rounded-xl shadow-lg transition-all">
+        <span>Back to Course Hub</span>
+      </a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../assets/js/introai-shared.js"></script>
+  <script>
+    const EXERCISE_SLUG = 'week09_fair_or_foul';
+
+    let studentName = '', studentEmail = '';
+    let enjoymentRating = 0;
+
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName = session.name;
+      studentEmail = session.email;
+      trackExerciseStart(EXERCISE_SLUG);
+    })();
+
+    const CASES = [
+      { icon: '🎙️', title: 'The cloned voice',
+        r1: 'A studio uses AI to clone a voice actor\'s voice for new lines of dialogue. The actor was never asked and is not paid.',
+        r2: 'The same, but the actor agreed in a contract, is paid for every AI line, and can withdraw later.' },
+      { icon: '🤖', title: 'The overnight farmer',
+        r1: 'A player runs an AI script that grinds for rare items all night while they sleep. Other players grind by hand.',
+        r2: 'The game officially offers "AI auto-farm" to every player as a paid, clearly labeled feature.' },
+      { icon: '💸', title: 'The perfectly timed offer',
+        r1: 'A machine-learning system learns when each player is most frustrated and pops up a "buy a power-up" offer at that moment.',
+        r2: 'The game shows a notice: "We time offers to your mood," and lets you switch it off.' },
+      { icon: '🎚️', title: 'The secret difficulty dial',
+        r1: 'The game quietly makes enemies weaker when you keep losing, and never tells you.',
+        r2: 'The game announces "Adaptive Difficulty is on" and shows a toggle in the settings.' },
+      { icon: '🎯', title: 'The AI aim-assist',
+        r1: 'In an online match, some players use AI-assisted aiming that humans cannot see or detect.',
+        r2: 'The game puts AI-assisted players in their own separate lobbies, clearly marked.' },
+      { icon: '🏆', title: 'The AI co-op partner',
+        r1: 'A highly advanced AI joins a professional tournament team as a full "player". Nobody is told it is an AI.',
+        r2: 'The tournament openly allows AI teammates, with the rules published in advance and AI teams in their own league.' }
+    ];
+    const LABELS = ['Totally fair', 'Mostly fair', 'Unsure', 'Mostly foul', 'Foul play'];
+
+    let roundIdx = 0;
+    const ratings = [new Array(CASES.length).fill(0), new Array(CASES.length).fill(0)];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const badge = document.getElementById('user-badge');
+      badge.textContent = '\u{1F464} ' + studentName;
+      badge.classList.remove('hidden');
+      renderRound();
+    });
+
+    function renderRound() {
+      const r2 = roundIdx === 1;
+      document.getElementById('round-badge').textContent = roundIdx + 1;
+      document.getElementById('round-title').textContent = r2 ? 'Round 2: With Consent & Transparency' : 'Round 1: As It Is';
+      document.getElementById('round-sub').textContent = r2 ? 'Same cases, but players are told and have agreed.' : '1 = totally fair, 5 = foul play';
+      document.getElementById('round-btn').textContent = r2 ? 'Lock in and compare' : 'Lock in my ratings';
+      document.getElementById('cases').innerHTML = CASES.map((c, i) =>
+        '<div class="rounded-2xl border border-gray-200 p-4">' +
+        '<p class="text-sm font-black text-gray-900 mb-1">' + c.icon + ' ' + c.title + '</p>' +
+        '<p class="text-xs text-gray-600 leading-relaxed mb-3">' + (r2 ? c.r2 : c.r1) + '</p>' +
+        '<div class="grid grid-cols-5 gap-1.5">' +
+        [1, 2, 3, 4, 5].map(n => '<button type="button" class="rate-btn border border-gray-200 rounded-lg py-2 text-[11px] font-bold text-gray-600 bg-gray-50" id="rb-' + i + '-' + n + '" onclick="rate(' + i + ',' + n + ')">' + n + '<span class="hidden sm:block text-[9px] font-medium">' + LABELS[n - 1] + '</span></button>').join('') +
+        '</div></div>'
+      ).join('');
+      updateProgress();
+    }
+
+    function rate(i, n) {
+      ratings[roundIdx][i] = n;
+      for (let k = 1; k <= 5; k++) document.getElementById('rb-' + i + '-' + k).classList.toggle('sel', k === n);
+      document.getElementById('rate-err').classList.add('hidden');
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const done = ratings[roundIdx].filter(Boolean).length;
+      document.getElementById('progress-pill').textContent = done + ' / ' + CASES.length + ' rated';
+    }
+
+    function finishRound() {
+      if (ratings[roundIdx].some(v => !v)) { document.getElementById('rate-err').classList.remove('hidden'); return; }
+      if (roundIdx === 0) {
+        roundIdx = 1;
+        renderRound();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      document.getElementById('round-btn').classList.add('hidden');
+      document.querySelectorAll('.rate-btn').forEach(b => b.disabled = true);
+      showShift();
+    }
+
+    function showShift() {
+      document.getElementById('shift-list').innerHTML = CASES.map((c, i) => {
+        const a = ratings[0][i], b = ratings[1][i], d = b - a;
+        const tag = d < 0 ? 'bg-green-50 border-green-200 text-green-800' : d > 0 ? 'bg-red-50 border-red-200 text-red-800' : 'bg-gray-50 border-gray-200 text-gray-600';
+        const note = d < 0 ? 'Consent made it feel fairer' : d > 0 ? 'Feels worse once you picture it' : 'No change';
+        return '<div class="flex items-center justify-between gap-2 border rounded-xl p-3 ' + tag + '">' +
+          '<span class="font-bold">' + c.icon + ' ' + c.title + '</span>' +
+          '<span class="font-mono font-bold">' + a + ' → ' + b + '</span><span class="hidden sm:inline">' + note + '</span></div>';
+      }).join('');
+      document.getElementById('shift-card').classList.remove('hidden');
+      document.getElementById('reflect-card').classList.remove('hidden');
+      document.getElementById('shift-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#star-rating .star-btn').forEach((s, idx) => s.classList.toggle('active', idx < val));
+      document.getElementById('rating-err').classList.add('hidden');
+    }
+
+    function checkField(id, errId) {
+      const el = document.getElementById(id);
+      const ok = !!el.value.trim();
+      el.classList.toggle('error', !ok);
+      document.getElementById(errId).classList.toggle('hidden', ok);
+      return ok;
+    }
+
+    async function handleSubmit(ev) {
+      ev.preventDefault();
+      const banner = document.getElementById('submit-error-banner');
+      banner.classList.add('hidden');
+
+      let valid = true;
+      valid = checkField('biggest', 'biggest-err') && valid;
+      valid = checkField('still-foul', 'foul-err') && valid;
+      valid = checkField('rule', 'rule-err') && valid;
+      if (enjoymentRating === 0) { document.getElementById('rating-err').classList.remove('hidden'); valid = false; }
+      if (!valid) {
+        banner.textContent = 'Please fill out all required fields marked in red.';
+        banner.classList.remove('hidden');
+        return;
+      }
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> <span>Submitting...</span>';
+
+      const payload = {
+        round1_ratings: CASES.map((c, i) => c.title + '=' + ratings[0][i]).join(', '),
+        round2_ratings: CASES.map((c, i) => c.title + '=' + ratings[1][i]).join(', '),
+        cases_that_got_fairer: ratings[1].filter((v, i) => v < ratings[0][i]).length,
+        biggest_change_reflection: document.getElementById('biggest').value.trim(),
+        still_foul_reflection: document.getElementById('still-foul').value.trim(),
+        code_of_conduct_rule: document.getElementById('rule').value.trim()
+      };
+
+      try {
+        await submitExercise(EXERCISE_SLUG, payload, { enjoymentRating: enjoymentRating || undefined });
+        document.getElementById('success-first-name').textContent = studentName.split(' ')[0] || 'Student';
+        document.getElementById('success-screen').classList.remove('hidden');
+      } catch (err) {
+        console.error('Submission error:', err);
+        banner.textContent = err.message || 'Failed to submit exercise. Please try again.';
+        banner.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerHTML = '<span>Submit Results 🚀</span>';
+      }
+    }
+  </script>
+</body>
+
+</html>

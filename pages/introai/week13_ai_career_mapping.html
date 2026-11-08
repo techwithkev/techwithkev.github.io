@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Career Mapping | Intro to AI · Week 13</title>
+  <meta name="description"
+    content="Week 13 Activity: AI Career Mapping. Explore AI-related careers, research daily roles and required skills, and connect AI jobs to your personal interests.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/activity.css">
+  <style>
+    .form-input:focus {
+      outline: none; border-color: #0d9488;
+      box-shadow: 0 0 0 3px rgba(13,148,136,0.12);
+    }
+    .form-input.error { border-color: #ef4444; }
+    .opt-btn {
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .opt-btn:hover { transform: translateY(-1px); }
+    .opt-btn.selected {
+      border-color: #0d9488 !important;
+      background: #f0fdfa !important;
+      color: #115e59 !important;
+      font-weight: 700;
+    }
+    .star-btn {
+      font-size: 24px;
+      cursor: pointer;
+      filter: grayscale(100%);
+      transition: filter 0.15s ease, transform 0.1s ease;
+    }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body class="bg-[#F0FDF4]/30 text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- MAIN CONTENT -->
+  <div id="main-content" class="max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-teal-200 pb-6">
+      <div>
+        <a href="index.html"
+          class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-teal-600 mb-3 hover:text-teal-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">AI Career Mapping 💼</h1>
+        <p class="text-gray-500 font-medium italic mt-1">Explore AI Roles, Skills &amp; Personal Connections · Week 13 · Exercise 1</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-teal-50 border border-teal-200 text-teal-800 shadow-sm self-start md:self-auto">
+        Week 13
+      </div>
+    </header>
+
+    <!-- Brief Card (matches user slide layout) -->
+    <div class="rounded-3xl p-6 md:p-8 mb-8 border bg-gradient-to-br from-teal-900 via-teal-800 to-teal-950 text-white shadow-xl">
+      <div class="flex items-center justify-between flex-wrap gap-2 mb-3">
+        <span class="px-3 py-1 rounded-full bg-teal-500/20 text-teal-300 border border-teal-400/30 text-[10px] font-black uppercase tracking-widest">
+          EXERCISE 1
+        </span>
+        <span class="text-teal-300 text-xs font-mono font-bold">Individual research · ~20 minutes</span>
+      </div>
+
+      <h2 class="text-2xl font-black text-white tracking-tight mb-4">AI Career Mapping 🗺️</h2>
+
+      <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10 text-xs text-teal-100 leading-relaxed mb-4 space-y-2.5">
+        <div class="flex items-start gap-2.5">
+          <span class="text-teal-300 font-bold">•</span>
+          <span><strong>Pick one AI-related career</strong> that sounds interesting to you: one from today's discussion, or one you research yourself.</span>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <span class="text-teal-300 font-bold">•</span>
+          <span><strong>Research:</strong> What does a typical day look like? What skills or classes would help you get there?</span>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <span class="text-teal-300 font-bold">•</span>
+          <span><strong>Connect it:</strong> What's one thing about this job that matches something you already enjoy?</span>
+        </div>
+        <div class="flex items-start gap-2.5">
+          <span class="text-teal-300 font-bold">•</span>
+          <span><strong>Be ready to share:</strong> One thing that surprised you during your research.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN FORM -->
+    <form id="ai_career_mapping-form" onsubmit="handleSubmit(event)" novalidate>
+
+      <!-- Step 1: Career Pick -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-full text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-teal-600">1</div>
+          <h2 class="text-lg font-black text-gray-900">Pick Your AI Career Path 🎯</h2>
+        </div>
+
+        <div class="mb-5">
+          <p class="text-xs font-black uppercase tracking-widest text-gray-500 mb-3">Choose an AI career field: <span class="text-red-500">*</span></p>
+          <div id="career-picker" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <button type="button" class="opt-btn border border-gray-200 rounded-2xl p-3.5 text-left bg-gray-50/80 hover:border-teal-400" onclick="setCareer('AI Research Scientist & Algorithm Specialist', this)">
+              🧠 <strong>AI Research Scientist</strong>
+              <div class="text-[11px] text-gray-500 font-normal mt-1">Design neural architectures, train foundation models, write math papers.</div>
+            </button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-2xl p-3.5 text-left bg-gray-50/80 hover:border-teal-400" onclick="setCareer('Machine Learning & Systems Engineer', this)">
+              🛠️ <strong>Machine Learning Engineer</strong>
+              <div class="text-[11px] text-gray-500 font-normal mt-1">Build production pipelines, optimize inference speed, deploy models to cloud.</div>
+            </button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-2xl p-3.5 text-left bg-gray-50/80 hover:border-teal-400" onclick="setCareer('AI Product & Interaction Designer (UX)', this)">
+              🎨 <strong>AI Product &amp; UX Designer</strong>
+              <div class="text-[11px] text-gray-500 font-normal mt-1">Craft AI interface flows, design human-in-the-loop controls &amp; safety.</div>
+            </button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-2xl p-3.5 text-left bg-gray-50/80 hover:border-teal-400" onclick="setCareer('AI Ethics, Safety & Governance Specialist', this)">
+              ⚖️ <strong>AI Ethics &amp; Policy Officer</strong>
+              <div class="text-[11px] text-gray-500 font-normal mt-1">Audit training bias, establish AI governance, safeguard user rights.</div>
+            </button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-2xl p-3.5 text-left bg-gray-50/80 hover:border-teal-400" onclick="setCareer('Game AI & Procedural World Developer', this)">
+              🎮 <strong>Game AI Developer</strong>
+              <div class="text-[11px] text-gray-500 font-normal mt-1">Create smart NPC behavior trees, generative dialogue, &amp; world physics.</div>
+            </button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-2xl p-3.5 text-left bg-gray-50/80 hover:border-teal-400" onclick="setCareer('Data Engineer & Model Trainer', this)">
+              📊 <strong>Data Engineer &amp; Curator</strong>
+              <div class="text-[11px] text-gray-500 font-normal mt-1">Clean datasets, fine-tune domain LLMs, build automated data pipelines.</div>
+            </button>
+          </div>
+          <p id="career-error" class="hidden text-xs text-red-500 font-medium mt-2">Please select an AI career path.</p>
+        </div>
+
+        <div>
+          <label for="career-title" class="block text-xs font-black uppercase tracking-widest text-gray-600 mb-1.5">
+            Specific Job Title / Role Name: <span class="text-red-500">*</span>
+          </label>
+          <input id="career-title" type="text"
+            placeholder="e.g. Generative AI Game Designer, Computer Vision Robotics Specialist..."
+            class="form-input w-full p-3.5 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 placeholder-gray-400 transition-all" required />
+          <p id="career-title-error" class="hidden text-xs text-red-500 font-medium mt-1">Please specify the exact role or title.</p>
+        </div>
+      </div>
+
+      <!-- Step 2: Research Details -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-full text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-teal-600">2</div>
+          <h2 class="text-lg font-black text-gray-900">Research the Daily Role &amp; Required Skills 🔍</h2>
+        </div>
+
+        <div class="space-y-5">
+          <div>
+            <label for="typical-day-desc" class="block text-xs font-black uppercase tracking-widest text-teal-900 mb-1.5">
+              1. What does a typical day look like in this career? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="typical-day-desc" rows="3"
+              placeholder="e.g. Testing prompt variations, collaborating with software engineers, analyzing model output errors, meeting with users..."
+              class="form-input w-full p-3.5 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="typical-day-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe a typical day in this role.</p>
+          </div>
+
+          <div>
+            <label for="required-skills-classes" class="block text-xs font-black uppercase tracking-widest text-teal-900 mb-1.5">
+              2. What skills, subjects, or classes would help you get there? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="required-skills-classes" rows="3"
+              placeholder="e.g. Python programming, statistics, linear algebra, psychology, public speaking, ethics, graphic design..."
+              class="form-input w-full p-3.5 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="skills-error" class="hidden text-xs text-red-500 font-medium mt-1">Please list relevant skills or classes.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Personal Connection & Surprises -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-full text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-teal-600">3</div>
+          <h2 class="text-lg font-black text-gray-900">Personal Connection &amp; Surprises 💡</h2>
+        </div>
+
+        <div class="space-y-5">
+          <div>
+            <label for="personal-connection" class="block text-xs font-black uppercase tracking-widest text-teal-900 mb-1.5">
+              1. What's one thing about this job that matches something you ALREADY enjoy? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="personal-connection" rows="3"
+              placeholder="e.g. I love writing creative stories and sketching UI layouts, so AI Interaction Design lets me build user experiences..."
+              class="form-input w-full p-3.5 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="connection-error" class="hidden text-xs text-red-500 font-medium mt-1">Please share how this job connects to your interests.</p>
+          </div>
+
+          <div>
+            <label for="surprising-discovery" class="block text-xs font-black uppercase tracking-widest text-teal-900 mb-1.5">
+              2. What is one thing that SURPRISED you during your research? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="surprising-discovery" rows="3"
+              placeholder="e.g. I was surprised that AI ethics specialists come from philosophy and law backgrounds, not just math!"
+              class="form-input w-full p-3.5 rounded-xl border border-gray-200 bg-gray-50 text-xs font-medium text-gray-900 placeholder-gray-400 transition-all resize-none" required></textarea>
+            <p id="surprise-error" class="hidden text-xs text-red-500 font-medium mt-1">Please share one surprising discovery.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reflection & Rating -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-8 h-8 rounded-full text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-teal-600">⭐</div>
+          <h2 class="text-lg font-black text-gray-900">Activity Rating</h2>
+        </div>
+        <div>
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-500 mb-2">How much did you enjoy this career mapping activity?</label>
+          <div class="flex gap-2" id="enjoyment-stars" role="group" aria-label="Enjoyment rating">
+            <button type="button" class="star-btn" data-val="1" onclick="setRating(1)" aria-label="1 star">⭐</button>
+            <button type="button" class="star-btn" data-val="2" onclick="setRating(2)" aria-label="2 stars">⭐</button>
+            <button type="button" class="star-btn" data-val="3" onclick="setRating(3)" aria-label="3 stars">⭐</button>
+            <button type="button" class="star-btn" data-val="4" onclick="setRating(4)" aria-label="4 stars">⭐</button>
+            <button type="button" class="star-btn" data-val="5" onclick="setRating(5)" aria-label="5 stars">⭐</button>
+          </div>
+          <p id="rating-error" class="hidden text-xs text-red-500 font-medium mt-2">Please select an enjoyment rating.</p>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-12">
+        <p id="form-error" class="hidden text-sm font-medium text-red-500 mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+          <span id="form-error-text">Please complete all required fields.</span>
+        </p>
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800">
+          <span id="submit-label">Submit Career Mapping &#8594;</span>
+        </button>
+        <p class="text-center text-xs text-gray-400 font-medium mt-3">Results will load to the teacher dashboard.</p>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div id="success-screen"
+    class="hidden fixed inset-0 z-[90] bg-[#F0FDF4] flex items-center justify-center p-4">
+    <div class="text-center max-w-md bg-white rounded-3xl shadow-xl p-8 border border-teal-100">
+      <div class="w-20 h-20 mx-auto rounded-2xl mb-6 flex items-center justify-center bg-teal-100 text-teal-600 shadow-sm">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <div class="inline-block px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 bg-teal-50 text-teal-800">
+        Career Research Saved!
+      </div>
+      <h2 class="text-3xl font-black text-gray-900 mb-3 tracking-tight">
+        Awesome work, <span id="success-name" class="text-teal-600"></span>!
+      </h2>
+      <p class="text-gray-500 mb-8 leading-relaxed text-sm">
+        Your AI Career Mapping response has been submitted to your teacher. Get ready to share your surprising discovery in class!
+      </p>
+      <a href="index.html"
+        class="inline-flex items-center gap-2 text-white font-black py-3.5 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm bg-gradient-to-r from-teal-600 to-teal-700">
+        Return to Course Hub
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <script src="../../assets/js/introai-shared.js"></script>
+  <script>
+    const EXERCISE_SLUG = 'week13_ai_career_mapping';
+
+    let studentName = '', studentEmail = '';
+    let selectedCareerCategory = '';
+    let enjoymentRating = 0;
+
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName  = session.name;
+      studentEmail = session.email;
+      trackExerciseStart(EXERCISE_SLUG);
+    })();
+
+    function setCareer(cat, btn) {
+      selectedCareerCategory = cat;
+      document.querySelectorAll('#career-picker .opt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById('career-error').classList.add('hidden');
+    }
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#enjoyment-stars .star-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx < val);
+      });
+      document.getElementById('rating-error').classList.add('hidden');
+    }
+
+    async function handleSubmit(ev) {
+      ev.preventDefault();
+      let ok = true;
+
+      if (!selectedCareerCategory) {
+        document.getElementById('career-error').classList.remove('hidden'); ok = false;
+      }
+
+      const fields = [
+        { id: 'career-title', errId: 'career-title-error' },
+        { id: 'typical-day-desc', errId: 'typical-day-error' },
+        { id: 'required-skills-classes', errId: 'skills-error' },
+        { id: 'personal-connection', errId: 'connection-error' },
+        { id: 'surprising-discovery', errId: 'surprise-error' }
+      ];
+
+      fields.forEach(f => {
+        const el = document.getElementById(f.id);
+        const val = el ? el.value.trim() : '';
+        if (el) el.classList.toggle('error', !val);
+        const errEl = document.getElementById(f.errId);
+        if (errEl) errEl.classList.toggle('hidden', !!val);
+        if (!val) ok = false;
+      });
+
+      if (enjoymentRating === 0) {
+        document.getElementById('rating-error').classList.remove('hidden'); ok = false;
+      }
+
+      if (!ok) {
+        document.getElementById('form-error').classList.remove('hidden');
+        document.querySelector('.error, [id$="-error"]:not(.hidden)')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      document.getElementById('form-error').classList.add('hidden');
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting\u2026';
+
+      const payload = {
+        selected_career_category:  selectedCareerCategory,
+        career_title:              document.getElementById('career-title').value.trim(),
+        typical_day_desc:          document.getElementById('typical-day-desc').value.trim(),
+        required_skills_classes:   document.getElementById('required-skills-classes').value.trim(),
+        personal_connection:       document.getElementById('personal-connection').value.trim(),
+        surprising_discovery:      document.getElementById('surprising-discovery').value.trim()
+      };
+
+      try {
+        await submitExercise(EXERCISE_SLUG, payload, { enjoymentRating: enjoymentRating || undefined });
+        document.getElementById('success-name').textContent = studentName.split(' ')[0];
+        document.getElementById('success-screen').classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        console.error('[Week 13 AI Career Mapping] Submission error:', err.message);
+        btn.disabled = false;
+        document.getElementById('submit-label').textContent = 'Submit Career Mapping \u2192';
+        document.getElementById('form-error-text').textContent = '\u26a0\ufe0f Network error submitting activity. Please try again.';
+        document.getElementById('form-error').classList.remove('hidden');
+      }
+    }
+  </script>
+
+</body>
+</html>

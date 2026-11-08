@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Methodology | Tech With Kev</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed": "#171e00",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed-variant": "#044d65",
+                    "on-primary-fixed": "#001f2b",
+                    "inverse-surface": "#2f3133",
+                    "on-tertiary-fixed-variant": "#3d4d00",
+                    "surface-bright": "#f9f9fc",
+                    "primary-container": "#004b63",
+                    "on-error-container": "#93000a",
+                    "surface-tint": "#2a657e",
+                    "on-tertiary-container": "#9dc000",
+                    "surface-container-highest": "#e2e2e5",
+                    "tertiary": "#283300",
+                    "surface-container-low": "#f3f3f6",
+                    "inverse-primary": "#96ceeb",
+                    "error-container": "#ffdad6",
+                    "on-tertiary": "#ffffff",
+                    "on-surface": "#1a1c1e",
+                    "secondary-fixed": "#8cf3f3",
+                    "on-primary-container": "#83bad6",
+                    "background": "#f9f9fc",
+                    "on-background": "#1a1c1e",
+                    "surface": "#f9f9fc",
+                    "outline-variant": "#c0c7cd",
+                    "on-error": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "outline": "#71787d",
+                    "surface-container-high": "#e8e8ea",
+                    "primary-fixed": "#bfe8ff",
+                    "on-primary": "#ffffff",
+                    "tertiary-container": "#3c4b00",
+                    "secondary-container": "#8cf3f3",
+                    "primary": "#003345",
+                    "tertiary-fixed": "#c8f323",
+                    "on-secondary-fixed-variant": "#004f4f",
+                    "primary-fixed-dim": "#96ceeb",
+                    "surface-dim": "#dadadc",
+                    "tertiary-fixed-dim": "#aed500",
+                    "surface-variant": "#e2e2e5",
+                    "on-secondary-container": "#007070",
+                    "on-secondary-fixed": "#002020",
+                    "on-surface-variant": "#40484c",
+                    "inverse-on-surface": "#f0f0f3",
+                    "error": "#ba1a1a",
+                    "secondary": "#006a6a",
+                    "surface-container": "#eeeef0",
+                    "secondary-fixed-dim": "#6fd7d6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Space Grotesk"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-grid {
+            background-image: radial-gradient(#003345 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
+            opacity: 0.03;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-tertiary-fixed selection:text-on-tertiary-fixed">
+<!-- Top Navigation Bar -->
+<nav class="sticky top-0 z-50 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm dark:shadow-none border-none transition-colors duration-300">
+<div class="flex justify-between items-center max-w-7xl mx-auto px-6 py-4">
+<div class="text-xl font-black text-[#003345] dark:text-[#004b63] tracking-tighter font-headline">
+                Tech With Kev
+            </div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-[#006a6a] font-bold border-b-2 border-[#006a6a] pb-1 font-headline tracking-tight transition-all duration-200" href="#">Methodology</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-[#003345] font-headline tracking-tight transition-all duration-200" href="#">Assessments</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-[#003345] font-headline tracking-tight transition-all duration-200" href="#">Pricing</a>
+<button class="bg-gradient-to-br from-primary to-primary-container text-white px-6 py-2.5 rounded-lg font-bold tracking-tight hover:brightness-110 active:scale-[0.98] transition-all">
+                    Get Started
+                </button>
+</div>
+<!-- Mobile Toggle -->
+<div class="md:hidden">
+<span class="material-symbols-outlined text-primary">menu</span>
+</div>
+</div>
+</nav>
+<main>
+<!-- Hero Section: The Architect -->
+<section class="relative py-24 overflow-hidden">
+<div class="absolute inset-0 bg-grid pointer-events-none"></div>
+<div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+<div class="lg:col-span-7 z-10">
+<span class="text-secondary font-headline font-bold uppercase tracking-widest text-sm mb-4 block">Teaching Philosophy</span>
+<h1 class="font-headline font-black text-6xl md:text-7xl text-primary leading-[0.9] tracking-tighter mb-8">
+                        The Logic <br/>&amp; The Line.
+                    </h1>
+<p class="text-xl text-on-surface-variant max-w-xl leading-relaxed mb-10">
+                        Education isn't about memorizing formulas. It's about engineering a mind that can solve problems from first principles—whether in a Math exam or a Python terminal.
+                    </p>
+<div class="flex gap-4">
+<div class="h-12 w-1 bg-tertiary-fixed"></div>
+<p class="font-headline font-medium text-lg italic text-primary">"I bridge the gap between abstract mathematical concepts and tangible digital execution."</p>
+</div>
+</div>
+<div class="lg:col-span-5 relative">
+<div class="aspect-square rounded-xl bg-surface-container-high overflow-hidden shadow-2xl">
+<img class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" data-alt="Professional portrait of a male educator with a thoughtful expression in a modern, architecturally designed office studio with soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYeS_mW8KL7STHI59r6InU1ocwE8fMsOIRoHoX5CtkBPs5-OVD37yrcub6KsoiyBoKtYbcCY8SODh3kxI66NNAi4GEq_uNnbUGCWeXyOhZmIW6SCUXAQgVQPzxOlr7kzO7XADnPvk6U9mi_VMj_rt7yVJWnnmMrf7PqLwmhOlX2PCysIQ7t5_xoPaBt94oXJ3jU7w7f6mV4g2UpUX0qtua-P0a4N5xw2QP29wqL8V1oqQBZp_d4JwGOkAKU2-zN8rnWI6q2ASeAyU"/>
+</div>
+<!-- Decorative Overlay -->
+<div class="absolute -bottom-6 -left-6 bg-primary p-8 rounded-lg shadow-xl hidden md:block">
+<div class="flex flex-col gap-1">
+<span class="text-tertiary-fixed font-black text-4xl">12+</span>
+<span class="text-white text-xs uppercase tracking-widest font-bold">Years of Engineering Logic</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Credentials Bento Grid -->
+<section class="py-24 bg-surface-container-low">
+<div class="max-w-7xl mx-auto px-6">
+<div class="mb-16">
+<h2 class="font-headline font-black text-4xl text-primary tracking-tight">Authority &amp; Credentials</h2>
+<div class="h-1 w-24 bg-secondary mt-4"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Academic Block -->
+<div class="md:col-span-2 bg-surface-container-lowest p-10 rounded-xl relative overflow-hidden">
+<div class="absolute top-0 right-0 p-8 opacity-10">
+<span class="material-symbols-outlined text-9xl">school</span>
+</div>
+<span class="text-secondary font-bold text-sm tracking-widest uppercase mb-6 block">Foundation</span>
+<h3 class="font-headline font-bold text-3xl text-primary mb-4">Academic Excellence</h3>
+<p class="text-on-surface-variant text-lg leading-relaxed mb-8 max-w-lg">
+                            B.Eng in Computer Engineering with a focus on Applied Mathematics. Kevin's background isn't just in teaching, but in the practical application of logic in high-stakes environments.
+                        </p>
+<div class="flex gap-8 border-t border-outline-variant/20 pt-8">
+<div>
+<p class="text-primary font-black text-xl">NTU Alumni</p>
+<p class="text-xs text-on-surface-variant uppercase font-bold">Engineering Honor</p>
+</div>
+<div>
+<p class="text-primary font-black text-xl">Top 1% Rank</p>
+<p class="text-xs text-on-surface-variant uppercase font-bold">National Math Olympiad</p>
+</div>
+</div>
+</div>
+<!-- Python Block -->
+<div class="bg-primary text-white p-10 rounded-xl flex flex-col justify-between">
+<div>
+<span class="text-tertiary-fixed font-bold text-sm tracking-widest uppercase mb-6 block">The Tech</span>
+<h3 class="font-headline font-bold text-3xl mb-4">Full-Stack Logic</h3>
+<p class="text-on-primary-container text-sm leading-relaxed">
+                                Proficiency in Python isn't just about syntax. It's about data structures, algorithmic efficiency, and scalable thinking.
+                            </p>
+</div>
+<div class="mt-8 flex flex-wrap gap-2">
+<span class="px-3 py-1 bg-primary-container rounded text-xs font-mono">def solve(math_problem):</span>
+<span class="px-3 py-1 bg-tertiary text-tertiary-fixed rounded text-xs font-mono">return code_logic</span>
+</div>
+</div>
+<!-- Philosophy Block -->
+<div class="bg-surface-container-highest p-10 rounded-xl md:col-span-3">
+<div class="grid md:grid-cols-2 gap-12 items-center">
+<div>
+<h3 class="font-headline font-bold text-3xl text-primary mb-4">The Teaching Philosophy</h3>
+<p class="text-on-surface-variant text-lg leading-relaxed">
+                                    I believe every student is an architect. My role is to provide the blueprints (concepts) and the building blocks (formulas &amp; code), and then challenge them to construct their own understanding. We move from <strong>Visual intuition</strong> to <strong>Abstract logic</strong> to <strong>Coded execution</strong>.
+                                </p>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-container-lowest p-6 rounded-lg">
+<span class="material-symbols-outlined text-secondary mb-2" data-weight="fill">precision_manufacturing</span>
+<p class="text-primary font-bold text-sm uppercase">Precision</p>
+<p class="text-xs text-on-surface-variant mt-1">Zero tolerance for vague definitions.</p>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-lg">
+<span class="material-symbols-outlined text-secondary mb-2" data-weight="fill">insights</span>
+<p class="text-primary font-bold text-sm uppercase">Data-Driven</p>
+<p class="text-xs text-on-surface-variant mt-1">Measuring progress through weekly sprints.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Methodology: Logic & Line -->
+<section class="py-32">
+<div class="max-w-7xl mx-auto px-6">
+<div class="text-center max-w-2xl mx-auto mb-20">
+<h2 class="font-headline font-black text-5xl text-primary mb-6">The 'Logic &amp; Line' Approach</h2>
+<p class="text-on-surface-variant text-lg">A proprietary three-stage framework that bridges the gap between pure mathematics and modern programming.</p>
+</div>
+<div class="flex flex-col gap-12">
+<!-- Step 1 -->
+<div class="flex flex-col md:flex-row gap-12 items-center">
+<div class="md:w-1/2">
+<div class="w-16 h-16 bg-surface-container-high flex items-center justify-center rounded-lg mb-6">
+<span class="text-2xl font-black text-primary">01</span>
+</div>
+<h4 class="font-headline font-bold text-2xl text-primary mb-4">Deconstruct the Variable</h4>
+<p class="text-on-surface-variant leading-relaxed mb-6">
+                                Before writing a single line of code or solving an equation, we strip the problem down to its logical components. We identify the constants, the variables, and the constraints.
+                            </p>
+<ul class="space-y-3">
+<li class="flex items-center gap-3 text-sm font-semibold text-primary">
+<span class="material-symbols-outlined text-secondary text-base">check_circle</span> Identifying Root Logic
+                                </li>
+<li class="flex items-center gap-3 text-sm font-semibold text-primary">
+<span class="material-symbols-outlined text-secondary text-base">check_circle</span> Visualizing Equation Flows
+                                </li>
+</ul>
+</div>
+<div class="md:w-1/2 h-64 bg-surface-container-low rounded-xl relative overflow-hidden group">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-80" data-alt="Close up of a chalkboard with complex mathematical equations and glowing digital data overlay in soft blue" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1_vWaPExaQXTw_qMwDIKgm5bkfLYmuFhE76f9fJdspw18EOwxQcTn9stX2LshlhidNjm1tDc8zb9jBB2px-tG8UJk_oFeXpJat-W0KZxEYAhO3MSYbEmjRV3XtjF75Zwg7z4yl3HNhdwhovUNa_XKu_KmUAtmiU7ODUOd9itI-4OWNgn3-jGP5irSASzIfRxdAVXjjtzqO0qzhkFHG9Lh3tg_Va__oNUg--99F90kvQV2rMbbCTeyiyCGExUzyohfQkmHSUHK4mU"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent"></div>
+</div>
+</div>
+<!-- Line Divider -->
+<div class="hidden md:flex justify-center">
+<div class="h-24 w-px bg-outline-variant/30"></div>
+</div>
+<!-- Step 2 -->
+<div class="flex flex-col md:flex-row-reverse gap-12 items-center">
+<div class="md:w-1/2">
+<div class="w-16 h-16 bg-surface-container-high flex items-center justify-center rounded-lg mb-6">
+<span class="text-2xl font-black text-primary">02</span>
+</div>
+<h4 class="font-headline font-bold text-2xl text-primary mb-4">Bridging to the Line</h4>
+<p class="text-on-surface-variant leading-relaxed mb-6">
+                                This is where Math becomes alive. We translate mathematical logic into Python scripts. Loops become summations; functions become actual code.
+                            </p>
+<div class="bg-primary p-6 rounded-lg shadow-lg">
+<code class="text-tertiary-fixed text-xs font-mono">
+<span class="text-on-primary-container"># Calculating Sigma in Python</span><br/>
+                                    total = sum(i for i in range(1, 101))
+                                </code>
+</div>
+</div>
+<div class="md:w-1/2 h-64 bg-surface-container-low rounded-xl relative overflow-hidden group">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-80" data-alt="Macro shot of code on a monitor with reflections of light, shallow depth of field focusing on Python syntax" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDW8TTD_dxrLeWmiEwUaV6XkLq_9x8QvSvNMBCG5ZGKKbGcNHvVhlzKXO6RoPBHwiSW3rJVBZNCvUiX2j7yKDcsR8fuh4ry0NtUPlsoAjfkaXUAVIB6WmTOeqyIztimmn3_JfovqPkxIQYekfqeN_eSllF3R8z8FXegyotSOoFN5MPZtiGYDhX6daHbitLM3pdvxg32eQW83YIO60yHjTCGnTRVvMcJm5Xp7CKJxPOCxzyAZCWEiq0dJWLPM3QUiUj6mritwNYYa0I"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Success Stories: Evidence Based -->
+<section class="py-24 bg-[#001f2b] text-white overflow-hidden">
+<div class="max-w-7xl mx-auto px-6">
+<div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+<div class="max-w-xl">
+<span class="text-tertiary-fixed font-headline font-bold uppercase tracking-widest text-sm mb-4 block">Proof of Concept</span>
+<h2 class="font-headline font-black text-4xl md:text-5xl leading-tight tracking-tight">Real Growth, Quantified.</h2>
+</div>
+<div class="hidden md:block">
+<button class="border border-white/20 hover:bg-white/10 px-8 py-3 rounded-lg font-bold tracking-tight transition-all">View All Results</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Result Card 1 -->
+<div class="bg-white/5 backdrop-blur-sm p-10 rounded-xl relative">
+<div class="flex justify-between items-start mb-12">
+<div class="flex flex-col">
+<span class="text-5xl font-black font-headline text-tertiary-fixed">C5 → A1</span>
+<span class="text-xs uppercase tracking-widest text-on-primary-container font-bold mt-2">O-Level A-Math</span>
+</div>
+<span class="material-symbols-outlined text-4xl text-white/20">trending_up</span>
+</div>
+<p class="text-on-primary-container text-sm leading-relaxed italic">
+                            "Before Kev, I was struggling with vectors. He showed me how to visualize them in 3D using Python scripts. It clicked instantly."
+                        </p>
+<div class="mt-8 pt-8 border-t border-white/10 flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-high"></div>
+<div>
+<p class="text-sm font-bold">Marcus T.</p>
+<p class="text-[10px] uppercase font-bold text-on-primary-container">Sec 4 Student</p>
+</div>
+</div>
+</div>
+<!-- Result Card 2 -->
+<div class="bg-white/5 backdrop-blur-sm p-10 rounded-xl relative">
+<div class="flex justify-between items-start mb-12">
+<div class="flex flex-col">
+<span class="text-5xl font-black font-headline text-tertiary-fixed">D7 → B3</span>
+<span class="text-xs uppercase tracking-widest text-on-primary-container font-bold mt-2">Pure Physics/Math</span>
+</div>
+<span class="material-symbols-outlined text-4xl text-white/20">monitoring</span>
+</div>
+<p class="text-on-primary-container text-sm leading-relaxed italic">
+                            "The 'Logic &amp; Line' method helped me stop memorizing and start understanding the underlying mechanics of every problem."
+                        </p>
+<div class="mt-8 pt-8 border-t border-white/10 flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-high"></div>
+<div>
+<p class="text-sm font-bold">Sarah Lim</p>
+<p class="text-[10px] uppercase font-bold text-on-primary-container">IP Year 4</p>
+</div>
+</div>
+</div>
+<!-- Result Card 3 -->
+<div class="bg-white/5 backdrop-blur-sm p-10 rounded-xl relative">
+<div class="flex justify-between items-start mb-12">
+<div class="flex flex-col">
+<span class="text-5xl font-black font-headline text-tertiary-fixed">U → A</span>
+<span class="text-xs uppercase tracking-widest text-on-primary-container font-bold mt-2">H2 Mathematics</span>
+</div>
+<span class="material-symbols-outlined text-4xl text-white/20">bolt</span>
+</div>
+<p class="text-on-primary-container text-sm leading-relaxed italic">
+                            "Kevin’s ability to explain A-Level calculus using coding analogies was a game changer for my finals. Highly recommend."
+                        </p>
+<div class="mt-8 pt-8 border-t border-white/10 flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-high"></div>
+<div>
+<p class="text-sm font-bold">Jonathan Tan</p>
+<p class="text-[10px] uppercase font-bold text-on-primary-container">JC 2 Graduate</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Final Trust CTA -->
+<section class="py-32 relative overflow-hidden">
+<div class="max-w-4xl mx-auto px-6 text-center">
+<h3 class="font-headline font-black text-4xl md:text-5xl text-primary mb-8 tracking-tight">Ready to transition from guessing to engineering?</h3>
+<div class="flex flex-col md:flex-row justify-center gap-6">
+<button class="bg-primary text-white px-10 py-4 rounded-lg font-bold tracking-tight shadow-xl hover:brightness-110 active:scale-[0.98] transition-all">Book a Logic Assessment</button>
+<button class="bg-surface-container-high text-primary px-10 py-4 rounded-lg font-bold tracking-tight hover:bg-surface-container-highest transition-all">Download My Python Guide</button>
+</div>
+<div class="mt-16 pt-8 border-t border-outline-variant/30 inline-flex items-center gap-8">
+<div class="text-left">
+<p class="text-xs font-bold uppercase tracking-widest text-secondary">Verified Trust</p>
+<p class="text-xl font-headline font-bold text-primary">Google Certified Educator</p>
+</div>
+<div class="w-px h-10 bg-outline-variant/30"></div>
+<div class="text-left">
+<p class="text-xs font-bold uppercase tracking-widest text-secondary">Global Impact</p>
+<p class="text-xl font-headline font-bold text-primary">500+ Students Mentored</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Component -->
+<footer class="bg-slate-50 dark:bg-[#001f2b] w-full rounded-none">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 max-w-7xl mx-auto px-8 py-16">
+<div class="md:col-span-1">
+<div class="text-lg font-bold text-[#003345] dark:text-[#f9f9fc] mb-6 font-headline tracking-tighter">
+                    Tech With Kev
+                </div>
+<p class="font-['Inter'] text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+                    © 2024 Tech With Kev. Precision in Math &amp; Python. Building the next generation of digital architects.
+                </p>
+</div>
+<div>
+<h4 class="font-headline font-bold text-[#003345] dark:text-[#f9f9fc] mb-6">Programmes</h4>
+<ul class="space-y-4">
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors text-sm" href="#">O-Level Advantage</a></li>
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors text-sm" href="#">IP Math Sprint</a></li>
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors text-sm" href="#">Python Mastery</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-headline font-bold text-[#003345] dark:text-[#f9f9fc] mb-6">Community</h4>
+<ul class="space-y-4">
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors text-sm" href="#">Contact</a></li>
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors text-sm" href="#">Instagram</a></li>
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors text-sm" href="#">LinkedIn</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-headline font-bold text-[#003345] dark:text-[#f9f9fc] mb-6">Insight</h4>
+<a class="inline-flex items-center gap-2 text-[#006a6a] dark:text-[#c8f323] font-semibold text-sm group" href="#">
+                    Subscribe to Newsletter
+                    <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
+</a>
+</div>
+</div>
+</footer>
+</body></html>

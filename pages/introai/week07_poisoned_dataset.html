@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poisoned Dataset | Intro to AI · Week 7</title>
+  <meta name="description"
+    content="Week 7 Activity: Poisoned Dataset! Hunt for hidden errors in a training dataset and discover why dirty data makes dirty AI.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/activity.css">
+  <style>
+    .form-input:focus { outline: none; border-color: #ea580c; box-shadow: 0 0 0 3px rgba(234,88,12,0.1); }
+    .form-input.error { border-color: #ef4444; }
+    .data-row { cursor: pointer; transition: background 0.1s ease; }
+    .data-row:hover { background: #fff7ed; }
+    .data-row.flagged { background: #ffedd5; }
+    .data-row.hit { background: #dcfce7; }
+    .data-row.miss { background: #fee2e2; }
+    .opt-btn { transition: all 0.15s ease; cursor: pointer; }
+    .opt-btn:hover { transform: translateY(-1px); }
+    .opt-btn.right { border-color: #16a34a !important; background: #f0fdf4 !important; color: #166534 !important; }
+    .opt-btn.wrong { border-color: #ef4444 !important; background: #fef2f2 !important; color: #991b1b !important; }
+    .star-btn { font-size: 26px; cursor: pointer; filter: grayscale(100%); transition: filter 0.15s ease, transform 0.1s ease; }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; animation: spin 0.65s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <div id="main-content" class="max-w-3xl mx-auto px-4 pt-8">
+
+    <header class="mb-6">
+      <a href="index.html" class="inline-flex items-center text-xs font-bold text-orange-600 hover:text-orange-700 transition-colors mb-3">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        Back to Course Hub
+      </a>
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <div class="inline-flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-orange-100 text-orange-800">Week 7 Activity</span>
+            <span class="text-xs text-gray-500 font-medium">Data Quality &amp; Bias</span>
+          </div>
+          <h1 class="text-3xl font-black text-gray-900 mt-1 tracking-tight">Poisoned Dataset ☠️</h1>
+        </div>
+        <div id="user-badge" class="hidden text-xs bg-orange-50 border border-orange-200 text-orange-800 px-3 py-1.5 rounded-full font-bold"></div>
+      </div>
+    </header>
+
+    <div class="bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-3xl p-6 shadow-xl mb-8">
+      <h2 class="text-lg font-extrabold mb-1">Your Mission</h2>
+      <p class="text-xs text-orange-100 mb-4 leading-relaxed">
+        A cat-vs-dog identifier is being trained on this dataset, but <strong>4 rows have been poisoned</strong>.
+        Find them before the AI learns the wrong thing. "Garbage in, garbage out!"
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-medium">
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-orange-200 block mb-0.5">1. Flag</span>Click suspicious rows.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-orange-200 block mb-0.5">2. Diagnose</span>Pick the type of error for each.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-orange-200 block mb-0.5">3. Check</span>Score yourself, then answer a bias question.</div>
+      </div>
+    </div>
+
+    <form id="poison-form" onsubmit="handleSubmit(event)" novalidate>
+
+      <!-- STEP 1: FIND THE POISON -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-orange-500 text-white font-black flex items-center justify-center text-sm shadow">1</div>
+            <div>
+              <h3 class="text-base font-bold text-gray-900">Hunt the Bad Rows</h3>
+              <p class="text-xs text-gray-500">Click a row to flag it. For a duplicate, flag the extra copy.</p>
+            </div>
+          </div>
+          <div id="flag-count" class="text-xs font-black px-3 py-1.5 rounded-full bg-gray-100 text-gray-600">0 flagged</div>
+        </div>
+
+        <div class="overflow-x-auto rounded-xl border border-gray-200 mb-4">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-gray-100 text-gray-700 font-bold">
+              <tr><th class="p-2">Photo_ID</th><th class="p-2">Weight_kg</th><th class="p-2">Ear_Shape</th><th class="p-2">Sound</th><th class="p-2">Label</th></tr>
+            </thead>
+            <tbody id="data-body" class="divide-y divide-gray-100 font-mono text-gray-600"></tbody>
+          </table>
+        </div>
+
+        <div id="diagnose-panel" class="hidden space-y-2 mb-4">
+          <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">Diagnose each flagged row</p>
+          <div id="diagnose-list" class="space-y-2"></div>
+        </div>
+
+        <button type="button" id="check-btn" onclick="checkAnswers()"
+          class="w-full py-3 rounded-xl text-sm font-black text-white bg-orange-500 hover:bg-orange-600 shadow-md transition-all active:scale-95">
+          Check my answers
+        </button>
+        <p id="check-err" class="text-xs text-red-500 mt-2 hidden">Flag at least one row and pick an error type for each flag.</p>
+
+        <div id="check-result" class="hidden mt-4 p-4 rounded-2xl border text-xs leading-relaxed"></div>
+      </div>
+
+      <!-- STEP 2: REPRESENTATIVE QUESTION -->
+      <div id="rep-card" class="hidden bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-full bg-orange-500 text-white font-black flex items-center justify-center text-sm shadow">2</div>
+          <div>
+            <h3 class="text-base font-bold text-gray-900">Even Clean Data Can Be Biased</h3>
+            <p class="text-xs text-gray-500">This dataset only contains cats and dogs. A pet app uses it for all animals.</p>
+          </div>
+        </div>
+        <p class="text-xs font-bold text-gray-700 mb-2">What is the biggest risk?</p>
+        <div id="rep-options" class="space-y-2 mb-3">
+          <button type="button" class="opt-btn w-full text-left border border-gray-200 rounded-xl p-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="pickRep(0,this)">The table has too many columns.</button>
+          <button type="button" class="opt-btn w-full text-left border border-gray-200 rounded-xl p-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="pickRep(1,this)">It will confidently label a rabbit or a hamster as a cat or a dog.</button>
+          <button type="button" class="opt-btn w-full text-left border border-gray-200 rounded-xl p-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="pickRep(2,this)">The weights are measured in kilograms.</button>
+        </div>
+        <p id="rep-feedback" class="hidden text-xs leading-relaxed p-3 rounded-xl border"></p>
+      </div>
+
+      <!-- REFLECTION + SUBMIT -->
+      <div id="reflect-card" class="hidden">
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 rounded-full bg-orange-500 text-white font-black flex items-center justify-center text-sm shadow">3</div>
+            <div>
+              <h3 class="text-base font-bold text-gray-900">Fix It</h3>
+              <p class="text-xs text-gray-500">Think like the person cleaning the data</p>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Which error would hurt the AI most, and why? <span class="text-red-500">*</span></label>
+              <textarea id="worst-error" rows="2" placeholder="e.g. The mislabeled cat, because the AI would learn that small pointy-eared animals can be dogs."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="worst-err" class="text-xs text-red-500 mt-1 hidden">Please answer this question.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">How would you fix the data and make it more complete? <span class="text-red-500">*</span></label>
+              <textarea id="fix-plan" rows="2" placeholder="e.g. Delete the duplicate, fix the labels, and add photos of other pets."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="fix-err" class="text-xs text-red-500 mt-1 hidden">Please describe your fix.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-8 text-center">
+          <h3 class="text-sm font-bold text-gray-900 mb-1">Activity Enjoyment Rating</h3>
+          <p class="text-xs text-gray-500 mb-3">How fun was hunting bad data?</p>
+          <div id="star-rating" class="flex justify-center gap-2 mb-4">
+            <button type="button" class="star-btn" onclick="setRating(1)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(2)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(3)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(4)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(5)">⭐</button>
+          </div>
+          <p id="rating-err" class="text-xs text-red-500 mb-3 hidden">Please select a star rating.</p>
+          <div id="submit-error-banner" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-medium"></div>
+          <button type="submit" id="submit-btn"
+            class="w-full py-4 px-8 rounded-2xl text-base font-extrabold text-white shadow-xl transition-all hover:bg-orange-600 active:scale-[0.99] flex items-center justify-center gap-2 bg-orange-500">
+            <span>Submit Results 🚀</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div id="success-screen" class="hidden fixed inset-0 z-[120] bg-white flex items-center justify-center p-4">
+    <div class="max-w-md w-full text-center">
+      <div class="w-20 h-20 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+      </div>
+      <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-800 mb-2">Dataset Cleaned! 🧹</span>
+      <h2 class="text-3xl font-black text-gray-900 mb-2">Great Job, <span id="success-first-name">Student</span>!</h2>
+      <p class="text-xs text-gray-600 mb-6 leading-relaxed">Your results have been recorded in the class database.</p>
+      <a href="index.html" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm rounded-xl shadow-lg transition-all">
+        <span>Back to Course Hub</span>
+      </a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../assets/js/introai-shared.js"></script>
+  <script>
+    const EXERCISE_SLUG = 'week07_poisoned_dataset';
+
+    let studentName = '', studentEmail = '';
+    let enjoymentRating = 0;
+
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName = session.name;
+      studentEmail = session.email;
+      trackExerciseStart(EXERCISE_SLUG);
+    })();
+
+    const ERROR_TYPES = ['Impossible value', 'Missing value', 'Duplicate row', 'Wrong label'];
+
+    // `bad` is the planted error type for that row (null = clean row).
+    const ROWS = [
+      { id: 'C01', w: '4.2',  ears: 'Pointy', sound: 'Meow', label: 'Cat', bad: null },
+      { id: 'C02', w: '28.0', ears: 'Floppy', sound: 'Bark', label: 'Dog', bad: null },
+      { id: 'C03', w: '3.8',  ears: 'Pointy', sound: 'Meow', label: 'Cat', bad: null },
+      { id: 'C04', w: '450',  ears: 'Pointy', sound: 'Meow', label: 'Cat', bad: 'Impossible value' },
+      { id: 'C05', w: '22.5', ears: 'Floppy', sound: 'Bark', label: 'Dog', bad: null },
+      { id: 'C06', w: '5.1',  ears: 'Pointy', sound: 'Meow', label: 'Cat', bad: null },
+      { id: 'C07', w: '18.0', ears: 'Floppy', sound: 'Bark', label: '',    bad: 'Missing value' },
+      { id: 'C08', w: '31.0', ears: 'Floppy', sound: 'Bark', label: 'Dog', bad: null },
+      { id: 'C02', w: '28.0', ears: 'Floppy', sound: 'Bark', label: 'Dog', bad: 'Duplicate row' },
+      { id: 'C10', w: '4.5',  ears: 'Pointy', sound: 'Meow', label: 'Cat', bad: null },
+      { id: 'C11', w: '3.2',  ears: 'Pointy', sound: 'Meow', label: 'Dog', bad: 'Wrong label' },
+      { id: 'C12', w: '25.0', ears: 'Floppy', sound: 'Bark', label: 'Dog', bad: null }
+    ];
+    const TIPS = {
+      'Impossible value': 'No cat weighs 450 kg. Probably a typo for 4.5. Inaccurate data.',
+      'Missing value': 'The label is blank, so the AI cannot learn from this row. Incomplete data.',
+      'Duplicate row': 'C02 appears twice, so the AI over-counts one dog. Duplicates skew training.',
+      'Wrong label': 'A 3.2 kg, pointy-eared, meowing animal labeled Dog. The AI would learn the wrong rule.'
+    };
+
+    const flags = {}; // rowIndex -> chosen error type (or '')
+    let checked = false;
+    let score = 0;
+    let repChoice = -1;
+    let repCorrect = false;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const badge = document.getElementById('user-badge');
+      badge.textContent = '\u{1F464} ' + studentName;
+      badge.classList.remove('hidden');
+      renderTable();
+    });
+
+    function renderTable() {
+      document.getElementById('data-body').innerHTML = ROWS.map((r, i) =>
+        '<tr class="data-row" id="row-' + i + '" onclick="toggleFlag(' + i + ')">' +
+        '<td class="p-2">' + r.id + '</td><td class="p-2">' + r.w + '</td><td class="p-2">' + r.ears +
+        '</td><td class="p-2">' + r.sound + '</td><td class="p-2">' + (r.label || '<span class="text-gray-300">(blank)</span>') + '</td></tr>'
+      ).join('');
+    }
+
+    function toggleFlag(i) {
+      if (checked) return;
+      if (i in flags) delete flags[i]; else flags[i] = '';
+      document.getElementById('row-' + i).classList.toggle('flagged', i in flags);
+      renderDiagnose();
+      document.getElementById('check-err').classList.add('hidden');
+    }
+
+    function renderDiagnose() {
+      const keys = Object.keys(flags).map(Number).sort((a, b) => a - b);
+      document.getElementById('flag-count').textContent = keys.length + ' flagged';
+      document.getElementById('diagnose-panel').classList.toggle('hidden', keys.length === 0);
+      document.getElementById('diagnose-list').innerHTML = keys.map(i =>
+        '<div class="flex items-center justify-between flex-wrap gap-2 border border-orange-100 bg-orange-50/50 rounded-xl p-2">' +
+        '<span class="text-xs font-mono font-bold text-gray-700">Row ' + (i + 1) + ' (' + ROWS[i].id + ')</span>' +
+        '<select class="text-xs border border-gray-300 rounded-lg px-2 py-1.5 bg-white font-bold text-gray-700" onchange="setType(' + i + ', this.value)">' +
+        '<option value="">Pick error type...</option>' +
+        ERROR_TYPES.map(t => '<option value="' + t + '"' + (flags[i] === t ? ' selected' : '') + '>' + t + '</option>').join('') +
+        '</select></div>'
+      ).join('');
+    }
+
+    function setType(i, val) { flags[i] = val; document.getElementById('check-err').classList.add('hidden'); }
+
+    function checkAnswers() {
+      if (checked) return;
+      const keys = Object.keys(flags).map(Number);
+      if (keys.length === 0 || keys.some(k => !flags[k])) {
+        document.getElementById('check-err').classList.remove('hidden');
+        return;
+      }
+      checked = true;
+      score = 0;
+      let found = 0, falseFlags = 0, typeRight = 0;
+      keys.forEach(i => {
+        const row = document.getElementById('row-' + i);
+        row.classList.remove('flagged');
+        if (ROWS[i].bad) {
+          found++;
+          row.classList.add('hit');
+          if (flags[i] === ROWS[i].bad) { typeRight++; score += 2; } else { score += 1; }
+        } else {
+          falseFlags++;
+          row.classList.add('miss');
+          score -= 1;
+        }
+      });
+      const missed = ROWS.map((r, i) => ({ r, i })).filter(x => x.r.bad && !(x.i in flags));
+      missed.forEach(x => document.getElementById('row-' + x.i).classList.add('miss'));
+      score = Math.max(0, score);
+
+      document.getElementById('check-btn').classList.add('hidden');
+      const tips = ROWS.filter(r => r.bad).map(r => '<li><strong>' + r.bad + ':</strong> ' + TIPS[r.bad] + '</li>').join('');
+      const box = document.getElementById('check-result');
+      box.className = 'mt-4 p-4 rounded-2xl border text-xs leading-relaxed ' +
+        (found === 4 && falseFlags === 0 ? 'bg-green-50 border-green-200 text-green-900' : 'bg-amber-50 border-amber-200 text-amber-900');
+      box.innerHTML = '<strong>Found ' + found + ' of 4 poisoned rows' +
+        (falseFlags ? ', with ' + falseFlags + ' clean row' + (falseFlags === 1 ? '' : 's') + ' wrongly flagged' : '') +
+        '. Score: ' + score + ' / 8.</strong> Green rows were poisoned, red rows were missed or clean.' +
+        '<ul class="list-disc pl-4 mt-2 space-y-1">' + tips + '</ul>';
+      box.classList.remove('hidden');
+      document.getElementById('rep-card').classList.remove('hidden');
+      document.getElementById('rep-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      window._found = found; window._falseFlags = falseFlags; window._typeRight = typeRight;
+    }
+
+    function pickRep(i, btn) {
+      if (repChoice !== -1) return;
+      repChoice = i;
+      repCorrect = i === 1;
+      btn.classList.add(repCorrect ? 'right' : 'wrong');
+      const opts = document.querySelectorAll('#rep-options .opt-btn');
+      opts[1].classList.add('right');
+      opts.forEach(b => b.disabled = true);
+      const fb = document.getElementById('rep-feedback');
+      fb.className = 'text-xs leading-relaxed p-3 rounded-xl border ' + (repCorrect ? 'bg-green-50 border-green-200 text-green-900' : 'bg-red-50 border-red-200 text-red-900');
+      fb.textContent = (repCorrect ? 'Right! ' : 'Not quite. ') +
+        'A dataset is only representative of what it contains. An AI that has never seen a rabbit can only guess "cat" or "dog". Clean data is not the same as complete or fair data.';
+      fb.classList.remove('hidden');
+      document.getElementById('reflect-card').classList.remove('hidden');
+    }
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#star-rating .star-btn').forEach((s, idx) => s.classList.toggle('active', idx < val));
+      document.getElementById('rating-err').classList.add('hidden');
+    }
+
+    function checkField(id, errId) {
+      const el = document.getElementById(id);
+      const ok = !!el.value.trim();
+      el.classList.toggle('error', !ok);
+      document.getElementById(errId).classList.toggle('hidden', ok);
+      return ok;
+    }
+
+    async function handleSubmit(ev) {
+      ev.preventDefault();
+      const banner = document.getElementById('submit-error-banner');
+      banner.classList.add('hidden');
+
+      let valid = true;
+      valid = checkField('worst-error', 'worst-err') && valid;
+      valid = checkField('fix-plan', 'fix-err') && valid;
+      if (enjoymentRating === 0) { document.getElementById('rating-err').classList.remove('hidden'); valid = false; }
+      if (!valid) {
+        banner.textContent = 'Please fill out all required fields marked in red.';
+        banner.classList.remove('hidden');
+        return;
+      }
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> <span>Submitting...</span>';
+
+      const payload = {
+        score: score,
+        max_score: 8,
+        bad_rows_found: window._found,
+        false_flags: window._falseFlags,
+        error_types_correct: window._typeRight,
+        representativeness_correct: repCorrect,
+        worst_error_reflection: document.getElementById('worst-error').value.trim(),
+        fix_plan: document.getElementById('fix-plan').value.trim()
+      };
+
+      try {
+        await submitExercise(EXERCISE_SLUG, payload, { enjoymentRating: enjoymentRating || undefined });
+        document.getElementById('success-first-name').textContent = studentName.split(' ')[0] || 'Student';
+        document.getElementById('success-screen').classList.remove('hidden');
+      } catch (err) {
+        console.error('Submission error:', err);
+        banner.textContent = err.message || 'Failed to submit exercise. Please try again.';
+        banner.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerHTML = '<span>Submit Results 🚀</span>';
+      }
+    }
+  </script>
+</body>
+
+</html>

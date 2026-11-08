@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Be the Director | Intro to AI · Week 9</title>
+  <meta name="description"
+    content="Week 9 Activity: Be the Director! Play the hidden AI Director of a survival game and keep the player in the flow zone, then race the auto-director.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/activity.css">
+  <style>
+    .form-input:focus { outline: none; border-color: #e11d48; box-shadow: 0 0 0 3px rgba(225,29,72,0.1); }
+    .form-input.error { border-color: #ef4444; }
+    .dir-btn { transition: all 0.15s ease; cursor: pointer; }
+    .dir-btn:hover:not(:disabled) { transform: translateY(-1px); border-color: #e11d48; background: #fff1f2; }
+    .dir-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .star-btn { font-size: 26px; cursor: pointer; filter: grayscale(100%); transition: filter 0.15s ease, transform 0.1s ease; }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; animation: spin 0.65s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <div id="main-content" class="max-w-3xl mx-auto px-4 pt-8">
+
+    <header class="mb-6">
+      <a href="index.html" class="inline-flex items-center text-xs font-bold text-rose-600 hover:text-rose-700 transition-colors mb-3">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        Back to Course Hub
+      </a>
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <div class="inline-flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-rose-100 text-rose-800">Week 9 Activity</span>
+            <span class="text-xs text-gray-500 font-medium">Dynamic Difficulty &amp; Flow State</span>
+          </div>
+          <h1 class="text-3xl font-black text-gray-900 mt-1 tracking-tight">Be the Director 🎬</h1>
+        </div>
+        <div id="user-badge" class="hidden text-xs bg-rose-50 border border-rose-200 text-rose-800 px-3 py-1.5 rounded-full font-bold"></div>
+      </div>
+    </header>
+
+    <div class="bg-gradient-to-br from-rose-600 to-pink-700 text-white rounded-3xl p-6 shadow-xl mb-8">
+      <h2 class="text-lg font-extrabold mb-1">Your Mission</h2>
+      <p class="text-xs text-rose-100 mb-4 leading-relaxed">
+        You are the hidden <strong>AI Director</strong> of a zombie survival game. Each of 10 waves, choose what to throw at the player.
+        Keep their stress inside the <strong>green flow zone (40–70)</strong>: too low and they're bored, too high and they rage-quit.
+        You can't see the future, because the player's stress also wobbles on its own. Then race the auto-director.
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-medium">
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-rose-200 block mb-0.5">1. Direct</span>Pick a challenge each wave.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-rose-200 block mb-0.5">2. Compare</span>Your flow score vs the AI's.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-rose-200 block mb-0.5">3. Debate</span>Is secretly adapting fair?</div>
+      </div>
+    </div>
+
+    <form id="director-form" onsubmit="handleSubmit(event)" novalidate>
+
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-sm shadow">1</div>
+            <div>
+              <h3 id="wave-title" class="text-base font-bold text-gray-900">Wave 1 of 10</h3>
+              <p id="wave-sub" class="text-xs text-gray-500">Starting stress: 35</p>
+            </div>
+          </div>
+          <div id="flow-pill" class="text-xs font-black px-3 py-1.5 rounded-full bg-gray-100 text-gray-600">Flow waves: 0</div>
+        </div>
+
+        <!-- Stress meter -->
+        <div class="mb-1 flex justify-between text-[10px] font-black uppercase tracking-widest text-gray-400"><span>Bored</span><span>Flow</span><span>Rage-quit</span></div>
+        <div class="relative h-8 rounded-xl overflow-hidden border border-gray-200 bg-gray-100 mb-1">
+          <div class="absolute top-0 bottom-0 bg-green-200" style="left:40%;width:30%"></div>
+          <div id="stress-marker" class="absolute top-0 bottom-0 w-1.5 bg-rose-600 transition-all duration-500" style="left:35%"></div>
+        </div>
+        <p class="text-center text-xs font-mono font-bold text-gray-700 mb-4">Player stress: <span id="stress-val">35</span> <span id="stress-mood"></span></p>
+
+        <div id="history" class="flex flex-wrap gap-1.5 mb-4"></div>
+
+        <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Choose the next wave</p>
+        <div id="choices" class="grid grid-cols-2 gap-2"></div>
+        <div id="wave-msg" class="hidden mt-4 p-3 rounded-xl border text-xs leading-relaxed"></div>
+      </div>
+
+      <div id="result-card" class="hidden bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-sm shadow">2</div>
+          <div>
+            <h3 class="text-base font-bold text-gray-900">You vs the Auto-Director</h3>
+            <p class="text-xs text-gray-500">Same player, same random wobble, different decisions</p>
+          </div>
+        </div>
+        <div id="compare" class="grid grid-cols-2 gap-3 text-center mb-4"></div>
+        <div id="auto-history" class="flex flex-wrap gap-1.5 mb-3"></div>
+        <p class="text-xs text-gray-600 leading-relaxed bg-gray-50 border border-gray-200 rounded-xl p-3">
+          The auto-director uses a simple rule: <strong>pick the wave that should land the player closest to stress 55</strong>. It has no idea about the random wobble either, but it re-checks every wave. That is the core of dynamic difficulty adjustment.
+        </p>
+      </div>
+
+      <div id="reflect-card" class="hidden">
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 rounded-full bg-rose-600 text-white font-black flex items-center justify-center text-sm shadow">3</div>
+            <div>
+              <h3 class="text-base font-bold text-gray-900">Think It Through</h3>
+              <p class="text-xs text-gray-500">The ethics of an invisible director</p>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">What strategy did you use, and when did it fail? <span class="text-red-500">*</span></label>
+              <textarea id="strategy" rows="2" placeholder="e.g. I alternated big and quiet waves, but the wobble pushed me out of the zone."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="strategy-err" class="text-xs text-red-500 mt-1 hidden">Please describe your strategy.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Should a game tell players it is secretly adjusting difficulty? Why or why not? <span class="text-red-500">*</span></label>
+              <textarea id="disclose" rows="2" placeholder="e.g. Yes, a small note. If I win only because the game went easy on me, it feels fake."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="disclose-err" class="text-xs text-red-500 mt-1 hidden">Please share your view.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Could the same system be used to keep you playing longer than is healthy? How? <span class="text-red-500">*</span></label>
+              <textarea id="misuse" rows="2" placeholder="e.g. It could keep me just barely failing so I always want one more try."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="misuse-err" class="text-xs text-red-500 mt-1 hidden">Please answer this question.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-8 text-center">
+          <h3 class="text-sm font-bold text-gray-900 mb-1">Activity Enjoyment Rating</h3>
+          <p class="text-xs text-gray-500 mb-3">How fun was directing?</p>
+          <div id="star-rating" class="flex justify-center gap-2 mb-4">
+            <button type="button" class="star-btn" onclick="setRating(1)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(2)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(3)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(4)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(5)">⭐</button>
+          </div>
+          <p id="rating-err" class="text-xs text-red-500 mb-3 hidden">Please select a star rating.</p>
+          <div id="submit-error-banner" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-medium"></div>
+          <button type="submit" id="submit-btn"
+            class="w-full py-4 px-8 rounded-2xl text-base font-extrabold text-white shadow-xl transition-all hover:bg-rose-700 active:scale-[0.99] flex items-center justify-center gap-2 bg-rose-600">
+            <span>Submit Results 🚀</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div id="success-screen" class="hidden fixed inset-0 z-[120] bg-white flex items-center justify-center p-4">
+    <div class="max-w-md w-full text-center">
+      <div class="w-20 h-20 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+      </div>
+      <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 mb-2">That's a Wrap! 🎬</span>
+      <h2 class="text-3xl font-black text-gray-900 mb-2">Great Job, <span id="success-first-name">Student</span>!</h2>
+      <p class="text-xs text-gray-600 mb-6 leading-relaxed">Your results have been recorded in the class database.</p>
+      <a href="index.html" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm rounded-xl shadow-lg transition-all">
+        <span>Back to Course Hub</span>
+      </a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../assets/js/introai-shared.js"></script>
+  <script>
+    const EXERCISE_SLUG = 'week09_be_the_director';
+
+    let studentName = '', studentEmail = '';
+    let enjoymentRating = 0;
+
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName = session.name;
+      studentEmail = session.email;
+      trackExerciseStart(EXERCISE_SLUG);
+    })();
+
+    const OPTIONS = [
+      { id: 'Quiet moment', icon: '🌙', effect: -20 },
+      { id: 'Small group',  icon: '🧟', effect: 8 },
+      { id: 'Big horde',    icon: '🧟‍♂️🧟‍♀️', effect: 22 },
+      { id: 'Boss fight',   icon: '👹', effect: 38 }
+    ];
+    const WAVES = 10, START = 35, DRIFT = -4, LOW = 40, HIGH = 70, TARGET = 55;
+    // Fixed "wobble" so the human and the auto-director face identical luck.
+    // From wave 6 the player gets tired, which adds extra stress.
+    const WOBBLE = [3, -4, 6, -2, 5, -6, 2, 4, -3, 5];
+    const FATIGUE_FROM = 5, FATIGUE = 6;
+
+    const clamp = v => Math.max(0, Math.min(100, v));
+    const nextStress = (st, opt, w) => clamp(st + opt.effect + DRIFT + WOBBLE[w] + (w >= FATIGUE_FROM ? FATIGUE : 0));
+    const mood = st => st < LOW ? '😴 bored' : st > HIGH ? '😡 frustrated' : '😎 in flow';
+    const inFlow = st => st >= LOW && st <= HIGH;
+
+    let wave = 0, stress = START, flowCount = 0;
+    const picks = [];
+    let autoFlow = 0;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const badge = document.getElementById('user-badge');
+      badge.textContent = '\u{1F464} ' + studentName;
+      badge.classList.remove('hidden');
+      renderWave();
+    });
+
+    function renderMeter() {
+      document.getElementById('stress-marker').style.left = Math.min(98.5, stress) + '%';
+      document.getElementById('stress-val').textContent = stress;
+      document.getElementById('stress-mood').textContent = '(' + mood(stress) + ')';
+    }
+
+    function renderWave() {
+      document.getElementById('wave-title').textContent = 'Wave ' + (wave + 1) + ' of ' + WAVES;
+      document.getElementById('wave-sub').textContent = wave >= FATIGUE_FROM ? 'The player is getting tired...' : 'Keep them between 40 and 70';
+      renderMeter();
+      document.getElementById('choices').innerHTML = OPTIONS.map((o, i) =>
+        '<button type="button" class="dir-btn border border-gray-200 rounded-xl p-3 text-left bg-gray-50" onclick="choose(' + i + ')">' +
+        '<span class="block text-lg">' + o.icon + '</span><span class="block text-xs font-bold text-gray-800">' + o.id + '</span>' +
+        '<span class="block text-[11px] font-mono text-gray-500">' + (o.effect > 0 ? '+' : '') + o.effect + ' stress</span></button>'
+      ).join('');
+    }
+
+    function choose(i) {
+      const opt = OPTIONS[i];
+      const before = stress;
+      stress = nextStress(stress, opt, wave);
+      picks.push(opt.id);
+      const ok = inFlow(stress);
+      if (ok) flowCount++;
+      document.getElementById('flow-pill').textContent = 'Flow waves: ' + flowCount;
+      renderMeter();
+
+      const chip = document.createElement('span');
+      chip.className = 'text-[11px] font-mono font-bold px-2 py-1 rounded-lg border ' + (ok ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800');
+      chip.textContent = 'W' + (wave + 1) + ': ' + stress;
+      document.getElementById('history').appendChild(chip);
+
+      const msg = document.getElementById('wave-msg');
+      msg.className = 'mt-4 p-3 rounded-xl border text-xs leading-relaxed ' + (ok ? 'bg-green-50 border-green-200 text-green-900' : 'bg-red-50 border-red-200 text-red-900');
+      msg.textContent = before + ' → ' + stress + ' (' + mood(stress) + '). The wobble nudged the player by ' + (WOBBLE[wave] + (wave >= FATIGUE_FROM ? FATIGUE : 0)) + ' on its own.';
+      msg.classList.remove('hidden');
+
+      wave++;
+      if (wave >= WAVES) { document.querySelectorAll('.dir-btn').forEach(b => b.disabled = true); finish(); }
+      else renderWave();
+    }
+
+    function runAuto() {
+      let st = START;
+      const seq = [];
+      autoFlow = 0;
+      for (let w = 0; w < WAVES; w++) {
+        // The AI predicts WITHOUT the wobble, then lives with the real result.
+        let best = OPTIONS[0], bestGap = Infinity;
+        OPTIONS.forEach(o => {
+          const predicted = clamp(st + o.effect + DRIFT);
+          const gap = Math.abs(predicted - TARGET);
+          if (gap < bestGap) { bestGap = gap; best = o; }
+        });
+        st = nextStress(st, best, w);
+        if (inFlow(st)) autoFlow++;
+        seq.push({ pick: best.id, stress: st });
+      }
+      return seq;
+    }
+
+    function finish() {
+      const seq = runAuto();
+      const you = flowCount;
+      document.getElementById('compare').innerHTML =
+        '<div class="rounded-2xl border border-rose-200 bg-rose-50 p-3"><p class="text-[10px] font-black uppercase tracking-widest text-rose-500">You</p><p class="text-3xl font-mono font-black text-rose-700">' + you + ' / ' + WAVES + '</p><p class="text-[11px] text-gray-500">waves in flow</p></div>' +
+        '<div class="rounded-2xl border border-gray-200 p-3"><p class="text-[10px] font-black uppercase tracking-widest text-gray-400">Auto-director</p><p class="text-3xl font-mono font-black text-gray-900">' + autoFlow + ' / ' + WAVES + '</p><p class="text-[11px] text-gray-500">waves in flow</p></div>';
+      document.getElementById('auto-history').innerHTML = seq.map((s, i) => {
+        const ok = inFlow(s.stress);
+        return '<span class="text-[11px] font-mono font-bold px-2 py-1 rounded-lg border ' + (ok ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800') +
+          '" title="' + s.pick + '">W' + (i + 1) + ': ' + s.stress + '</span>';
+      }).join('');
+      document.getElementById('result-card').classList.remove('hidden');
+      document.getElementById('reflect-card').classList.remove('hidden');
+      document.getElementById('result-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#star-rating .star-btn').forEach((s, idx) => s.classList.toggle('active', idx < val));
+      document.getElementById('rating-err').classList.add('hidden');
+    }
+
+    function checkField(id, errId) {
+      const el = document.getElementById(id);
+      const ok = !!el.value.trim();
+      el.classList.toggle('error', !ok);
+      document.getElementById(errId).classList.toggle('hidden', ok);
+      return ok;
+    }
+
+    async function handleSubmit(ev) {
+      ev.preventDefault();
+      const banner = document.getElementById('submit-error-banner');
+      banner.classList.add('hidden');
+
+      let valid = true;
+      valid = checkField('strategy', 'strategy-err') && valid;
+      valid = checkField('disclose', 'disclose-err') && valid;
+      valid = checkField('misuse', 'misuse-err') && valid;
+      if (enjoymentRating === 0) { document.getElementById('rating-err').classList.remove('hidden'); valid = false; }
+      if (!valid) {
+        banner.textContent = 'Please fill out all required fields marked in red.';
+        banner.classList.remove('hidden');
+        return;
+      }
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> <span>Submitting...</span>';
+
+      const payload = {
+        my_flow_waves: flowCount,
+        auto_director_flow_waves: autoFlow,
+        total_waves: WAVES,
+        my_picks: picks.join(', '),
+        strategy_reflection: document.getElementById('strategy').value.trim(),
+        disclosure_opinion: document.getElementById('disclose').value.trim(),
+        misuse_reflection: document.getElementById('misuse').value.trim()
+      };
+
+      try {
+        await submitExercise(EXERCISE_SLUG, payload, { enjoymentRating: enjoymentRating || undefined });
+        document.getElementById('success-first-name').textContent = studentName.split(' ')[0] || 'Student';
+        document.getElementById('success-screen').classList.remove('hidden');
+      } catch (err) {
+        console.error('Submission error:', err);
+        banner.textContent = err.message || 'Failed to submit exercise. Please try again.';
+        banner.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerHTML = '<span>Submit Results 🚀</span>';
+      }
+    }
+  </script>
+</body>
+
+</html>

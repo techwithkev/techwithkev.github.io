@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Newsroom Desk | Intro to AI · Week 11</title>
+  <meta name="description"
+    content="Week 11 Activity: Newsroom Desk! Run the night desk with a limited budget of fact-checks and decide which viral clips to publish, hold or reject.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/activity.css">
+  <style>
+    .form-input:focus { outline: none; border-color: #1d4ed8; box-shadow: 0 0 0 3px rgba(29,78,216,0.1); }
+    .form-input.error { border-color: #ef4444; }
+    .opt-btn { transition: all 0.15s ease; cursor: pointer; }
+    .opt-btn:hover:not(:disabled) { transform: translateY(-1px); }
+    .opt-btn:disabled { cursor: default; }
+    .opt-btn.used { background: #eff6ff !important; border-color: #93c5fd !important; color: #1e3a8a !important; }
+    .star-btn { font-size: 26px; cursor: pointer; filter: grayscale(100%); transition: filter 0.15s ease, transform 0.1s ease; }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; animation: spin 0.65s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <div id="main-content" class="max-w-3xl mx-auto px-4 pt-8">
+
+    <header class="mb-6">
+      <a href="index.html" class="inline-flex items-center text-xs font-bold text-blue-700 hover:text-blue-800 transition-colors mb-3">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        Back to Course Hub
+      </a>
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <div class="inline-flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-blue-100 text-blue-800">Week 11 Activity</span>
+            <span class="text-xs text-gray-500 font-medium">Verify Before You Share</span>
+          </div>
+          <h1 class="text-3xl font-black text-gray-900 mt-1 tracking-tight">Newsroom Desk 📰</h1>
+        </div>
+        <div id="user-badge" class="hidden text-xs bg-blue-50 border border-blue-200 text-blue-800 px-3 py-1.5 rounded-full font-bold"></div>
+      </div>
+    </header>
+
+    <div class="bg-gradient-to-br from-sky-700 to-blue-900 text-white rounded-3xl p-6 shadow-xl mb-8">
+      <h2 class="text-lg font-extrabold mb-1">Your Mission</h2>
+      <p class="text-xs text-sky-100 mb-4 leading-relaxed">
+        You run the night desk at the <strong>Daily Signal</strong>. Four viral clips just landed and you have <strong>10 fact-check tokens</strong> for the whole night.
+        Each check costs 1. Decide for each clip: <strong>Publish</strong>, <strong>Hold</strong> or <strong>Reject</strong>.
+        Publishing something fake is a disaster, but rejecting something real is costly too. Spot-the-tell skills help, but are they enough?
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-medium">
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-sky-200 block mb-0.5">1. Investigate</span>Spend tokens on checks.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-sky-200 block mb-0.5">2. Decide</span>Publish, hold or reject each clip.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-sky-200 block mb-0.5">3. Reflect</span>Which checks were worth it?</div>
+      </div>
+    </div>
+
+    <form id="desk-form" onsubmit="handleSubmit(event)" novalidate>
+
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-blue-700 text-white font-black flex items-center justify-center text-sm shadow">1</div>
+            <div>
+              <h3 class="text-base font-bold text-gray-900">The Night Desk</h3>
+              <p class="text-xs text-gray-500">All clips and people here are fictional.</p>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <div id="token-pill" class="text-xs font-black px-3 py-1.5 rounded-full bg-blue-50 text-blue-800 border border-blue-200">Tokens: 10</div>
+            <div id="score-pill" class="text-xs font-black px-3 py-1.5 rounded-full bg-gray-100 text-gray-600">Score: 0</div>
+          </div>
+        </div>
+        <div id="clips" class="space-y-5"></div>
+        <p id="decide-hint" class="text-xs text-gray-400 mt-4">Decide all four clips to close the edition.</p>
+      </div>
+
+      <div id="reflect-card" class="hidden">
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 rounded-full bg-blue-700 text-white font-black flex items-center justify-center text-sm shadow">★</div>
+            <div>
+              <h3 class="text-base font-bold text-gray-900">Edition Closed: <span id="final-score" class="font-mono"></span></h3>
+              <p id="final-line" class="text-xs text-gray-500"></p>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Which check was most valuable and which was least? Why? <span class="text-red-500">*</span></label>
+              <textarea id="valuable" rows="2" placeholder="e.g. 'Official statement' settled three clips. 'Visual tells' misled me on the rescue video."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="valuable-err" class="text-xs text-red-500 mt-1 hidden">Please answer this question.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">One bad clip was not AI at all, just real footage with the wrong label. Why does that matter for how we fight fakes? <span class="text-red-500">*</span></label>
+              <textarea id="not-ai" rows="2" placeholder="e.g. Misleading context is just as harmful, and no deepfake detector would catch it. You have to check the story, not only the pixels."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="notai-err" class="text-xs text-red-500 mt-1 hidden">Please answer this question.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Write a three-step rule for checking a viral clip before you share it. <span class="text-red-500">*</span></label>
+              <textarea id="rule" rows="3" placeholder="e.g. 1) Who posted it? 2) Has anyone trustworthy confirmed it? 3) Does the original context match?"
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="rule-err" class="text-xs text-red-500 mt-1 hidden">Please write your rule.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-8 text-center">
+          <h3 class="text-sm font-bold text-gray-900 mb-1">Activity Enjoyment Rating</h3>
+          <p class="text-xs text-gray-500 mb-3">How was running the desk?</p>
+          <div id="star-rating" class="flex justify-center gap-2 mb-4">
+            <button type="button" class="star-btn" onclick="setRating(1)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(2)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(3)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(4)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(5)">⭐</button>
+          </div>
+          <p id="rating-err" class="text-xs text-red-500 mb-3 hidden">Please select a star rating.</p>
+          <div id="submit-error-banner" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-medium"></div>
+          <button type="submit" id="submit-btn"
+            class="w-full py-4 px-8 rounded-2xl text-base font-extrabold text-white shadow-xl transition-all hover:bg-blue-800 active:scale-[0.99] flex items-center justify-center gap-2 bg-blue-700">
+            <span>Submit Results 🚀</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div id="success-screen" class="hidden fixed inset-0 z-[120] bg-white flex items-center justify-center p-4">
+    <div class="max-w-md w-full text-center">
+      <div class="w-20 h-20 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+      </div>
+      <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 mb-2">Edition Published! 📰</span>
+      <h2 class="text-3xl font-black text-gray-900 mb-2">Great Job, <span id="success-first-name">Student</span>!</h2>
+      <p class="text-xs text-gray-600 mb-6 leading-relaxed">Your results have been recorded in the class database.</p>
+      <a href="index.html" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-blue-700 hover:bg-blue-800 text-white font-bold text-sm rounded-xl shadow-lg transition-all">
+        <span>Back to Course Hub</span>
+      </a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../assets/js/introai-shared.js"></script>
+  <script>
+    const EXERCISE_SLUG = 'week11_newsroom_desk';
+
+    let studentName = '', studentEmail = '';
+    let enjoymentRating = 0;
+
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName = session.name;
+      studentEmail = session.email;
+      trackExerciseStart(EXERCISE_SLUG);
+    })();
+
+    const BUDGET = 10;
+    const TOOLS = [
+      { id: 'source', label: '🔎 Check the source account' },
+      { id: 'reverse', label: '🖼 Reverse-search the clip' },
+      { id: 'context', label: '📍 Check the original context' },
+      { id: 'official', label: '🏛 Look for an official statement' },
+      { id: 'tells', label: '🎭 Study the visual and audio tells' }
+    ];
+    // ideal: the right call. truth: shown after deciding.
+    const CLIPS = [
+      { title: '🌊 Dam breach footage', blurb: 'Dramatic phone video of water pouring over Miller Dam. Already 2 million views.', ideal: 'publish',
+        truth: 'Genuine footage by a verified local reporter. Publishing was right.',
+        finds: {
+          source: 'Filmed by Dana Ruiz, a reporter at a local station for six years. The station verifies the account.',
+          reverse: 'No earlier copies exist. The first upload was 20 minutes ago, from this account.',
+          context: 'The water level and road signs match this morning\'s county flood reports.',
+          official: 'The county emergency office confirms a breach at Miller Dam and posted its own photos.',
+          tells: 'Nothing odd. Normal phone shake and natural sound.' } },
+      { title: '🎙 Senator Vale resignation audio', blurb: 'A leaked voice clip of Senator Vale "resigning". It is spreading fast.', ideal: 'reject',
+        truth: 'A cloned voice. Rejecting was right, and publishing would have been a disaster.',
+        finds: {
+          source: 'Posted by an account created two days ago with 41 followers and no other posts.',
+          reverse: 'No outlet or official channel has this audio. Every copy traces back to that one account.',
+          context: 'Senator Vale was live on TV at the time this call supposedly happened.',
+          official: 'The Senator\'s office says the clip is fake and is reporting it.',
+          tells: 'The voice is flat, with no breathing and perfectly even pauses. Suspicious, but tells alone are not proof.' } },
+      { title: '🎪 Stage collapse video', blurb: '"Tonight at City Arena": a stage collapses on a cheering crowd. A huge account posted it.', ideal: 'reject',
+        truth: 'Real footage, but from 2019 in another city, with a false label. No AI involved, and still misleading. Rejecting was right.',
+        finds: {
+          source: 'A popular account with 300,000 followers and a long history. It often shares viral clips without checking.',
+          reverse: 'The same footage appears in a 2019 article about a stage collapse in a different city.',
+          context: 'Banners in the crowd show a 2019 tour, not tonight\'s event.',
+          official: 'City Arena says no incident happened tonight.',
+          tells: 'No sign of AI at all. The footage is real, just old and mislabeled.' } },
+      { title: '🚒 Rescue on Pine Street', blurb: 'A grainy video of a bystander pulling someone from a car. Sent by a brand-new account.', ideal: 'publish',
+        truth: 'Genuine footage from an eyewitness. The odd lighting was just dusk and an old phone. Publishing was right.',
+        finds: {
+          source: 'A new account, but the sender is an eyewitness who left a phone number.',
+          reverse: 'No earlier copies. The first upload is from this eyewitness.',
+          context: 'Our reporter phoned the eyewitness. The street, the time and the fire engine markings all match.',
+          official: 'The fire department confirms the rescue and thanks the bystander.',
+          tells: 'The lighting looks odd and the edges shimmer a little, but it was filmed at dusk on an old phone. Real footage can look strange too.' } }
+    ];
+
+    let tokens = BUDGET, score = 0;
+    const revealed = CLIPS.map(() => new Set());
+    const decision = CLIPS.map(() => null);
+    const usage = {}; TOOLS.forEach(t => { usage[t.id] = 0; });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const badge = document.getElementById('user-badge');
+      badge.textContent = '\u{1F464} ' + studentName;
+      badge.classList.remove('hidden');
+      render();
+    });
+
+    function render() {
+      document.getElementById('token-pill').textContent = 'Tokens: ' + tokens;
+      document.getElementById('score-pill').textContent = 'Score: ' + score;
+      document.getElementById('clips').innerHTML = CLIPS.map((c, ci) => {
+        const done = decision[ci] !== null;
+        const toolBtns = TOOLS.map(t => {
+          const used = revealed[ci].has(t.id);
+          const off = done || used || tokens <= 0;
+          return '<button type="button" class="opt-btn border border-gray-200 rounded-xl px-3 py-2 text-left text-xs font-bold text-gray-600 bg-gray-50 ' + (used ? 'used' : '') + '"' +
+            (off ? ' disabled' : '') + ' onclick="check(' + ci + ',\'' + t.id + '\')">' + t.label + (used ? '' : ' <span class="text-gray-400">(1 token)</span>') + '</button>';
+        }).join('');
+        const finds = [...revealed[ci]].map(id =>
+          '<li><span class="font-black text-blue-800">' + TOOLS.find(t => t.id === id).label.replace(/^\S+\s/, '') + ':</span> ' + c.finds[id] + '</li>').join('');
+        const decBtns = [['publish', '✅ Publish'], ['hold', '⏸ Hold'], ['reject', '🚫 Reject']].map(d =>
+          '<button type="button" class="opt-btn border rounded-xl px-4 py-2 text-xs font-black ' + decStyle(ci, d[0]) + '"' + (done ? ' disabled' : '') + ' onclick="decide(' + ci + ',\'' + d[0] + '\')">' + d[1] + '</button>').join('');
+        const result = done ? '<div class="mt-3 p-3 rounded-xl border text-xs leading-relaxed ' + resultStyle(ci) + '">' + resultText(ci) + '</div>' : '';
+        return '<div class="rounded-2xl border border-gray-200 p-4">' +
+          '<p class="text-sm font-black text-gray-900">' + (ci + 1) + '. ' + c.title + '</p>' +
+          '<p class="text-xs text-gray-600 mb-3">' + c.blurb + '</p>' +
+          '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">' + toolBtns + '</div>' +
+          (finds ? '<ul class="list-disc pl-5 space-y-1 text-xs text-gray-700 mb-3">' + finds + '</ul>' : '') +
+          '<div class="flex flex-wrap gap-2">' + decBtns + '</div>' + result + '</div>';
+      }).join('');
+    }
+
+    function decStyle(ci, d) {
+      if (decision[ci] === d) return 'border-blue-700 bg-blue-50 text-blue-900';
+      return 'border-gray-200 bg-white text-gray-700';
+    }
+
+    function points(ci) {
+      const d = decision[ci], ideal = CLIPS[ci].ideal;
+      if (d === 'hold') return 2;
+      if (d === ideal) return 10;
+      return d === 'publish' ? -10 : -5; // published something bad, or rejected something real
+    }
+    function resultStyle(ci) {
+      const p = points(ci);
+      return p >= 10 ? 'bg-green-50 border-green-200 text-green-900' : p > 0 ? 'bg-amber-50 border-amber-200 text-amber-900' : 'bg-red-50 border-red-200 text-red-900';
+    }
+    function resultText(ci) {
+      const p = points(ci), d = decision[ci];
+      const lead = d === 'hold' ? 'You held it: ' : (p >= 10 ? 'Correct: ' : (d === 'publish' ? 'Disaster: ' : 'Costly miss: '));
+      return '<strong>' + lead + (p > 0 ? '+' : '') + p + ' points.</strong> ' + CLIPS[ci].truth +
+        (d === 'hold' ? ' Holding is safe, but a newsroom that holds everything never publishes the truth.' : '');
+    }
+
+    function check(ci, id) {
+      if (decision[ci] !== null || revealed[ci].has(id) || tokens <= 0) return;
+      tokens--; usage[id]++;
+      revealed[ci].add(id);
+      render();
+    }
+
+    function decide(ci, d) {
+      if (decision[ci] !== null) return;
+      decision[ci] = d;
+      score += points(ci);
+      render();
+      if (decision.every(x => x !== null)) closeEdition();
+    }
+
+    function maxScore() { return CLIPS.length * 10; }
+
+    function closeEdition() {
+      document.getElementById('decide-hint').classList.add('hidden');
+      document.getElementById('final-score').textContent = score + ' / ' + maxScore();
+      const used = BUDGET - tokens;
+      document.getElementById('final-line').textContent = 'You spent ' + used + ' of ' + BUDGET + ' tokens. Top score needs a correct call on all four clips.';
+      const card = document.getElementById('reflect-card');
+      card.classList.remove('hidden');
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#star-rating .star-btn').forEach((s, i) => s.classList.toggle('active', i < val));
+      document.getElementById('rating-err').classList.add('hidden');
+    }
+
+    function checkField(id, errId) {
+      const el = document.getElementById(id);
+      const ok = !!el.value.trim();
+      el.classList.toggle('error', !ok);
+      document.getElementById(errId).classList.toggle('hidden', ok);
+      return ok;
+    }
+
+    async function handleSubmit(ev) {
+      ev.preventDefault();
+      const banner = document.getElementById('submit-error-banner');
+      banner.classList.add('hidden');
+
+      const allDecided = decision.every(x => x !== null);
+      let valid = allDecided;
+      valid = checkField('valuable', 'valuable-err') && valid;
+      valid = checkField('not-ai', 'notai-err') && valid;
+      valid = checkField('rule', 'rule-err') && valid;
+      if (enjoymentRating === 0) { document.getElementById('rating-err').classList.remove('hidden'); valid = false; }
+      if (!valid) {
+        banner.textContent = allDecided ? 'Please fill out all required fields marked in red.' : 'Decide all four clips first.';
+        banner.classList.remove('hidden');
+        return;
+      }
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> <span>Submitting...</span>';
+
+      const payload = {
+        total_score: score,
+        max_score: maxScore(),
+        tokens_used: BUDGET - tokens,
+        decisions: CLIPS.map((c, i) => (i + 1) + '=' + decision[i]).join(', '),
+        correct_calls: CLIPS.filter((c, i) => decision[i] === c.ideal).length,
+        published_a_bad_clip: CLIPS.some((c, i) => decision[i] === 'publish' && c.ideal !== 'publish'),
+        checks_by_type: TOOLS.map(t => t.id + '=' + usage[t.id]).join(', '),
+        most_and_least_valuable_check: document.getElementById('valuable').value.trim(),
+        misleading_context_reflection: document.getElementById('not-ai').value.trim(),
+        verification_rule: document.getElementById('rule').value.trim()
+      };
+
+      try {
+        await submitExercise(EXERCISE_SLUG, payload, { enjoymentRating: enjoymentRating || undefined });
+        document.getElementById('success-first-name').textContent = studentName.split(' ')[0] || 'Student';
+        document.getElementById('success-screen').classList.remove('hidden');
+      } catch (err) {
+        console.error('Submission error:', err);
+        banner.textContent = err.message || 'Failed to submit exercise. Please try again.';
+        banner.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerHTML = '<span>Submit Results 🚀</span>';
+      }
+    }
+  </script>
+</body>
+
+</html>

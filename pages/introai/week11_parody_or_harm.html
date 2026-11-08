@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parody or Harm? | Intro to AI · Week 11</title>
+  <meta name="description"
+    content="Week 11 Activity: Parody or Harm? Judge six fictional deepfake scenarios with four criteria and see whether the criteria change your first reaction.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/activity.css">
+  <style>
+    .form-input:focus { outline: none; border-color: #db2777; box-shadow: 0 0 0 3px rgba(219,39,119,0.1); }
+    .form-input.error { border-color: #ef4444; }
+    .opt-btn { transition: all 0.15s ease; cursor: pointer; }
+    .opt-btn:hover:not(:disabled) { transform: translateY(-1px); }
+    .opt-btn.sel { border-color: #db2777 !important; background: #fdf2f8 !important; color: #831843 !important; font-weight: 700; }
+    .opt-btn.right { border-color: #16a34a !important; background: #f0fdf4 !important; color: #166534 !important; }
+    .opt-btn.wrong { border-color: #ef4444 !important; background: #fef2f2 !important; color: #991b1b !important; }
+    .star-btn { font-size: 26px; cursor: pointer; filter: grayscale(100%); transition: filter 0.15s ease, transform 0.1s ease; }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; animation: spin 0.65s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <div id="main-content" class="max-w-3xl mx-auto px-4 pt-8">
+
+    <header class="mb-6">
+      <a href="index.html" class="inline-flex items-center text-xs font-bold text-pink-600 hover:text-pink-700 transition-colors mb-3">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        Back to Course Hub
+      </a>
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <div class="inline-flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-pink-100 text-pink-800">Week 11 Activity</span>
+            <span class="text-xs text-gray-500 font-medium">Consent &amp; Harm</span>
+          </div>
+          <h1 class="text-3xl font-black text-gray-900 mt-1 tracking-tight">Parody or Harm? ⚖️</h1>
+        </div>
+        <div id="user-badge" class="hidden text-xs bg-pink-50 border border-pink-200 text-pink-800 px-3 py-1.5 rounded-full font-bold"></div>
+      </div>
+    </header>
+
+    <div class="bg-gradient-to-br from-pink-600 to-rose-700 text-white rounded-3xl p-6 shadow-xl mb-8">
+      <h2 class="text-lg font-extrabold mb-1">Your Mission</h2>
+      <p class="text-xs text-pink-100 mb-4 leading-relaxed">
+        Is a fake video a harmless joke or a harmful impersonation? Gut feelings differ, so use criteria. For each of six <strong>fictional</strong> scenarios, give your gut reaction,
+        then answer four questions. The criteria give a verdict. Does it match your gut?
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-medium">
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-pink-200 block mb-0.5">1. Gut check</span>Parody, harmful, or it depends?</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-pink-200 block mb-0.5">2. Criteria</span>Answer four yes or no questions.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-pink-200 block mb-0.5">3. Compare</span>Did the criteria change your mind?</div>
+      </div>
+    </div>
+
+    <form id="parody-form" onsubmit="handleSubmit(event)" novalidate>
+
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
+          <div class="flex items-center gap-3">
+            <div id="case-badge" class="w-8 h-8 rounded-full bg-pink-600 text-white font-black flex items-center justify-center text-sm shadow">1</div>
+            <div>
+              <h3 id="case-title" class="text-base font-bold text-gray-900"></h3>
+              <p class="text-xs text-gray-500">All people and events here are made up.</p>
+            </div>
+          </div>
+          <div id="score-pill" class="text-xs font-black px-3 py-1.5 rounded-full bg-gray-100 text-gray-600">Criteria right: 0</div>
+        </div>
+
+        <p id="case-text" class="text-sm text-gray-700 leading-relaxed bg-gray-50 border border-gray-200 rounded-2xl p-4 mb-4"></p>
+
+        <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">1. Your gut reaction</p>
+        <div id="gut-options" class="grid grid-cols-3 gap-2 mb-5"></div>
+
+        <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">2. The four criteria</p>
+        <div id="criteria" class="space-y-3 mb-4"></div>
+
+        <p id="check-err" class="text-xs text-red-500 mb-2 hidden">Give a gut reaction and answer all four questions first.</p>
+        <button type="button" id="check-btn" onclick="checkCase()"
+          class="w-full py-3 rounded-xl text-sm font-black text-white bg-pink-600 hover:bg-pink-700 shadow-md transition-all active:scale-95">
+          Check my reasoning
+        </button>
+
+        <div id="case-result" class="hidden mt-4 p-4 rounded-2xl border text-xs leading-relaxed"></div>
+        <button type="button" id="next-btn" onclick="nextCase()"
+          class="hidden mt-3 w-full py-3 rounded-xl text-sm font-black text-white bg-rose-600 hover:bg-rose-700 shadow-md transition-all active:scale-95">
+          Next scenario →
+        </button>
+      </div>
+
+      <div id="summary-card" class="hidden bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-full bg-pink-600 text-white font-black flex items-center justify-center text-sm shadow">★</div>
+          <div>
+            <h3 class="text-base font-bold text-gray-900">Gut vs Criteria</h3>
+            <p id="summary-line" class="text-xs text-gray-500"></p>
+          </div>
+        </div>
+        <div id="summary-list" class="space-y-2 text-xs"></div>
+      </div>
+
+      <div id="reflect-card" class="hidden">
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Which question changed your mind most often, and in which scenario? <span class="text-red-500">*</span></label>
+              <textarea id="criterion" rows="2" placeholder="e.g. 'Could it fool people?' changed my mind on the senator clip. I thought a public figure made it fair game."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="criterion-err" class="text-xs text-red-500 mt-1 hidden">Please answer this question.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Why is "the person is famous" not enough to make a fake video okay? <span class="text-red-500">*</span></label>
+              <textarea id="famous" rows="2" placeholder="e.g. Being famous does not mean people agreed to be faked. If it can fool people, it can still do real damage."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="famous-err" class="text-xs text-red-500 mt-1 hidden">Please answer this question.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Write one rule you would give your classmates before they make or share a synthetic video. <span class="text-red-500">*</span></label>
+              <textarea id="rule" rows="2" placeholder="e.g. Ask first, label it clearly, and never make something realistic enough to fool people."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="rule-err" class="text-xs text-red-500 mt-1 hidden">Please write a rule.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-8 text-center">
+          <h3 class="text-sm font-bold text-gray-900 mb-1">Activity Enjoyment Rating</h3>
+          <p class="text-xs text-gray-500 mb-3">How engaging was the debate?</p>
+          <div id="star-rating" class="flex justify-center gap-2 mb-4">
+            <button type="button" class="star-btn" onclick="setRating(1)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(2)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(3)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(4)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(5)">⭐</button>
+          </div>
+          <p id="rating-err" class="text-xs text-red-500 mb-3 hidden">Please select a star rating.</p>
+          <div id="submit-error-banner" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-medium"></div>
+          <button type="submit" id="submit-btn"
+            class="w-full py-4 px-8 rounded-2xl text-base font-extrabold text-white shadow-xl transition-all hover:bg-pink-700 active:scale-[0.99] flex items-center justify-center gap-2 bg-pink-600">
+            <span>Submit Results 🚀</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div id="success-screen" class="hidden fixed inset-0 z-[120] bg-white flex items-center justify-center p-4">
+    <div class="max-w-md w-full text-center">
+      <div class="w-20 h-20 bg-pink-100 text-pink-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+      </div>
+      <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-pink-100 text-pink-800 mb-2">Verdicts Delivered! ⚖️</span>
+      <h2 class="text-3xl font-black text-gray-900 mb-2">Great Job, <span id="success-first-name">Student</span>!</h2>
+      <p class="text-xs text-gray-600 mb-6 leading-relaxed">Your results have been recorded in the class database.</p>
+      <a href="index.html" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-pink-600 hover:bg-pink-700 text-white font-bold text-sm rounded-xl shadow-lg transition-all">
+        <span>Back to Course Hub</span>
+      </a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../assets/js/introai-shared.js"></script>
+  <script>
+    const EXERCISE_SLUG = 'week11_parody_or_harm';
+
+    let studentName = '', studentEmail = '';
+    let enjoymentRating = 0;
+
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName = session.name;
+      studentEmail = session.email;
+      trackExerciseStart(EXERCISE_SLUG);
+    })();
+
+    const QUESTIONS = [
+      { id: 'obvious', text: 'Is it obviously fake to any reasonable viewer?' },
+      { id: 'publicActs', text: 'Is it about a public figure\'s public actions (not their private life)?' },
+      { id: 'fooling', text: 'Could it fool people or damage someone\'s reputation?' },
+      { id: 'consent', text: 'Did the person agree, knowing how it would be used?' }
+    ];
+    const VERDICTS = {
+      parody: 'Parody or satire',
+      harmful: 'Harmful impersonation',
+      consent: 'Fine: everyone agreed',
+      grey: 'Grey area: ask first'
+    };
+    const GUT_LABELS = { parody: 'Parody or harmless', harmful: 'Harmful', depends: 'It depends' };
+    // A gut reaction "matches" when it points the same way as the criteria verdict:
+    // harmless joke -> parody or everyone-agreed, harmful -> harmful, it depends -> grey area.
+    function gutMatches(g, verdict) {
+      return (g === 'parody' && (verdict === 'parody' || verdict === 'consent'))
+        || (g === 'harmful' && verdict === 'harmful')
+        || (g === 'depends' && verdict === 'grey');
+    }
+    // The verdict follows from the four answers, in this order of priority.
+    function verdictFrom(a) {
+      if (a.fooling) return 'harmful';
+      if (a.obvious && a.publicActs) return 'parody';
+      if (a.consent) return 'consent';
+      return 'grey';
+    }
+
+    const CASES = [
+      { title: 'The Mayor Bumble cartoon',
+        text: 'A school art club posts a wildly exaggerated animation of "Mayor Bumble" tripping over a giant scroll labeled "New Parking Rules". Everyone can see it is a cartoon.',
+        key: { obvious: true, publicActs: true, fooling: false, consent: false },
+        why: 'Clearly exaggerated, about a public official\'s public actions, and nobody could mistake it for real.' },
+      { title: 'The classmate "confession"',
+        text: 'A student makes a realistic fake video of a classmate "admitting" they cheated on a test, and posts it in the class chat as a joke.',
+        key: { obvious: false, publicActs: false, fooling: true, consent: false },
+        why: 'Realistic, aimed at a private person who never agreed, and it could easily damage their reputation.' },
+      { title: 'The chef-voice sketch',
+        text: 'Three friends clone their own voices to record a silly cooking sketch with exaggerated chef accents. All three agreed, and the video is labeled "made with AI".',
+        key: { obvious: true, publicActs: false, fooling: false, consent: true },
+        why: 'Not about a public figure, but it is obviously a sketch, labeled, and everyone involved agreed.' },
+      { title: 'The grandparent call',
+        text: 'A scammer copies a teenager\'s voice from a public video and phones their grandparent, begging for emergency money.',
+        key: { obvious: false, publicActs: false, fooling: true, consent: false },
+        why: 'Realistic by design, aimed at a private person, and meant to deceive and steal.' },
+      { title: 'The pop star date night',
+        text: 'A fan account posts an obviously fake, goofy video of famous singer "Zara Nova" on a clumsy date. It is labeled as AI, but it is about her personal life.',
+        key: { obvious: true, publicActs: false, fooling: false, consent: false },
+        why: 'It is obviously fake and unlikely to fool anyone, but it is about private life without her agreement. This is a grey area, so the safest move is to ask first.' },
+      { title: 'The senator\'s announcement',
+        text: 'Days before an election, a realistic fake audio clip of "Senator Vale" announcing a harmful new policy spreads online with no label.',
+        key: { obvious: false, publicActs: true, fooling: true, consent: false },
+        why: 'He is a public figure and it is about public matters, but it is realistic, unlabeled, and built to mislead voters. Being famous does not make it okay.' }
+    ];
+
+    let idx = 0, locked = false, criteriaRight = 0;
+    let gut = null;
+    const answers = {};
+    const history = [];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const badge = document.getElementById('user-badge');
+      badge.textContent = '\u{1F464} ' + studentName;
+      badge.classList.remove('hidden');
+      showCase();
+    });
+
+    function showCase() {
+      const c = CASES[idx];
+      locked = false; gut = null;
+      QUESTIONS.forEach(q => { answers[q.id] = null; });
+      document.getElementById('case-badge').textContent = idx + 1;
+      document.getElementById('case-title').textContent = c.title;
+      document.getElementById('case-text').textContent = c.text;
+      document.getElementById('gut-options').innerHTML = [['parody', '😄 Parody / harmless'], ['harmful', '⚠️ Harmful'], ['depends', '🤔 It depends']].map(g =>
+        '<button type="button" class="opt-btn border border-gray-200 rounded-xl p-3 text-xs font-bold text-gray-600 bg-gray-50" data-gut="' + g[0] + '" onclick="setGut(\'' + g[0] + '\')">' + g[1] + '</button>').join('');
+      document.getElementById('criteria').innerHTML = QUESTIONS.map(q =>
+        '<div class="flex items-center justify-between flex-wrap gap-2 border border-gray-200 rounded-xl p-3" data-q="' + q.id + '">' +
+        '<span class="text-xs font-bold text-gray-700 flex-1 min-w-[200px]">' + q.text + '</span>' +
+        '<div class="flex gap-2"><button type="button" class="opt-btn border border-gray-200 rounded-lg px-4 py-1.5 text-xs font-bold text-gray-600 bg-gray-50" data-a="yes" onclick="setAnswer(\'' + q.id + '\',true,this)">Yes</button>' +
+        '<button type="button" class="opt-btn border border-gray-200 rounded-lg px-4 py-1.5 text-xs font-bold text-gray-600 bg-gray-50" data-a="no" onclick="setAnswer(\'' + q.id + '\',false,this)">No</button></div></div>').join('');
+      document.getElementById('check-btn').classList.remove('hidden');
+      document.getElementById('check-err').classList.add('hidden');
+      document.getElementById('case-result').classList.add('hidden');
+      document.getElementById('next-btn').classList.add('hidden');
+    }
+
+    function setGut(g) {
+      if (locked) return;
+      gut = g;
+      document.querySelectorAll('[data-gut]').forEach(b => b.classList.toggle('sel', b.dataset.gut === g));
+    }
+
+    function setAnswer(id, val, btn) {
+      if (locked) return;
+      answers[id] = val;
+      btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.toggle('sel', b === btn));
+    }
+
+    function checkCase() {
+      if (locked) return;
+      if (!gut || QUESTIONS.some(q => answers[q.id] === null)) { document.getElementById('check-err').classList.remove('hidden'); return; }
+      locked = true;
+      const c = CASES[idx];
+      let right = 0;
+      QUESTIONS.forEach(q => {
+        const ok = answers[q.id] === c.key[q.id];
+        if (ok) right++;
+        const row = document.querySelector('[data-q="' + q.id + '"]');
+        row.querySelectorAll('.opt-btn').forEach(b => {
+          const val = b.dataset.a === 'yes';
+          b.disabled = true; b.classList.remove('sel');
+          if (val === c.key[q.id]) b.classList.add('right');
+          else if (val === answers[q.id]) b.classList.add('wrong');
+        });
+      });
+      criteriaRight += right;
+      document.getElementById('score-pill').textContent = 'Criteria right: ' + criteriaRight;
+      document.querySelectorAll('[data-gut]').forEach(b => { b.disabled = true; });
+
+      const verdict = verdictFrom(c.key);
+      const gutLabel = GUT_LABELS[gut];
+      const agrees = gutMatches(gut, verdict);
+      history.push({ title: c.title, gut, verdict, agrees, right });
+
+      const box = document.getElementById('case-result');
+      box.className = 'mt-4 p-4 rounded-2xl border text-xs leading-relaxed ' + (agrees ? 'bg-green-50 border-green-200 text-green-900' : 'bg-amber-50 border-amber-200 text-amber-900');
+      box.innerHTML = '<strong>You got ' + right + ' of 4 criteria right. The criteria say: ' + VERDICTS[verdict] + '.</strong><br>' + c.why +
+        '<br><span class="font-bold">Your gut said "' + gutLabel + '"' + (agrees ? ', and the criteria agree.' : ', which the criteria do not simply confirm. That is the point of using criteria.') + '</span>';
+      box.classList.remove('hidden');
+      document.getElementById('check-btn').classList.add('hidden');
+      const nxt = document.getElementById('next-btn');
+      nxt.textContent = idx === CASES.length - 1 ? 'See gut vs criteria →' : 'Next scenario →';
+      nxt.classList.remove('hidden');
+    }
+
+    function nextCase() {
+      if (idx === CASES.length - 1) { showSummary(); return; }
+      idx++;
+      showCase();
+    }
+
+    function showSummary() {
+      const agreed = history.filter(h => h.agrees).length;
+      document.getElementById('summary-line').textContent = 'Your gut matched the criteria in ' + agreed + ' of ' + history.length + ' scenarios. You got ' + criteriaRight + ' of ' + CASES.length * QUESTIONS.length + ' criteria answers right.';
+      document.getElementById('summary-list').innerHTML = history.map(h =>
+        '<div class="flex items-center justify-between gap-2 border rounded-xl p-3 ' + (h.agrees ? 'border-green-200 bg-green-50' : 'border-amber-200 bg-amber-50') + '">' +
+        '<span class="font-bold text-gray-800">' + h.title + '</span>' +
+        '<span class="text-gray-600">Gut: ' + GUT_LABELS[h.gut].toLowerCase() + ' → Criteria: ' + VERDICTS[h.verdict] + '</span></div>').join('');
+      document.getElementById('summary-card').classList.remove('hidden');
+      document.getElementById('reflect-card').classList.remove('hidden');
+      document.getElementById('next-btn').classList.add('hidden');
+      document.getElementById('summary-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#star-rating .star-btn').forEach((s, i) => s.classList.toggle('active', i < val));
+      document.getElementById('rating-err').classList.add('hidden');
+    }
+
+    function checkField(id, errId) {
+      const el = document.getElementById(id);
+      const ok = !!el.value.trim();
+      el.classList.toggle('error', !ok);
+      document.getElementById(errId).classList.toggle('hidden', ok);
+      return ok;
+    }
+
+    async function handleSubmit(ev) {
+      ev.preventDefault();
+      const banner = document.getElementById('submit-error-banner');
+      banner.classList.add('hidden');
+
+      let valid = history.length === CASES.length;
+      valid = checkField('criterion', 'criterion-err') && valid;
+      valid = checkField('famous', 'famous-err') && valid;
+      valid = checkField('rule', 'rule-err') && valid;
+      if (enjoymentRating === 0) { document.getElementById('rating-err').classList.remove('hidden'); valid = false; }
+      if (!valid) {
+        banner.textContent = history.length === CASES.length
+          ? 'Please fill out all required fields marked in red.' : 'Judge all six scenarios first.';
+        banner.classList.remove('hidden');
+        return;
+      }
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> <span>Submitting...</span>';
+
+      const payload = {
+        criteria_correct: criteriaRight,
+        criteria_total: CASES.length * QUESTIONS.length,
+        gut_matched_criteria: history.filter(h => h.agrees).length,
+        gut_reactions: history.map(h => h.title + '=' + h.gut).join(', '),
+        criteria_verdicts: history.map(h => h.title + '=' + h.verdict).join(', '),
+        question_that_changed_mind: document.getElementById('criterion').value.trim(),
+        famous_not_enough: document.getElementById('famous').value.trim(),
+        classmate_rule: document.getElementById('rule').value.trim()
+      };
+
+      try {
+        await submitExercise(EXERCISE_SLUG, payload, { enjoymentRating: enjoymentRating || undefined });
+        document.getElementById('success-first-name').textContent = studentName.split(' ')[0] || 'Student';
+        document.getElementById('success-screen').classList.remove('hidden');
+      } catch (err) {
+        console.error('Submission error:', err);
+        banner.textContent = err.message || 'Failed to submit exercise. Please try again.';
+        banner.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerHTML = '<span>Submit Results 🚀</span>';
+      }
+    }
+  </script>
+</body>
+
+</html>

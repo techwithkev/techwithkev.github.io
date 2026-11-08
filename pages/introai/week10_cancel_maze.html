@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cancel Maze | Intro to AI · Week 10</title>
+  <meta name="description"
+    content="Week 10 Activity: Cancel Maze! Try to cancel a subscription trapped behind dark patterns, race the honest version, then name the tricks you hit.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/activity.css">
+  <style>
+    .form-input:focus { outline: none; border-color: #c026d3; box-shadow: 0 0 0 3px rgba(192,38,211,0.1); }
+    .form-input.error { border-color: #ef4444; }
+    .opt-btn { transition: all 0.15s ease; cursor: pointer; }
+    .opt-btn:hover:not(:disabled) { transform: translateY(-1px); }
+    .opt-btn.right { border-color: #16a34a !important; background: #f0fdf4 !important; color: #166534 !important; }
+    .opt-btn.wrong { border-color: #ef4444 !important; background: #fef2f2 !important; color: #991b1b !important; }
+    .star-btn { font-size: 26px; cursor: pointer; filter: grayscale(100%); transition: filter 0.15s ease, transform 0.1s ease; }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; animation: spin 0.65s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .phone { border: 6px solid #111827; border-radius: 1.5rem; background: #fff; min-height: 340px; }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <div id="main-content" class="max-w-3xl mx-auto px-4 pt-8">
+
+    <header class="mb-6">
+      <a href="index.html" class="inline-flex items-center text-xs font-bold text-fuchsia-600 hover:text-fuchsia-700 transition-colors mb-3">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        Back to Course Hub
+      </a>
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <div class="inline-flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-fuchsia-100 text-fuchsia-800">Week 10 Activity</span>
+            <span class="text-xs text-gray-500 font-medium">Dark Patterns</span>
+          </div>
+          <h1 class="text-3xl font-black text-gray-900 mt-1 tracking-tight">Cancel Maze 🌀</h1>
+        </div>
+        <div id="user-badge" class="hidden text-xs bg-fuchsia-50 border border-fuchsia-200 text-fuchsia-800 px-3 py-1.5 rounded-full font-bold"></div>
+      </div>
+    </header>
+
+    <div class="bg-gradient-to-br from-fuchsia-600 to-purple-700 text-white rounded-3xl p-6 shadow-xl mb-8">
+      <h2 class="text-lg font-extrabold mb-1">Your Mission</h2>
+      <p class="text-xs text-fuchsia-100 mb-4 leading-relaxed">
+        Your free trial of <strong>StreamBox</strong> just charged you $14.99. You want out. Try to cancel in the <strong>Trap version</strong>, then in the <strong>Honest version</strong>,
+        and compare. Finally, name the dark patterns that got in your way.
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-medium">
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-fuchsia-200 block mb-0.5">1. Escape</span>Cancel in the trap flow.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-fuchsia-200 block mb-0.5">2. Compare</span>Cancel in the honest flow.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-fuchsia-200 block mb-0.5">3. Name it</span>Identify the patterns and fix one.</div>
+      </div>
+    </div>
+
+    <form id="maze-form" onsubmit="handleSubmit(event)" novalidate>
+
+      <!-- STEP 1/2: THE FLOWS -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
+          <div class="flex items-center gap-3">
+            <div id="flow-badge" class="w-8 h-8 rounded-full bg-fuchsia-600 text-white font-black flex items-center justify-center text-sm shadow">1</div>
+            <div>
+              <h3 id="flow-title" class="text-base font-bold text-gray-900"></h3>
+              <p id="flow-sub" class="text-xs text-gray-500"></p>
+            </div>
+          </div>
+          <div id="click-pill" class="text-xs font-black px-3 py-1.5 rounded-full bg-gray-100 text-gray-600">Clicks: 0</div>
+        </div>
+
+        <div id="phone" class="phone p-4"></div>
+
+        <div id="flow-result" class="hidden mt-4 p-4 rounded-2xl border text-xs leading-relaxed"></div>
+        <button type="button" id="flow-next" onclick="afterTrap()"
+          class="hidden mt-4 w-full py-3 rounded-xl text-sm font-black text-white bg-fuchsia-600 hover:bg-fuchsia-700 shadow-md transition-all active:scale-95">
+          Now try the Honest version →
+        </button>
+      </div>
+
+      <!-- STEP 3: NAME THE PATTERNS -->
+      <div id="name-card" class="hidden bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-full bg-fuchsia-600 text-white font-black flex items-center justify-center text-sm shadow">3</div>
+          <div>
+            <h3 class="text-base font-bold text-gray-900">Name the Trick</h3>
+            <p class="text-xs text-gray-500">Match each moment from the trap flow to its dark pattern</p>
+          </div>
+        </div>
+        <div id="evidence" class="space-y-4"></div>
+        <div id="pattern-score" class="hidden mt-4 p-3 rounded-xl border text-xs bg-gray-50 border-gray-200 font-bold"></div>
+      </div>
+
+      <div id="reflect-card" class="hidden">
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Rewrite the shaming button so it is honest but still persuasive. <span class="text-red-500">*</span></label>
+              <p class="text-[11px] text-gray-400 mb-1">The trap said: "No thanks, I like paying full price".</p>
+              <input id="rewrite" type="text" maxlength="80" placeholder="e.g. No thanks, continue to cancel"
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400">
+              <p id="rewrite-err" class="text-xs text-red-500 mt-1 hidden">Please write an honest button label (at least 3 characters).</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Who benefits from the trap version, and who is harmed? <span class="text-red-500">*</span></label>
+              <textarea id="who" rows="2" placeholder="e.g. StreamBox keeps revenue. People on tight budgets lose money and time."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="who-err" class="text-xs text-red-500 mt-1 hidden">Please answer this question.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">If an AI tool suggested the trap layout, who is responsible for shipping it? <span class="text-red-500">*</span></label>
+              <textarea id="responsible" rows="2" placeholder="e.g. The company and designer. The AI only suggested it, and they chose to ship it."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="resp-err" class="text-xs text-red-500 mt-1 hidden">Please share your view.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-8 text-center">
+          <h3 class="text-sm font-bold text-gray-900 mb-1">Activity Enjoyment Rating</h3>
+          <p class="text-xs text-gray-500 mb-3">How was escaping the maze?</p>
+          <div id="star-rating" class="flex justify-center gap-2 mb-4">
+            <button type="button" class="star-btn" onclick="setRating(1)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(2)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(3)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(4)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(5)">⭐</button>
+          </div>
+          <p id="rating-err" class="text-xs text-red-500 mb-3 hidden">Please select a star rating.</p>
+          <div id="submit-error-banner" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-medium"></div>
+          <button type="submit" id="submit-btn"
+            class="w-full py-4 px-8 rounded-2xl text-base font-extrabold text-white shadow-xl transition-all hover:bg-fuchsia-700 active:scale-[0.99] flex items-center justify-center gap-2 bg-fuchsia-600">
+            <span>Submit Results 🚀</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div id="success-screen" class="hidden fixed inset-0 z-[120] bg-white flex items-center justify-center p-4">
+    <div class="max-w-md w-full text-center">
+      <div class="w-20 h-20 bg-fuchsia-100 text-fuchsia-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+      </div>
+      <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-fuchsia-100 text-fuchsia-800 mb-2">You Escaped! 🌀</span>
+      <h2 class="text-3xl font-black text-gray-900 mb-2">Great Job, <span id="success-first-name">Student</span>!</h2>
+      <p class="text-xs text-gray-600 mb-6 leading-relaxed">Your results have been recorded in the class database.</p>
+      <a href="index.html" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-fuchsia-600 hover:bg-fuchsia-700 text-white font-bold text-sm rounded-xl shadow-lg transition-all">
+        <span>Back to Course Hub</span>
+      </a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../assets/js/introai-shared.js"></script>
+  <script>
+    const EXERCISE_SLUG = 'week10_cancel_maze';
+
+    let studentName = '', studentEmail = '';
+    let enjoymentRating = 0;
+
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName = session.name;
+      studentEmail = session.email;
+      trackExerciseStart(EXERCISE_SLUG);
+    })();
+
+    /* ---------- The two flows ----------
+       Each screen: { html: () => string }. Buttons call go(next) for the real path,
+       or trap(msg) for a misdirection (counts as a click and a wrong click, no progress). */
+    const BIG = 'w-full py-3 rounded-xl text-sm font-black text-white bg-green-500 mb-2';
+    const TINY = 'text-[10px] text-gray-300 underline block mx-auto mt-3';
+    const OKBTN = 'w-full py-3 rounded-xl text-sm font-black text-white bg-fuchsia-600 mb-2';
+
+    const TRAP = {
+      account: () => `
+        <p class="text-xs font-black text-gray-900 mb-1">StreamBox · My Account</p>
+        <p class="text-[11px] text-gray-500 mb-3">Plan: Premium · $14.99/mo · charged today</p>
+        <button type="button" class="${BIG}" onclick="trap('That was the Upgrade button. It does not cancel anything.')">⭐ Upgrade to Ultra! Save 20%</button>
+        <button type="button" class="${BIG}" onclick="trap('That just shows your viewing stats.')">📊 See my stats</button>
+        <button type="button" class="${TINY}" onclick="go('manage')">Manage plan</button>`,
+      manage: () => `
+        <p class="text-xs font-black text-gray-900 mb-2">Manage Plan</p>
+        <button type="button" class="${BIG}" onclick="trap('You chose to keep your plan. Back to Manage Plan.')">✅ Keep my plan</button>
+        <label class="flex items-center gap-2 text-[11px] text-gray-500 mb-2"><input type="checkbox" checked> Yes, send me exclusive offers every day</label>
+        <button type="button" class="${TINY}" onclick="go('shame')">I want to cancel</button>`,
+      shame: () => `
+        <p class="text-sm font-black text-gray-900 mb-1">Wait! 🎁 Don't go!</p>
+        <p class="text-[11px] text-gray-500 mb-3">Stay and get <strong>50% off</strong> for 3 months.</p>
+        <button type="button" class="${BIG}" onclick="trap('You accepted the discount, so you are still subscribed.')">Yes, save me money! 💰</button>
+        <button type="button" class="${TINY}" onclick="go('survey')">No thanks, I like paying full price</button>`,
+      survey: () => `
+        <p class="text-xs font-black text-gray-900 mb-2">Before you go, tell us why (required)</p>
+        <select id="why" class="w-full border border-gray-300 rounded-lg p-2 text-xs mb-2" onchange="document.getElementById('why-go').disabled = !this.value">
+          <option value="">Choose a reason...</option><option>Too expensive</option><option>Not using it</option><option>Found something better</option>
+        </select>
+        <button type="button" class="${BIG}" onclick="trap('You chose to pause instead. Your plan is still active.')">⏸ Pause instead (stay subscribed)</button>
+        <button type="button" id="why-go" disabled class="text-[10px] text-gray-400 underline block mx-auto mt-3 disabled:opacity-40" onclick="go('sure')">Continue</button>`,
+      sure: () => `
+        <p class="text-sm font-black text-red-600 mb-1">⚠️ You will lose 214 saved shows!</p>
+        <p class="text-[11px] text-gray-500 mb-3">Offer ends in 00:59. Are you sure?</p>
+        <button type="button" class="${BIG}" onclick="trap('You chose to keep your shows. Back one step.', 'sure')">Keep my shows ❤️</button>
+        <button type="button" class="${TINY}" onclick="go('confirm')">Cancel anyway</button>`,
+      confirm: () => `
+        <p class="text-xs font-black text-gray-900 mb-2">Final step</p>
+        <p class="text-[11px] text-gray-500 mb-2">Type <strong>CANCEL</strong> to confirm.</p>
+        <input id="typed" class="w-full border border-gray-300 rounded-lg p-2 text-xs mb-2" placeholder="CANCEL" oninput="document.getElementById('final-go').disabled = this.value !== 'CANCEL'">
+        <button type="button" id="final-go" disabled class="${OKBTN} disabled:opacity-40" onclick="finishFlow()">Confirm cancellation</button>`
+    };
+
+    const HONEST = {
+      account: () => `
+        <p class="text-xs font-black text-gray-900 mb-1">StreamBox · My Account</p>
+        <p class="text-[11px] text-gray-500 mb-3">Plan: Premium · $14.99/mo</p>
+        <button type="button" class="${OKBTN}" onclick="go('confirm')">Cancel subscription</button>
+        <button type="button" class="w-full py-3 rounded-xl text-sm font-bold text-gray-700 bg-gray-100 mb-2" onclick="trap('That just shows your viewing stats.')">See my stats</button>`,
+      confirm: () => `
+        <p class="text-xs font-black text-gray-900 mb-1">Cancel your subscription?</p>
+        <p class="text-[11px] text-gray-500 mb-3">You keep access until the end of this billing period. You can rejoin any time.</p>
+        <button type="button" class="${OKBTN}" onclick="finishFlow()">Yes, cancel</button>
+        <button type="button" class="w-full py-3 rounded-xl text-sm font-bold text-gray-700 bg-gray-100" onclick="trap('You chose to keep your plan.', 'account')">No, keep my plan</button>`
+    };
+
+    let phase = 'trap';       // 'trap' | 'honest'
+    let screen = 'account';
+    const stats = { trap: { clicks: 0, wrong: 0, t0: 0, secs: 0 }, honest: { clicks: 0, wrong: 0, t0: 0, secs: 0 } };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const badge = document.getElementById('user-badge');
+      badge.textContent = '\u{1F464} ' + studentName;
+      badge.classList.remove('hidden');
+      startPhase('trap');
+    });
+
+    function flows() { return phase === 'trap' ? TRAP : HONEST; }
+
+    function startPhase(p) {
+      phase = p; screen = 'account';
+      stats[p].clicks = 0; stats[p].wrong = 0; stats[p].t0 = Date.now();
+      document.getElementById('flow-badge').textContent = p === 'trap' ? '1' : '2';
+      document.getElementById('flow-title').textContent = p === 'trap' ? 'The Trap Version' : 'The Honest Version';
+      document.getElementById('flow-sub').textContent = p === 'trap' ? 'Find a way to cancel StreamBox. Read carefully!' : 'Same task, designed with respect for the user.';
+      document.getElementById('flow-result').classList.add('hidden');
+      document.getElementById('flow-next').classList.add('hidden');
+      render();
+    }
+
+    function render() {
+      document.getElementById('phone').innerHTML = flows()[screen]();
+      document.getElementById('click-pill').textContent = 'Clicks: ' + stats[phase].clicks;
+    }
+
+    function go(next) { stats[phase].clicks++; screen = next; render(); }
+
+    function trap(msg, backTo) {
+      stats[phase].clicks++; stats[phase].wrong++;
+      if (backTo) screen = backTo;
+      render();
+      const note = document.createElement('p');
+      note.className = 'text-[11px] font-bold text-red-600 mt-3';
+      note.textContent = '🪤 ' + msg;
+      document.getElementById('phone').appendChild(note);
+    }
+
+    function finishFlow() {
+      const s = stats[phase];
+      s.clicks++;
+      s.secs = Math.round((Date.now() - s.t0) / 1000);
+      document.getElementById('click-pill').textContent = 'Clicks: ' + s.clicks;
+      document.getElementById('phone').innerHTML = '<div class="text-center pt-10"><p class="text-3xl mb-2">✅</p><p class="text-sm font-black text-gray-900">Subscription cancelled</p></div>';
+      const box = document.getElementById('flow-result');
+      box.className = 'mt-4 p-4 rounded-2xl border text-xs leading-relaxed ' + (phase === 'trap' ? 'bg-amber-50 border-amber-200 text-amber-900' : 'bg-green-50 border-green-200 text-green-900');
+      box.innerHTML = phase === 'trap'
+        ? '<strong>You escaped in ' + s.clicks + ' clicks and ' + s.secs + ' seconds</strong>, with ' + s.wrong + ' wrong click' + (s.wrong === 1 ? '' : 's') + ' on traps. Most people give up before this point.'
+        : '<strong>Honest version: ' + s.clicks + ' clicks, ' + s.secs + ' seconds.</strong> Compare: the trap took ' + stats.trap.clicks + ' clicks. Same company, same goal. Different respect for the user.';
+      box.classList.remove('hidden');
+      const nxt = document.getElementById('flow-next');
+      if (phase === 'trap') { nxt.classList.remove('hidden'); }
+      else { showNaming(); }
+    }
+
+    function afterTrap() { startPhase('honest'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+    /* ---------- Naming the patterns ---------- */
+    const PATTERNS = ['Forced Continuity', 'Confirmshaming', 'Roach Motel'];
+    const EVIDENCE = [
+      { say: 'A free trial quietly turned into a $14.99 charge.', answer: 'Forced Continuity' },
+      { say: 'The decline button read "No thanks, I like paying full price".', answer: 'Confirmshaming' },
+      { say: '"Manage plan" was tiny gray text, and cancelling took 6 screens, but signing up took one tap.', answer: 'Roach Motel' }
+    ];
+    const picks = [null, null, null];
+
+    function showNaming() {
+      document.getElementById('flow-next').classList.add('hidden');
+      document.getElementById('evidence').innerHTML = EVIDENCE.map((e, i) =>
+        '<div class="rounded-2xl border border-gray-200 p-4"><p class="text-xs text-gray-700 mb-3">' + (i + 1) + '. ' + e.say + '</p>' +
+        '<div class="grid grid-cols-1 sm:grid-cols-3 gap-2">' +
+        PATTERNS.map(p => '<button type="button" class="opt-btn border border-gray-200 rounded-xl p-2 text-xs font-bold text-gray-600 bg-gray-50" data-ev="' + i + '" data-p="' + p + '" onclick="pickPattern(' + i + ',\'' + p + '\',this)">' + p + '</button>').join('') +
+        '</div></div>'
+      ).join('');
+      const card = document.getElementById('name-card');
+      card.classList.remove('hidden');
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function pickPattern(i, p, btn) {
+      if (picks[i] !== null) return;
+      picks[i] = p;
+      const ok = EVIDENCE[i].answer === p;
+      btn.classList.add(ok ? 'right' : 'wrong');
+      document.querySelectorAll('[data-ev="' + i + '"]').forEach(b => {
+        if (b.dataset.p === EVIDENCE[i].answer) b.classList.add('right');
+        b.disabled = true;
+      });
+      if (picks.every(v => v !== null)) {
+        const n = picks.filter((v, k) => v === EVIDENCE[k].answer).length;
+        const sc = document.getElementById('pattern-score');
+        sc.textContent = 'You named ' + n + ' of 3 patterns correctly.';
+        sc.classList.remove('hidden');
+        document.getElementById('reflect-card').classList.remove('hidden');
+      }
+    }
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#star-rating .star-btn').forEach((s, idx) => s.classList.toggle('active', idx < val));
+      document.getElementById('rating-err').classList.add('hidden');
+    }
+
+    function checkField(id, errId, min) {
+      const el = document.getElementById(id);
+      const ok = el.value.trim().length >= (min || 1);
+      el.classList.toggle('error', !ok);
+      document.getElementById(errId).classList.toggle('hidden', ok);
+      return ok;
+    }
+
+    async function handleSubmit(ev) {
+      ev.preventDefault();
+      const banner = document.getElementById('submit-error-banner');
+      banner.classList.add('hidden');
+
+      let valid = true;
+      valid = checkField('rewrite', 'rewrite-err', 3) && valid;
+      valid = checkField('who', 'who-err') && valid;
+      valid = checkField('responsible', 'resp-err') && valid;
+      if (enjoymentRating === 0) { document.getElementById('rating-err').classList.remove('hidden'); valid = false; }
+      if (!valid) {
+        banner.textContent = 'Please fill out all required fields marked in red.';
+        banner.classList.remove('hidden');
+        return;
+      }
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> <span>Submitting...</span>';
+
+      const payload = {
+        trap_clicks: stats.trap.clicks,
+        trap_wrong_clicks: stats.trap.wrong,
+        trap_seconds: stats.trap.secs,
+        honest_clicks: stats.honest.clicks,
+        patterns_named_correctly: picks.filter((v, k) => v === EVIDENCE[k].answer).length,
+        rewritten_button: document.getElementById('rewrite').value.trim(),
+        who_benefits_who_harmed: document.getElementById('who').value.trim(),
+        responsibility_view: document.getElementById('responsible').value.trim()
+      };
+
+      try {
+        await submitExercise(EXERCISE_SLUG, payload, { enjoymentRating: enjoymentRating || undefined });
+        document.getElementById('success-first-name').textContent = studentName.split(' ')[0] || 'Student';
+        document.getElementById('success-screen').classList.remove('hidden');
+      } catch (err) {
+        console.error('Submission error:', err);
+        banner.textContent = err.message || 'Failed to submit exercise. Please try again.';
+        banner.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerHTML = '<span>Submit Results 🚀</span>';
+      }
+    }
+  </script>
+</body>
+
+</html>

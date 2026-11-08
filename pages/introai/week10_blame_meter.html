@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blame Meter | Intro to AI · Week 10</title>
+  <meta name="description"
+    content="Week 10 Activity: Blame Meter! Decide who is responsible when AI-assisted design goes wrong, then see how learning someone's intent changes the verdict.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/activity.css">
+  <style>
+    .form-input:focus { outline: none; border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220,38,38,0.1); }
+    .form-input.error { border-color: #ef4444; }
+    .tok-btn { transition: all 0.1s ease; cursor: pointer; }
+    .tok-btn:hover:not(:disabled) { transform: scale(1.1); }
+    .tok-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    input[type=range] { accent-color: #dc2626; }
+    .star-btn { font-size: 26px; cursor: pointer; filter: grayscale(100%); transition: filter 0.15s ease, transform 0.1s ease; }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; animation: spin 0.65s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <div id="main-content" class="max-w-3xl mx-auto px-4 pt-8">
+
+    <header class="mb-6">
+      <a href="index.html" class="inline-flex items-center text-xs font-bold text-red-600 hover:text-red-700 transition-colors mb-3">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        Back to Course Hub
+      </a>
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <div class="inline-flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-red-100 text-red-800">Week 10 Activity</span>
+            <span class="text-xs text-gray-500 font-medium">Responsibility in AI Design</span>
+          </div>
+          <h1 class="text-3xl font-black text-gray-900 mt-1 tracking-tight">Blame Meter ⚖️</h1>
+        </div>
+        <div id="user-badge" class="hidden text-xs bg-red-50 border border-red-200 text-red-800 px-3 py-1.5 rounded-full font-bold"></div>
+      </div>
+    </header>
+
+    <div class="bg-gradient-to-br from-red-600 to-orange-700 text-white rounded-3xl p-6 shadow-xl mb-8">
+      <h2 class="text-lg font-extrabold mb-1">Your Mission</h2>
+      <p class="text-xs text-red-100 mb-4 leading-relaxed">
+        When an AI-assisted design hurts people, who is responsible? For two cases you get <strong>10 responsibility tokens</strong> to spread among the people involved.
+        For the third you set a meter. Then a twist reveals what people knew, and you decide again.
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-medium">
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-red-200 block mb-0.5">Round 1</span>Assign blame as the cases are told.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-red-200 block mb-0.5">Round 2</span>Learn what they knew. Does your verdict move?</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-red-200 block mb-0.5">Reflect</span>Does intent change responsibility?</div>
+      </div>
+    </div>
+
+    <form id="blame-form" onsubmit="handleSubmit(event)" novalidate>
+
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div id="round-badge" class="w-8 h-8 rounded-full bg-red-600 text-white font-black flex items-center justify-center text-sm shadow">1</div>
+          <div>
+            <h3 id="round-title" class="text-base font-bold text-gray-900"></h3>
+            <p id="round-sub" class="text-xs text-gray-500"></p>
+          </div>
+        </div>
+        <div id="cases" class="space-y-5"></div>
+        <p id="lock-err" class="text-xs text-red-500 mt-3 hidden">Use all 10 tokens in each of the first two cases.</p>
+        <button type="button" id="lock-btn" onclick="lockRound()"
+          class="mt-4 w-full py-3 rounded-xl text-sm font-black text-white bg-red-600 hover:bg-red-700 shadow-md transition-all active:scale-95">
+          Lock in my verdicts
+        </button>
+      </div>
+
+      <div id="shift-card" class="hidden bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-full bg-red-600 text-white font-black flex items-center justify-center text-sm shadow">★</div>
+          <div>
+            <h3 class="text-base font-bold text-gray-900">How Your Verdicts Moved</h3>
+            <p class="text-xs text-gray-500">Round 1 → Round 2</p>
+          </div>
+        </div>
+        <div id="shift-list" class="space-y-3 text-xs"></div>
+      </div>
+
+      <div id="reflect-card" class="hidden">
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Did knowing what people knew change who you blamed? Give one example. <span class="text-red-500">*</span></label>
+              <textarea id="intent" rows="2" placeholder="e.g. Once I learned leadership ordered the hidden button, I moved most tokens from the designer to the company."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="intent-err" class="text-xs text-red-500 mt-1 hidden">Please answer this question.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Case 3: where is the line between clever marketing and wrong? <span class="text-red-500">*</span></label>
+              <textarea id="line" rows="2" placeholder="e.g. It is wrong when it makes the user feel bad for a free choice, or targets people who cannot judge it."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="line-err" class="text-xs text-red-500 mt-1 hidden">Please share where you draw the line.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">"The AI suggested it" is not an excuse. Do you agree? Why or why not? <span class="text-red-500">*</span></label>
+              <textarea id="excuse" rows="2" placeholder="e.g. I agree. A person chose to use the suggestion and ship it, so a person is accountable."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="excuse-err" class="text-xs text-red-500 mt-1 hidden">Please share your view.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-8 text-center">
+          <h3 class="text-sm font-bold text-gray-900 mb-1">Activity Enjoyment Rating</h3>
+          <p class="text-xs text-gray-500 mb-3">How engaging was the debate?</p>
+          <div id="star-rating" class="flex justify-center gap-2 mb-4">
+            <button type="button" class="star-btn" onclick="setRating(1)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(2)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(3)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(4)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(5)">⭐</button>
+          </div>
+          <p id="rating-err" class="text-xs text-red-500 mb-3 hidden">Please select a star rating.</p>
+          <div id="submit-error-banner" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-medium"></div>
+          <button type="submit" id="submit-btn"
+            class="w-full py-4 px-8 rounded-2xl text-base font-extrabold text-white shadow-xl transition-all hover:bg-red-700 active:scale-[0.99] flex items-center justify-center gap-2 bg-red-600">
+            <span>Submit Results 🚀</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div id="success-screen" class="hidden fixed inset-0 z-[120] bg-white flex items-center justify-center p-4">
+    <div class="max-w-md w-full text-center">
+      <div class="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+      </div>
+      <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 mb-2">Verdict Delivered! ⚖️</span>
+      <h2 class="text-3xl font-black text-gray-900 mb-2">Great Job, <span id="success-first-name">Student</span>!</h2>
+      <p class="text-xs text-gray-600 mb-6 leading-relaxed">Your results have been recorded in the class database.</p>
+      <a href="index.html" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-red-600 hover:bg-red-700 text-white font-bold text-sm rounded-xl shadow-lg transition-all">
+        <span>Back to Course Hub</span>
+      </a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../assets/js/introai-shared.js"></script>
+  <script>
+    const EXERCISE_SLUG = 'week10_blame_meter';
+
+    let studentName = '', studentEmail = '';
+    let enjoymentRating = 0;
+
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName = session.name;
+      studentEmail = session.email;
+      trackExerciseStart(EXERCISE_SLUG);
+    })();
+
+    const TOKENS = 10;
+    // Cases 0 and 1 use token allocation; case 2 uses a 0-100 meter.
+    const CASES = [
+      { title: '🪤 The 6-screen cancel',
+        r1: 'An app gives a free trial, then charges your card automatically. Cancelling takes 6 screens. An AI design tool suggested the layout.',
+        r2: 'Twist: an internal memo shows leadership asked for the cancel button to be hidden because it "boosts retention revenue".',
+        parties: ['The designer who built it', 'Company leadership', 'The AI tool\'s maker', 'The user (should have read the terms)'] },
+      { title: '🎨 The biased design tool',
+        r1: 'An AI design tool was trained mostly on pictures of one kind of user. Its layouts work worse for everyone else. Nobody meant any harm.',
+        r2: 'Twist: the tool\'s documentation warned about this exact bias, and the design team skipped all testing with other users.',
+        parties: ['The AI tool\'s maker', 'The designer using it', 'The company that shipped it', 'No one: it was an accident'] },
+      { title: '🛍️ The "no thanks" button', meter: true,
+        r1: 'A store\'s decline button says "No thanks, I don\'t want to save money". Is that clever marketing, or is it wrong?',
+        r2: 'Twist: the store\'s data shows this wording doubles sales among teenagers, and it now shows it mostly to them.' }
+    ];
+
+    const alloc = [[0, 1].map(() => null), [0, 1].map(() => null)]; // [round][case] -> array of tokens
+    const meter = [50, 50];                                           // [round] -> 0..100
+    let round = 0;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const badge = document.getElementById('user-badge');
+      badge.textContent = '\u{1F464} ' + studentName;
+      badge.classList.remove('hidden');
+      CASES.forEach((c, i) => { if (!c.meter) alloc[0][i] = c.parties.map(() => 0); });
+      renderRound();
+    });
+
+    function remaining(ci) { return TOKENS - alloc[round][ci].reduce((a, b) => a + b, 0); }
+
+    function renderRound() {
+      document.getElementById('round-badge').textContent = round + 1;
+      document.getElementById('round-title').textContent = round === 0 ? 'Round 1: As Told' : 'Round 2: The Twist';
+      document.getElementById('round-sub').textContent = round === 0
+        ? 'Spread 10 tokens in each of the first two cases, and set the meter in the third.'
+        : 'Same cases, new facts. Move tokens and the meter however you now see it.';
+      document.getElementById('lock-btn').textContent = round === 0 ? 'Lock in my verdicts' : 'Lock in and compare';
+      document.getElementById('cases').innerHTML = CASES.map((c, ci) => {
+        const story = round === 0 ? c.r1 : c.r1 + ' <strong class="text-red-700">' + c.r2 + '</strong>';
+        let body;
+        if (c.meter) {
+          body = '<div class="flex items-center gap-3"><span class="text-[11px] font-bold text-gray-500 w-24 text-right">Clever marketing</span>' +
+            '<input type="range" min="0" max="100" value="' + meter[round] + '" class="flex-1" oninput="setMeter(this.value)">' +
+            '<span class="text-[11px] font-bold text-gray-500 w-12">Wrong</span></div>' +
+            '<p class="text-center text-xs font-mono font-black text-red-600 mt-1" id="meter-val">' + meter[round] + ' / 100</p>';
+        } else {
+          body = '<p class="text-[11px] font-bold text-gray-400 mb-2">Tokens left: <span id="left-' + ci + '" class="font-mono text-gray-700">' + remaining(ci) + '</span></p>' +
+            c.parties.map((p, pi) =>
+              '<div class="flex items-center justify-between gap-2 py-1.5">' +
+              '<span class="text-xs font-bold text-gray-700 flex-1">' + p + '</span>' +
+              '<button type="button" class="tok-btn w-7 h-7 rounded-lg bg-gray-100 font-black text-gray-700" onclick="tok(' + ci + ',' + pi + ',-1)">−</button>' +
+              '<span id="tok-' + ci + '-' + pi + '" class="w-6 text-center font-mono font-black text-red-600">' + alloc[round][ci][pi] + '</span>' +
+              '<button type="button" class="tok-btn w-7 h-7 rounded-lg bg-red-600 font-black text-white" onclick="tok(' + ci + ',' + pi + ',1)">+</button>' +
+              '<span class="w-24 text-xs tracking-tighter text-red-500 text-right" id="bar-' + ci + '-' + pi + '"></span></div>'
+            ).join('');
+        }
+        return '<div class="rounded-2xl border border-gray-200 p-4"><p class="text-sm font-black text-gray-900 mb-1">' + c.title + '</p>' +
+          '<p class="text-xs text-gray-600 leading-relaxed mb-3">' + story + '</p>' + body + '</div>';
+      }).join('');
+      CASES.forEach((c, ci) => { if (!c.meter) c.parties.forEach((p, pi) => paintBar(ci, pi)); });
+    }
+
+    function paintBar(ci, pi) { document.getElementById('bar-' + ci + '-' + pi).textContent = '●'.repeat(alloc[round][ci][pi]); }
+
+    function tok(ci, pi, d) {
+      const a = alloc[round][ci];
+      if (d > 0 && remaining(ci) <= 0) return;
+      if (d < 0 && a[pi] <= 0) return;
+      a[pi] += d;
+      document.getElementById('tok-' + ci + '-' + pi).textContent = a[pi];
+      document.getElementById('left-' + ci).textContent = remaining(ci);
+      paintBar(ci, pi);
+      document.getElementById('lock-err').classList.add('hidden');
+    }
+
+    function setMeter(v) { meter[round] = Number(v); document.getElementById('meter-val').textContent = v + ' / 100'; }
+
+    function lockRound() {
+      if ([0, 1].some(ci => remaining(ci) !== 0)) { document.getElementById('lock-err').classList.remove('hidden'); return; }
+      if (round === 0) {
+        // Round 2 starts from the student's own Round 1 verdicts so they only have to move what changed.
+        alloc[1] = alloc[0].map(a => a ? a.slice() : null);
+        meter[1] = meter[0];
+        round = 1;
+        renderRound();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      document.getElementById('lock-btn').classList.add('hidden');
+      document.querySelectorAll('#cases button, #cases input').forEach(el => el.disabled = true);
+      showShift();
+    }
+
+    function showShift() {
+      document.getElementById('shift-list').innerHTML = CASES.map((c, ci) => {
+        let rows;
+        if (c.meter) {
+          rows = '<div class="flex justify-between"><span>Wrong-ness meter</span><span class="font-mono font-bold">' + meter[0] + ' → ' + meter[1] + '</span></div>';
+        } else {
+          rows = c.parties.map((p, pi) => {
+            const a = alloc[0][ci][pi], b = alloc[1][ci][pi], d = b - a;
+            const col = d > 0 ? 'text-red-600' : d < 0 ? 'text-green-700' : 'text-gray-400';
+            return '<div class="flex justify-between gap-2"><span>' + p + '</span><span class="font-mono font-bold ' + col + '">' + a + ' → ' + b + (d ? ' (' + (d > 0 ? '+' : '') + d + ')' : '') + '</span></div>';
+          }).join('');
+        }
+        return '<div class="rounded-2xl border border-gray-200 p-3"><p class="font-black text-gray-900 mb-2">' + c.title + '</p><div class="space-y-1 text-gray-600">' + rows + '</div></div>';
+      }).join('');
+      document.getElementById('shift-card').classList.remove('hidden');
+      document.getElementById('reflect-card').classList.remove('hidden');
+      document.getElementById('shift-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#star-rating .star-btn').forEach((s, idx) => s.classList.toggle('active', idx < val));
+      document.getElementById('rating-err').classList.add('hidden');
+    }
+
+    function checkField(id, errId) {
+      const el = document.getElementById(id);
+      const ok = !!el.value.trim();
+      el.classList.toggle('error', !ok);
+      document.getElementById(errId).classList.toggle('hidden', ok);
+      return ok;
+    }
+
+    function fmt(r, ci) { return CASES[ci].parties.map((p, pi) => p + '=' + alloc[r][ci][pi]).join(', '); }
+
+    async function handleSubmit(ev) {
+      ev.preventDefault();
+      const banner = document.getElementById('submit-error-banner');
+      banner.classList.add('hidden');
+
+      let valid = round === 1 && document.getElementById('lock-btn').classList.contains('hidden');
+      valid = checkField('intent', 'intent-err') && valid;
+      valid = checkField('line', 'line-err') && valid;
+      valid = checkField('excuse', 'excuse-err') && valid;
+      if (enjoymentRating === 0) { document.getElementById('rating-err').classList.remove('hidden'); valid = false; }
+      if (!valid) {
+        banner.textContent = 'Please complete both rounds and fill out all required fields marked in red.';
+        banner.classList.remove('hidden');
+        return;
+      }
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> <span>Submitting...</span>';
+
+      const payload = {
+        cancel_flow_round1: fmt(0, 0),
+        cancel_flow_round2: fmt(1, 0),
+        biased_tool_round1: fmt(0, 1),
+        biased_tool_round2: fmt(1, 1),
+        no_thanks_meter_round1: meter[0],
+        no_thanks_meter_round2: meter[1],
+        intent_changes_blame: document.getElementById('intent').value.trim(),
+        marketing_vs_wrong_line: document.getElementById('line').value.trim(),
+        ai_suggested_it_view: document.getElementById('excuse').value.trim()
+      };
+
+      try {
+        await submitExercise(EXERCISE_SLUG, payload, { enjoymentRating: enjoymentRating || undefined });
+        document.getElementById('success-first-name').textContent = studentName.split(' ')[0] || 'Student';
+        document.getElementById('success-screen').classList.remove('hidden');
+      } catch (err) {
+        console.error('Submission error:', err);
+        banner.textContent = err.message || 'Failed to submit exercise. Please try again.';
+        banner.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerHTML = '<span>Submit Results 🚀</span>';
+      }
+    }
+  </script>
+</body>
+
+</html>

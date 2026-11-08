@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Assessment Center | Tech With Kev</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed": "#171e00",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed-variant": "#044d65",
+                    "on-primary-fixed": "#001f2b",
+                    "inverse-surface": "#2f3133",
+                    "on-tertiary-fixed-variant": "#3d4d00",
+                    "surface-bright": "#f9f9fc",
+                    "primary-container": "#004b63",
+                    "on-error-container": "#93000a",
+                    "surface-tint": "#2a657e",
+                    "on-tertiary-container": "#9dc000",
+                    "surface-container-highest": "#e2e2e5",
+                    "tertiary": "#283300",
+                    "surface-container-low": "#f3f3f6",
+                    "inverse-primary": "#96ceeb",
+                    "error-container": "#ffdad6",
+                    "on-tertiary": "#ffffff",
+                    "on-surface": "#1a1c1e",
+                    "secondary-fixed": "#8cf3f3",
+                    "on-primary-container": "#83bad6",
+                    "background": "#f9f9fc",
+                    "on-background": "#1a1c1e",
+                    "surface": "#f9f9fc",
+                    "outline-variant": "#c0c7cd",
+                    "on-error": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "outline": "#71787d",
+                    "surface-container-high": "#e8e8ea",
+                    "primary-fixed": "#bfe8ff",
+                    "on-primary": "#ffffff",
+                    "tertiary-container": "#3c4b00",
+                    "secondary-container": "#8cf3f3",
+                    "primary": "#003345",
+                    "tertiary-fixed": "#c8f323",
+                    "on-secondary-fixed-variant": "#004f4f",
+                    "primary-fixed-dim": "#96ceeb",
+                    "surface-dim": "#dadadc",
+                    "tertiary-fixed-dim": "#aed500",
+                    "surface-variant": "#e2e2e5",
+                    "on-secondary-container": "#007070",
+                    "on-secondary-fixed": "#002020",
+                    "on-surface-variant": "#40484c",
+                    "inverse-on-surface": "#f0f0f3",
+                    "error": "#ba1a1a",
+                    "secondary": "#006a6a",
+                    "surface-container": "#eeeef0",
+                    "secondary-fixed-dim": "#6fd7d6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Space Grotesk"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+        }
+        .asymmetric-border {
+            border-left: 4px solid #c8f323;
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface">
+<!-- TopNavBar -->
+<nav class="sticky top-0 z-50 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm dark:shadow-none transition-colors duration-300">
+<div class="flex justify-between items-center max-w-7xl mx-auto px-6 py-4">
+<div class="text-xl font-black text-[#003345] dark:text-[#004b63] tracking-tighter font-['Space_Grotesk']">
+                Tech With Kev
+            </div>
+<div class="hidden md:flex items-center space-x-8">
+<a class="text-slate-600 dark:text-slate-400 hover:text-[#003345] transition-all duration-200 font-['Space_Grotesk']" href="#">Methodology</a>
+<a class="text-[#006a6a] font-bold border-b-2 border-[#006a6a] pb-1 font-['Space_Grotesk']" href="#">Assessments</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-[#003345] transition-all duration-200 font-['Space_Grotesk']" href="#">Pricing</a>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-6 py-2.5 rounded-lg font-headline font-bold text-sm tracking-wide hover:brightness-110 active:scale-[0.98] transition-all duration-200">
+                Get Started
+            </button>
+</div>
+</nav>
+<main class="max-w-7xl mx-auto px-6 py-20">
+<!-- Hero Section -->
+<header class="mb-24 text-center max-w-3xl mx-auto">
+<span class="inline-block py-1 px-3 mb-6 text-xs font-bold tracking-widest text-secondary uppercase bg-secondary-container/20 rounded">Pathfinding</span>
+<h1 class="text-5xl md:text-6xl font-headline font-bold text-primary tracking-tight mb-8 leading-[1.1]">
+                Quantify Your <span class="text-secondary">Cognitive Edge</span>
+</h1>
+<p class="text-lg text-on-surface-variant leading-relaxed">
+                Before we build, we measure. Our diagnostic tools are engineered to pinpoint the exact intersection of your mathematical intuition and logical structured thinking.
+            </p>
+</header>
+<!-- Assessment Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+<!-- Math Diagnostic Card -->
+<div class="group relative bg-surface-container-low rounded-xl overflow-hidden transition-all duration-300 hover:translate-y-[-4px]">
+<div class="h-64 overflow-hidden relative">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Abstract geometric visualization of mathematical fractals and clean white architectural lines with soft blue shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB85Rda7Z_R_BpAZf6IdUiYbhokmabcfNMALpPb6H-G6EGpHzeeFwLmQi4vBOWGc3LfIyqnCttE2pGFi9iSL7YrrTq9PWK_4hRrzmWPuJ-Wc_TpPVw3YgLmoTfLIPWzOvUnxj62-vxy7GD21whODaXAkutYOIoqlIOICvg49dNUuJH3iI1cTJLIvN-dWllL4M1iqpo4R9e3MvxFWtowSow0-irKYL6KXCwobgOTJJphybIdDJzG84QsHXMp3OHHWG6ulXIyCMi9OgI"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-low via-transparent to-transparent"></div>
+<div class="absolute top-6 left-6 flex space-x-2">
+<span class="bg-primary/90 text-on-primary px-3 py-1 rounded text-xs font-bold font-headline backdrop-blur-sm">CORE MATH</span>
+</div>
+</div>
+<div class="p-8 asymmetric-border">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="text-3xl font-headline font-bold text-primary mb-2">Math Diagnostic</h3>
+<div class="flex items-center text-on-surface-variant text-sm font-medium">
+<span class="material-symbols-outlined text-base mr-1" style="font-variation-settings: 'opsz' 20;">schedule</span>
+                                25 Minutes
+                            </div>
+</div>
+</div>
+<p class="text-on-surface-variant mb-8 leading-relaxed">
+                        Assess your mastery across Algebra, Calculus, and Statistical reasoning. This is not a test of memorization, but of first-principles understanding.
+                    </p>
+<div class="space-y-4 mb-10">
+<div class="flex items-center">
+<span class="material-symbols-outlined text-secondary mr-3" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-sm font-medium">Gap identification in conceptual fundamentals</span>
+</div>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-secondary mr-3" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-sm font-medium">Benchmarking against O/A Level &amp; IB standards</span>
+</div>
+</div>
+<button class="w-full bg-surface-container-lowest text-primary py-4 rounded-lg font-headline font-bold tracking-wide border border-outline-variant/20 hover:bg-primary hover:text-on-primary transition-all duration-300">
+                        START DIAGNOSTIC
+                    </button>
+</div>
+</div>
+<!-- Python Logic Challenge Card -->
+<div class="group relative bg-surface-container-low rounded-xl overflow-hidden transition-all duration-300 hover:translate-y-[-4px]">
+<div class="h-64 overflow-hidden relative">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Futuristic dark workspace with code on multiple glass screens, glowing lime green syntax highlighting and tech atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcUzZL1f-9ZUtlwZ7TDvFrryRXlUAfgL_ek45ivN6O7NpVD5cY6nuiluyp-3kKKQ-hwFv1pmvDp2G9Y1U7OXSamgnFBwxVfdrtS0fQl-JvL_XARgbgoaFfTLI26WU2WpHTgCQsjGrJw7JK_f9fMG5tTFbsfshmRH2zio_erdf4KBh5SqInIuUTeB_KXXqNwD3O-0HjBHbqj2SfLurAjpRZhb0dv54J_G3iGwQF8U1Wqz27l0bH_jX4XVxZgv2EobIYeIgClpN1Gcs"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-low via-transparent to-transparent"></div>
+<div class="absolute top-6 left-6 flex space-x-2">
+<span class="bg-tertiary text-tertiary-fixed px-3 py-1 rounded text-xs font-bold font-headline backdrop-blur-sm">PYTHON LOGIC</span>
+</div>
+</div>
+<div class="p-8 border-l-4 border-primary">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="text-3xl font-headline font-bold text-primary mb-2">Python Logic Challenge</h3>
+<div class="flex items-center text-on-surface-variant text-sm font-medium">
+<span class="material-symbols-outlined text-base mr-1" style="font-variation-settings: 'opsz' 20;">schedule</span>
+                                15 Minutes
+                            </div>
+</div>
+</div>
+<p class="text-on-surface-variant mb-8 leading-relaxed">
+                        Experience our unique 'Logic Gate' approach. We test your ability to structure problems computationally, regardless of prior coding syntax knowledge.
+                    </p>
+<div class="space-y-4 mb-10">
+<div class="flex items-center">
+<span class="material-symbols-outlined text-secondary mr-3" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-sm font-medium">Algorithmic thinking pattern discovery</span>
+</div>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-secondary mr-3" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-sm font-medium">Computational efficiency awareness score</span>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary py-4 rounded-lg font-headline font-bold tracking-wide hover:brightness-110 shadow-lg shadow-primary/10 transition-all duration-300">
+                        LAUNCH CHALLENGE
+                    </button>
+</div>
+</div>
+</div>
+<!-- How it Works Section -->
+<section class="mt-32 py-20 px-12 bg-surface-container-highest rounded-xl">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-16 text-center">
+<div class="space-y-4">
+<div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary text-tertiary-fixed font-headline font-bold text-xl mb-2">1</div>
+<h4 class="font-headline font-bold text-primary text-xl">Analyze</h4>
+<p class="text-sm text-on-surface-variant leading-relaxed px-4">Complete the diagnostic to generate your unique logic profile and competency heat-map.</p>
+</div>
+<div class="space-y-4">
+<div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary text-tertiary-fixed font-headline font-bold text-xl mb-2">2</div>
+<h4 class="font-headline font-bold text-primary text-xl">Consult</h4>
+<p class="text-sm text-on-surface-variant leading-relaxed px-4">Review your results with Kev in a 15-minute specialized strategy briefing session.</p>
+</div>
+<div class="space-y-4">
+<div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary text-tertiary-fixed font-headline font-bold text-xl mb-2">3</div>
+<h4 class="font-headline font-bold text-primary text-xl">Ascend</h4>
+<p class="text-sm text-on-surface-variant leading-relaxed px-4">Receive your personalized roadmap and begin your high-performance learning journey.</p>
+</div>
+</div>
+</section>
+<!-- Newsletter / Lead Gen Section -->
+<section class="mt-32 max-w-4xl mx-auto text-center">
+<div class="p-12 bg-primary rounded-xl relative overflow-hidden">
+<div class="absolute top-0 right-0 w-64 h-64 bg-secondary/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+<div class="relative z-10">
+<h2 class="text-3xl font-headline font-bold text-on-primary mb-4">Not ready for a test?</h2>
+<p class="text-primary-fixed-dim/80 mb-8 max-w-xl mx-auto">Get our "First Principles" guide on mastering O-Level Math and Python logic sent directly to your inbox.</p>
+<div class="flex flex-col md:flex-row gap-4 max-w-lg mx-auto">
+<input class="flex-1 bg-white/5 border-0 focus:ring-2 focus:ring-secondary text-white rounded-lg px-6 py-4 placeholder:text-slate-500" placeholder="Email address" type="email"/>
+<button class="bg-tertiary-fixed text-on-tertiary-fixed px-8 py-4 rounded-lg font-headline font-bold hover:brightness-110 transition-all">SEND GUIDE</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-slate-50 dark:bg-[#001f2b] w-full rounded-none">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 max-w-7xl mx-auto px-8 py-16">
+<div class="col-span-1 md:col-span-1">
+<div class="text-lg font-bold text-[#003345] dark:text-[#f9f9fc] mb-6">Tech With Kev</div>
+<p class="text-slate-500 dark:text-slate-400 font-['Inter'] text-sm leading-relaxed">
+                    © 2024 Tech With Kev. Precision in Math &amp; Python.
+                </p>
+</div>
+<div class="space-y-4">
+<h5 class="font-headline font-bold text-primary dark:text-white uppercase text-xs tracking-widest">Navigation</h5>
+<ul class="space-y-3">
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors font-['Inter'] text-sm" href="#">Methodology</a></li>
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors font-['Inter'] text-sm" href="#">Assessments</a></li>
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors font-['Inter'] text-sm" href="#">Pricing</a></li>
+</ul>
+</div>
+<div class="space-y-4">
+<h5 class="font-headline font-bold text-primary dark:text-white uppercase text-xs tracking-widest">Connect</h5>
+<ul class="space-y-3">
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors font-['Inter'] text-sm" href="#">Instagram</a></li>
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors font-['Inter'] text-sm" href="#">LinkedIn</a></li>
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors font-['Inter'] text-sm" href="#">Newsletter</a></li>
+</ul>
+</div>
+<div class="space-y-4">
+<h5 class="font-headline font-bold text-primary dark:text-white uppercase text-xs tracking-widest">Support</h5>
+<ul class="space-y-3">
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors font-['Inter'] text-sm" href="#">Contact</a></li>
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors font-['Inter'] text-sm" href="#">Privacy Policy</a></li>
+</ul>
+</div>
+</div>
+</footer>
+</body></html>

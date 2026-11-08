@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NPC Needs Lab | Intro to AI · Week 9</title>
+  <meta name="description"
+    content="Week 9 Activity: NPC Needs Lab! Tune a utility-score AI so an NPC makes sensible choices in six game situations.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/activity.css">
+  <style>
+    .form-input:focus { outline: none; border-color: #0d9488; box-shadow: 0 0 0 3px rgba(13,148,136,0.1); }
+    .form-input.error { border-color: #ef4444; }
+    .star-btn { font-size: 26px; cursor: pointer; filter: grayscale(100%); transition: filter 0.15s ease, transform 0.1s ease; }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; animation: spin 0.65s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    input[type=range] { accent-color: #0d9488; }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <div id="main-content" class="max-w-3xl mx-auto px-4 pt-8">
+
+    <header class="mb-6">
+      <a href="index.html" class="inline-flex items-center text-xs font-bold text-teal-600 hover:text-teal-700 transition-colors mb-3">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        Back to Course Hub
+      </a>
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <div class="inline-flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-teal-100 text-teal-800">Week 9 Activity</span>
+            <span class="text-xs text-gray-500 font-medium">AI in Gaming · Utility Systems</span>
+          </div>
+          <h1 class="text-3xl font-black text-gray-900 mt-1 tracking-tight">NPC Needs Lab 🧪</h1>
+        </div>
+        <div id="user-badge" class="hidden text-xs bg-teal-50 border border-teal-200 text-teal-800 px-3 py-1.5 rounded-full font-bold"></div>
+      </div>
+    </header>
+
+    <div class="bg-gradient-to-br from-teal-600 to-emerald-700 text-white rounded-3xl p-6 shadow-xl mb-8">
+      <h2 class="text-lg font-extrabold mb-1">Your Mission</h2>
+      <p class="text-xs text-teal-100 mb-4 leading-relaxed">
+        A utility-system NPC gives every action a <strong>score</strong> (how important you set it × how urgent it is right now) and does the action with the highest score.
+        Tune the five importance sliders until Rex the orc makes the sensible choice in all <strong>6 situations</strong>.
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-medium">
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-teal-200 block mb-0.5">1. Tune</span>Drag the importance sliders.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-teal-200 block mb-0.5">2. Watch</span>See every action's score update live.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-teal-200 block mb-0.5">3. Pass all 6</span>Then reflect on how this differs from a state machine.</div>
+      </div>
+    </div>
+
+    <form id="lab-form" onsubmit="handleSubmit(event)" novalidate>
+
+      <!-- TUNING PANEL -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-teal-600 text-white font-black flex items-center justify-center text-sm shadow">1</div>
+            <div>
+              <h3 class="text-base font-bold text-gray-900">Tune Rex's Brain</h3>
+              <p class="text-xs text-gray-500">Importance of each action (0 = never, 3 = very important)</p>
+            </div>
+          </div>
+          <div id="pass-pill" class="text-xs font-black px-3 py-1.5 rounded-full bg-gray-100 text-gray-600">0 / 6 sensible</div>
+        </div>
+        <div id="sliders" class="space-y-3"></div>
+        <p class="text-[11px] text-gray-400 mt-3">Urgency is fixed: Heal = low health, Reload = low ammo, Eat = hunger, Attack = enemy near &amp; has ammo, Flee = enemy near &amp; low health, Patrol = a constant 0.2.</p>
+      </div>
+
+      <!-- SCENARIOS -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-full bg-teal-600 text-white font-black flex items-center justify-center text-sm shadow">2</div>
+          <div>
+            <h3 class="text-base font-bold text-gray-900">Six Situations</h3>
+            <p class="text-xs text-gray-500">Green means Rex picks the sensible action. Red means keep tuning.</p>
+          </div>
+        </div>
+        <div id="scenario-list" class="space-y-3"></div>
+      </div>
+
+      <!-- REFLECTION -->
+      <div id="reflect-card" class="hidden">
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 rounded-full bg-teal-600 text-white font-black flex items-center justify-center text-sm shadow">3</div>
+            <div>
+              <h3 class="text-base font-bold text-gray-900">All 6 sensible! Now reflect</h3>
+              <p class="text-xs text-gray-500">Your weights are saved with your answers</p>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Which slider was hardest to set, and why? <span class="text-red-500">*</span></label>
+              <textarea id="hardest" rows="2" placeholder="e.g. Flee vs Heal. They both matter when health is low, so I had to make Flee a bit stronger."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="hardest-err" class="text-xs text-red-500 mt-1 hidden">Please answer this question.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">How is a utility system different from the state machine (Patrol → Chase → Attack → Flee)? <span class="text-red-500">*</span></label>
+              <textarea id="vs-state" rows="2" placeholder="e.g. A state machine follows fixed switches. A utility system weighs everything at once, so it can handle mixed situations."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="vs-err" class="text-xs text-red-500 mt-1 hidden">Please explain the difference.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Invent a 7th situation where your NPC might still act strangely. <span class="text-red-500">*</span></label>
+              <textarea id="edge-case" rows="2" placeholder="e.g. Health 30%, ammo 0%, enemy right next to him. He might try to reload while being hit."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="edge-err" class="text-xs text-red-500 mt-1 hidden">Please invent an edge case.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-8 text-center">
+          <h3 class="text-sm font-bold text-gray-900 mb-1">Activity Enjoyment Rating</h3>
+          <p class="text-xs text-gray-500 mb-3">How fun was tuning the NPC?</p>
+          <div id="star-rating" class="flex justify-center gap-2 mb-4">
+            <button type="button" class="star-btn" onclick="setRating(1)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(2)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(3)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(4)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(5)">⭐</button>
+          </div>
+          <p id="rating-err" class="text-xs text-red-500 mb-3 hidden">Please select a star rating.</p>
+          <div id="submit-error-banner" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-medium"></div>
+          <button type="submit" id="submit-btn"
+            class="w-full py-4 px-8 rounded-2xl text-base font-extrabold text-white shadow-xl transition-all hover:bg-teal-700 active:scale-[0.99] flex items-center justify-center gap-2 bg-teal-600">
+            <span>Submit Results 🚀</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div id="success-screen" class="hidden fixed inset-0 z-[120] bg-white flex items-center justify-center p-4">
+    <div class="max-w-md w-full text-center">
+      <div class="w-20 h-20 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+      </div>
+      <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-teal-100 text-teal-800 mb-2">Rex Is Ready! 🧪</span>
+      <h2 class="text-3xl font-black text-gray-900 mb-2">Great Job, <span id="success-first-name">Student</span>!</h2>
+      <p class="text-xs text-gray-600 mb-6 leading-relaxed">Your results have been recorded in the class database.</p>
+      <a href="index.html" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm rounded-xl shadow-lg transition-all">
+        <span>Back to Course Hub</span>
+      </a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../assets/js/introai-shared.js"></script>
+  <script>
+    const EXERCISE_SLUG = 'week09_npc_needs_lab';
+
+    let studentName = '', studentEmail = '';
+    let enjoymentRating = 0;
+
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName = session.name;
+      studentEmail = session.email;
+      trackExerciseStart(EXERCISE_SLUG);
+    })();
+
+    // urgency functions: needs are 0..1
+    const ACTIONS = [
+      { id: 'Heal',   icon: '💊', urgency: s => 1 - s.health },
+      { id: 'Reload', icon: '🔫', urgency: s => 1 - s.ammo },
+      { id: 'Eat',    icon: '🍖', urgency: s => s.hunger },
+      { id: 'Attack', icon: '⚔️', urgency: s => s.enemy * s.ammo },
+      { id: 'Flee',   icon: '🏃', urgency: s => s.enemy * (1 - s.health) }
+    ];
+    const PATROL = 0.2; // baseline score so Rex does something when nothing is urgent
+
+    const SCENARIOS = [
+      { name: 'Wounded and cornered', want: 'Flee',   s: { health: 0.2,  ammo: 0.8, hunger: 0.2,  enemy: 0.9 } },
+      { name: 'Healthy and armed',    want: 'Attack', s: { health: 0.9,  ammo: 1.0, hunger: 0.1,  enemy: 0.9 } },
+      { name: 'Empty magazine',       want: 'Reload', s: { health: 0.8,  ammo: 0.0, hunger: 0.2,  enemy: 0.1 } },
+      { name: 'Starving, no enemies', want: 'Eat',    s: { health: 0.7,  ammo: 0.7, hunger: 0.95, enemy: 0.0 } },
+      { name: 'Hurt but safe',        want: 'Heal',   s: { health: 0.15, ammo: 0.6, hunger: 0.3,  enemy: 0.0 } },
+      { name: 'Everything is fine',   want: 'Patrol', s: { health: 1.0,  ammo: 1.0, hunger: 0.0,  enemy: 0.0 } }
+    ];
+
+    // Rex starts with a deliberately bad brain: obsessed with healing, timid, and not hungry.
+    const weights = { Heal: 2, Reload: 1, Eat: 0.3, Attack: 0.2, Flee: 0.5 };
+    let allPassed = false;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const badge = document.getElementById('user-badge');
+      badge.textContent = '\u{1F464} ' + studentName;
+      badge.classList.remove('hidden');
+      document.getElementById('sliders').innerHTML = ACTIONS.map(a =>
+        '<div class="flex items-center gap-3">' +
+        '<span class="w-24 text-xs font-bold text-gray-700">' + a.icon + ' ' + a.id + '</span>' +
+        '<input type="range" min="0" max="3" step="0.1" value="' + weights[a.id] + '" class="flex-1" oninput="setWeight(\'' + a.id + '\', this.value)">' +
+        '<span id="w-' + a.id + '" class="w-10 text-right text-xs font-mono font-bold text-teal-700">' + weights[a.id].toFixed(1) + '</span></div>'
+      ).join('');
+      refresh();
+    });
+
+    function setWeight(id, v) {
+      weights[id] = parseFloat(v);
+      document.getElementById('w-' + id).textContent = weights[id].toFixed(1);
+      refresh();
+    }
+
+    function scoresFor(s) {
+      const sc = ACTIONS.map(a => ({ id: a.id, icon: a.icon, score: weights[a.id] * a.urgency(s) }));
+      sc.push({ id: 'Patrol', icon: '🚶', score: PATROL });
+      return sc;
+    }
+
+    function refresh() {
+      let passed = 0;
+      document.getElementById('scenario-list').innerHTML = SCENARIOS.map(sc => {
+        const scores = scoresFor(sc.s);
+        const max = Math.max.apply(null, scores.map(x => x.score));
+        const best = scores.filter(x => x.score === max);
+        const tie = best.length > 1;
+        const chosen = best[0].id;
+        const ok = !tie && chosen === sc.want;
+        if (ok) passed++;
+        const bars = scores.map(x => {
+          const pct = Math.min(100, (x.score / 3) * 100);
+          const isBest = x.score === max;
+          return '<div class="flex items-center gap-2 text-[11px]"><span class="w-16 font-bold text-gray-600">' + x.icon + ' ' + x.id + '</span>' +
+            '<div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-2 rounded-full ' + (isBest ? 'bg-teal-500' : 'bg-gray-300') + '" style="width:' + pct + '%"></div></div>' +
+            '<span class="w-10 text-right font-mono text-gray-500">' + x.score.toFixed(2) + '</span></div>';
+        }).join('');
+        const st = sc.s;
+        return '<div class="rounded-2xl border p-3 ' + (ok ? 'border-green-200 bg-green-50/60' : 'border-red-200 bg-red-50/40') + '">' +
+          '<div class="flex items-center justify-between flex-wrap gap-1 mb-2">' +
+          '<span class="text-xs font-black text-gray-900">' + (ok ? '✅ ' : '❌ ') + sc.name + '</span>' +
+          '<span class="text-[11px] font-mono text-gray-500">HP ' + Math.round(st.health * 100) + '% · Ammo ' + Math.round(st.ammo * 100) +
+          '% · Hunger ' + Math.round(st.hunger * 100) + '% · Enemy ' + Math.round(st.enemy * 100) + '%</span></div>' +
+          '<p class="text-[11px] text-gray-500 mb-2">Sensible choice: <strong>' + sc.want + '</strong>. Rex chooses: <strong>' + (tie ? 'a tie!' : chosen) + '</strong></p>' +
+          '<div class="space-y-1">' + bars + '</div></div>';
+      }).join('');
+      document.getElementById('pass-pill').textContent = passed + ' / ' + SCENARIOS.length + ' sensible';
+      document.getElementById('pass-pill').className = 'text-xs font-black px-3 py-1.5 rounded-full ' +
+        (passed === SCENARIOS.length ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600');
+      if (passed === SCENARIOS.length && !allPassed) {
+        document.getElementById('reflect-card').classList.remove('hidden');
+        document.getElementById('reflect-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      allPassed = passed === SCENARIOS.length;
+      window._passed = passed;
+    }
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#star-rating .star-btn').forEach((s, idx) => s.classList.toggle('active', idx < val));
+      document.getElementById('rating-err').classList.add('hidden');
+    }
+
+    function checkField(id, errId) {
+      const el = document.getElementById(id);
+      const ok = !!el.value.trim();
+      el.classList.toggle('error', !ok);
+      document.getElementById(errId).classList.toggle('hidden', ok);
+      return ok;
+    }
+
+    async function handleSubmit(ev) {
+      ev.preventDefault();
+      const banner = document.getElementById('submit-error-banner');
+      banner.classList.add('hidden');
+
+      let valid = allPassed;
+      valid = checkField('hardest', 'hardest-err') && valid;
+      valid = checkField('vs-state', 'vs-err') && valid;
+      valid = checkField('edge-case', 'edge-err') && valid;
+      if (enjoymentRating === 0) { document.getElementById('rating-err').classList.remove('hidden'); valid = false; }
+      if (!valid) {
+        banner.textContent = allPassed
+          ? 'Please fill out all required fields marked in red.'
+          : 'Get all 6 situations green before submitting.';
+        banner.classList.remove('hidden');
+        return;
+      }
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> <span>Submitting...</span>';
+
+      const payload = {
+        weights: Object.keys(weights).map(k => k + '=' + weights[k].toFixed(1)).join(', '),
+        situations_sensible: window._passed,
+        hardest_slider: document.getElementById('hardest').value.trim(),
+        utility_vs_state_machine: document.getElementById('vs-state').value.trim(),
+        edge_case: document.getElementById('edge-case').value.trim()
+      };
+
+      try {
+        await submitExercise(EXERCISE_SLUG, payload, { enjoymentRating: enjoymentRating || undefined });
+        document.getElementById('success-first-name').textContent = studentName.split(' ')[0] || 'Student';
+        document.getElementById('success-screen').classList.remove('hidden');
+      } catch (err) {
+        console.error('Submission error:', err);
+        banner.textContent = err.message || 'Failed to submit exercise. Please try again.';
+        banner.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerHTML = '<span>Submit Results 🚀</span>';
+      }
+    }
+  </script>
+</body>
+
+</html>

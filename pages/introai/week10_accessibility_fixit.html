@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accessibility Fix-It Lab | Intro to AI · Week 10</title>
+  <meta name="description"
+    content="Week 10 Activity: Accessibility Fix-It Lab! Fix low-contrast text, color-only signals and missing alt text, then match each fix to the people who need it.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/activity.css">
+  <style>
+    .form-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .form-input.error { border-color: #ef4444; }
+    .opt-btn { transition: all 0.15s ease; cursor: pointer; }
+    .opt-btn.sel { border-color: #2563eb !important; background: #eff6ff !important; color: #1e3a8a !important; font-weight: 700; }
+    .opt-btn.right { border-color: #16a34a !important; background: #f0fdf4 !important; color: #166534 !important; }
+    .opt-btn.wrong { border-color: #ef4444 !important; background: #fef2f2 !important; color: #991b1b !important; }
+    .gray-mode { filter: grayscale(100%); }
+    .star-btn { font-size: 26px; cursor: pointer; filter: grayscale(100%); transition: filter 0.15s ease, transform 0.1s ease; }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; animation: spin 0.65s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <div id="main-content" class="max-w-3xl mx-auto px-4 pt-8">
+
+    <header class="mb-6">
+      <a href="index.html" class="inline-flex items-center text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors mb-3">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        Back to Course Hub
+      </a>
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <div class="inline-flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-blue-100 text-blue-800">Week 10 Activity</span>
+            <span class="text-xs text-gray-500 font-medium">Accessibility</span>
+          </div>
+          <h1 class="text-3xl font-black text-gray-900 mt-1 tracking-tight">Accessibility Fix-It Lab ♿</h1>
+        </div>
+        <div id="user-badge" class="hidden text-xs bg-blue-50 border border-blue-200 text-blue-800 px-3 py-1.5 rounded-full font-bold"></div>
+      </div>
+    </header>
+
+    <div class="bg-gradient-to-br from-blue-600 to-cyan-700 text-white rounded-3xl p-6 shadow-xl mb-8">
+      <h2 class="text-lg font-extrabold mb-1">Your Mission</h2>
+      <p class="text-xs text-blue-100 mb-4 leading-relaxed">
+        Researchers found accessibility problems on <strong>95.9%</strong> of the top million home pages. You are the fixer.
+        Work through four stations: contrast, color-only signals, alt text, and who relies on what.
+      </p>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-medium">
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-blue-200 block mb-0.5">1. Contrast</span>Reach a 4.5 ratio.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-blue-200 block mb-0.5">2. Color</span>Don't rely on color alone.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-blue-200 block mb-0.5">3. Alt text</span>Describe what matters.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-blue-200 block mb-0.5">4. Match</span>Who needs what?</div>
+      </div>
+    </div>
+
+    <form id="a11y-form" onsubmit="handleSubmit(event)" novalidate>
+
+      <!-- STATION 1: CONTRAST -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-black flex items-center justify-center text-sm shadow">1</div>
+          <div>
+            <h3 class="text-base font-bold text-gray-900">Station 1: Fix the Contrast</h3>
+            <p class="text-xs text-gray-500">Change each text color until it passes. Normal text needs 4.5:1, large text needs 3:1.</p>
+          </div>
+        </div>
+        <div id="contrast-list" class="space-y-3"></div>
+        <p id="contrast-status" class="mt-3 text-xs font-black text-gray-500">0 / 3 passing</p>
+      </div>
+
+      <!-- STATION 2: COLOR ONLY -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-black flex items-center justify-center text-sm shadow">2</div>
+          <div>
+            <h3 class="text-base font-bold text-gray-900">Station 2: When Color Is the Only Clue</h3>
+            <p class="text-xs text-gray-500">A server dashboard shows status with colored dots only. Toggle the color-blind view and see what disappears.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 mb-3">
+          <button type="button" class="opt-btn border border-gray-200 rounded-xl px-3 py-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="toggleGray(this)">👁 Toggle no-color view</button>
+        </div>
+        <div id="status-board" class="rounded-2xl border border-gray-200 p-4 mb-4 space-y-2">
+          <div class="flex items-center gap-3 text-sm"><span class="inline-block w-3 h-3 rounded-full bg-green-500"></span> Server A</div>
+          <div class="flex items-center gap-3 text-sm"><span class="inline-block w-3 h-3 rounded-full bg-red-500"></span> Server B</div>
+          <div class="flex items-center gap-3 text-sm"><span class="inline-block w-3 h-3 rounded-full bg-green-500"></span> Server C</div>
+        </div>
+        <p class="text-xs font-bold text-gray-700 mb-2">Select every change that would truly fix it:</p>
+        <div id="fix-options" class="space-y-2 mb-3"></div>
+        <button type="button" onclick="checkStation2()" class="px-4 py-2 rounded-xl text-xs font-black text-white bg-blue-600 hover:bg-blue-700 transition-all active:scale-95">Check my fixes</button>
+        <p id="s2-feedback" class="hidden mt-3 text-xs leading-relaxed p-3 rounded-xl border"></p>
+      </div>
+
+      <!-- STATION 3: ALT TEXT -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-black flex items-center justify-center text-sm shadow">3</div>
+          <div>
+            <h3 class="text-base font-bold text-gray-900">Station 3: Write the Alt Text</h3>
+            <p class="text-xs text-gray-500">A screen reader will read your words out loud. Describe what matters, in 5 to 125 characters.</p>
+          </div>
+        </div>
+        <div id="alt-list" class="space-y-4"></div>
+        <button type="button" onclick="checkStation3()" class="mt-4 px-4 py-2 rounded-xl text-xs font-black text-white bg-blue-600 hover:bg-blue-700 transition-all active:scale-95">Check my alt text</button>
+      </div>
+
+      <!-- STATION 4: MATCH -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-black flex items-center justify-center text-sm shadow">4</div>
+          <div>
+            <h3 class="text-base font-bold text-gray-900">Station 4: Who Relies on It?</h3>
+            <p class="text-xs text-gray-500">Match each feature to the people who need it most.</p>
+          </div>
+        </div>
+        <div id="match-list" class="space-y-3"></div>
+        <button type="button" onclick="checkStation4()" class="mt-4 px-4 py-2 rounded-xl text-xs font-black text-white bg-blue-600 hover:bg-blue-700 transition-all active:scale-95">Check my matches</button>
+        <p id="s4-feedback" class="hidden mt-3 text-xs leading-relaxed p-3 rounded-xl border"></p>
+      </div>
+
+      <div id="reflect-card" class="hidden">
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Which fix surprised you most, and why? <span class="text-red-500">*</span></label>
+              <textarea id="surprise" rows="2" placeholder="e.g. Seeing the red and green dots turn into the same gray. I never thought about that."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="surprise-err" class="text-xs text-red-500 mt-1 hidden">Please answer this question.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Accessible design helps people beyond those with disabilities. Give one example. <span class="text-red-500">*</span></label>
+              <textarea id="everyone" rows="2" placeholder="e.g. Captions help in a loud cafeteria or a silent library."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="everyone-err" class="text-xs text-red-500 mt-1 hidden">Please give an example.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">An AI design tool made the low-contrast banner. How could you catch that before shipping? <span class="text-red-500">*</span></label>
+              <textarea id="ai-check" rows="2" placeholder="e.g. Run a contrast checker and test with real users who have low vision."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="aicheck-err" class="text-xs text-red-500 mt-1 hidden">Please answer this question.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-8 text-center">
+          <h3 class="text-sm font-bold text-gray-900 mb-1">Activity Enjoyment Rating</h3>
+          <p class="text-xs text-gray-500 mb-3">How was the fix-it lab?</p>
+          <div id="star-rating" class="flex justify-center gap-2 mb-4">
+            <button type="button" class="star-btn" onclick="setRating(1)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(2)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(3)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(4)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(5)">⭐</button>
+          </div>
+          <p id="rating-err" class="text-xs text-red-500 mb-3 hidden">Please select a star rating.</p>
+          <div id="submit-error-banner" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-medium"></div>
+          <button type="submit" id="submit-btn"
+            class="w-full py-4 px-8 rounded-2xl text-base font-extrabold text-white shadow-xl transition-all hover:bg-blue-700 active:scale-[0.99] flex items-center justify-center gap-2 bg-blue-600">
+            <span>Submit Results 🚀</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div id="success-screen" class="hidden fixed inset-0 z-[120] bg-white flex items-center justify-center p-4">
+    <div class="max-w-md w-full text-center">
+      <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+      </div>
+      <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 mb-2">Everything Fixed! ♿</span>
+      <h2 class="text-3xl font-black text-gray-900 mb-2">Great Job, <span id="success-first-name">Student</span>!</h2>
+      <p class="text-xs text-gray-600 mb-6 leading-relaxed">Your results have been recorded in the class database.</p>
+      <a href="index.html" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-lg transition-all">
+        <span>Back to Course Hub</span>
+      </a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../assets/js/introai-shared.js"></script>
+  <script>
+    const EXERCISE_SLUG = 'week10_accessibility_fixit';
+
+    let studentName = '', studentEmail = '';
+    let enjoymentRating = 0;
+
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName = session.name;
+      studentEmail = session.email;
+      trackExerciseStart(EXERCISE_SLUG);
+    })();
+
+    /* ---------- WCAG contrast math ---------- */
+    function hexToRgb(h) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+    function lum(hex) {
+      const c = hexToRgb(hex).map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+      return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+    }
+    function ratio(a, b) { const l1 = lum(a), l2 = lum(b); return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05); }
+
+    const CONTRAST = [
+      { name: 'Body text on white', bg: '#ffffff', fg: '#cccccc', need: 4.5, size: 'text-sm', sample: 'Free shipping on all orders over $50.' },
+      { name: 'Button label on yellow', bg: '#ffe066', fg: '#ffffff', need: 4.5, size: 'text-sm font-bold', sample: 'ADD TO CART' },
+      { name: 'Large heading on blue-gray (24px bold)', bg: '#8aa4c8', fg: '#b8c8e0', need: 3, size: 'text-2xl font-black', sample: 'Summer Sale' }
+    ];
+    const fgNow = CONTRAST.map(c => c.fg);
+
+    /* ---------- Station 2 ---------- */
+    const FIXES = [
+      { id: 'labels', text: 'Add text labels such as "Online" and "Offline"', good: true },
+      { id: 'icons', text: 'Add different shapes or icons (a check and a cross)', good: true },
+      { id: 'bigger', text: 'Make the dots bigger', good: false },
+      { id: 'vivid', text: 'Make the green greener and the red redder', good: false },
+      { id: 'leave', text: 'Leave it. Most people can see the colors.', good: false }
+    ];
+    const fixSel = new Set();
+
+    /* ---------- Station 3 ---------- */
+    const TREND = /(rise|rose|rising|increas|grow|grew|up|higher|climb)/i;
+    const ALTS = [
+      { visual: '🐕🥏', bg: 'bg-green-100', title: 'Photo: a golden dog leaps to catch a red frisbee in a sunny park.',
+        test: v => /dog/i.test(v) && /(frisbee|catch|jump|leap)/i.test(v), hint: 'Mention the dog and what it is doing.' },
+      { visual: '📊', bg: 'bg-blue-100', title: 'Chart: a bar chart where monthly sales rise every month from January to March.',
+        test: v => /(sales|chart|bar|graph)/i.test(v) && TREND.test(v), hint: 'Say what the chart shows, including the trend (for example "rose").' },
+      { visual: '🛒', bg: 'bg-amber-100', title: 'Button icon: a shopping cart. Clicking it adds the item to your cart.',
+        test: v => /cart/i.test(v), hint: 'Describe the function ("Add to cart"), not the picture.' }
+    ];
+    const altValues = ['', '', ''];
+    let altChecked = false, altValid = 0;
+
+    /* ---------- Station 4 ---------- */
+    const MATCH = [
+      { feature: 'Color contrast', answer: 'Low vision or color blindness' },
+      { feature: 'Alt text', answer: 'Blind people using a screen reader' },
+      { feature: 'Keyboard navigation', answer: 'People who cannot use a mouse' },
+      { feature: 'Captions', answer: 'Deaf or hard-of-hearing people' }
+    ];
+    const WHO = MATCH.map(m => m.answer).slice().sort();
+    const matchVals = ['', '', '', ''];
+
+    const done = { s1: false, s2: false, s3: false, s4: false };
+    let s2Correct = false, s4Score = 0;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const badge = document.getElementById('user-badge');
+      badge.textContent = '\u{1F464} ' + studentName;
+      badge.classList.remove('hidden');
+      renderContrast(); renderFixes(); renderAlts(); renderMatch();
+    });
+
+    // Built once; updateContrast() changes only text, never the <input type="color">,
+    // so the native color picker stays open while a student drags.
+    function renderContrast() {
+      document.getElementById('contrast-list').innerHTML = CONTRAST.map((c, i) =>
+        '<div id="ct-' + i + '" class="rounded-2xl border p-3">' +
+        '<div class="rounded-xl p-3 mb-2" style="background:' + c.bg + '"><span id="ct-sample-' + i + '" class="' + c.size + '">' + c.sample + '</span></div>' +
+        '<div class="flex items-center justify-between flex-wrap gap-2 text-xs">' +
+        '<span class="font-bold text-gray-700">' + c.name + '</span>' +
+        '<label class="flex items-center gap-2">Text color <input type="color" value="' + fgNow[i] + '" oninput="setFg(' + i + ',this.value)"></label>' +
+        '<span id="ct-ratio-' + i + '" class="font-mono font-black"></span></div></div>'
+      ).join('');
+      CONTRAST.forEach((c, i) => updateContrast(i));
+    }
+
+    function updateContrast(i) {
+      const c = CONTRAST[i], r = ratio(fgNow[i], c.bg), ok = r >= c.need;
+      document.getElementById('ct-sample-' + i).style.color = fgNow[i];
+      document.getElementById('ct-' + i).className = 'rounded-2xl border p-3 ' + (ok ? 'border-green-200' : 'border-red-200');
+      const out = document.getElementById('ct-ratio-' + i);
+      out.className = 'font-mono font-black ' + (ok ? 'text-green-700' : 'text-red-600');
+      out.textContent = r.toFixed(2) + ':1 ' + (ok ? '✓ passes' : '✗ needs ' + c.need);
+      const n = CONTRAST.filter((cc, k) => ratio(fgNow[k], cc.bg) >= cc.need).length;
+      document.getElementById('contrast-status').textContent = n + ' / 3 passing';
+      done.s1 = n === 3;
+      window._contrastPassing = n;
+      checkAllDone();
+    }
+
+    function setFg(i, v) { fgNow[i] = v; updateContrast(i); }
+
+    function toggleGray(btn) { document.getElementById('status-board').classList.toggle('gray-mode'); btn.classList.toggle('sel'); }
+
+    function renderFixes() {
+      document.getElementById('fix-options').innerHTML = FIXES.map(f =>
+        '<button type="button" class="opt-btn w-full text-left border border-gray-200 rounded-xl p-3 text-xs font-bold text-gray-600 bg-gray-50" id="fx-' + f.id + '" onclick="toggleFix(\'' + f.id + '\')">' + f.text + '</button>'
+      ).join('');
+    }
+    function toggleFix(id) {
+      if (done.s2) return;
+      if (fixSel.has(id)) fixSel.delete(id); else fixSel.add(id);
+      document.getElementById('fx-' + id).classList.toggle('sel', fixSel.has(id));
+    }
+    function checkStation2() {
+      if (done.s2) return;
+      const fb = document.getElementById('s2-feedback');
+      if (fixSel.size === 0) {
+        fb.className = 'mt-3 text-xs leading-relaxed p-3 rounded-xl border bg-gray-50 border-gray-200 text-gray-600';
+        fb.textContent = 'Select at least one change first.';
+        fb.classList.remove('hidden');
+        return;
+      }
+      FIXES.forEach(f => {
+        const b = document.getElementById('fx-' + f.id);
+        b.classList.remove('sel'); b.disabled = true;
+        if (f.good) b.classList.add('right');
+        else if (fixSel.has(f.id)) b.classList.add('wrong');
+      });
+      s2Correct = FIXES.every(f => fixSel.has(f.id) === f.good);
+      fb.className = 'mt-3 text-xs leading-relaxed p-3 rounded-xl border ' + (s2Correct ? 'bg-green-50 border-green-200 text-green-900' : 'bg-amber-50 border-amber-200 text-amber-900');
+      fb.textContent = (s2Correct ? 'Exactly right. ' : 'Close, but not quite. ') +
+        'Bigger or more vivid colors do not help someone who cannot tell red from green. Labels and shapes carry the meaning without color.';
+      fb.classList.remove('hidden');
+      done.s2 = true; checkAllDone();
+    }
+
+    function renderAlts() {
+      document.getElementById('alt-list').innerHTML = ALTS.map((a, i) =>
+        '<div class="rounded-2xl border border-gray-200 p-3" id="alt-' + i + '">' +
+        '<div class="flex items-center gap-3 mb-2"><div class="w-14 h-14 rounded-xl ' + a.bg + ' flex items-center justify-center text-2xl">' + a.visual + '</div>' +
+        '<p class="text-xs text-gray-600">' + a.title + '</p></div>' +
+        '<input type="text" maxlength="140" placeholder="Write the alt text..." oninput="altValues[' + i + ']=this.value" class="form-input w-full px-3 py-2 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400">' +
+        '<p class="alt-out hidden mt-2 text-[11px] leading-relaxed"></p></div>'
+      ).join('');
+    }
+    function checkStation3() {
+      altValid = 0;
+      ALTS.forEach((a, i) => {
+        const v = (altValues[i] || '').trim();
+        let msg = '', ok = false;
+        if (v.length < 5) msg = 'Too short. Write at least 5 characters.';
+        else if (v.length > 125) msg = 'Too long. Keep it under 125 characters.';
+        else if (/^(image|picture|photo|icon|graphic)\s+of/i.test(v)) msg = 'Skip "image of". The screen reader already says it is an image.';
+        else if (!a.test(v)) msg = a.hint;
+        else { ok = true; altValid++; }
+        const out = document.querySelector('#alt-' + i + ' .alt-out');
+        out.className = 'alt-out mt-2 text-[11px] leading-relaxed ' + (ok ? 'text-green-700' : 'text-red-600');
+        out.textContent = ok ? '✓ A screen reader would say: "Image, ' + v + '"' : '✗ ' + msg;
+      });
+      altChecked = true;
+      done.s3 = altValid === ALTS.length;
+      checkAllDone();
+    }
+
+    function renderMatch() {
+      document.getElementById('match-list').innerHTML = MATCH.map((m, i) =>
+        '<div class="flex items-center justify-between flex-wrap gap-2 border border-gray-200 rounded-xl p-3">' +
+        '<span class="text-xs font-black text-gray-800">' + m.feature + '</span>' +
+        '<select class="text-xs border border-gray-300 rounded-lg px-2 py-1.5 bg-white font-bold text-gray-700" onchange="matchVals[' + i + ']=this.value">' +
+        '<option value="">Choose...</option>' + WHO.map(w => '<option>' + w + '</option>').join('') + '</select></div>'
+      ).join('');
+    }
+    function checkStation4() {
+      if (matchVals.some(v => !v)) return;
+      s4Score = MATCH.filter((m, i) => matchVals[i] === m.answer).length;
+      const fb = document.getElementById('s4-feedback');
+      fb.className = 'mt-3 text-xs leading-relaxed p-3 rounded-xl border ' + (s4Score === 4 ? 'bg-green-50 border-green-200 text-green-900' : 'bg-amber-50 border-amber-200 text-amber-900');
+      fb.textContent = 'You matched ' + s4Score + ' of 4 correctly.' + (s4Score === 4 ? '' : ' Each feature maps to one group: contrast to low vision, alt text to screen readers, keyboard to no-mouse users, captions to deaf or hard-of-hearing people.');
+      fb.classList.remove('hidden');
+      done.s4 = true; checkAllDone();
+    }
+
+    function checkAllDone() {
+      // Station 1 and 3 must truly be fixed; 2 and 4 must have been attempted.
+      if (done.s1 && done.s2 && done.s3 && done.s4) document.getElementById('reflect-card').classList.remove('hidden');
+    }
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#star-rating .star-btn').forEach((s, idx) => s.classList.toggle('active', idx < val));
+      document.getElementById('rating-err').classList.add('hidden');
+    }
+
+    function checkField(id, errId) {
+      const el = document.getElementById(id);
+      const ok = !!el.value.trim();
+      el.classList.toggle('error', !ok);
+      document.getElementById(errId).classList.toggle('hidden', ok);
+      return ok;
+    }
+
+    async function handleSubmit(ev) {
+      ev.preventDefault();
+      const banner = document.getElementById('submit-error-banner');
+      banner.classList.add('hidden');
+
+      let valid = done.s1 && done.s2 && done.s3 && done.s4;
+      valid = checkField('surprise', 'surprise-err') && valid;
+      valid = checkField('everyone', 'everyone-err') && valid;
+      valid = checkField('ai-check', 'aicheck-err') && valid;
+      if (enjoymentRating === 0) { document.getElementById('rating-err').classList.remove('hidden'); valid = false; }
+      if (!valid) {
+        banner.textContent = (done.s1 && done.s2 && done.s3 && done.s4)
+          ? 'Please fill out all required fields marked in red.' : 'Finish all four stations first.';
+        banner.classList.remove('hidden');
+        return;
+      }
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> <span>Submitting...</span>';
+
+      const payload = {
+        contrast_ratios: CONTRAST.map((c, i) => c.name + '=' + ratio(fgNow[i], c.bg).toFixed(2)).join(', '),
+        contrast_passing: window._contrastPassing,
+        color_only_fix_correct: s2Correct,
+        alt_texts: ALTS.map((a, i) => (i + 1) + ') ' + (altValues[i] || '').trim()).join(' | '),
+        alt_texts_valid: altValid,
+        feature_matches_correct: s4Score,
+        surprise_reflection: document.getElementById('surprise').value.trim(),
+        benefits_everyone_example: document.getElementById('everyone').value.trim(),
+        catching_ai_mistakes: document.getElementById('ai-check').value.trim()
+      };
+
+      try {
+        await submitExercise(EXERCISE_SLUG, payload, { enjoymentRating: enjoymentRating || undefined });
+        document.getElementById('success-first-name').textContent = studentName.split(' ')[0] || 'Student';
+        document.getElementById('success-screen').classList.remove('hidden');
+      } catch (err) {
+        console.error('Submission error:', err);
+        banner.textContent = err.message || 'Failed to submit exercise. Please try again.';
+        banner.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerHTML = '<span>Submit Results 🚀</span>';
+      }
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planet Hopper | Intro to AI · Week 9</title>
+  <meta name="description"
+    content="Week 9 Activity: Planet Hopper! Warp between procedurally generated planets, complete three discovery missions, and see how one seed builds a whole world.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/activity.css">
+  <style>
+    .form-input:focus { outline: none; border-color: #0284c7; box-shadow: 0 0 0 3px rgba(2,132,199,0.1); }
+    .form-input.error { border-color: #ef4444; }
+    .star-btn { font-size: 26px; cursor: pointer; filter: grayscale(100%); transition: filter 0.15s ease, transform 0.1s ease; }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; animation: spin 0.65s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #planet-canvas { background: radial-gradient(circle at 30% 30%, #1e293b, #020617); border-radius: 1rem; }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <div id="main-content" class="max-w-3xl mx-auto px-4 pt-8">
+
+    <header class="mb-6">
+      <a href="index.html" class="inline-flex items-center text-xs font-bold text-sky-600 hover:text-sky-700 transition-colors mb-3">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        Back to Course Hub
+      </a>
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <div class="inline-flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-sky-100 text-sky-800">Week 9 Activity</span>
+            <span class="text-xs text-gray-500 font-medium">Procedural Generation</span>
+          </div>
+          <h1 class="text-3xl font-black text-gray-900 mt-1 tracking-tight">Planet Hopper 🪐</h1>
+        </div>
+        <div id="user-badge" class="hidden text-xs bg-sky-50 border border-sky-200 text-sky-800 px-3 py-1.5 rounded-full font-bold"></div>
+      </div>
+    </header>
+
+    <div class="bg-gradient-to-br from-sky-600 to-indigo-700 text-white rounded-3xl p-6 shadow-xl mb-8">
+      <h2 class="text-lg font-extrabold mb-1">Your Mission</h2>
+      <p class="text-xs text-sky-100 mb-4 leading-relaxed">
+        No Man's Sky has over 18 quintillion planets, and nobody drew them by hand. Each is built by an algorithm from a single number, the <strong>seed</strong>.
+        Warp through random seeds to complete three discovery missions. Then prove that the same seed always rebuilds the same world.
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-medium">
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-sky-200 block mb-0.5">1. Warp</span>Jump to a random planet.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-sky-200 block mb-0.5">2. Match</span>Find planets that fit each mission.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-sky-200 block mb-0.5">3. Revisit</span>Re-enter a seed to get the same planet back.</div>
+      </div>
+    </div>
+
+    <form id="planet-form" onsubmit="handleSubmit(event)" novalidate>
+
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-full bg-sky-600 text-white font-black flex items-center justify-center text-sm shadow">1</div>
+          <div>
+            <h3 class="text-base font-bold text-gray-900">Scan the Planet</h3>
+            <p class="text-xs text-gray-500">Warps used: <span id="warp-count" class="font-mono font-bold">0</span></p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 items-center">
+          <canvas id="planet-canvas" width="260" height="260" class="w-full max-w-[260px] mx-auto"></canvas>
+          <div>
+            <p id="planet-name" class="text-xl font-black text-gray-900 mb-1">—</p>
+            <p class="text-[11px] font-mono text-gray-400 mb-3">Seed: <span id="planet-seed">—</span></p>
+            <dl id="planet-stats" class="grid grid-cols-2 gap-2 text-xs mb-4"></dl>
+            <button type="button" onclick="warp()"
+              class="w-full py-3 rounded-xl text-sm font-black text-white bg-sky-600 hover:bg-sky-700 shadow-md transition-all active:scale-95 mb-2">
+              🚀 Warp to a random planet
+            </button>
+            <div class="flex gap-2">
+              <input id="seed-input" type="text" placeholder="Type a seed (e.g. 4821)"
+                class="form-input flex-1 px-3 py-2 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400">
+              <button type="button" onclick="visitSeed()" class="px-4 py-2 rounded-xl text-xs font-black bg-gray-100 hover:bg-gray-200 text-gray-700 transition-all">Visit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-full bg-sky-600 text-white font-black flex items-center justify-center text-sm shadow">2</div>
+          <div>
+            <h3 class="text-base font-bold text-gray-900">Discovery Missions</h3>
+            <p class="text-xs text-gray-500">Missions complete automatically when you land on a match</p>
+          </div>
+        </div>
+        <div id="missions" class="space-y-3"></div>
+      </div>
+
+      <div id="reflect-card" class="hidden">
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 rounded-full bg-sky-600 text-white font-black flex items-center justify-center text-sm shadow">3</div>
+            <div>
+              <h3 class="text-base font-bold text-gray-900">All missions complete!</h3>
+              <p class="text-xs text-gray-500">Now explain what you saw like a game developer</p>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Why can a game hold 18 quintillion planets without a giant hard drive? <span class="text-red-500">*</span></label>
+              <textarea id="storage" rows="2" placeholder="e.g. It only stores the seed number and the recipe. The planet is rebuilt on demand."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="storage-err" class="text-xs text-red-500 mt-1 hidden">Please answer this question.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Is "procedurally generated" the same thing as "random"? Use your seed test as evidence. <span class="text-red-500">*</span></label>
+              <textarea id="random" rows="2" placeholder="e.g. No. Warping felt random, but typing the same seed gave the identical planet."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="random-err" class="text-xs text-red-500 mt-1 hidden">Please explain.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">What can an algorithm NOT give you that a human level designer can? <span class="text-red-500">*</span></label>
+              <textarea id="limits" rows="2" placeholder="e.g. Meaning. Planets can be different without any of them feeling memorable or part of a story."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="limits-err" class="text-xs text-red-500 mt-1 hidden">Please share your view.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-8 text-center">
+          <h3 class="text-sm font-bold text-gray-900 mb-1">Activity Enjoyment Rating</h3>
+          <p class="text-xs text-gray-500 mb-3">How fun was exploring?</p>
+          <div id="star-rating" class="flex justify-center gap-2 mb-4">
+            <button type="button" class="star-btn" onclick="setRating(1)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(2)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(3)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(4)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(5)">⭐</button>
+          </div>
+          <p id="rating-err" class="text-xs text-red-500 mb-3 hidden">Please select a star rating.</p>
+          <div id="submit-error-banner" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-medium"></div>
+          <button type="submit" id="submit-btn"
+            class="w-full py-4 px-8 rounded-2xl text-base font-extrabold text-white shadow-xl transition-all hover:bg-sky-700 active:scale-[0.99] flex items-center justify-center gap-2 bg-sky-600">
+            <span>Submit Results 🚀</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div id="success-screen" class="hidden fixed inset-0 z-[120] bg-white flex items-center justify-center p-4">
+    <div class="max-w-md w-full text-center">
+      <div class="w-20 h-20 bg-sky-100 text-sky-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+      </div>
+      <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-sky-100 text-sky-800 mb-2">Explorer Rank Earned! 🪐</span>
+      <h2 class="text-3xl font-black text-gray-900 mb-2">Great Job, <span id="success-first-name">Student</span>!</h2>
+      <p class="text-xs text-gray-600 mb-6 leading-relaxed">Your results have been recorded in the class database.</p>
+      <a href="index.html" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-sky-600 hover:bg-sky-700 text-white font-bold text-sm rounded-xl shadow-lg transition-all">
+        <span>Back to Course Hub</span>
+      </a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../assets/js/introai-shared.js"></script>
+  <script>
+    const EXERCISE_SLUG = 'week09_planet_hopper';
+
+    let studentName = '', studentEmail = '';
+    let enjoymentRating = 0;
+
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName = session.name;
+      studentEmail = session.email;
+      trackExerciseStart(EXERCISE_SLUG);
+    })();
+
+    /* ---------- Seeded generation: same seed => same planet, always ---------- */
+    function hashInt(str) {
+      let h = 2166136261;
+      for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+      return h >>> 0;
+    }
+    function mulberry32(a) {
+      return function () {
+        a |= 0; a = (a + 0x6D2B79F5) | 0;
+        let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+    function lattice(ix, iy, s) {
+      let h = Math.imul(ix, 374761393) ^ Math.imul(iy, 668265263) ^ s;
+      h = Math.imul(h ^ (h >>> 13), 1274126177);
+      return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+    }
+    function valueNoise(x, y, s) {
+      const x0 = Math.floor(x), y0 = Math.floor(y), fx = x - x0, fy = y - y0;
+      const sx = fx * fx * (3 - 2 * fx), sy = fy * fy * (3 - 2 * fy);
+      const a = lattice(x0, y0, s), b = lattice(x0 + 1, y0, s), c = lattice(x0, y0 + 1, s), d = lattice(x0 + 1, y0 + 1, s);
+      return a + (b - a) * sx + (c - a) * sy + (a - b - c + d) * sx * sy;
+    }
+
+    const SYL = ['ka', 'zor', 'ni', 'vex', 'lu', 'mar', 'tho', 'ri', 'qua', 'bel', 'dra', 'sy', 'on', 'eth', 'ul'];
+
+    function makePlanet(seedStr) {
+      const si = hashInt(seedStr);
+      const rnd = mulberry32(si);
+      const water = Math.round(rnd() * 100);          // % surface water
+      const temp = Math.round(rnd() * 160 - 80);       // degrees C
+      const rough = 2 + rnd() * 4;                    // terrain frequency
+      const lifeRoll = rnd();
+      const habitable = temp >= 0 && temp <= 35 && water >= 35 && water <= 75;
+      let life = 'None';
+      if (habitable) life = lifeRoll > 0.5 ? 'Animals' : 'Plants';
+      else if (water > 20 && temp > -30 && temp < 60 && lifeRoll > 0.7) life = 'Microbes';
+      const name = [0, 1, 2].map(() => SYL[Math.floor(rnd() * SYL.length)]).join('');
+      return { seed: seedStr, si, water, temp, rough, life, name: name[0].toUpperCase() + name.slice(1) + '-' + (10 + Math.floor(rnd() * 90)) };
+    }
+
+    function drawPlanet(p) {
+      const cv = document.getElementById('planet-canvas'), ctx = cv.getContext('2d');
+      const W = cv.width, R = W * 0.42, cx = W / 2, cy = W / 2;
+      const img = ctx.createImageData(W, W);
+      const seaLevel = p.water / 100; // noise below this is ocean
+      for (let y = 0; y < W; y++) {
+        for (let x = 0; x < W; x++) {
+          const dx = x - cx, dy = y - cy, d2 = dx * dx + dy * dy, i = (y * W + x) * 4;
+          if (d2 > R * R) { img.data[i + 3] = 0; continue; }
+          const nx = dx / R, ny = dy / R, nz = Math.sqrt(1 - nx * nx - ny * ny);
+          // sample noise on the sphere surface so the globe looks round
+          const u = (nx * p.rough + 10), v = (ny * p.rough + 10), w = nz * p.rough;
+          const n = 0.65 * valueNoise(u + w, v, p.si) + 0.35 * valueNoise((u + w) * 2.3, v * 2.3, p.si ^ 0x9e37);
+          let r, g, b;
+          if (n < seaLevel) {
+            const depth = n / Math.max(seaLevel, 0.01);
+            r = 20 + 20 * depth; g = 60 + 70 * depth; b = 140 + 80 * depth;
+            if (p.temp < -20) { r = 200; g = 225; b = 245; } // frozen sea
+          } else {
+            const h = (n - seaLevel) / Math.max(1 - seaLevel, 0.01);
+            if (p.temp < -20) { r = 235; g = 240; b = 250; }                    // ice
+            else if (p.temp > 50) { r = 190 - 40 * h; g = 90 - 30 * h; b = 50; } // scorched
+            else if (p.life === 'Plants' || p.life === 'Animals') { r = 50 + 60 * h; g = 150 - 40 * h; b = 60; }
+            else { r = 170 - 30 * h; g = 150 - 30 * h; b = 110; }              // dry rock
+          }
+          const light = 0.35 + 0.65 * Math.max(0, (-nx * 0.5 - ny * 0.4 + nz * 0.75)); // shading
+          img.data[i] = r * light; img.data[i + 1] = g * light; img.data[i + 2] = b * light; img.data[i + 3] = 255;
+        }
+      }
+      ctx.clearRect(0, 0, W, W);
+      ctx.putImageData(img, 0, 0);
+    }
+
+    /* ---------- Missions ---------- */
+    const MISSIONS = [
+      { id: 'ocean',  icon: '🌊', title: 'Ocean World',  brief: 'Find a planet with 80% or more surface water.', test: p => p.water >= 80 },
+      { id: 'frozen', icon: '🧊', title: 'Frozen Rock',  brief: 'Find a cold (−40°C or below), dry (30% water or less) planet.', test: p => p.temp <= -40 && p.water <= 30 },
+      { id: 'garden', icon: '🌿', title: 'Garden World', brief: 'Find a planet with life on it: plants or animals.', test: p => p.life === 'Plants' || p.life === 'Animals' }
+    ];
+    const done = {};       // mission id -> seed
+    let warps = 0;
+    let current = null;
+    let revisited = false;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const badge = document.getElementById('user-badge');
+      badge.textContent = '\u{1F464} ' + studentName;
+      badge.classList.remove('hidden');
+      warp();
+      warps = 0; document.getElementById('warp-count').textContent = '0'; // the starting planet is free
+    });
+
+    function show(p) {
+      current = p;
+      drawPlanet(p);
+      document.getElementById('planet-name').textContent = p.name;
+      document.getElementById('planet-seed').textContent = p.seed;
+      const stat = (label, val) => '<div class="bg-gray-50 border border-gray-200 rounded-xl p-2"><dt class="text-[10px] font-black uppercase tracking-widest text-gray-400">' + label + '</dt><dd class="font-mono font-bold text-gray-800">' + val + '</dd></div>';
+      document.getElementById('planet-stats').innerHTML =
+        stat('Water', p.water + '%') + stat('Temp', p.temp + '°C') + stat('Life', p.life) + stat('Terrain', p.rough < 3.3 ? 'Smooth' : p.rough < 4.7 ? 'Hilly' : 'Rugged');
+      checkMissions(p);
+    }
+
+    function warp() {
+      const seed = String(Math.floor(Math.random() * 90000) + 10000);
+      warps++;
+      document.getElementById('warp-count').textContent = warps;
+      show(makePlanet(seed));
+    }
+
+    function visitSeed() {
+      const v = document.getElementById('seed-input').value.trim();
+      if (!v) return;
+      const p = makePlanet(v);
+      // Revisit test: typing a seed we already discovered a mission on counts as proof of determinism.
+      if (Object.values(done).includes(v)) revisited = true;
+      show(p);
+      renderMissions();
+    }
+
+    function checkMissions(p) {
+      MISSIONS.forEach(m => { if (!done[m.id] && m.test(p)) done[m.id] = p.seed; });
+      renderMissions();
+    }
+
+    function renderMissions() {
+      document.getElementById('missions').innerHTML = MISSIONS.map(m => {
+        const ok = !!done[m.id];
+        return '<div class="flex items-start gap-3 rounded-2xl border p-3 ' + (ok ? 'border-green-200 bg-green-50/60' : 'border-gray-200') + '">' +
+          '<span class="text-xl">' + (ok ? '✅' : m.icon) + '</span><div class="text-xs"><p class="font-black text-gray-900">' + m.title + '</p>' +
+          '<p class="text-gray-500">' + m.brief + '</p>' +
+          (ok ? '<p class="font-mono text-green-700 mt-1">Found at seed ' + done[m.id] + '. Type it in the Visit box to see it again!</p>' : '') + '</div></div>';
+      }).join('') +
+        '<div class="flex items-start gap-3 rounded-2xl border p-3 ' + (revisited ? 'border-green-200 bg-green-50/60' : 'border-gray-200') + '">' +
+        '<span class="text-xl">' + (revisited ? '✅' : '🔁') + '</span><div class="text-xs"><p class="font-black text-gray-900">Prove the Seed</p>' +
+        '<p class="text-gray-500">Type a seed from a completed mission into the Visit box and confirm you get the same planet back.</p></div></div>';
+
+      const all = MISSIONS.every(m => done[m.id]) && revisited;
+      if (all) document.getElementById('reflect-card').classList.remove('hidden');
+      window._allDone = all;
+    }
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#star-rating .star-btn').forEach((s, idx) => s.classList.toggle('active', idx < val));
+      document.getElementById('rating-err').classList.add('hidden');
+    }
+
+    function checkField(id, errId) {
+      const el = document.getElementById(id);
+      const ok = !!el.value.trim();
+      el.classList.toggle('error', !ok);
+      document.getElementById(errId).classList.toggle('hidden', ok);
+      return ok;
+    }
+
+    async function handleSubmit(ev) {
+      ev.preventDefault();
+      const banner = document.getElementById('submit-error-banner');
+      banner.classList.add('hidden');
+
+      let valid = !!window._allDone;
+      valid = checkField('storage', 'storage-err') && valid;
+      valid = checkField('random', 'random-err') && valid;
+      valid = checkField('limits', 'limits-err') && valid;
+      if (enjoymentRating === 0) { document.getElementById('rating-err').classList.remove('hidden'); valid = false; }
+      if (!valid) {
+        banner.textContent = window._allDone ? 'Please fill out all required fields marked in red.' : 'Complete all missions first.';
+        banner.classList.remove('hidden');
+        return;
+      }
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> <span>Submitting...</span>';
+
+      const payload = {
+        warps_used: warps,
+        ocean_seed: done.ocean,
+        frozen_seed: done.frozen,
+        garden_seed: done.garden,
+        seed_revisit_proven: revisited,
+        storage_explanation: document.getElementById('storage').value.trim(),
+        random_vs_procedural: document.getElementById('random').value.trim(),
+        algorithm_limits: document.getElementById('limits').value.trim()
+      };
+
+      try {
+        await submitExercise(EXERCISE_SLUG, payload, { enjoymentRating: enjoymentRating || undefined });
+        document.getElementById('success-first-name').textContent = studentName.split(' ')[0] || 'Student';
+        document.getElementById('success-screen').classList.remove('hidden');
+      } catch (err) {
+        console.error('Submission error:', err);
+        banner.textContent = err.message || 'Failed to submit exercise. Please try again.';
+        banner.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerHTML = '<span>Submit Results 🚀</span>';
+      }
+    }
+  </script>
+</body>
+
+</html>
