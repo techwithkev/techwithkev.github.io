@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deepfake Lab | Intro to AI · Week 11</title>
+  <meta name="description"
+    content="Week 11 Activity: Deepfake Lab! Watch four cartoon news clips and spot the visual tells: blinking, lighting, edges and lip sync. Some clips are real.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/activity.css">
+  <style>
+    .form-input:focus { outline: none; border-color: #7e22ce; box-shadow: 0 0 0 3px rgba(126,34,206,0.1); }
+    .form-input.error { border-color: #ef4444; }
+    .opt-btn { transition: all 0.15s ease; cursor: pointer; }
+    .opt-btn:hover:not(:disabled) { transform: translateY(-1px); }
+    .opt-btn.sel { border-color: #7e22ce !important; background: #faf5ff !important; color: #581c87 !important; font-weight: 700; }
+    .opt-btn.right { border-color: #16a34a !important; background: #f0fdf4 !important; color: #166534 !important; }
+    .opt-btn.wrong { border-color: #ef4444 !important; background: #fef2f2 !important; color: #991b1b !important; }
+    .star-btn { font-size: 26px; cursor: pointer; filter: grayscale(100%); transition: filter 0.15s ease, transform 0.1s ease; }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; animation: spin 0.65s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <div id="main-content" class="max-w-3xl mx-auto px-4 pt-8">
+
+    <header class="mb-6">
+      <a href="index.html" class="inline-flex items-center text-xs font-bold text-purple-600 hover:text-purple-700 transition-colors mb-3">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        Back to Course Hub
+      </a>
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <div class="inline-flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-purple-100 text-purple-800">Week 11 Activity</span>
+            <span class="text-xs text-gray-500 font-medium">Spotting the Tells</span>
+          </div>
+          <h1 class="text-3xl font-black text-gray-900 mt-1 tracking-tight">Deepfake Lab 🎭</h1>
+        </div>
+        <div id="user-badge" class="hidden text-xs bg-purple-50 border border-purple-200 text-purple-800 px-3 py-1.5 rounded-full font-bold"></div>
+      </div>
+    </header>
+
+    <div class="bg-gradient-to-br from-purple-600 to-indigo-700 text-white rounded-3xl p-6 shadow-xl mb-8">
+      <h2 class="text-lg font-extrabold mb-1">Your Mission</h2>
+      <p class="text-xs text-purple-100 mb-4 leading-relaxed">
+        Four cartoon news clips just arrived at the lab. Some are genuine and some are synthetic. Watch each one loop and look for the <strong>visual tells</strong>:
+        blinking, lighting, edges and lip sync. Careful: a real clip has <strong>no</strong> tells, and flagging one that isn't there costs you points.
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-medium">
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-purple-200 block mb-0.5">1. Watch</span>Each clip loops every 8 seconds.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-purple-200 block mb-0.5">2. Log</span>Tick every tell you can see.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-purple-200 block mb-0.5">3. Judge</span>Real or fake? Lock in your verdict.</div>
+      </div>
+    </div>
+
+    <form id="lab-form" onsubmit="handleSubmit(event)" novalidate>
+
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
+          <div class="flex items-center gap-3">
+            <div id="clip-badge" class="w-8 h-8 rounded-full bg-purple-600 text-white font-black flex items-center justify-center text-sm shadow">1</div>
+            <div>
+              <h3 id="clip-title" class="text-base font-bold text-gray-900"></h3>
+              <p class="text-xs text-gray-500">Cartoon presenters only. No real people appear in this lab.</p>
+            </div>
+          </div>
+          <div id="score-pill" class="text-xs font-black px-3 py-1.5 rounded-full bg-gray-100 text-gray-600">Score: 0</div>
+        </div>
+
+        <svg id="stage" viewBox="0 0 320 200" class="w-full rounded-2xl border border-gray-200 mb-4" role="img" aria-label="Animated cartoon news presenter">
+          <defs>
+            <linearGradient id="faceLit" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fbe0c6"/><stop offset="1" stop-color="#d4a07a"/></linearGradient>
+            <linearGradient id="faceFlipped" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d4a07a"/><stop offset="1" stop-color="#fbe0c6"/></linearGradient>
+          </defs>
+          <rect id="bg" x="0" y="0" width="320" height="200" fill="#cbd5e1"/>
+          <!-- Scene light source on the left, and an object whose shadow falls to the right -->
+          <circle cx="28" cy="34" r="12" fill="#fde047"/>
+          <g stroke="#fde047" stroke-width="2"><line x1="28" y1="12" x2="28" y2="6"/><line x1="46" y1="34" x2="54" y2="34"/><line x1="40" y1="20" x2="46" y2="14"/><line x1="40" y1="48" x2="46" y2="54"/></g>
+          <ellipse cx="290" cy="168" rx="26" ry="5" fill="#0f172a" opacity="0.28"/>
+          <rect x="262" y="132" width="22" height="34" rx="3" fill="#92400e"/>
+          <ellipse cx="273" cy="124" rx="16" ry="14" fill="#16a34a"/>
+          <path id="shirt" d="M78 200 Q84 150 160 144 Q236 150 242 200 Z" fill="#1e3a8a"/>
+          <rect x="146" y="128" width="28" height="24" fill="#e0b08a"/>
+          <ellipse id="head" cx="160" cy="94" rx="40" ry="48" fill="url(#faceLit)"/>
+          <path id="hair" d="M118 90 Q118 44 160 42 Q202 44 202 90 Q190 62 160 60 Q130 62 118 90 Z" fill="#3b2f2f" stroke="#3b2f2f" stroke-width="3"/>
+          <ellipse cx="145" cy="92" rx="7" ry="5" fill="#fff"/><ellipse cx="175" cy="92" rx="7" ry="5" fill="#fff"/>
+          <circle cx="146" cy="92" r="2.6" fill="#1f2937"/><circle cx="176" cy="92" r="2.6" fill="#1f2937"/>
+          <ellipse id="lidL" cx="145" cy="92" rx="8" ry="0" fill="#e8b994"/><ellipse id="lidR" cx="175" cy="92" rx="8" ry="0" fill="#e8b994"/>
+          <ellipse id="mouth" cx="160" cy="120" rx="9" ry="1" fill="#7f1d1d"/>
+          <rect x="0" y="168" width="320" height="32" fill="#0f172a" opacity="0.82"/>
+          <text id="caption" x="160" y="189" text-anchor="middle" fill="#ffffff" font-size="11" font-family="Outfit, sans-serif"></text>
+        </svg>
+
+        <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Which tells can you see? (tick all that apply)</p>
+        <div id="tell-options" class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4"></div>
+
+        <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Your verdict</p>
+        <div class="grid grid-cols-2 gap-2 mb-4">
+          <button type="button" class="opt-btn border border-gray-200 rounded-xl p-3 text-sm font-bold text-gray-600 bg-gray-50" data-verdict="real" onclick="setVerdict('real')">✅ Looks real</button>
+          <button type="button" class="opt-btn border border-gray-200 rounded-xl p-3 text-sm font-bold text-gray-600 bg-gray-50" data-verdict="fake" onclick="setVerdict('fake')">🎭 Looks fake</button>
+        </div>
+        <p id="lock-err" class="text-xs text-red-500 mb-2 hidden">Choose a verdict first.</p>
+        <button type="button" id="lock-btn" onclick="lockClip()"
+          class="w-full py-3 rounded-xl text-sm font-black text-white bg-purple-600 hover:bg-purple-700 shadow-md transition-all active:scale-95">
+          Lock in this clip
+        </button>
+
+        <div id="clip-result" class="hidden mt-4 p-4 rounded-2xl border text-xs leading-relaxed"></div>
+        <button type="button" id="next-btn" onclick="nextClip()"
+          class="hidden mt-3 w-full py-3 rounded-xl text-sm font-black text-white bg-indigo-600 hover:bg-indigo-700 shadow-md transition-all active:scale-95">
+          Next clip →
+        </button>
+      </div>
+
+      <div id="reflect-card" class="hidden">
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 rounded-full bg-purple-600 text-white font-black flex items-center justify-center text-sm shadow">★</div>
+            <div>
+              <h3 class="text-base font-bold text-gray-900">Lab Report: <span id="final-score" class="font-mono"></span></h3>
+              <p class="text-xs text-gray-500">What did the tells teach you?</p>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Which tell was easiest to spot, and which was hardest? Why? <span class="text-red-500">*</span></label>
+              <textarea id="easy-hard" rows="2" placeholder="e.g. Lip sync was easy because the caption showed the timing. Edges were hard because the flicker was small."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="easy-err" class="text-xs text-red-500 mt-1 hidden">Please answer this question.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Did you ever flag a tell on a real clip? What does that teach you about relying on tells? <span class="text-red-500">*</span></label>
+              <textarea id="false-alarm" rows="2" placeholder="e.g. Yes. Natural blinking can look odd too, so a single oddity is not proof."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="alarm-err" class="text-xs text-red-500 mt-1 hidden">Please answer this question.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">AI keeps improving, so tells will disappear. What else could you rely on? <span class="text-red-500">*</span></label>
+              <textarea id="beyond-tells" rows="2" placeholder="e.g. Checking the source, finding the original clip, and waiting for an official statement."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="beyond-err" class="text-xs text-red-500 mt-1 hidden">Please answer this question.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-8 text-center">
+          <h3 class="text-sm font-bold text-gray-900 mb-1">Activity Enjoyment Rating</h3>
+          <p class="text-xs text-gray-500 mb-3">How was playing detective?</p>
+          <div id="star-rating" class="flex justify-center gap-2 mb-4">
+            <button type="button" class="star-btn" onclick="setRating(1)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(2)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(3)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(4)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(5)">⭐</button>
+          </div>
+          <p id="rating-err" class="text-xs text-red-500 mb-3 hidden">Please select a star rating.</p>
+          <div id="submit-error-banner" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-medium"></div>
+          <button type="submit" id="submit-btn"
+            class="w-full py-4 px-8 rounded-2xl text-base font-extrabold text-white shadow-xl transition-all hover:bg-purple-700 active:scale-[0.99] flex items-center justify-center gap-2 bg-purple-600">
+            <span>Submit Results 🚀</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div id="success-screen" class="hidden fixed inset-0 z-[120] bg-white flex items-center justify-center p-4">
+    <div class="max-w-md w-full text-center">
+      <div class="w-20 h-20 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+      </div>
+      <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 mb-2">Case Closed! 🎭</span>
+      <h2 class="text-3xl font-black text-gray-900 mb-2">Great Job, <span id="success-first-name">Student</span>!</h2>
+      <p class="text-xs text-gray-600 mb-6 leading-relaxed">Your results have been recorded in the class database.</p>
+      <a href="index.html" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm rounded-xl shadow-lg transition-all">
+        <span>Back to Course Hub</span>
+      </a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../assets/js/introai-shared.js"></script>
+  <script>
+    const EXERCISE_SLUG = 'week11_deepfake_lab';
+
+    let studentName = '', studentEmail = '';
+    let enjoymentRating = 0;
+
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName = session.name;
+      studentEmail = session.email;
+      trackExerciseStart(EXERCISE_SLUG);
+    })();
+
+    /* ---------- The clips ----------
+       Every clip loops over LOOP seconds. A "tell" exists only when listed in `tells`;
+       a real clip has none. */
+    const LOOP = 8;
+    const WORDS = [['Residents', 0.2, 0.7], ['should', 0.95, 0.45], ['stay', 1.5, 0.45], ['calm', 2.05, 0.55],
+                   ['and', 2.85, 0.3], ['follow', 3.25, 0.55], ['official', 3.95, 0.65], ['updates', 4.75, 0.65], ['tonight', 5.65, 0.8]];
+    const TELLS = [
+      { id: 'blink', label: '👁 Blinking looks off', why: 'Blinking was too regular (like a metronome), not natural and irregular.' },
+      { id: 'light', label: '💡 Lighting does not match the scene', why: 'The scene light is on the left and the plant shadow falls right, but the face was lit from the right.' },
+      { id: 'edges', label: '✂️ Edges blur or flicker', why: 'The hair outline wobbled and flickered as the head moved.' },
+      { id: 'sync', label: '👄 Mouth does not match the words', why: 'The mouth moved about half a second behind the captions.' }
+    ];
+    const CLIPS = [
+      { title: 'Clip A: "Evening Update"', fake: true, tells: ['blink', 'sync'], bg: '#cbd5e1', shirt: '#1e3a8a', hair: '#3b2f2f', blink: 'regular', syncLag: 0.55, lightFlip: false, flicker: false },
+      { title: 'Clip B: "Weather Desk"', fake: false, tells: [], bg: '#bfdbfe', shirt: '#7c2d12', hair: '#78350f', blink: 'natural', syncLag: 0, lightFlip: false, flicker: false },
+      { title: 'Clip C: "Breaking Alert"', fake: true, tells: ['light', 'edges'], bg: '#fecaca', shirt: '#14532d', hair: '#111827', blink: 'natural', syncLag: 0, lightFlip: true, flicker: true },
+      { title: 'Clip D: "School Notice"', fake: false, tells: [], bg: '#d9f99d', shirt: '#581c87', hair: '#92400e', blink: 'natural', syncLag: 0, lightFlip: false, flicker: false }
+    ];
+    const BLINKS = { natural: [1.1, 3.9, 6.2], regular: [0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5] };
+    const BLINK_LEN = 0.16;
+
+    /* Pure helpers (also used by the animation loop) */
+    function loopTime(t) { return ((t % LOOP) + LOOP) % LOOP; }
+    function blinkClosed(clip, t) {
+      const tt = loopTime(t);
+      return BLINKS[clip.blink].some(s => tt >= s && tt < s + BLINK_LEN);
+    }
+    function mouthOpen(clip, t) {
+      const tt = loopTime(t - clip.syncLag);
+      const w = WORDS.find(x => tt >= x[1] && tt < x[1] + x[2]);
+      return w ? 0.25 + 0.75 * Math.abs(Math.sin(Math.PI * 3 * (tt - w[1]) / w[2])) : 0;
+    }
+    function captionAt(t) {
+      const tt = loopTime(t);
+      return WORDS.map(w => (tt >= w[1] && tt < w[1] + w[2]) ? '[' + w[0] + ']' : w[0]).join(' ');
+    }
+
+    let idx = 0, total = 0, locked = false, verdict = null, timer = null, t0 = 0;
+    const checked = new Set();
+    const results = [];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const badge = document.getElementById('user-badge');
+      badge.textContent = '\u{1F464} ' + studentName;
+      badge.classList.remove('hidden');
+      showClip();
+    });
+
+    function showClip() {
+      const c = CLIPS[idx];
+      locked = false; verdict = null; checked.clear();
+      document.getElementById('clip-badge').textContent = idx + 1;
+      document.getElementById('clip-title').textContent = c.title;
+      document.getElementById('bg').setAttribute('fill', c.bg);
+      document.getElementById('shirt').setAttribute('fill', c.shirt);
+      document.getElementById('hair').setAttribute('fill', c.hair);
+      document.getElementById('hair').setAttribute('stroke', c.hair);
+      document.getElementById('head').setAttribute('fill', c.lightFlip ? 'url(#faceFlipped)' : 'url(#faceLit)');
+      document.getElementById('tell-options').innerHTML = TELLS.map(t =>
+        '<button type="button" class="opt-btn border border-gray-200 rounded-xl p-3 text-left text-xs font-bold text-gray-600 bg-gray-50" data-tell="' + t.id + '" onclick="toggleTell(\'' + t.id + '\')">' + t.label + '</button>').join('');
+      document.querySelectorAll('[data-verdict]').forEach(b => { b.classList.remove('sel', 'right', 'wrong'); b.disabled = false; });
+      document.getElementById('clip-result').classList.add('hidden');
+      document.getElementById('next-btn').classList.add('hidden');
+      document.getElementById('lock-btn').classList.remove('hidden');
+      document.getElementById('lock-err').classList.add('hidden');
+      startAnimation(c);
+    }
+
+    function startAnimation(c) {
+      clearInterval(timer);
+      t0 = performance.now();
+      const el = id => document.getElementById(id);
+      timer = setInterval(() => {
+        const t = (performance.now() - t0) / 1000;
+        const closed = blinkClosed(c, t);
+        el('lidL').setAttribute('ry', closed ? 5.5 : 0);
+        el('lidR').setAttribute('ry', closed ? 5.5 : 0);
+        el('mouth').setAttribute('ry', 1 + mouthOpen(c, t) * 7);
+        el('caption').textContent = captionAt(t);
+        el('hair').setAttribute('transform', c.flicker
+          ? 'translate(' + ((Math.random() * 5 - 2.5).toFixed(1)) + ',' + ((Math.random() * 3 - 1.5).toFixed(1)) + ')' : '');
+      }, 50);
+    }
+
+    function toggleTell(id) {
+      if (locked) return;
+      if (checked.has(id)) checked.delete(id); else checked.add(id);
+      document.querySelector('[data-tell="' + id + '"]').classList.toggle('sel', checked.has(id));
+    }
+
+    function setVerdict(v) {
+      if (locked) return;
+      verdict = v;
+      document.querySelectorAll('[data-verdict]').forEach(b => b.classList.toggle('sel', b.dataset.verdict === v));
+      document.getElementById('lock-err').classList.add('hidden');
+    }
+
+    function lockClip() {
+      if (locked) return;
+      if (!verdict) { document.getElementById('lock-err').classList.remove('hidden'); return; }
+      locked = true;
+      const c = CLIPS[idx];
+      const verdictOk = (verdict === 'fake') === c.fake;
+      const found = c.tells.filter(t => checked.has(t));
+      const missed = c.tells.filter(t => !checked.has(t));
+      const falseAlarms = [...checked].filter(t => !c.tells.includes(t));
+      const pts = Math.max(0, (verdictOk ? 2 : 0) + found.length - falseAlarms.length);
+      total += pts;
+      results.push({ clip: c.title.split(':')[0], verdictOk, found: found.length, missed: missed.length, falseAlarms: falseAlarms.length });
+      document.getElementById('score-pill').textContent = 'Score: ' + total;
+
+      TELLS.forEach(t => {
+        const b = document.querySelector('[data-tell="' + t.id + '"]');
+        b.disabled = true; b.classList.remove('sel');
+        if (c.tells.includes(t.id)) b.classList.add('right');
+        else if (checked.has(t.id)) b.classList.add('wrong');
+      });
+      document.querySelectorAll('[data-verdict]').forEach(b => {
+        b.disabled = true; b.classList.remove('sel');
+        if ((b.dataset.verdict === 'fake') === c.fake) b.classList.add('right');
+        else if (b.dataset.verdict === verdict) b.classList.add('wrong');
+      });
+      document.getElementById('lock-btn').classList.add('hidden');
+
+      const box = document.getElementById('clip-result');
+      const lines = [];
+      lines.push('<strong>' + (c.fake ? 'This clip was synthetic.' : 'This clip was genuine, so it has no tells.') + ' +' + pts + ' points.</strong>');
+      if (c.fake) c.tells.forEach(id => lines.push((checked.has(id) ? '✓ ' : '✗ missed: ') + TELLS.find(t => t.id === id).why));
+      falseAlarms.forEach(id => lines.push('⚠ False alarm: "' + TELLS.find(t => t.id === id).label.replace(/^\S+\s/, '') + '" was not planted here (−1).'));
+      if (!c.fake && verdictOk && !falseAlarms.length) lines.push('Nice. You did not see tells that were not there.');
+      if (!c.fake && !verdictOk) lines.push('Real footage can look odd too. With no specific tell to point at, calling it fake was a guess.');
+      box.className = 'mt-4 p-4 rounded-2xl border text-xs leading-relaxed ' + (verdictOk ? 'bg-green-50 border-green-200 text-green-900' : 'bg-amber-50 border-amber-200 text-amber-900');
+      box.innerHTML = lines.join('<br>');
+      box.classList.remove('hidden');
+
+      const nxt = document.getElementById('next-btn');
+      nxt.textContent = idx === CLIPS.length - 1 ? 'See my lab report →' : 'Next clip →';
+      nxt.classList.remove('hidden');
+    }
+
+    function nextClip() {
+      if (idx === CLIPS.length - 1) {
+        clearInterval(timer);
+        document.getElementById('final-score').textContent = total + ' / ' + maxScore();
+        const card = document.getElementById('reflect-card');
+        card.classList.remove('hidden');
+        document.getElementById('next-btn').classList.add('hidden');
+        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+      idx++;
+      showClip();
+    }
+
+    function maxScore() { return CLIPS.reduce((s, c) => s + 2 + c.tells.length, 0); }
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#star-rating .star-btn').forEach((s, i) => s.classList.toggle('active', i < val));
+      document.getElementById('rating-err').classList.add('hidden');
+    }
+
+    function checkField(id, errId) {
+      const el = document.getElementById(id);
+      const ok = !!el.value.trim();
+      el.classList.toggle('error', !ok);
+      document.getElementById(errId).classList.toggle('hidden', ok);
+      return ok;
+    }
+
+    async function handleSubmit(ev) {
+      ev.preventDefault();
+      const banner = document.getElementById('submit-error-banner');
+      banner.classList.add('hidden');
+
+      let valid = results.length === CLIPS.length;
+      valid = checkField('easy-hard', 'easy-err') && valid;
+      valid = checkField('false-alarm', 'alarm-err') && valid;
+      valid = checkField('beyond-tells', 'beyond-err') && valid;
+      if (enjoymentRating === 0) { document.getElementById('rating-err').classList.remove('hidden'); valid = false; }
+      if (!valid) {
+        banner.textContent = results.length === CLIPS.length
+          ? 'Please fill out all required fields marked in red.' : 'Judge all four clips first.';
+        banner.classList.remove('hidden');
+        return;
+      }
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> <span>Submitting...</span>';
+
+      const payload = {
+        total_score: total,
+        max_score: maxScore(),
+        verdicts_correct: results.filter(r => r.verdictOk).length,
+        tells_found: results.reduce((s, r) => s + r.found, 0),
+        tells_missed: results.reduce((s, r) => s + r.missed, 0),
+        false_alarms: results.reduce((s, r) => s + r.falseAlarms, 0),
+        easiest_hardest_tell: document.getElementById('easy-hard').value.trim(),
+        false_alarm_reflection: document.getElementById('false-alarm').value.trim(),
+        beyond_tells_reflection: document.getElementById('beyond-tells').value.trim()
+      };
+
+      try {
+        await submitExercise(EXERCISE_SLUG, payload, { enjoymentRating: enjoymentRating || undefined });
+        document.getElementById('success-first-name').textContent = studentName.split(' ')[0] || 'Student';
+        document.getElementById('success-screen').classList.remove('hidden');
+      } catch (err) {
+        console.error('Submission error:', err);
+        banner.textContent = err.message || 'Failed to submit exercise. Please try again.';
+        banner.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerHTML = '<span>Submit Results 🚀</span>';
+      }
+    }
+  </script>
+</body>
+
+</html>

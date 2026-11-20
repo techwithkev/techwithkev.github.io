@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt Comparison | Intro to AI · Week 3</title>
+  <meta name="description"
+    content="Activity 1: Prompt Comparison. Explore how changing style and detail in your prompt changes the AI image output, then go freestyle with Subject + Style + Detail.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/activity.css">
+  <style>
+    .form-input:focus {
+      outline: none; border-color: #0d9488;
+      box-shadow: 0 0 0 3px rgba(13,148,136,0.1);
+    }
+    .form-input.error { border-color: #ef4444; }
+
+    /* Prompt pair cards */
+    .prompt-pair {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    }
+    @media (max-width: 520px) {
+      .prompt-pair { grid-template-columns: 1fr; }
+    }
+    .prompt-pill {
+      border-radius: 14px; padding: 14px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; line-height: 1.6; font-weight: 500;
+    }
+    .prompt-a { background: #f0fdfa; border: 1.5px solid #99f6e4; color: #134e4a; }
+    .prompt-b { background: #faf5ff; border: 1.5px solid #d8b4fe; color: #3b0764; }
+
+    /* Rating stars */
+    .star-btn {
+      font-size: 22px; cursor: pointer; transition: transform 0.1s ease;
+      background: none; border: none; padding: 2px;
+      filter: grayscale(1) opacity(0.35);
+    }
+    .star-btn.lit { filter: none; }
+    .star-btn:hover { transform: scale(1.25); }
+
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Copy button flash */
+    .copy-btn { transition: all 0.15s ease; }
+    .copy-btn:active { transform: scale(0.95); }
+
+    /* Opt btn */
+    .opt-btn { transition: all 0.15s ease; cursor: pointer; }
+    .opt-btn:hover { transform: translateY(-1px); }
+    .opt-btn.selected {
+      border-color: #0d9488 !important;
+      background: #f0fdfa !important;
+      color: #134e4a !important;
+      font-weight: 700;
+    }
+
+    /* Image upload zone */
+    .upload-zone {
+      border: 2px dashed #d1fae5; border-radius: 14px;
+      padding: 18px 16px; text-align: center; cursor: pointer;
+      transition: all 0.2s ease; background: #f9fafb;
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: #0d9488; background: #f0fdfa;
+    }
+    .upload-zone .zone-thumb {
+      max-height: 130px; max-width: 100%; border-radius: 10px;
+      object-fit: contain; margin: 0 auto 6px;
+    }
+  </style>
+</head>
+
+<body class="bg-[#F9FAFB] text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+
+  <!-- ══ MAIN CONTENT ══ -->
+  <div id="main-content" class="max-w-2xl mx-auto px-4 md:px-8 py-8 md:py-12">
+
+    <!-- Header -->
+    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-200 pb-6">
+      <div>
+        <a href="index.html"
+          class="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-teal-600 mb-3 hover:text-teal-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Back to Course Hub
+        </a>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tight text-gray-900">
+          Prompt <span class="text-teal-500">Comparison</span>
+        </h1>
+        <p class="text-gray-500 font-medium italic mt-1">Activity 1 &middot; Prompt Engineering &middot; Week 3</p>
+      </div>
+      <div class="px-5 py-2 rounded-full font-black text-xs uppercase tracking-widest bg-teal-50 border border-teal-200 text-teal-800 shadow-sm self-start md:self-auto">
+        Week 3
+      </div>
+    </header>
+
+    <!-- Activity Brief -->
+    <div class="rounded-3xl p-6 mb-8 border bg-gradient-to-r from-teal-50 to-cyan-50 border-teal-100 shadow-sm">
+      <div class="flex gap-4">
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 bg-teal-500 text-white shadow-md">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-lg font-black text-teal-950 mb-1">Activity Goal</h2>
+          <p class="text-sm text-teal-900 leading-relaxed mb-3">
+            Discover how small changes to a prompt can produce dramatically different AI images. Run each prompt pair, observe the differences, then unleash your creativity in the Freestyle round.
+          </p>
+          <ul class="text-xs text-teal-800 space-y-1 bg-white/70 backdrop-blur-sm p-4 rounded-xl border border-teal-100/50">
+            <li>&#9312; <strong>Style Change</strong>: run both robot prompts, compare cartoon vs. photorealistic.</li>
+            <li>&#9313; <strong>Detail Change</strong>: run both castle prompts, compare vague vs. richly detailed.</li>
+            <li>&#9314; <strong>Freestyle</strong>: write your own prompt combining Subject + Style + Detail.</li>
+            <li>&#9315; Record your observations and be ready to share one surprising result!</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <form id="comparison-form" onsubmit="handleSubmit(event)" novalidate>
+
+      <!-- ══ PART 1: STYLE CHANGE ══ -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-teal-500">1</div>
+          <h2 class="text-base font-black text-gray-900">Style Change</h2>
+        </div>
+        <p class="text-xs text-gray-500 mb-5 ml-11">Run both prompts below in your AI image tool, then record what you notice.</p>
+
+        <!-- Prompt pills -->
+        <div class="prompt-pair mb-5">
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[10px] font-black uppercase tracking-widest text-teal-600">Prompt A</span>
+              <button type="button" class="copy-btn text-[10px] font-bold text-gray-400 hover:text-teal-600 px-2 py-0.5 rounded-md border border-gray-200 hover:border-teal-200 transition-colors"
+                onclick="copyText('Robot reading a book, cartoon style', this)">Copy</button>
+            </div>
+            <div class="prompt-pill prompt-a">Robot reading a book, cartoon style</div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[10px] font-black uppercase tracking-widest text-violet-600">Prompt B</span>
+              <button type="button" class="copy-btn text-[10px] font-bold text-gray-400 hover:text-violet-600 px-2 py-0.5 rounded-md border border-gray-200 hover:border-violet-200 transition-colors"
+                onclick="copyText('Robot reading a book, photorealistic style', this)">Copy</button>
+            </div>
+            <div class="prompt-pill prompt-b">Robot reading a book, photorealistic style</div>
+          </div>
+        </div>
+
+        <!-- Which tool -->
+        <div class="mb-4">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">AI tool used</label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="style-tool-picker">
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('style', 'ChatGPT/DALL-E', this)">&#129302; ChatGPT</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('style', 'Gemini', this)">&#10024; Gemini</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('style', 'Adobe Firefly', this)">&#128293; Firefly</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('style', 'Other', this)">&#128172; Other</button>
+          </div>
+        </div>
+
+        <!-- Observations -->
+        <div class="mb-4">
+          <label for="style-obs" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            What differences did you notice? <span class="text-red-500">*</span>
+          </label>
+          <textarea id="style-obs" rows="3"
+            placeholder="e.g. The cartoon version had bold outlines and bright colours, while the photorealistic one looked like a real metal robot in a library..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"></textarea>
+          <p id="style-obs-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe what you noticed.</p>
+        </div>
+
+        <!-- Upload best image -->
+        <div class="mb-4">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            Upload your favourite image <span class="text-gray-300">(optional)</span>
+          </label>
+          <div class="upload-zone" id="style-upload-zone"
+            ondragover="handleDragOver(event,'style-upload-zone')"
+            ondragleave="handleDragLeave('style-upload-zone')"
+            ondrop="handleDrop(event,'style-img','style-upload-zone')"
+            onclick="document.getElementById('style-img').click()">
+            <input type="file" id="style-img" accept="image/*" class="hidden"
+              onchange="previewImage(this,'style-upload-zone','style-img-preview','style-img-thumb')">
+            <div id="style-img-placeholder">
+              <svg class="w-7 h-7 mx-auto mb-1.5 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              <p class="text-xs font-bold text-gray-400">Click or drag &amp; drop an image</p>
+              <p class="text-[10px] text-gray-400 mt-0.5">PNG, JPG, WEBP &middot; Max 5 MB</p>
+            </div>
+            <div id="style-img-preview" class="hidden flex flex-col items-center gap-2">
+              <img id="style-img-thumb" class="zone-thumb" src="" alt="Style image preview">
+              <button type="button" class="text-[10px] font-bold text-red-400 hover:text-red-600"
+                onclick="removeImage('style-img','style-upload-zone','style-img-preview',event)">&#10005; Remove</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rating -->
+        <div>
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Which result was more interesting?</label>
+          <div class="flex gap-3">
+            <button type="button" id="style-pick-a"
+              onclick="setFave('style', 'A')"
+              class="flex-1 py-2.5 rounded-xl border border-gray-200 font-bold text-xs text-gray-600 bg-gray-50 hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700 transition-all">
+              &#127912; Prompt A (Cartoon)
+            </button>
+            <button type="button" id="style-pick-b"
+              onclick="setFave('style', 'B')"
+              class="flex-1 py-2.5 rounded-xl border border-gray-200 font-bold text-xs text-gray-600 bg-gray-50 hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700 transition-all">
+              &#128247; Prompt B (Photorealistic)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PART 2: DETAIL CHANGE ══ -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-teal-500">2</div>
+          <h2 class="text-base font-black text-gray-900">Detail Change</h2>
+        </div>
+        <p class="text-xs text-gray-500 mb-5 ml-11">Run both prompts below. Notice how adding rich detail transforms the output.</p>
+
+        <!-- Prompt pills -->
+        <div class="prompt-pair mb-5">
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[10px] font-black uppercase tracking-widest text-teal-600">Prompt A: Vague</span>
+              <button type="button" class="copy-btn text-[10px] font-bold text-gray-400 hover:text-teal-600 px-2 py-0.5 rounded-md border border-gray-200 hover:border-teal-200 transition-colors"
+                onclick="copyText('Castle in the clouds', this)">Copy</button>
+            </div>
+            <div class="prompt-pill prompt-a">Castle in the clouds</div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-[10px] font-black uppercase tracking-widest text-violet-600">Prompt B: Detailed</span>
+              <button type="button" class="copy-btn text-[10px] font-bold text-gray-400 hover:text-violet-600 px-2 py-0.5 rounded-md border border-gray-200 hover:border-violet-200 transition-colors"
+                onclick="copyText('Floating medieval castle made of crystal in swirling purple clouds at twilight', this)">Copy</button>
+            </div>
+            <div class="prompt-pill prompt-b">Floating medieval castle made of crystal in swirling purple clouds at twilight</div>
+          </div>
+        </div>
+
+        <!-- Which tool -->
+        <div class="mb-4">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">AI tool used</label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="detail-tool-picker">
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('detail', 'ChatGPT/DALL-E', this)">&#129302; ChatGPT</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('detail', 'Gemini', this)">&#10024; Gemini</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('detail', 'Adobe Firefly', this)">&#128293; Firefly</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('detail', 'Other', this)">&#128172; Other</button>
+          </div>
+        </div>
+
+        <!-- Observations -->
+        <div class="mb-4">
+          <label for="detail-obs" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            How did the extra detail change the image? <span class="text-red-500">*</span>
+          </label>
+          <textarea id="detail-obs" rows="3"
+            placeholder="e.g. The vague prompt gave a generic white fluffy castle, but Prompt B had glowing crystal spires, purple dramatic lighting and looked like a fantasy movie..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"></textarea>
+          <p id="detail-obs-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe what you noticed.</p>
+        </div>
+
+        <!-- Upload best image -->
+        <div class="mb-4">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            Upload your favourite image <span class="text-gray-300">(optional)</span>
+          </label>
+          <div class="upload-zone" id="detail-upload-zone"
+            ondragover="handleDragOver(event,'detail-upload-zone')"
+            ondragleave="handleDragLeave('detail-upload-zone')"
+            ondrop="handleDrop(event,'detail-img','detail-upload-zone')"
+            onclick="document.getElementById('detail-img').click()">
+            <input type="file" id="detail-img" accept="image/*" class="hidden"
+              onchange="previewImage(this,'detail-upload-zone','detail-img-preview','detail-img-thumb')">
+            <div id="detail-img-placeholder">
+              <svg class="w-7 h-7 mx-auto mb-1.5 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              <p class="text-xs font-bold text-gray-400">Click or drag &amp; drop an image</p>
+              <p class="text-[10px] text-gray-400 mt-0.5">PNG, JPG, WEBP &middot; Max 5 MB</p>
+            </div>
+            <div id="detail-img-preview" class="hidden flex flex-col items-center gap-2">
+              <img id="detail-img-thumb" class="zone-thumb" src="" alt="Detail image preview">
+              <button type="button" class="text-[10px] font-bold text-red-400 hover:text-red-600"
+                onclick="removeImage('detail-img','detail-upload-zone','detail-img-preview',event)">&#10005; Remove</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fave -->
+        <div>
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Which result was more impressive?</label>
+          <div class="flex gap-3">
+            <button type="button" id="detail-pick-a"
+              onclick="setFave('detail', 'A')"
+              class="flex-1 py-2.5 rounded-xl border border-gray-200 font-bold text-xs text-gray-600 bg-gray-50 hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700 transition-all">
+              &#9729;&#65039; Prompt A (Vague)
+            </button>
+            <button type="button" id="detail-pick-b"
+              onclick="setFave('detail', 'B')"
+              class="flex-1 py-2.5 rounded-xl border border-gray-200 font-bold text-xs text-gray-600 bg-gray-50 hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700 transition-all">
+              &#128142; Prompt B (Detailed)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PART 3: FREESTYLE ══ -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-teal-500">3</div>
+          <h2 class="text-base font-black text-gray-900">Freestyle</h2>
+        </div>
+        <p class="text-xs text-gray-500 mb-5 ml-11">
+          Now it's your turn! Combine <strong>Subject + Style + Detail</strong> to craft your own unique image prompt.
+        </p>
+
+        <!-- Builder hint -->
+        <div class="grid grid-cols-3 gap-3 mb-5">
+          <div class="rounded-xl p-3 bg-teal-50 border border-teal-100 text-center">
+            <div class="text-lg mb-0.5">&#127775;</div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-teal-700 mb-1">Subject</p>
+            <p class="text-[11px] text-teal-800 leading-snug">Who or what is in the image?</p>
+          </div>
+          <div class="rounded-xl p-3 bg-violet-50 border border-violet-100 text-center">
+            <div class="text-lg mb-0.5">&#127912;</div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-violet-700 mb-1">Style</p>
+            <p class="text-[11px] text-violet-800 leading-snug">Cartoon, oil painting, pixel art&hellip;</p>
+          </div>
+          <div class="rounded-xl p-3 bg-amber-50 border border-amber-100 text-center">
+            <div class="text-lg mb-0.5">&#128269;</div>
+            <p class="text-[10px] font-black uppercase tracking-widest text-amber-700 mb-1">Detail</p>
+            <p class="text-[11px] text-amber-800 leading-snug">Lighting, mood, setting, colours&hellip;</p>
+          </div>
+        </div>
+
+        <!-- Freestyle prompt -->
+        <div class="mb-4">
+          <label for="freestyle-prompt" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            Your Freestyle Prompt <span class="text-red-500">*</span>
+          </label>
+          <textarea id="freestyle-prompt" rows="3"
+            placeholder="e.g. A fluffy golden retriever astronaut floating in space, watercolor style, pastel colours, soft dreamy lighting, whimsical mood..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"></textarea>
+          <p id="freestyle-prompt-error" class="hidden text-xs text-red-500 font-medium mt-1">Please write your freestyle prompt.</p>
+        </div>
+
+        <!-- Which tool -->
+        <div class="mb-4">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">AI tool used</label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="freestyle-tool-picker">
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('freestyle', 'ChatGPT/DALL-E', this)">&#129302; ChatGPT</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('freestyle', 'Gemini', this)">&#10024; Gemini</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('freestyle', 'Adobe Firefly', this)">&#128293; Firefly</button>
+            <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('freestyle', 'Other', this)">&#128172; Other</button>
+          </div>
+        </div>
+
+        <!-- Freestyle result -->
+        <div class="mb-4">
+          <label for="freestyle-result" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            Describe your result <span class="text-red-500">*</span>
+          </label>
+          <textarea id="freestyle-result" rows="3"
+            placeholder="e.g. The AI nailed the watercolor look: the dog's suit had realistic folds and the background had a beautiful pastel galaxy. Really surprised by the detail!"
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"></textarea>
+          <p id="freestyle-result-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe your freestyle result.</p>
+        </div>
+
+        <!-- Upload freestyle image -->
+        <div class="mb-4">
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">
+            Upload your freestyle image <span class="text-gray-300">(optional)</span>
+          </label>
+          <div class="upload-zone" id="freestyle-upload-zone"
+            ondragover="handleDragOver(event,'freestyle-upload-zone')"
+            ondragleave="handleDragLeave('freestyle-upload-zone')"
+            ondrop="handleDrop(event,'freestyle-img','freestyle-upload-zone')"
+            onclick="document.getElementById('freestyle-img').click()">
+            <input type="file" id="freestyle-img" accept="image/*" class="hidden"
+              onchange="previewImage(this,'freestyle-upload-zone','freestyle-img-preview','freestyle-img-thumb')">
+            <div id="freestyle-img-placeholder">
+              <svg class="w-7 h-7 mx-auto mb-1.5 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              <p class="text-xs font-bold text-gray-400">Click or drag &amp; drop an image</p>
+              <p class="text-[10px] text-gray-400 mt-0.5">PNG, JPG, WEBP &middot; Max 5 MB</p>
+            </div>
+            <div id="freestyle-img-preview" class="hidden flex flex-col items-center gap-2">
+              <img id="freestyle-img-thumb" class="zone-thumb" src="" alt="Freestyle image preview">
+              <button type="button" class="text-[10px] font-bold text-red-400 hover:text-red-600"
+                onclick="removeImage('freestyle-img','freestyle-upload-zone','freestyle-img-preview',event)">&#10005; Remove</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Share highlight -->
+        <div>
+          <label for="share-highlight" class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-1.5">
+            One interesting thing you'd share with the class <span class="text-gray-300">(optional)</span>
+          </label>
+          <textarea id="share-highlight" rows="2"
+            placeholder="e.g. I learned that adding the word 'cinematic' totally changed the lighting in the image!"
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"></textarea>
+        </div>
+      </div>
+
+      <!-- ══ OVERALL REFLECTION ══ -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-8">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-teal-500">4</div>
+          <h2 class="text-base font-black text-gray-900">Big Takeaway</h2>
+        </div>
+        <p class="text-xs text-gray-500 mb-4">After all three tasks, what is the single biggest thing you learned about writing AI image prompts?</p>
+
+        <div class="mb-5">
+          <textarea id="big-takeaway" rows="2"
+            placeholder="e.g. The more specific I am, the more the AI understands exactly what I want..."
+            class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"></textarea>
+          <p id="big-takeaway-error" class="hidden text-xs text-red-500 font-medium mt-1">Please share your big takeaway.</p>
+        </div>
+
+        <!-- Enjoyment rating -->
+        <div>
+          <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">How much did you enjoy this activity?</label>
+          <div class="flex gap-1" id="enjoyment-stars" role="group" aria-label="Enjoyment rating">
+            <button type="button" class="star-btn" data-val="1" onclick="setRating(1)" aria-label="1 star">&#11088;</button>
+            <button type="button" class="star-btn" data-val="2" onclick="setRating(2)" aria-label="2 stars">&#11088;</button>
+            <button type="button" class="star-btn" data-val="3" onclick="setRating(3)" aria-label="3 stars">&#11088;</button>
+            <button type="button" class="star-btn" data-val="4" onclick="setRating(4)" aria-label="4 stars">&#11088;</button>
+            <button type="button" class="star-btn" data-val="5" onclick="setRating(5)" aria-label="5 stars">&#11088;</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-12">
+        <p id="form-error" class="hidden text-sm font-medium text-red-500 mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+          <span id="form-error-text">Please complete all required fields.</span>
+        </p>
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700">
+          <span id="submit-label">Submit My Results &#8594;</span>
+        </button>
+        <p class="text-center text-xs text-gray-400 font-medium mt-3">Results will be loaded to the teacher dashboard.</p>
+      </div>
+
+    </form>
+
+    <!-- ══ TIPS PANEL ══ -->
+    <section class="border-t border-gray-200 pt-8">
+      <div class="text-center mb-6">
+        <h3 class="text-lg font-black text-gray-900">Prompt Writing Tips</h3>
+        <p class="text-xs text-gray-500">Keep these in mind as you experiment today</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="flex gap-3 p-4 bg-white border border-gray-200 rounded-xl">
+          <span class="text-2xl">&#127775;</span>
+          <div>
+            <p class="text-xs font-black text-gray-900">Be Specific</p>
+            <p class="text-[11px] text-gray-500 leading-relaxed">Vague prompts give generic results. Add colours, materials, time of day, and emotions.</p>
+          </div>
+        </div>
+        <div class="flex gap-3 p-4 bg-white border border-gray-200 rounded-xl">
+          <span class="text-2xl">&#127912;</span>
+          <div>
+            <p class="text-xs font-black text-gray-900">Name the Style</p>
+            <p class="text-[11px] text-gray-500 leading-relaxed">Words like "oil painting", "pixel art", "Pixar 3D", or "photorealistic" dramatically change the look.</p>
+          </div>
+        </div>
+        <div class="flex gap-3 p-4 bg-white border border-gray-200 rounded-xl">
+          <span class="text-2xl">&#128161;</span>
+          <div>
+            <p class="text-xs font-black text-gray-900">Set the Mood</p>
+            <p class="text-[11px] text-gray-500 leading-relaxed">Try adding "cinematic", "eerie", "joyful", "dramatic lighting" or "golden hour" to shift the feel.</p>
+          </div>
+        </div>
+        <div class="flex gap-3 p-4 bg-white border border-gray-200 rounded-xl">
+          <span class="text-2xl">&#128257;</span>
+          <div>
+            <p class="text-xs font-black text-gray-900">Iterate &amp; Refine</p>
+            <p class="text-[11px] text-gray-500 leading-relaxed">Don't stop at the first result. Tweak one element at a time and compare: that's how pros do it!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ══ SUCCESS SCREEN ══ -->
+  <div id="success-screen"
+    class="hidden fixed inset-0 z-[90] bg-[#F9FAFB] flex items-center justify-center p-4">
+    <div class="text-center max-w-md bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+      <div class="w-20 h-20 mx-auto rounded-2xl mb-6 flex items-center justify-center bg-teal-100 text-teal-600 shadow-sm">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <div class="inline-block px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 bg-teal-50 text-teal-800">
+        Results Saved!
+      </div>
+      <h2 class="text-3xl font-black text-gray-900 mb-3 tracking-tight">
+        Nice work, <span id="success-name" class="text-teal-600"></span>!
+      </h2>
+      <p class="text-gray-500 mb-8 leading-relaxed text-sm">
+        Your prompt comparisons and freestyle results have been stored. Your teacher will review everyone&rsquo;s observations on the dashboard.
+      </p>
+      <a href="index.html"
+        class="inline-flex items-center gap-2 text-white font-black py-3.5 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm bg-gradient-to-r from-teal-500 to-cyan-600">
+        Return to Course Hub
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <script src="../../assets/js/introai-shared.js"></script>
+  <script>
+    /* ══ EXERCISE CONFIG ══ */
+    const EXERCISE_SLUG = 'week03_prompt_comparison';
+
+    /* ══ STATE ══ */
+    let studentName = '', studentEmail = '';
+    let tools = { style: '', detail: '', freestyle: '' };
+    let faves = { style: '', detail: '' };
+    let enjoymentRating = 0;
+
+    /* ── Require a session from the course hub (index.html) ── */
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName  = session.name;
+      studentEmail = session.email;
+      trackExerciseStart(EXERCISE_SLUG);
+    })();
+
+    /* ══ COPY PROMPT ══ */
+    function copyText(text, btn) {
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = '\u2713 Copied!';
+        btn.style.color = '#0d9488';
+        setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1500);
+      }).catch(() => {
+        // Fallback for older browsers
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        btn.textContent = '\u2713 Copied!';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+      });
+    }
+
+    /* ══ TOOL PICKERS ══ */
+    const PICKER_IDS = { style: 'style-tool-picker', detail: 'detail-tool-picker', freestyle: 'freestyle-tool-picker' };
+
+    function setTool(section, val, btn) {
+      tools[section] = val;
+      document.querySelectorAll(`#${PICKER_IDS[section]} .opt-btn`).forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    }
+
+    /* ══ FAVOURITE PICKERS ══ */
+    const FAVE_STYLE = 'background:#f0fdfa;border-color:#0d9488;color:#134e4a;font-weight:700;';
+    const FAVE_VIOLET = 'background:#faf5ff;border-color:#7c3aed;color:#3b0764;font-weight:700;';
+
+    function setFave(section, pick) {
+      faves[section] = pick;
+      const a = document.getElementById(`${section}-pick-a`);
+      const b = document.getElementById(`${section}-pick-b`);
+      a.style.cssText = pick === 'A' ? FAVE_STYLE : '';
+      b.style.cssText = pick === 'B' ? FAVE_VIOLET : '';
+    }
+
+    /* ══ STAR RATING ══ */
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#enjoyment-stars .star-btn').forEach(btn => {
+        btn.classList.toggle('lit', parseInt(btn.dataset.val) <= val);
+      });
+    }
+
+    /* ══ IMAGE UPLOAD ══ */
+    function handleDragOver(ev, zoneId) {
+      ev.preventDefault();
+      document.getElementById(zoneId).classList.add('drag-over');
+    }
+    function handleDragLeave(zoneId) {
+      document.getElementById(zoneId).classList.remove('drag-over');
+    }
+    function handleDrop(ev, inputId, zoneId) {
+      ev.preventDefault();
+      document.getElementById(zoneId).classList.remove('drag-over');
+      const file = ev.dataTransfer.files[0];
+      if (!file) return;
+      const input = document.getElementById(inputId);
+      const dt = new DataTransfer(); dt.items.add(file); input.files = dt.files;
+      input.dispatchEvent(new Event('change'));
+    }
+    function previewImage(input, zoneId, previewId, thumbId) {
+      const file = input.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image is too large. Please choose a file under 5 MB.');
+        input.value = ''; return;
+      }
+      const reader = new FileReader();
+      reader.onload = e => {
+        document.getElementById(thumbId).src = e.target.result;
+        document.getElementById(`${zoneId.replace('-zone','')}-placeholder`).classList.add('hidden');
+        document.getElementById(previewId).classList.remove('hidden');
+        
+        // Add a checkmark visual alert if not already present
+        let badge = document.getElementById(`${zoneId}-success-badge`);
+        if (!badge) {
+          badge = document.createElement('div');
+          badge.id = `${zoneId}-success-badge`;
+          badge.className = 'text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md mt-1 border border-emerald-200 inline-block';
+          badge.innerHTML = '✓ Image Loaded &amp; Ready';
+          const prevEl = document.getElementById(previewId);
+          prevEl.insertBefore(badge, prevEl.lastElementChild);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+    function removeImage(inputId, zoneId, previewId, ev) {
+      ev.stopPropagation();
+      document.getElementById(inputId).value = '';
+      document.getElementById(previewId).classList.add('hidden');
+      document.getElementById(`${zoneId.replace('-zone','')}-placeholder`).classList.remove('hidden');
+      const badge = document.getElementById(`${zoneId}-success-badge`);
+      if (badge) badge.remove();
+    }
+    async function uploadToStorage(file, folder) {
+      const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const path = `week03/${folder}/${Date.now()}_${safe}`;
+      const resp = await fetch(`${SUPABASE_URL}/storage/v1/object/introai-uploads/${path}`, {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': file.type,
+          'x-upsert': 'true'
+        },
+        body: file
+      });
+      if (!resp.ok) throw new Error(`Upload failed: ${resp.status}`);
+      return `${SUPABASE_URL}/storage/v1/object/public/introai-uploads/${path}`;
+    }
+
+    /* ══ SUBMIT ══ */
+    async function handleSubmit(ev) {
+      ev.preventDefault();
+      let ok = true;
+
+      const required = [
+        ['style-obs',          'style-obs-error'],
+        ['detail-obs',         'detail-obs-error'],
+        ['freestyle-prompt',   'freestyle-prompt-error'],
+        ['freestyle-result',   'freestyle-result-error'],
+        ['big-takeaway',       'big-takeaway-error'],
+      ];
+
+      required.forEach(([id, errId]) => {
+        const val = document.getElementById(id).value.trim();
+        document.getElementById(errId).classList.toggle('hidden', !!val);
+        if (!val) ok = false;
+      });
+
+      if (!ok) {
+        document.getElementById('form-error').classList.remove('hidden');
+        document.querySelector('[id$="-error"]:not(.hidden)')
+          ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      document.getElementById('form-error').classList.add('hidden');
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Uploading images…';
+
+      /* Upload images if provided */
+      let styleImgUrl = null, detailImgUrl = null, freestyleImgUrl = null;
+      try {
+        const styleFile     = document.getElementById('style-img').files[0];
+        const detailFile    = document.getElementById('detail-img').files[0];
+        const freestyleFile = document.getElementById('freestyle-img').files[0];
+        if (styleFile)     styleImgUrl     = await uploadToStorage(styleFile,     'style');
+        if (detailFile)    detailImgUrl    = await uploadToStorage(detailFile,    'detail');
+        if (freestyleFile) freestyleImgUrl = await uploadToStorage(freestyleFile, 'freestyle');
+      } catch (err) {
+        console.warn('[Week 3 PC] Image upload warning:', err.message);
+        // Continue without images rather than blocking the student
+      }
+
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting…';
+
+      const payload = {
+        /* Style Change */
+        style_tool:           tools.style   || null,
+        style_fave_prompt:    faves.style   || null,
+        style_observations:   document.getElementById('style-obs').value.trim(),
+        style_image_url:      styleImgUrl,
+        /* Detail Change */
+        detail_tool:          tools.detail  || null,
+        detail_fave_prompt:   faves.detail  || null,
+        detail_observations:  document.getElementById('detail-obs').value.trim(),
+        detail_image_url:     detailImgUrl,
+        /* Freestyle */
+        freestyle_tool:       tools.freestyle || null,
+        freestyle_prompt:     document.getElementById('freestyle-prompt').value.trim(),
+        freestyle_result:     document.getElementById('freestyle-result').value.trim(),
+        freestyle_image_url:  freestyleImgUrl,
+        share_highlight:      document.getElementById('share-highlight').value.trim() || null,
+        /* Reflection */
+        big_takeaway:         document.getElementById('big-takeaway').value.trim()
+      };
+
+      try {
+        await submitExercise(EXERCISE_SLUG, payload, { enjoymentRating: enjoymentRating || undefined });
+      } catch (err) {
+        console.error('[Week 3 PC] Submission error:', err.message);
+        btn.disabled = false;
+        document.getElementById('submit-label').textContent = 'Submit My Results \u2192';
+        if (err.message.includes('409') || err.message.includes('duplicate key')) {
+          document.getElementById('form-error-text').textContent = '⚠️ You have already submitted this activity!';
+        } else {
+          document.getElementById('form-error-text').textContent = '\u26A0 Network error. Please try again or notify your teacher.';
+        }
+        document.getElementById('form-error').classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('success-name').textContent = studentName.split(' ')[0];
+      document.getElementById('success-screen').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+
+</body>
+
+</html>

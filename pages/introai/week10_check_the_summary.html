@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Check the AI Summary | Intro to AI · Week 10</title>
+  <meta name="description"
+    content="Week 10 Activity: Check the AI Summary! Fact-check an AI-written user research summary against the real interview quotes and catch what it got wrong.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/activity.css">
+  <style>
+    .form-input:focus { outline: none; border-color: #16a34a; box-shadow: 0 0 0 3px rgba(22,163,74,0.1); }
+    .form-input.error { border-color: #ef4444; }
+    .opt-btn { transition: all 0.15s ease; cursor: pointer; }
+    .opt-btn:hover:not(:disabled) { transform: translateY(-1px); }
+    .opt-btn.sel { border-color: #16a34a !important; background: #f0fdf4 !important; color: #166534 !important; font-weight: 700; }
+    .opt-btn.right { border-color: #16a34a !important; background: #f0fdf4 !important; color: #166534 !important; }
+    .opt-btn.wrong { border-color: #ef4444 !important; background: #fef2f2 !important; color: #991b1b !important; }
+    .quote-chip { transition: all 0.15s ease; cursor: pointer; }
+    .quote-chip.sel { background: #dcfce7 !important; border-color: #16a34a !important; color: #166534 !important; }
+    .star-btn { font-size: 26px; cursor: pointer; filter: grayscale(100%); transition: filter 0.15s ease, transform 0.1s ease; }
+    .star-btn:hover { transform: scale(1.15); }
+    .star-btn.active { filter: grayscale(0%); }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; animation: spin 0.65s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <div id="main-content" class="max-w-3xl mx-auto px-4 pt-8">
+
+    <header class="mb-6">
+      <a href="index.html" class="inline-flex items-center text-xs font-bold text-green-600 hover:text-green-700 transition-colors mb-3">
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        Back to Course Hub
+      </a>
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div>
+          <div class="inline-flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-green-100 text-green-800">Week 10 Activity</span>
+            <span class="text-xs text-gray-500 font-medium">AI in User Research</span>
+          </div>
+          <h1 class="text-3xl font-black text-gray-900 mt-1 tracking-tight">Check the AI Summary 🔎</h1>
+        </div>
+        <div id="user-badge" class="hidden text-xs bg-green-50 border border-green-200 text-green-800 px-3 py-1.5 rounded-full font-bold"></div>
+      </div>
+    </header>
+
+    <div class="bg-gradient-to-br from-green-600 to-lime-700 text-white rounded-3xl p-6 shadow-xl mb-8">
+      <h2 class="text-lg font-extrabold mb-1">Your Mission</h2>
+      <p class="text-xs text-green-100 mb-4 leading-relaxed">
+        Designers use AI to summarize user interviews: "showing what users actually said, not what a designer guessed."
+        But what if the summary is wrong? You interviewed 8 students about a <strong>Study Buddy</strong> app. An AI wrote six findings.
+        Fact-check each one against the real quotes.
+      </p>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-medium">
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-green-200 block mb-0.5">1. Read</span>The 8 interview quotes.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-green-200 block mb-0.5">2. Verify</span>Judge each AI claim.</div>
+        <div class="bg-white/10 rounded-2xl p-3 border border-white/20"><span class="font-bold text-green-200 block mb-0.5">3. Improve</span>Write a better prompt.</div>
+      </div>
+    </div>
+
+    <form id="summary-form" onsubmit="handleSubmit(event)" novalidate>
+
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-full bg-green-600 text-white font-black flex items-center justify-center text-sm shadow">1</div>
+          <div>
+            <h3 class="text-base font-bold text-gray-900">The Raw Interviews</h3>
+            <p class="text-xs text-gray-500">This is what users actually said</p>
+          </div>
+        </div>
+        <div id="quotes" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+      </div>
+
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center justify-between flex-wrap gap-2 mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-green-600 text-white font-black flex items-center justify-center text-sm shadow">2</div>
+            <div>
+              <h3 class="text-base font-bold text-gray-900">The AI's Summary</h3>
+              <p class="text-xs text-gray-500">For each claim, pick a verdict, then tap the quotes that are your evidence</p>
+            </div>
+          </div>
+          <div id="verdict-pill" class="text-xs font-black px-3 py-1.5 rounded-full bg-gray-100 text-gray-600">0 / 6 judged</div>
+        </div>
+        <div id="claims" class="space-y-4"></div>
+        <p id="claims-err" class="text-xs text-red-500 mt-3 hidden">Please give a verdict for every claim.</p>
+        <button type="button" onclick="gradeClaims()" id="grade-btn"
+          class="mt-4 w-full py-3 rounded-xl text-sm font-black text-white bg-green-600 hover:bg-green-700 shadow-md transition-all active:scale-95">
+          Check my verdicts
+        </button>
+        <div id="grade-result" class="hidden mt-4 p-4 rounded-2xl border text-xs leading-relaxed"></div>
+      </div>
+
+      <div id="reflect-card" class="hidden">
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 rounded-full bg-green-600 text-white font-black flex items-center justify-center text-sm shadow">3</div>
+            <div>
+              <h3 class="text-base font-bold text-gray-900">Make the AI More Honest</h3>
+              <p class="text-xs text-gray-500">AI helps designers try more ideas, but judgment stays human</p>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Write a better prompt that would stop the AI inventing or exaggerating. <span class="text-red-500">*</span></label>
+              <textarea id="better-prompt" rows="3" placeholder="e.g. Summarize these interviews. For every finding, quote the interview numbers that support it, and say 'not mentioned' if no one said it."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="prompt-err" class="text-xs text-red-500 mt-1 hidden">Please write your improved prompt (at least 20 characters).</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">If the team built the app from the wrong summary, what would go wrong? <span class="text-red-500">*</span></label>
+              <textarea id="consequence" rows="2" placeholder="e.g. They would charge a subscription and spam notifications, exactly what students said they hate."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="conseq-err" class="text-xs text-red-500 mt-1 hidden">Please answer this question.</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Which of the three error types is hardest to spot, and why? <span class="text-red-500">*</span></label>
+              <textarea id="hardest-error" rows="2" placeholder="e.g. Invented claims. They sound reasonable, so you only catch them if you check every quote."
+                class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl text-xs text-gray-900 placeholder-gray-400"></textarea>
+              <p id="hard-err" class="text-xs text-red-500 mt-1 hidden">Please answer this question.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-8 text-center">
+          <h3 class="text-sm font-bold text-gray-900 mb-1">Activity Enjoyment Rating</h3>
+          <p class="text-xs text-gray-500 mb-3">How was playing fact-checker?</p>
+          <div id="star-rating" class="flex justify-center gap-2 mb-4">
+            <button type="button" class="star-btn" onclick="setRating(1)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(2)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(3)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(4)">⭐</button>
+            <button type="button" class="star-btn" onclick="setRating(5)">⭐</button>
+          </div>
+          <p id="rating-err" class="text-xs text-red-500 mb-3 hidden">Please select a star rating.</p>
+          <div id="submit-error-banner" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-medium"></div>
+          <button type="submit" id="submit-btn"
+            class="w-full py-4 px-8 rounded-2xl text-base font-extrabold text-white shadow-xl transition-all hover:bg-green-700 active:scale-[0.99] flex items-center justify-center gap-2 bg-green-600">
+            <span>Submit Results 🚀</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div id="success-screen" class="hidden fixed inset-0 z-[120] bg-white flex items-center justify-center p-4">
+    <div class="max-w-md w-full text-center">
+      <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+      </div>
+      <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 mb-2">Fact-Checked! 🔎</span>
+      <h2 class="text-3xl font-black text-gray-900 mb-2">Great Job, <span id="success-first-name">Student</span>!</h2>
+      <p class="text-xs text-gray-600 mb-6 leading-relaxed">Your results have been recorded in the class database.</p>
+      <a href="index.html" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-green-600 hover:bg-green-700 text-white font-bold text-sm rounded-xl shadow-lg transition-all">
+        <span>Back to Course Hub</span>
+      </a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../assets/js/introai-shared.js"></script>
+  <script>
+    const EXERCISE_SLUG = 'week10_check_the_summary';
+
+    let studentName = '', studentEmail = '';
+    let enjoymentRating = 0;
+
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName = session.name;
+      studentEmail = session.email;
+      trackExerciseStart(EXERCISE_SLUG);
+    })();
+
+    const QUOTES = [
+      'I forget deadlines all the time. I need reminders.',
+      'Notifications stress me out. Too many pings and I mute everything.',
+      'I like studying with friends, but scheduling it is a pain.',
+      'I would never pay for a study app. Free or nothing.',
+      'I use my phone for everything. My laptop battery is dead half the time.',
+      'Reminders help, but only one a day, not ten.',
+      'I wish it could quiz me. Making flashcards is boring.',
+      'Dark mode? I don\'t care. I just want it to work.'
+    ];
+
+    const VERDICTS = [
+      { id: 'supported',    label: '✅ Supported by the interviews' },
+      { id: 'contradicted', label: '❌ Contradicted or exaggerated' },
+      { id: 'invented',     label: '👻 Not in the interviews at all' }
+    ];
+
+        const CLAIMS = [
+      { text: 'Students want reminders, but not too many of them.', answer: 'supported', why: 'Quotes 1, 2 and 6 all point to a few helpful reminders.' },
+      { text: 'Students love push notifications and want more of them.', answer: 'contradicted', why: 'Quotes 2 and 6 say the opposite: too many pings get muted.' },
+      { text: 'Students would happily pay a monthly subscription.', answer: 'contradicted', why: 'Quote 4 says "free or nothing".' },
+      { text: 'Students want an easier way to study with friends.', answer: 'supported', why: 'Quote 3: scheduling group study is a pain.' },
+      { text: 'Most students study late at night, so the app should default to a night theme.', answer: 'invented', why: 'No one mentioned study times, and Quote 8 says they do not care about dark mode.' },
+      { text: 'Students want a talking voice assistant built into the app.', answer: 'invented', why: 'Quote 7 only asks for quizzes. Nobody mentioned voice.' }
+    ];
+
+    const verdicts = new Array(CLAIMS.length).fill(null);
+    const evidenceSel = CLAIMS.map(() => new Set());
+    let graded = false, score = 0;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const badge = document.getElementById('user-badge');
+      badge.textContent = '\u{1F464} ' + studentName;
+      badge.classList.remove('hidden');
+      document.getElementById('quotes').innerHTML = QUOTES.map((q, i) =>
+        '<div class="rounded-xl border border-gray-200 bg-gray-50 p-3 text-xs text-gray-700"><span class="font-black text-green-700 mr-1">Q' + (i + 1) + '</span>"' + q + '"</div>'
+      ).join('');
+      document.getElementById('claims').innerHTML = CLAIMS.map((c, i) =>
+        '<div class="rounded-2xl border border-gray-200 p-4" id="claim-' + i + '">' +
+        '<p class="text-xs font-black text-gray-900 mb-3">🤖 ' + (i + 1) + '. ' + c.text + '</p>' +
+        '<div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">' +
+        VERDICTS.map(v => '<button type="button" class="opt-btn border border-gray-200 rounded-xl p-2 text-[11px] font-bold text-gray-600 bg-gray-50" data-claim="' + i + '" data-v="' + v.id + '" onclick="setVerdict(' + i + ',\'' + v.id + '\',this)">' + v.label + '</button>').join('') +
+        '</div>' +
+        '<p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Evidence (optional)</p>' +
+        '<div class="flex flex-wrap gap-1.5">' +
+        QUOTES.map((q, k) => '<button type="button" class="quote-chip border border-gray-200 rounded-lg px-2 py-1 text-[11px] font-bold text-gray-500 bg-white" onclick="toggleEvidence(' + i + ',' + (k + 1) + ',this)">Q' + (k + 1) + '</button>').join('') +
+        '</div><p class="claim-why hidden mt-3 text-[11px] leading-relaxed"></p></div>'
+      ).join('');
+    });
+
+    function setVerdict(i, v, btn) {
+      if (graded) return;
+      verdicts[i] = v;
+      document.querySelectorAll('[data-claim="' + i + '"]').forEach(b => b.classList.toggle('sel', b === btn));
+      document.getElementById('verdict-pill').textContent = verdicts.filter(Boolean).length + ' / ' + CLAIMS.length + ' judged';
+      document.getElementById('claims-err').classList.add('hidden');
+    }
+
+    function toggleEvidence(i, n, btn) {
+      if (graded) return;
+      if (evidenceSel[i].has(n)) evidenceSel[i].delete(n); else evidenceSel[i].add(n);
+      btn.classList.toggle('sel', evidenceSel[i].has(n));
+    }
+
+    function gradeClaims() {
+      if (graded) return;
+      if (verdicts.some(v => !v)) { document.getElementById('claims-err').classList.remove('hidden'); return; }
+      graded = true;
+      score = 0;
+      CLAIMS.forEach((c, i) => {
+        const ok = verdicts[i] === c.answer;
+        if (ok) score++;
+        const card = document.getElementById('claim-' + i);
+        card.classList.add(ok ? 'border-green-300' : 'border-red-300');
+        card.querySelectorAll('.opt-btn').forEach(b => {
+          b.classList.remove('sel'); b.disabled = true;
+          if (b.dataset.v === c.answer) b.classList.add('right');
+          else if (b.dataset.v === verdicts[i]) b.classList.add('wrong');
+        });
+        const why = card.querySelector('.claim-why');
+        why.className = 'claim-why mt-3 text-[11px] leading-relaxed ' + (ok ? 'text-green-700' : 'text-red-700');
+        why.textContent = (ok ? '✓ ' : '✗ ') + c.why;
+      });
+      document.getElementById('grade-btn').classList.add('hidden');
+      const box = document.getElementById('grade-result');
+      box.className = 'mt-4 p-4 rounded-2xl border text-xs leading-relaxed ' + (score >= 5 ? 'bg-green-50 border-green-200 text-green-900' : 'bg-amber-50 border-amber-200 text-amber-900');
+      box.innerHTML = '<strong>You caught ' + score + ' of 6.</strong> The AI summary got 4 of 6 claims wrong: two contradict the interviews and two were invented. It read confidently the whole time. That is why a designer\'s judgment, and a human check against the source, still matters.';
+      box.classList.remove('hidden');
+      document.getElementById('reflect-card').classList.remove('hidden');
+      box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#star-rating .star-btn').forEach((s, idx) => s.classList.toggle('active', idx < val));
+      document.getElementById('rating-err').classList.add('hidden');
+    }
+
+    function checkField(id, errId, min) {
+      const el = document.getElementById(id);
+      const ok = el.value.trim().length >= (min || 1);
+      el.classList.toggle('error', !ok);
+      document.getElementById(errId).classList.toggle('hidden', ok);
+      return ok;
+    }
+
+    async function handleSubmit(ev) {
+      ev.preventDefault();
+      const banner = document.getElementById('submit-error-banner');
+      banner.classList.add('hidden');
+
+      let valid = graded;
+      valid = checkField('better-prompt', 'prompt-err', 20) && valid;
+      valid = checkField('consequence', 'conseq-err') && valid;
+      valid = checkField('hardest-error', 'hard-err') && valid;
+      if (enjoymentRating === 0) { document.getElementById('rating-err').classList.remove('hidden'); valid = false; }
+      if (!valid) {
+        banner.textContent = graded ? 'Please fill out all required fields marked in red.' : 'Check your verdicts first.';
+        banner.classList.remove('hidden');
+        return;
+      }
+
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> <span>Submitting...</span>';
+
+      const payload = {
+        claims_judged_correctly: score,
+        total_claims: CLAIMS.length,
+        my_verdicts: CLAIMS.map((c, i) => (i + 1) + '=' + verdicts[i]).join(', '),
+        evidence_chosen: CLAIMS.map((c, i) => (i + 1) + ':' + ([...evidenceSel[i]].sort((a, b) => a - b).map(n => 'Q' + n).join('+') || 'none')).join(', '),
+        improved_prompt: document.getElementById('better-prompt').value.trim(),
+        wrong_summary_consequence: document.getElementById('consequence').value.trim(),
+        hardest_error_type: document.getElementById('hardest-error').value.trim()
+      };
+
+      try {
+        await submitExercise(EXERCISE_SLUG, payload, { enjoymentRating: enjoymentRating || undefined });
+        document.getElementById('success-first-name').textContent = studentName.split(' ')[0] || 'Student';
+        document.getElementById('success-screen').classList.remove('hidden');
+      } catch (err) {
+        console.error('Submission error:', err);
+        banner.textContent = err.message || 'Failed to submit exercise. Please try again.';
+        banner.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerHTML = '<span>Submit Results 🚀</span>';
+      }
+    }
+  </script>
+</body>
+
+</html>

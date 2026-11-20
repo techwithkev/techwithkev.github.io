@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scene Soundtrack | Intro to AI · Week 4</title>
+  <meta name="description"
+    content="Activity 3: Scene Soundtrack. Pick a scene image and use AI to compose a soundtrack that perfectly matches its mood and atmosphere.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/activity.css">
+  <style>
+    .form-input:focus {
+      outline: none;
+      border-color: #a21caf;
+      box-shadow: 0 0 0 3px rgba(162, 28, 175, 0.1);
+    }
+    .form-input.error { border-color: #ef4444; }
+
+    /* Rating stars */
+    .star-btn {
+      font-size: 22px; cursor: pointer; transition: transform 0.1s ease;
+      background: none; border: none; padding: 2px;
+      filter: grayscale(1) opacity(0.35);
+    }
+    .star-btn.lit { filter: none; }
+    .star-btn:hover { transform: scale(1.25); }
+
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Copy button flash */
+    .copy-btn { transition: all 0.15s ease; }
+    .copy-btn:active { transform: scale(0.95); }
+
+    /* Scene card */
+    .scene-card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .scene-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+    .scene-card.selected {
+      border-color: #a21caf !important;
+      box-shadow: 0 0 0 3px rgba(162,28,175,0.2), 0 8px 24px rgba(0,0,0,0.12);
+      background: #faf5ff !important;
+    }
+    .scene-card.selected .scene-check {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .scene-check {
+      position: absolute;
+      top: 8px; right: 8px;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: #a21caf;
+      color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      opacity: 0;
+      transform: scale(0.6);
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 5;
+    }
+
+    /* Image wrapper for strictly uniform thumbnail size & ratio */
+    .scene-img-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      height: 170px;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 8px;
+      background: #0f172a;
+      flex-shrink: 0;
+    }
+    @supports (aspect-ratio: 16/10) {
+      .scene-img-wrap {
+        height: auto;
+      }
+    }
+    .scene-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      transition: transform 0.35s ease;
+    }
+    .scene-card:hover .scene-img {
+      transform: scale(1.05);
+    }
+    .scene-img-wrap .zoom-btn {
+      position: absolute;
+      bottom: 8px; right: 8px;
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      cursor: pointer;
+      z-index: 2;
+    }
+    .scene-img-wrap:hover .zoom-btn,
+    .scene-card:focus-within .zoom-btn { opacity: 1; transform: scale(1); }
+    .zoom-btn svg { width: 15px; height: 15px; }
+
+    /* Lightbox */
+    #lightbox {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.22s ease;
+    }
+    #lightbox.open { opacity: 1; pointer-events: auto; }
+    #lightbox img {
+      max-width: min(92vw, 1200px);
+      max-height: 90vh;
+      border-radius: 16px;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.7);
+      transform: scale(0.94);
+      transition: transform 0.25s cubic-bezier(0.34, 1.3, 0.64, 1);
+      object-fit: contain;
+    }
+    #lightbox.open img { transform: scale(1); }
+    #lightbox-close {
+      position: absolute; top: 20px; right: 20px;
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff; font-size: 20px; line-height: 1;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s;
+    }
+    #lightbox-close:hover { background: rgba(255,255,255,0.22); }
+    #lightbox-caption {
+      position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+      font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.6);
+      letter-spacing: 0.05em; white-space: nowrap;
+    }
+  </style>
+</head>
+
+<body class="bg-[#F9FAFB] text-gray-900 min-h-screen font-sans antialiased pb-20">
+
+  <!-- ══ MAIN LAYOUT ══ -->
+  <div class="max-w-3xl mx-auto px-4 pt-8">
+
+    <!-- Back Button -->
+    <a href="index.html" class="inline-flex items-center gap-2 text-xs font-bold text-gray-400 hover:text-fuchsia-600 mb-6 transition-colors group">
+      <svg class="w-4 h-4 transform group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      Back to Course Hub
+    </a>
+
+    <!-- Header Banner -->
+    <header class="bg-white border border-gray-200 rounded-3xl p-6 md:p-8 shadow-sm mb-8 relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-40 h-40 rounded-full opacity-10 bg-fuchsia-400 translate-x-10 -translate-y-10"></div>
+      <div class="absolute bottom-0 left-0 w-24 h-24 rounded-full opacity-5 bg-purple-400 -translate-x-8 translate-y-8"></div>
+      <div class="flex items-center gap-3 mb-3">
+        <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-fuchsia-100 text-fuchsia-800">
+          Week 4
+        </span>
+        <span class="text-xs font-bold text-gray-400">Activity 3</span>
+      </div>
+      <h1 class="text-2xl md:text-3xl font-black text-gray-900 tracking-tight mb-2">
+        Scene Soundtrack 🎬🎵
+      </h1>
+      <p class="text-xs md:text-sm text-gray-500 leading-relaxed max-w-2xl">
+        Every great scene needs great music! Choose one of the images below, then use an AI music generator like
+        <strong class="text-fuchsia-700">Suno</strong> or <strong class="text-fuchsia-700">Udio</strong>
+        to create a soundtrack that perfectly captures the scene's mood, energy, and atmosphere.
+      </p>
+    </header>
+
+    <!-- FORM -->
+    <form id="soundtrack-form" onsubmit="handleSubmit(event)" novalidate>
+
+      <!-- ══ STEP 1: Choose a Scene ══ -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-fuchsia-600">1</div>
+          <h2 class="text-base font-black text-gray-900">Choose Your Scene</h2>
+        </div>
+
+        <p class="text-xs text-gray-500 mb-5 ml-11">Pick the image that speaks to you: you'll compose a soundtrack just for it.</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 ml-0 sm:ml-11" id="scene-selector">
+
+          <!-- Scene A: Mars Astronaut -->
+          <button type="button" class="scene-card border-2 border-gray-200 rounded-2xl p-2.5 bg-gray-50 text-left"
+            onclick="selectScene('The Last Astronaut', this)">
+            <div class="scene-check">&#10003;</div>
+            <div class="scene-img-wrap">
+              <img src="images/scene_mars_astronaut.jpg" alt="A lone astronaut on Mars" class="scene-img" loading="lazy">
+              <button type="button" class="zoom-btn" onclick="openLightbox(event, 'images/scene_mars_astronaut.jpg', '&#x1F680; The Last Astronaut')" aria-label="View full size">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0zm-3 0H8m3-3v6"/></svg>
+              </button>
+            </div>
+            <div class="px-1 flex-1 flex flex-col justify-between">
+              <div>
+                <p class="text-xs font-black text-gray-900 leading-snug">&#x1F680; The Last Astronaut</p>
+                <p class="text-[11px] text-gray-500 mt-1 leading-snug">A lone figure on a distant, silent world.</p>
+              </div>
+            </div>
+          </button>
+
+          <!-- Scene B: Rainy Ramen Shop -->
+          <button type="button" class="scene-card border-2 border-gray-200 rounded-2xl p-2.5 bg-gray-50 text-left"
+            onclick="selectScene('A Rainy Evening', this)">
+            <div class="scene-check">&#10003;</div>
+            <div class="scene-img-wrap">
+              <img src="images/scene_rainy_ramen_shop.jpg" alt="Cozy rainy ramen shop" class="scene-img" loading="lazy">
+              <button type="button" class="zoom-btn" onclick="openLightbox(event, 'images/scene_rainy_ramen_shop.jpg', '&#x1F35C; A Rainy Evening')" aria-label="View full size">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0zm-3 0H8m3-3v6"/></svg>
+              </button>
+            </div>
+            <div class="px-1 flex-1 flex flex-col justify-between">
+              <div>
+                <p class="text-xs font-black text-gray-900 leading-snug">&#x1F35C; A Rainy Evening</p>
+                <p class="text-[11px] text-gray-500 mt-1 leading-snug">Warm light, steam, and friendly voices in the rain.</p>
+              </div>
+            </div>
+          </button>
+
+          <!-- Scene C: Dragon Battle -->
+          <button type="button" class="scene-card border-2 border-gray-200 rounded-2xl p-2.5 bg-gray-50 text-left"
+            onclick="selectScene(&quot;The Dragon&apos;s Siege&quot;, this)">
+            <div class="scene-check">&#10003;</div>
+            <div class="scene-img-wrap">
+              <img src="images/scene_dragon_battle.jpg" alt="Epic dragon battle" class="scene-img" loading="lazy">
+              <button type="button" class="zoom-btn" onclick="openLightbox(event, 'images/scene_dragon_battle.jpg', '&#x1F409; The Dragon\'s Siege')" aria-label="View full size">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0zm-3 0H8m3-3v6"/></svg>
+              </button>
+            </div>
+            <div class="px-1 flex-1 flex flex-col justify-between">
+              <div>
+                <p class="text-xs font-black text-gray-900 leading-snug">&#x1F409; The Dragon's Siege</p>
+                <p class="text-[11px] text-gray-500 mt-1 leading-snug">Fire, chaos, and the thunder of battle.</p>
+              </div>
+            </div>
+          </button>
+
+          <!-- Scene D: Caribbean Festival -->
+          <button type="button" class="scene-card border-2 border-gray-200 rounded-2xl p-2.5 bg-gray-50 text-left"
+            onclick="selectScene('Festival Day', this)">
+            <div class="scene-check">&#10003;</div>
+            <div class="scene-img-wrap">
+              <img src="images/scene_caribbean_festival.jpg" alt="Caribbean street festival" class="scene-img" loading="lazy">
+              <button type="button" class="zoom-btn" onclick="openLightbox(event, 'images/scene_caribbean_festival.jpg', '&#x1F389; Festival Day')" aria-label="View full size">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0zm-3 0H8m3-3v6"/></svg>
+              </button>
+            </div>
+            <div class="px-1 flex-1 flex flex-col justify-between">
+              <div>
+                <p class="text-xs font-black text-gray-900 leading-snug">&#x1F389; Festival Day</p>
+                <p class="text-[11px] text-gray-500 mt-1 leading-snug">Pure joy, rhythm, and colour in the streets.</p>
+              </div>
+            </div>
+          </button>
+
+        </div>
+        <p id="scene-error" class="hidden text-xs text-red-500 font-medium mt-3 ml-11">Please choose a scene to score.</p>
+      </div>
+
+      <!-- ══ STEP 2: Describe the Mood ══ -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-fuchsia-600">2</div>
+          <h2 class="text-base font-black text-gray-900">Describe the Mood</h2>
+        </div>
+
+        <div class="space-y-4 ml-11">
+          <p class="text-xs text-gray-500">Before you write your prompt, think about what this scene <em>feels</em> like.</p>
+
+          <!-- Mood word pickers -->
+          <div>
+            <label class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Pick the mood words that fit your scene <span class="text-red-500">*</span></label>
+            <div class="flex flex-wrap gap-2" id="mood-picker">
+              <button type="button" class="opt-btn border border-gray-200 rounded-full py-1.5 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="toggleMood('Tense', this)">&#x1F624; Tense</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-full py-1.5 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="toggleMood('Mysterious', this)">&#x1F319; Mysterious</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-full py-1.5 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="toggleMood('Lonely', this)">&#x1F30C; Lonely</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-full py-1.5 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="toggleMood('Cozy', this)">&#x2615; Cozy</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-full py-1.5 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="toggleMood('Nostalgic', this)">&#x1F4F7; Nostalgic</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-full py-1.5 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="toggleMood('Epic', this)">&#x26A1; Epic</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-full py-1.5 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="toggleMood('Chaotic', this)">&#x1F525; Chaotic</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-full py-1.5 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="toggleMood('Joyful', this)">&#x1F389; Joyful</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-full py-1.5 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="toggleMood('Energetic', this)">&#x1F483; Energetic</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-full py-1.5 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="toggleMood('Peaceful', this)">&#x1F54A;&#xFE0F; Peaceful</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-full py-1.5 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="toggleMood('Dramatic', this)">&#x1F3AD; Dramatic</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-full py-1.5 px-3 text-xs font-bold text-gray-600 bg-gray-50" onclick="toggleMood('Hopeful', this)">&#x1F305; Hopeful</button>
+            </div>
+            <p id="mood-error" class="hidden text-xs text-red-500 font-medium mt-2">Please select at least one mood word.</p>
+          </div>
+
+          <!-- Scene description -->
+          <div>
+            <label for="scene-desc" class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1.5">
+              In your own words, describe what's happening in the scene <span class="text-red-500">*</span>
+            </label>
+            <textarea id="scene-desc" rows="3"
+              placeholder="e.g. An astronaut stands alone on Mars, gazing at two moons rising over an endless red desert. It feels both awe-inspiring and deeply lonely..."
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"
+              required></textarea>
+            <p id="scene-desc-error" class="hidden text-xs text-red-500 font-medium mt-1">Please describe the scene.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ STEP 3: Craft Your Prompt and Generate ══ -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-fuchsia-600">3</div>
+          <h2 class="text-base font-black text-gray-900">Craft Your Prompt &amp; Generate</h2>
+        </div>
+
+        <div class="space-y-4 ml-11">
+
+          <!-- Prompt tip -->
+          <div class="prompt-tip">
+            <p class="text-[11px] font-black text-fuchsia-800 uppercase tracking-wider mb-1.5">&#x1F4A1; Prompt Tips for Music AI</p>
+            <ul class="text-xs text-fuchsia-900 space-y-1 leading-relaxed">
+              <li>&#x2022; Include <strong>genre</strong> (e.g. orchestral, lo-fi, electronic, reggae)</li>
+              <li>&#x2022; Add <strong>instruments</strong> (e.g. strings, drums, steel pan, synthesizer)</li>
+              <li>&#x2022; Describe <strong>tempo</strong> (slow and brooding / fast and intense / upbeat)</li>
+              <li>&#x2022; Mention <strong>mood keywords</strong> (eerie, triumphant, warm, melancholic)</li>
+            </ul>
+          </div>
+
+          <!-- Prompt input -->
+          <div>
+            <label for="prompt-used" class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1.5">
+              Your music prompt <span class="text-red-500">*</span>
+            </label>
+            <textarea id="prompt-used" rows="3"
+              placeholder="e.g. Slow, lonely orchestral score with solo cello and sparse piano, eerie and vast, minimal percussion, cinematic space exploration feel, 30 seconds"
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"
+              required></textarea>
+            <p id="prompt-error" class="hidden text-xs text-red-500 font-medium mt-1">Please write your music prompt.</p>
+          </div>
+
+          <!-- AI Tool used -->
+          <div>
+            <label class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">AI Tool Used</label>
+            <div class="grid grid-cols-3 gap-2" id="tool-picker">
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('Suno', this)">&#x1F3B5; Suno</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('Udio', this)">&#x26A1; Udio</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50" onclick="setTool('Other', this)">&#x1F4AC; Other</button>
+            </div>
+            <p id="tool-error" class="hidden text-xs text-red-500 font-medium mt-1">Please select the tool used.</p>
+          </div>
+
+          <!-- Link input -->
+          <div>
+            <label for="music-link" class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1.5">
+              Link to your generated soundtrack <span class="text-red-500">*</span>
+            </label>
+            <input id="music-link" type="url" placeholder="e.g. https://suno.com/song/..."
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all"
+              required />
+            <p id="music-link-error" class="hidden text-xs text-red-500 font-medium mt-1">Please paste the link to your generated soundtrack.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ STEP 4: Reflection ══ -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-8">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-lg text-white text-sm font-black flex items-center justify-center flex-shrink-0 bg-fuchsia-600">4</div>
+          <h2 class="text-base font-black text-gray-900">Reflection</h2>
+        </div>
+
+        <div class="space-y-4 ml-11">
+
+          <!-- How well does it match? -->
+          <div>
+            <label class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">
+              How well does your soundtrack match the scene's mood? <span class="text-red-500">*</span>
+            </label>
+            <div class="grid grid-cols-4 gap-2" id="match-picker">
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50 text-center" onclick="setMatch('Perfect match', this)">&#x1F3AF;<br>Perfect</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50 text-center" onclick="setMatch('Close but not quite', this)">&#x1F90F;<br>Close</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50 text-center" onclick="setMatch('Somewhat off', this)">&#x1F605;<br>Off</button>
+              <button type="button" class="opt-btn border border-gray-200 rounded-xl py-2 px-2 text-xs font-bold text-gray-600 bg-gray-50 text-center" onclick="setMatch('Very different', this)">&#x1F62C;<br>Miss</button>
+            </div>
+            <p id="match-error" class="hidden text-xs text-red-500 font-medium mt-1">Please rate how well your soundtrack matched.</p>
+          </div>
+
+          <!-- What worked / what didn't -->
+          <div>
+            <label for="reflection" class="block text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1.5">
+              What worked well in your soundtrack? What would you change about your prompt? <span class="text-red-500">*</span>
+            </label>
+            <textarea id="reflection" rows="3"
+              placeholder="e.g. The cello really captured the loneliness of space, but the AI kept adding upbeat percussion that didn't fit at all. Next time I'd add 'no drums' to my prompt..."
+              class="form-input w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-900 placeholder-gray-400 transition-all resize-none"
+              required></textarea>
+            <p id="reflection-error" class="hidden text-xs text-red-500 font-medium mt-1">Please write your reflection.</p>
+          </div>
+
+          <!-- Enjoyment rating -->
+          <div>
+            <label class="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">How much did you enjoy this activity?</label>
+            <div class="flex gap-1" id="enjoyment-stars" role="group" aria-label="Enjoyment rating">
+              <button type="button" class="star-btn" data-val="1" onclick="setRating(1)" aria-label="1 star">&#x2B50;</button>
+              <button type="button" class="star-btn" data-val="2" onclick="setRating(2)" aria-label="2 stars">&#x2B50;</button>
+              <button type="button" class="star-btn" data-val="3" onclick="setRating(3)" aria-label="3 stars">&#x2B50;</button>
+              <button type="button" class="star-btn" data-val="4" onclick="setRating(4)" aria-label="4 stars">&#x2B50;</button>
+              <button type="button" class="star-btn" data-val="5" onclick="setRating(5)" aria-label="5 stars">&#x2B50;</button>
+            </div>
+            <p id="rating-error" class="hidden text-xs text-red-500 font-medium mt-1">Please select an enjoyment rating.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Section -->
+      <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm mb-12">
+        <p id="form-error" class="hidden text-sm font-medium text-red-500 mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+          <span id="form-error-text">Please complete all required fields.</span>
+        </p>
+        <button id="submit-btn" type="submit"
+          class="w-full text-white font-black py-4 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm tracking-wide flex items-center justify-center gap-2 bg-gradient-to-r from-fuchsia-600 to-purple-700 hover:from-fuchsia-700 hover:to-purple-800">
+          <span id="submit-label">Submit My Soundtrack &rarr;</span>
+        </button>
+        <p class="text-center text-xs text-gray-400 font-medium mt-3">Results will load to the teacher dashboard.</p>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div id="success-screen"
+    class="hidden fixed inset-0 z-[90] bg-[#F9FAFB] flex items-center justify-center p-4">
+    <div class="text-center max-w-md bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+      <div class="w-20 h-20 mx-auto rounded-2xl mb-6 flex items-center justify-center bg-fuchsia-100 text-fuchsia-600 shadow-sm">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <div class="inline-block px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 bg-fuchsia-50 text-fuchsia-800">
+        Soundtrack Saved! &#x1F3AC;&#x1F3B5;
+      </div>
+      <h2 class="text-3xl font-black text-gray-900 mb-3 tracking-tight">
+        Amazing work, <span id="success-name" class="text-fuchsia-600"></span>!
+      </h2>
+      <p class="text-gray-500 mb-8 leading-relaxed text-sm">
+        Your scene, soundtrack link, prompt, and reflections have been saved. Your teacher will check out your composition!
+      </p>
+      <a href="index.html"
+        class="inline-flex items-center gap-2 text-white font-black py-3.5 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-sm bg-gradient-to-r from-fuchsia-600 to-purple-700">
+        Return to Course Hub
+      </a>
+    </div>
+  </div>
+
+  <!-- ══ LIGHTBOX ══ -->
+  <div id="lightbox" role="dialog" aria-modal="true" aria-label="Full size image" onclick="closeLightboxOnBackdrop(event)">
+    <button id="lightbox-close" onclick="closeLightbox()" aria-label="Close">&times;</button>
+    <img id="lightbox-img" src="" alt="Full size scene">
+    <div id="lightbox-caption"></div>
+  </div>
+
+  <script src="../../assets/js/introai-shared.js"></script>
+  <script>
+    /* ══ EXERCISE CONFIG ══ */
+    const EXERCISE_SLUG = 'week04_scene_soundtrack';
+
+    /* ══ LIGHTBOX ══ */
+    function openLightbox(ev, src, caption) {
+      ev.stopPropagation(); // don't also trigger the scene card select
+      const lb = document.getElementById('lightbox');
+      const img = document.getElementById('lightbox-img');
+      const cap = document.getElementById('lightbox-caption');
+      img.src = src;
+      cap.innerHTML = caption;
+      lb.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    function closeLightboxOnBackdrop(ev) {
+      if (ev.target === document.getElementById('lightbox')) closeLightbox();
+    }
+    document.addEventListener('keydown', function(ev) {
+      if (ev.key === 'Escape') closeLightbox();
+    });
+
+    /* ══ STATE ══ */
+    let studentName = '', studentEmail = '';
+    let selectedScene = '';
+    let selectedMoods = [];
+    let selectedTool = '';
+    let selectedMatch = '';
+    let enjoymentRating = 0;
+
+    (function requireSession() {
+      const session = getStudentSession();
+      if (!session.name || !session.email || !session.cohortId) {
+        window.location.replace('index.html');
+        return;
+      }
+      studentName  = session.name;
+      studentEmail = session.email;
+      trackExerciseStart(EXERCISE_SLUG);
+    })();
+
+    /* ══ SCENE SELECTOR ══ */
+    function selectScene(sceneName, btn) {
+      selectedScene = sceneName;
+      document.querySelectorAll('#scene-selector .scene-card').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById('scene-error').classList.add('hidden');
+    }
+
+    /* ══ MOOD TOGGLES (multi-select) ══ */
+    function toggleMood(mood, btn) {
+      const idx = selectedMoods.indexOf(mood);
+      if (idx === -1) {
+        selectedMoods.push(mood);
+        btn.classList.add('selected');
+      } else {
+        selectedMoods.splice(idx, 1);
+        btn.classList.remove('selected');
+      }
+      if (selectedMoods.length > 0) {
+        document.getElementById('mood-error').classList.add('hidden');
+      }
+    }
+
+    /* ══ TOOL PICKER ══ */
+    function setTool(val, btn) {
+      selectedTool = val;
+      document.querySelectorAll('#tool-picker .opt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById('tool-error').classList.add('hidden');
+    }
+
+    /* ══ MATCH PICKER ══ */
+    function setMatch(val, btn) {
+      selectedMatch = val;
+      document.querySelectorAll('#match-picker .opt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      document.getElementById('match-error').classList.add('hidden');
+    }
+
+    /* ══ STAR RATING ══ */
+    function setRating(val) {
+      enjoymentRating = val;
+      document.querySelectorAll('#enjoyment-stars .star-btn').forEach(btn => {
+        btn.classList.toggle('lit', parseInt(btn.getAttribute('data-val')) <= val);
+      });
+      document.getElementById('rating-error').classList.add('hidden');
+    }
+
+    /* ══ SUBMIT ══ */
+    async function handleSubmit(ev) {
+      ev.preventDefault();
+      let ok = true;
+
+      if (!selectedScene) {
+        document.getElementById('scene-error').classList.remove('hidden');
+        ok = false;
+      }
+
+      if (selectedMoods.length === 0) {
+        document.getElementById('mood-error').classList.remove('hidden');
+        ok = false;
+      }
+
+      const textRequired = [
+        ['scene-desc',   'scene-desc-error'],
+        ['prompt-used',  'prompt-error'],
+        ['music-link',   'music-link-error'],
+        ['reflection',   'reflection-error'],
+      ];
+
+      textRequired.forEach(([id, errId]) => {
+        const val = document.getElementById(id).value.trim();
+        document.getElementById(errId).classList.toggle('hidden', !!val);
+        if (!val) ok = false;
+      });
+
+      if (!selectedTool) {
+        document.getElementById('tool-error').classList.remove('hidden');
+        ok = false;
+      }
+
+      if (!selectedMatch) {
+        document.getElementById('match-error').classList.remove('hidden');
+        ok = false;
+      }
+
+      if (enjoymentRating === 0) {
+        document.getElementById('rating-error').classList.remove('hidden');
+        ok = false;
+      }
+
+      if (!ok) {
+        document.getElementById('form-error').classList.remove('hidden');
+        document.querySelector('[id$="-error"]:not(.hidden)')
+          ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      document.getElementById('form-error').classList.add('hidden');
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('submit-label').innerHTML = '<span class="spinner"></span> Submitting\u2026';
+
+      const payload = {
+        scene_chosen:      selectedScene,
+        mood_words:        selectedMoods.join(', '),
+        scene_description: document.getElementById('scene-desc').value.trim(),
+        prompt_used:       document.getElementById('prompt-used').value.trim(),
+        ai_tool_used:      selectedTool,
+        music_link:        document.getElementById('music-link').value.trim(),
+        mood_match_rating: selectedMatch,
+        reflection:        document.getElementById('reflection').value.trim(),
+      };
+
+      try {
+        await submitExercise(EXERCISE_SLUG, payload, { enjoymentRating: enjoymentRating || undefined });
+      } catch (err) {
+        console.error('[Week 4 Soundtrack] Submission error:', err.message);
+        btn.disabled = false;
+        document.getElementById('submit-label').textContent = 'Submit My Soundtrack \u2192';
+        document.getElementById('form-error-text').textContent = '\u26A0 Network error. Please try again or notify your teacher.';
+        document.getElementById('form-error').classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('success-name').textContent = studentName.split(' ')[0];
+      document.getElementById('success-screen').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+
+</body>
+
+</html>

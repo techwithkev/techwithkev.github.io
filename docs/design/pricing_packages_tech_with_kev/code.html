@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#171e00",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#044d65",
+                        "on-primary-fixed": "#001f2b",
+                        "inverse-surface": "#2f3133",
+                        "on-tertiary-fixed-variant": "#3d4d00",
+                        "surface-bright": "#f9f9fc",
+                        "primary-container": "#004b63",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#2a657e",
+                        "on-tertiary-container": "#9dc000",
+                        "surface-container-highest": "#e2e2e5",
+                        "tertiary": "#283300",
+                        "surface-container-low": "#f3f3f6",
+                        "inverse-primary": "#96ceeb",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#1a1c1e",
+                        "secondary-fixed": "#8cf3f3",
+                        "on-primary-container": "#83bad6",
+                        "background": "#f9f9fc",
+                        "on-background": "#1a1c1e",
+                        "surface": "#f9f9fc",
+                        "outline-variant": "#c0c7cd",
+                        "on-error": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "outline": "#71787d",
+                        "surface-container-high": "#e8e8ea",
+                        "primary-fixed": "#bfe8ff",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#3c4b00",
+                        "secondary-container": "#8cf3f3",
+                        "primary": "#003345",
+                        "tertiary-fixed": "#c8f323",
+                        "on-secondary-fixed-variant": "#004f4f",
+                        "primary-fixed-dim": "#96ceeb",
+                        "surface-dim": "#dadadc",
+                        "tertiary-fixed-dim": "#aed500",
+                        "surface-variant": "#e2e2e5",
+                        "on-secondary-container": "#007070",
+                        "on-secondary-fixed": "#002020",
+                        "on-surface-variant": "#40484c",
+                        "inverse-on-surface": "#f0f0f3",
+                        "error": "#ba1a1a",
+                        "secondary": "#006a6a",
+                        "surface-container": "#eeeef0",
+                        "secondary-fixed-dim": "#6fd7d6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-headline { font-family: 'Space Grotesk', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- Top Navigation -->
+<header class="sticky top-0 z-50 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm dark:shadow-none border-none transition-colors duration-300">
+<div class="flex justify-between items-center max-w-7xl mx-auto px-6 py-4">
+<div class="text-xl font-black text-[#003345] dark:text-[#004b63] tracking-tighter font-headline">
+                Tech With Kev
+            </div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-slate-600 dark:text-slate-400 hover:text-[#003345] font-['Space_Grotesk'] font-bold tracking-tight transition-all duration-200" href="#">Methodology</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-[#003345] font-['Space_Grotesk'] font-bold tracking-tight transition-all duration-200" href="#">Assessments</a>
+<a class="text-[#006a6a] font-bold border-b-2 border-[#006a6a] pb-1 font-['Space_Grotesk'] tracking-tight" href="#">Pricing</a>
+</nav>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-6 py-2.5 rounded-lg font-headline font-bold hover:brightness-110 active:scale-[0.98] transition-all">
+                Get Started
+            </button>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-6 py-20">
+<!-- Hero Section -->
+<section class="mb-24 text-center">
+<span class="inline-block px-3 py-1 mb-6 text-xs font-bold tracking-widest text-secondary uppercase bg-secondary-container/20 rounded">STRUCTURED FOR SUCCESS</span>
+<h1 class="text-5xl md:text-7xl font-headline font-black text-primary mb-8 tracking-tighter leading-none">
+                Master Logic. <br/><span class="text-secondary">Execute Precision.</span>
+</h1>
+<p class="text-on-surface-variant max-w-2xl mx-auto text-lg leading-relaxed font-body">
+                Highly targeted educational frameworks designed for Singapore's rigorous standards. Choose the path that matches your technical or mathematical ambitions.
+            </p>
+</section>
+<!-- Pricing Cards Section -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+<!-- Package 1: O-Level Math Intensive -->
+<div class="flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden relative group">
+<div class="h-1 bg-primary absolute top-0 left-0 right-0"></div>
+<div class="p-8 flex flex-col h-full">
+<div class="flex items-center justify-between mb-6">
+<span class="bg-surface-container-low text-primary px-3 py-1 rounded text-xs font-bold font-headline uppercase tracking-wider">Academic Excellence</span>
+<span class="material-symbols-outlined text-primary" data-icon="functions">functions</span>
+</div>
+<h3 class="text-2xl font-headline font-bold text-primary mb-2">O-Level Math Intensive</h3>
+<p class="text-sm text-on-surface-variant mb-6">Comprehensive drill-based approach for A-Math and E-Math mastery.</p>
+<div class="mb-8">
+<span class="text-4xl font-black font-headline text-primary">$480</span>
+<span class="text-on-surface-variant text-sm">/ 4 sessions</span>
+</div>
+<ul class="space-y-4 mb-10 flex-grow">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-sm mt-1" data-icon="check_circle">check_circle</span>
+<span class="text-sm text-on-surface">Weekly 2-hour thematic workshops</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-sm mt-1" data-icon="check_circle">check_circle</span>
+<span class="text-sm text-on-surface">Exam-style diagnostic tests</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-sm mt-1" data-icon="check_circle">check_circle</span>
+<span class="text-sm text-on-surface">Curated Singapore TYS solutions</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-sm mt-1" data-icon="check_circle">check_circle</span>
+<span class="text-sm text-on-surface">Target: Sec 3/4 &amp; O-Level Candidates</span>
+</li>
+</ul>
+<button class="w-full py-4 rounded-lg bg-surface-container-low text-primary font-bold font-headline border-2 border-transparent hover:border-primary transition-all">
+                        Inquire Details
+                    </button>
+</div>
+</div>
+<!-- Package 2: Python Fundamentals (Featured) -->
+<div class="flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden relative shadow-[0_20px_40px_rgba(0,31,43,0.06)] scale-105 z-10">
+<div class="h-2 bg-gradient-to-r from-secondary to-tertiary-fixed absolute top-0 left-0 right-0"></div>
+<div class="absolute -left-1 top-12 bottom-12 w-1 bg-tertiary-fixed rounded-full"></div>
+<div class="p-8 flex flex-col h-full bg-primary/5">
+<div class="flex items-center justify-between mb-6">
+<span class="bg-tertiary text-tertiary-fixed px-3 py-1 rounded text-xs font-bold font-headline uppercase tracking-wider">Bestseller</span>
+<span class="material-symbols-outlined text-tertiary" data-icon="terminal">terminal</span>
+</div>
+<h3 class="text-2xl font-headline font-bold text-primary mb-2">Python Fundamentals</h3>
+<p class="text-sm text-on-surface-variant mb-6">From syntax to software. Build a robust foundation in computational thinking.</p>
+<div class="mb-8">
+<span class="text-4xl font-black font-headline text-primary">$620</span>
+<span class="text-on-surface-variant text-sm">/ 8-week module</span>
+</div>
+<ul class="space-y-4 mb-10 flex-grow">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-tertiary text-sm mt-1" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-sm font-semibold text-on-surface">Live coding &amp; pair programming</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-tertiary text-sm mt-1" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-sm text-on-surface">Algorithms &amp; Logic structures</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-tertiary text-sm mt-1" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-sm text-on-surface">Portfolio Project: Final Web App</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-tertiary text-sm mt-1" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-sm text-on-surface">Target: Students (12+) &amp; Professionals</span>
+</li>
+</ul>
+<button class="w-full py-4 rounded-lg bg-gradient-to-br from-primary to-primary-container text-white font-bold font-headline hover:brightness-110 active:scale-[0.98] transition-all">
+                        Book a Trial
+                    </button>
+</div>
+</div>
+<!-- Package 3: 1-on-1 Personalized Coaching -->
+<div class="flex flex-col bg-surface-container-lowest rounded-xl overflow-hidden relative group">
+<div class="h-1 bg-outline-variant absolute top-0 left-0 right-0"></div>
+<div class="p-8 flex flex-col h-full">
+<div class="flex items-center justify-between mb-6">
+<span class="bg-surface-container-low text-on-surface-variant px-3 py-1 rounded text-xs font-bold font-headline uppercase tracking-wider">Elite Bespoke</span>
+<span class="material-symbols-outlined text-primary" data-icon="person_search">person_search</span>
+</div>
+<h3 class="text-2xl font-headline font-bold text-primary mb-2">1-on-1 Personalized</h3>
+<p class="text-sm text-on-surface-variant mb-6">Concierge education tailored to your specific pace and goals.</p>
+<div class="mb-8">
+<span class="text-4xl font-black font-headline text-primary">$150</span>
+<span class="text-on-surface-variant text-sm">/ hour</span>
+</div>
+<ul class="space-y-4 mb-10 flex-grow">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-sm mt-1" data-icon="check_circle">check_circle</span>
+<span class="text-sm text-on-surface">Direct access to Lead Tutor (Kev)</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-sm mt-1" data-icon="check_circle">check_circle</span>
+<span class="text-sm text-on-surface">Flexible scheduling (Online/Physical)</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-sm mt-1" data-icon="check_circle">check_circle</span>
+<span class="text-sm text-on-surface">Hybrid Math + Python roadmap</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary text-sm mt-1" data-icon="check_circle">check_circle</span>
+<span class="text-sm text-on-surface">Target: Specific remedial or enrichment</span>
+</li>
+</ul>
+<button class="w-full py-4 rounded-lg bg-surface-container-low text-primary font-bold font-headline border-2 border-transparent hover:border-primary transition-all">
+                        Inquire Availability
+                    </button>
+</div>
+</div>
+</section>
+<!-- Feature Comparison (Tabular Layout) -->
+<section class="mt-32">
+<div class="text-center mb-16">
+<h2 class="text-3xl font-headline font-bold text-primary">Framework Comparison</h2>
+<div class="w-12 h-1 bg-tertiary-fixed mx-auto mt-4"></div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full border-separate border-spacing-y-4">
+<thead>
+<tr class="text-left text-on-surface-variant font-headline text-xs uppercase tracking-widest">
+<th class="px-6 py-4 font-black">Capabilities</th>
+<th class="px-6 py-4 font-black">Intensive</th>
+<th class="px-6 py-4 font-black">Python Fund.</th>
+<th class="px-6 py-4 font-black">1-on-1</th>
+</tr>
+</thead>
+<tbody class="font-body text-sm">
+<tr class="bg-surface-container-low">
+<td class="px-6 py-5 rounded-l-lg font-bold text-primary">Custom Curriculum</td>
+<td class="px-6 py-5 text-on-surface-variant">Modular</td>
+<td class="px-6 py-5 text-on-surface-variant">Fixed Track</td>
+<td class="px-6 py-5 rounded-r-lg font-bold text-secondary">100% Bespoke</td>
+</tr>
+<tr class="bg-white">
+<td class="px-6 py-5 rounded-l-lg font-bold text-primary">Post-Session Support</td>
+<td class="px-6 py-5 text-on-surface-variant">Email Only</td>
+<td class="px-6 py-5 text-on-surface-variant">LMS Community</td>
+<td class="px-6 py-5 rounded-r-lg font-bold text-secondary">Priority WhatsApp</td>
+</tr>
+<tr class="bg-surface-container-low">
+<td class="px-6 py-5 rounded-l-lg font-bold text-primary">Assessment Frequency</td>
+<td class="px-6 py-5 text-on-surface-variant">Weekly</td>
+<td class="px-6 py-5 text-on-surface-variant">Bi-Weekly</td>
+<td class="px-6 py-5 rounded-r-lg font-bold text-secondary">Real-time</td>
+</tr>
+<tr class="bg-white">
+<td class="px-6 py-5 rounded-l-lg font-bold text-primary">Materials Provided</td>
+<td class="px-6 py-5 text-on-surface-variant">Study Guides</td>
+<td class="px-6 py-5 text-on-surface-variant">Code Notebooks</td>
+<td class="px-6 py-5 rounded-r-lg font-bold text-secondary">All Inclusive</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="mt-32 p-12 bg-primary rounded-xl relative overflow-hidden">
+<div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 20px 20px;"></div>
+<div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+<div class="max-w-xl">
+<h2 class="text-3xl font-headline font-black text-white mb-4 leading-tight">Unsure which track is right for you?</h2>
+<p class="text-primary-container text-on-primary-container">Book a free 15-minute diagnostic call where we evaluate your current standing and recommend the most efficient path forward.</p>
+</div>
+<button class="bg-tertiary-fixed text-on-tertiary-fixed px-10 py-4 rounded-lg font-headline font-black hover:brightness-110 active:scale-95 transition-all whitespace-nowrap shadow-xl">
+                    Schedule Diagnostic
+                </button>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-slate-50 dark:bg-[#001f2b] w-full rounded-none">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 max-w-7xl mx-auto px-8 py-16">
+<div class="md:col-span-1">
+<div class="text-lg font-bold text-[#003345] dark:text-[#f9f9fc] font-headline mb-6">Tech With Kev</div>
+<p class="text-slate-500 dark:text-slate-400 font-['Inter'] text-sm leading-relaxed mb-6">
+                    © 2024 Tech With Kev. Precision in Math &amp; Python.
+                </p>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-slate-400 hover:text-[#006a6a] cursor-pointer" data-icon="terminal">terminal</span>
+<span class="material-symbols-outlined text-slate-400 hover:text-[#006a6a] cursor-pointer" data-icon="calculate">calculate</span>
+</div>
+</div>
+<div>
+<h4 class="font-bold text-primary dark:text-white mb-4 font-headline">Contact</h4>
+<ul class="space-y-3">
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors text-sm" href="#">Bookings</a></li>
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors text-sm" href="#">Support</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-primary dark:text-white mb-4 font-headline">Social</h4>
+<ul class="space-y-3">
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors text-sm" href="#">Instagram</a></li>
+<li><a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors text-sm" href="#">LinkedIn</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-primary dark:text-white mb-4 font-headline">Updates</h4>
+<a class="text-slate-500 dark:text-slate-400 hover:text-[#006a6a] dark:hover:text-[#c8f323] transition-colors text-sm" href="#">Newsletter</a>
+<div class="mt-4 flex focus-within:ring-2 focus-within:ring-[#006a6a] rounded-lg overflow-hidden">
+<input class="bg-white dark:bg-slate-800 border-none px-3 py-2 text-sm w-full outline-none" placeholder="Email" type="email"/>
+<button class="bg-primary text-white p-2">
+<span class="material-symbols-outlined text-sm" data-icon="send">send</span>
+</button>
+</div>
+</div>
+</div>
+</footer>
+</body></html>
